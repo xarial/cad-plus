@@ -79,6 +79,7 @@ namespace Xarial.XTools.Xport.ViewModels
         private int m_ActiveTabIndex;
         private string m_OutputDirectory;
         private double m_Progress;
+        private CancellationTokenSource m_CurrentCancellationToken;
 
         public string Log
         {
@@ -133,8 +134,8 @@ namespace Xarial.XTools.Xport.ViewModels
         private ICommand m_AddFolderCommand;
         private ICommand m_DeleteInputCommand;
 
-        public ICommand ExportCommand => m_ExportCommand ?? (m_ExportCommand = new RelayCommand(Export));
-        public ICommand CancelExportCommand => m_CancelExportCommand ?? (m_CancelExportCommand = new RelayCommand(CancelExport));
+        public ICommand ExportCommand => m_ExportCommand ?? (m_ExportCommand = new RelayCommand(Export, () => !IsExportInProgress && Input.Any() && Format != 0));
+        public ICommand CancelExportCommand => m_CancelExportCommand ?? (m_CancelExportCommand = new RelayCommand(CancelExport, () => IsExportInProgress));
         public ICommand BrowseOutputDirectoryCommand => m_BrowseOutputDirectoryCommand ?? (m_BrowseOutputDirectoryCommand = new RelayCommand(BrowseOutputDirectory));
         public ICommand AddFileCommand => m_AddFileCommand ?? (m_AddFileCommand = new RelayCommand(AddFile));
         public ICommand AddFolderCommand => m_AddFolderCommand ?? (m_AddFolderCommand = new RelayCommand(AddFolder));
@@ -156,8 +157,6 @@ namespace Xarial.XTools.Xport.ViewModels
             Format = Format_e.Html | Format_e.Pdf;
             Filter = "*.*";
         }
-
-        private CancellationTokenSource m_CurrentCancellationToken;
 
         private async void Export() 
         {   
@@ -189,6 +188,7 @@ namespace Xarial.XTools.Xport.ViewModels
             }
             finally 
             {
+                Progress = 0;
                 IsExportInProgress = false;
             }
         }

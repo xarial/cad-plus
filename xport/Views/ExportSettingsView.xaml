@@ -6,6 +6,9 @@
              xmlns:ui="clr-namespace:Xarial.XTools.Xport.UI"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="500">
+    <UserControl.Resources>
+        <ui:BooleanUniversalConverter x:Key="revBoolConv" TrueValue="False" FalseValue="True"/>
+    </UserControl.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
@@ -13,7 +16,7 @@
         </Grid.RowDefinitions>
         <TabControl Margin="2" SelectedIndex="{Binding Path=ActiveTabIndex}">
             <TabItem Header="Settings">
-                <Grid Grid.IsSharedSizeScope="True">
+                <Grid Grid.IsSharedSizeScope="True" IsEnabled="{Binding Path=IsExportInProgress, Converter={StaticResource revBoolConv}}">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="*"/>
                         <RowDefinition Height="Auto"/>

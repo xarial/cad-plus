@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+    <Fragment>
+        <DirectoryRef Id="INSTALLFOLDER">
+            <Component Id="cmpCC5600A0E0013FC2479752FF2E317D0E" Guid="*">
+                <File Id="filA37EA31C1F18E8079A0153A07EC2C1F2" KeyPath="yes" Source="$(var.SourceOutDir)\CommandLine.dll" />
+            </Component>
+            <Component Id="cmp885FEB504E1B89D60A1FE9D0A6E52699" Guid="*">
+                <File Id="fil63CF5C1E350D1D1C6D05CD323307CF3A" KeyPath="yes" Source="$(var.SourceOutDir)\xport.exe.config" />
+            </Component>
+        </DirectoryRef>
+    </Fragment>
+    <Fragment>
+        <ComponentGroup Id="FilesRegGroup">
+            <ComponentRef Id="cmpCC5600A0E0013FC2479752FF2E317D0E" />
+            <ComponentRef Id="cmp885FEB504E1B89D60A1FE9D0A6E52699" />
+        </ComponentGroup>
+    </Fragment>
+</Wix>

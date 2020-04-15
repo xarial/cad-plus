@@ -5,8 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
         xmlns:views="clr-namespace:Xarial.XTools.Xport.Views"
-        Title="MainWindow" Height="450" Width="800">
-    <Grid>
+        Title="xPort" Height="450" Width="800">
+    <Grid Margin="5">
         <views:ExportSettingsView/>
     </Grid>
 </Window>
