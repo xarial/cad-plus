@@ -7,8 +7,10 @@
 
 using eDrawings.Interop.EModelViewControl;
 using System;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Xarial.XTools.Xport.UI;
 
 namespace Xarial.XTools.Xport.Core
 {
@@ -92,6 +94,9 @@ namespace Xarial.XTools.Xport.Core
                 {
                     throw new Exception("Failed to access eDrawings control");
                 }
+
+                const int SIMPLE_UI = 0;
+                m_Control.FullUI = SIMPLE_UI;
             }
         }
 

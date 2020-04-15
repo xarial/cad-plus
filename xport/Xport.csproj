@@ -71,6 +71,7 @@
     </ApplicationDefinition>
     <Compile Include="Reflection\EnumHelper.cs" />
     <Compile Include="UI\EnumComboBox.cs" />
+    <Compile Include="UI\FsoBrowser.cs" />
     <Compile Include="UI\RelayCommand.cs" />
     <Compile Include="ViewModels\ExporterSettingsVM.cs" />
     <Compile Include="Views\ExportSettingsView.xaml.cs">

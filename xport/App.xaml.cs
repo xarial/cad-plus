@@ -22,8 +22,18 @@ namespace Xarial.XTools.Xport
     public partial class App : Application
     {
         [DllImport("Kernel32.dll")]
-        public static extern bool AttachConsole(int processId);
+        private static extern bool AttachConsole(int processId);
 
+        private class ConsoleProgressWriter : IProgress<double>
+        {
+            public void Report(double value)
+            {
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine($"Progress: {(value * 100).ToString("F")}%");
+                Console.ResetColor();
+            }
+        }
+        
         protected override void OnStartup(StartupEventArgs e)
         {
             if (e.Args.Any())
@@ -83,7 +93,7 @@ namespace Xarial.XTools.Xport
                 ContinueOnError = args.ContinueOnError
             };
 
-            using (var exporter = new Exporter(Console.Out))
+            using (var exporter = new Exporter(Console.Out, new ConsoleProgressWriter()))
             {
                 await exporter.Export(opts).ConfigureAwait(false);
             }

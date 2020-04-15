@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -20,14 +21,16 @@ namespace Xarial.XTools.Xport.Core
     {
         private readonly EDrawingsHost m_EdrawingsControl;
         private readonly TextWriter m_Logger;
+        private readonly IProgress<double> m_ProgressHandler;
 
-        public Exporter(TextWriter logger)
+        public Exporter(TextWriter logger, IProgress<double> progressHandler = null)
         {
             m_EdrawingsControl = new EDrawingsHost();
             m_Logger = logger;
+            m_ProgressHandler = progressHandler;
         }
-
-        public async Task Export(ExportOptions opts) 
+        
+        public async Task Export(ExportOptions opts, CancellationToken token = default) 
         {
             var curTime = DateTime.Now;
 
@@ -52,9 +55,16 @@ namespace Xarial.XTools.Xport.Core
 
                     foreach (var outFile in outFiles)
                     {
+                        if (token.IsCancellationRequested) 
+                        {
+                            m_Logger.WriteLine($"Cancelled by the user");
+                            return;
+                        }
+
                         m_Logger.WriteLine($"Exporting '{file}' to '{outFile}");
                         await ExportFile(outFile, opts.ContinueOnError);
-                        m_Logger.WriteLine($"Progress '{(double)++curJob / (double)totalJobs}'");
+                        
+                        m_ProgressHandler?.Report(++curJob / (double)totalJobs);
                     }
 
                     m_EdrawingsControl.CloseDocument();
