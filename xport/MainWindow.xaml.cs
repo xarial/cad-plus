@@ -19,6 +19,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Xarial.XTools.Xport.ViewModels;
 
 namespace Xarial.XTools.Xport
 {
@@ -27,6 +28,7 @@ namespace Xarial.XTools.Xport
         public MainWindow()
         {
             InitializeComponent();
+            this.DataContext = new ExporterSettingsVM();
         }
     }
 }

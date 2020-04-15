@@ -1,0 +1,68 @@
+﻿<UserControl x:Class="Xarial.XTools.Xport.Views.ExportSettingsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:ui="clr-namespace:Xarial.XTools.Xport.UI"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="500">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <TabControl Margin="2">
+            <TabItem Header="Settings">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <ListBox Grid.Row="0" Margin="2" ItemsSource="{Binding Path=Input}"/>
+                    <Grid Grid.Row="1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Filter:" Grid.Column="0" Margin="2"/>
+                        <TextBox Text="{Binding Path=Filter, UpdateSourceTrigger=PropertyChanged}" Grid.Column="1" Margin="2"/>
+                    </Grid>
+                    <Grid Grid.Row="2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Format:" Grid.Column="0" Margin="2"/>
+                        <ui:EnumComboBox Value="{Binding Path=Format}" Margin="2" Grid.Column="2" />
+                    </Grid>
+                    <CheckBox Grid.Row="3" Margin="2" IsChecked="{Binding Path=ContinueOnError}">Continue on error</CheckBox>
+                </Grid>
+            </TabItem>
+            <TabItem Header="Log">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBox Margin="2" AcceptsReturn="True" AcceptsTab="True" Grid.ColumnSpan="2"
+                             Text="{Binding Path=Log, Mode=OneWay}" IsReadOnly="True"/>
+                    <ProgressBar Grid.Row="1"/>
+                    <Button Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2"
+                            Command="{Binding Path=CancelExportCommand}">
+                        <TextBlock Text="Cancel" Margin="2"/>
+                    </Button>
+                </Grid>
+            </TabItem>
+        </TabControl>
+        <Button Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2"
+                Command="{Binding Path=ExportCommand}">
+            <TextBlock Text="Export" Margin="2"/>
+        </Button>
+    </Grid>
+</UserControl>
