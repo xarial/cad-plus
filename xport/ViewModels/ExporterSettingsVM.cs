@@ -2,11 +2,13 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
 using Xarial.XTools.Xport.Core;
 using Xarial.XTools.Xport.Reflection;
@@ -15,27 +17,74 @@ using Xarial.XTools.Xport.UI;
 namespace Xarial.XTools.Xport.ViewModels
 {
     [AttributeUsage(AttributeTargets.Field)]
-    public class FormatExtensionAttribute : Attribute 
+    public class FormatExtensionAttribute : DisplayNameAttribute
     {
         public string Extension { get; }
 
-        public FormatExtensionAttribute(string ext) 
+        public FormatExtensionAttribute(string ext) : base(ext)
         {
             Extension = ext;
+        }
+    }
+
+    [AttributeUsage(AttributeTargets.Field)]
+    public class EnumDisplayNameAttribute : DescriptionAttribute 
+    {
+        public EnumDisplayNameAttribute(string dispName) : base(dispName)
+        {
         }
     }
 
     [Flags]
     public enum Format_e 
     {
+        [EnumDisplayName("eDrawings Files (*.eprt, *.easm, *.edrw)")]
+        [FormatExtension("e")]
+        Edrw = 1 << 0,
+
+        [EnumDisplayName("eDrawings Zip Files (*.zip)")]
+        [FormatExtension("zip")]
+        Zip = 1 << 1,
+
+        [EnumDisplayName("eDrawings Executable Files (*.exe)")]
+        [FormatExtension("exe")]
+        Exe = 1 << 2,
+
+        [EnumDisplayName("eDrawings Web Html Files (*.html)")]
         [FormatExtension("html")]
-        Html = 1 << 0,
+        Html = 1 << 3,
 
+        [EnumDisplayName("eDrawings ActiveX Html Files (*.htm)")]
+        [FormatExtension("htm")]
+        Htm = 1 << 4,
+
+        [EnumDisplayName("Stereolithography Files (*.stl)")]
+        [FormatExtension("stl")]
+        Stl = 1 << 5,
+
+        [EnumDisplayName("Bitmap Files (*.bmp)")]
+        [FormatExtension("bmp")]
+        Bmp = 1 << 6,
+
+        [EnumDisplayName("TIFF Image Files (*.tif)")]
+        [FormatExtension("tif")]
+        Tiff = 1 << 7,
+
+        [EnumDisplayName("JPEG Image Files (*.jpg)")]
+        [FormatExtension("jpg")]
+        Jpeg = 1 << 8,
+
+        [EnumDisplayName("PNG Image Files (*.png)")]
+        [FormatExtension("png")]
+        Png = 1 << 9,
+
+        [EnumDisplayName("GIF Image Files (*.gif)")]
+        [FormatExtension("gif")]
+        Gif = 1 << 10,
+
+        [EnumDisplayName("PDF Files (*.pdf)")]
         [FormatExtension("pdf")]
-        Pdf = 1 << 1,
-
-        [FormatExtension("iges")]
-        Iges = 1 << 2
+        Pdf = 1 << 11,
     }
 
     public class LogWriter : TextWriter
@@ -49,7 +98,7 @@ namespace Xarial.XTools.Xport.ViewModels
 
         public override void WriteLine(string value)
         {
-            m_Vm.Log += Environment.NewLine + value;
+            m_Vm.Log += !string.IsNullOrEmpty(m_Vm.Log) ? Environment.NewLine + value : value;
         }
 
         public override Encoding Encoding => Encoding.Default;
@@ -80,6 +129,7 @@ namespace Xarial.XTools.Xport.ViewModels
         private string m_OutputDirectory;
         private double m_Progress;
         private CancellationTokenSource m_CurrentCancellationToken;
+        private bool m_IsSameDirectoryOutput;
 
         public string Log
         {
@@ -107,6 +157,16 @@ namespace Xarial.XTools.Xport.ViewModels
             set
             {
                 m_IsExportInProgress = value;
+                NotifyChanged();
+            }
+        }
+
+        public bool IsSameDirectoryOutput 
+        {
+            get => m_IsSameDirectoryOutput;
+            set 
+            {
+                m_IsSameDirectoryOutput = value;
                 NotifyChanged();
             }
         }
@@ -154,8 +214,12 @@ namespace Xarial.XTools.Xport.ViewModels
         public ExporterSettingsVM() 
         {
             Input = new ObservableCollection<string>();
-            Format = Format_e.Html | Format_e.Pdf;
+            Format = Format_e.Html;
             Filter = "*.*";
+
+            //
+            Input.Add(@"D:\Demo\chest-of-drawer\STOWE_COD_Apaksa.SLDPRT");
+            //
         }
 
         private async void Export() 
@@ -172,7 +236,7 @@ namespace Xarial.XTools.Xport.ViewModels
                     Input = Input?.ToArray(),
                     Filter = Filter,
                     Format = ExtractFormats(),
-                    OutputDirectory = OutputDirectory,
+                    OutputDirectory = IsSameDirectoryOutput ? "" : OutputDirectory,
                     ContinueOnError = ContinueOnError
                 };
 
@@ -182,9 +246,12 @@ namespace Xarial.XTools.Xport.ViewModels
                 {
                     await exporter.Export(opts, m_CurrentCancellationToken.Token).ConfigureAwait(false);
                 }
+
+                MessageBox.Show("Operation completed", "xPort", MessageBoxButton.OK, MessageBoxImage.Information);
             }
             catch
             {
+                MessageBox.Show("Processing error", "xPort", MessageBoxButton.OK, MessageBoxImage.Error);
             }
             finally 
             {

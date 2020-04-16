@@ -132,6 +132,26 @@ namespace Xarial.XTools.Xport.UI
                 return title;
             }
 
+            internal static string GetDescription(Enum value)
+            {
+                string title = "";
+
+                if (value != null)
+                {
+                    if (!value.TryGetAttribute<DescriptionAttribute>(a => title = a.Description))
+                    {
+                        title = GetTitle(value);
+
+                        if (string.IsNullOrEmpty(title))
+                        {
+                            title = value.ToString();
+                        }
+                    }
+                }
+
+                return title;
+            }
+
             private readonly EnumComboBox m_Parent;
             private readonly Enum m_Value;
             private readonly Enum[] m_AffectedFlags;
@@ -156,7 +176,7 @@ namespace Xarial.XTools.Xport.UI
                     Type = EnumItemType_e.Default;
                 }
 
-                Title = GetTitle(m_Value);
+                Title = GetDescription(m_Value);
 
                 if (!value.TryGetAttribute<DescriptionAttribute>(a => Description = a.Description))
                 {

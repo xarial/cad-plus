@@ -36,6 +36,11 @@ namespace Xarial.XTools.Xport
         
         protected override void OnStartup(StartupEventArgs e)
         {
+            System.Diagnostics.Debug.Assert(false);
+
+            Application.Current.DispatcherUnhandledException += OnDispatcherUnhandledException;
+            AppDomain.CurrentDomain.UnhandledException += OnDomainUnhandledException;
+
             if (e.Args.Any())
             {
                 AttachConsole(-1);
@@ -62,9 +67,10 @@ namespace Xarial.XTools.Xport
                 {
                     try
                     {
-                        var task = RunConsoleExporter(args);
-                        task.ConfigureAwait(false);
-                        task.Wait();
+                        RunConsoleExporter(args)
+                            .ConfigureAwait(false)
+                            .GetAwaiter()
+                            .GetResult();
                         res = true;
                     }
                     catch (Exception ex)
@@ -80,6 +86,15 @@ namespace Xarial.XTools.Xport
             {
                 base.OnStartup(e);
             }
+        }
+
+        private void OnDomainUnhandledException(object sender, UnhandledExceptionEventArgs e)
+        {
+        }
+
+        private void OnDispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
+        {
+            
         }
 
         private async Task RunConsoleExporter(Arguments args) 

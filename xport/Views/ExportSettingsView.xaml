@@ -70,13 +70,18 @@
                             <ColumnDefinition Width="Auto" SharedSizeGroup="Label"/>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
                         <TextBlock Text="Output Folder:" Grid.Column="0" Margin="2"/>
-                        <TextBox Text="{Binding Path=OutputDirectory, UpdateSourceTrigger=PropertyChanged}" Grid.Column="1" Margin="2"/>
+                        <TextBox Text="{Binding Path=OutputDirectory, UpdateSourceTrigger=PropertyChanged}" 
+                                 IsEnabled="{Binding Path=IsSameDirectoryOutput, Converter={StaticResource revBoolConv}}"
+                                 Grid.Column="1" Margin="2"/>
                         <Button Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2"
-                            Command="{Binding Path=BrowseOutputDirectoryCommand}">
+                                IsEnabled="{Binding Path=IsSameDirectoryOutput, Converter={StaticResource revBoolConv}}"
+                                Command="{Binding Path=BrowseOutputDirectoryCommand}">
                             <TextBlock Text="Browse..." Margin="2"/>
                         </Button>
+                        <CheckBox Grid.Column="3" VerticalAlignment="Center" Margin="2" IsChecked="{Binding Path=IsSameDirectoryOutput}">Same directory</CheckBox>
                     </Grid>
                     <CheckBox Grid.Row="4" Margin="2" IsChecked="{Binding Path=ContinueOnError}">Continue on error</CheckBox>
                 </Grid>

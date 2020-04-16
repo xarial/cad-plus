@@ -2,18 +2,26 @@
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
     <Fragment>
         <DirectoryRef Id="INSTALLFOLDER">
-            <Component Id="cmpCC5600A0E0013FC2479752FF2E317D0E" Guid="*">
-                <File Id="filA37EA31C1F18E8079A0153A07EC2C1F2" KeyPath="yes" Source="$(var.SourceOutDir)\CommandLine.dll" />
+            <Component Id="cmp01717950957F7944BD3CB4B4BD99A14E" Guid="*">
+                <File Id="fil07142CC9C172097D9774CE03EAE54D46" KeyPath="yes" Source="$(var.SourceOutDir)\eDrawings.Interop.EModelViewControl.dll" />
             </Component>
-            <Component Id="cmp885FEB504E1B89D60A1FE9D0A6E52699" Guid="*">
-                <File Id="fil63CF5C1E350D1D1C6D05CD323307CF3A" KeyPath="yes" Source="$(var.SourceOutDir)\xport.exe.config" />
+            <Component Id="cmpA817135223E9EE6C10FF7411363E16A1" Guid="*">
+                <File Id="fil8897D70D0E489CF73DEBAFE206FF5FA8" KeyPath="yes" Source="$(var.SourceOutDir)\Exporter.exe" />
+            </Component>
+            <Component Id="cmp207EB03AC4ADE7E8A572FCAEBBA71F5B" Guid="*">
+                <File Id="fil3E187AE2E74BDE59F623EB3A4E7EC63D" KeyPath="yes" Source="$(var.SourceOutDir)\Exporter.exe.config" />
+            </Component>
+            <Component Id="cmp968E6701DCBC68610EBB1F9D89291DD0" Guid="*">
+                <File Id="fil73BCA1EF0594E8C88F1F62A559B066AF" KeyPath="yes" Source="$(var.SourceOutDir)\SwEDrawingsHost.dll" />
             </Component>
         </DirectoryRef>
     </Fragment>
     <Fragment>
         <ComponentGroup Id="FilesRegGroup">
-            <ComponentRef Id="cmpCC5600A0E0013FC2479752FF2E317D0E" />
-            <ComponentRef Id="cmp885FEB504E1B89D60A1FE9D0A6E52699" />
+            <ComponentRef Id="cmp01717950957F7944BD3CB4B4BD99A14E" />
+            <ComponentRef Id="cmpA817135223E9EE6C10FF7411363E16A1" />
+            <ComponentRef Id="cmp207EB03AC4ADE7E8A572FCAEBBA71F5B" />
+            <ComponentRef Id="cmp968E6701DCBC68610EBB1F9D89291DD0" />
         </ComponentGroup>
     </Fragment>
 </Wix>

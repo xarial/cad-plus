@@ -5,11 +5,12 @@
 //License: https://xtools.xarial.com/license/
 //*********************************************************************
 
-using eDrawings.Interop.EModelViewControl;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Runtime.ExceptionServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -19,19 +20,19 @@ namespace Xarial.XTools.Xport.Core
 {
     public class Exporter : IDisposable
     {
-        private readonly EDrawingsHost m_EdrawingsControl;
         private readonly TextWriter m_Logger;
         private readonly IProgress<double> m_ProgressHandler;
 
         public Exporter(TextWriter logger, IProgress<double> progressHandler = null)
         {
-            m_EdrawingsControl = new EDrawingsHost();
             m_Logger = logger;
             m_ProgressHandler = progressHandler;
         }
         
         public async Task Export(ExportOptions opts, CancellationToken token = default) 
         {
+            m_Logger.WriteLine($"Exporting Started");
+
             var curTime = DateTime.Now;
 
             var jobs = ParseOptions(opts);
@@ -43,70 +44,105 @@ namespace Xarial.XTools.Xport.Core
             {
                 var file = job.Key;
 
-                try
+                var outFiles = job.Value;
+
+                foreach (var outFile in outFiles)
                 {
-                    var outFiles = job.Value;
-
-                    m_Logger.WriteLine($"Opening '{file}'...");
-
-                    await m_EdrawingsControl.OpenDocument(file).ConfigureAwait(false);
-
-                    m_Logger.WriteLine($"'{file}' opened. Starting exporting...");
-
-                    foreach (var outFile in outFiles)
+                    try
                     {
-                        if (token.IsCancellationRequested) 
+                        var desFile = outFile;
+
+                        int index = 0;
+
+                        while (File.Exists(desFile))
+                        {
+                            var outDir = Path.GetDirectoryName(outFile);
+                            var fileName = Path.GetFileNameWithoutExtension(outFile);
+                            var ext = Path.GetExtension(outFile);
+
+                            fileName = $"{fileName} ({++index})";
+
+                            desFile = Path.Combine(outDir, fileName + ext);
+                        }
+
+                        if (token.IsCancellationRequested)
                         {
                             m_Logger.WriteLine($"Cancelled by the user");
                             return;
                         }
 
-                        m_Logger.WriteLine($"Exporting '{file}' to '{outFile}");
-                        await ExportFile(outFile, opts.ContinueOnError);
-                        
-                        m_ProgressHandler?.Report(++curJob / (double)totalJobs);
+                        var prcStartInfo = new ProcessStartInfo()
+                        {
+                            CreateNoWindow = true,
+                            UseShellExecute = false,
+                            FileName = typeof(StandAloneExporter.Program).Assembly.Location,
+                            Arguments = $"\"{file}\" \"{outFile}\""
+                        };
+
+                        var res = await StartWaitProcessAsync(prcStartInfo, token).ConfigureAwait(false);
+
+                        if (!res)
+                        {
+                            throw new Exception("Failed to process the file");
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        m_Logger.WriteLine($"Error while processing '{file}': {ex.Message}");
+                        if (!opts.ContinueOnError)
+                        {
+                            throw ex;
+                        }
                     }
 
-                    m_EdrawingsControl.CloseDocument();
-                    m_Logger.WriteLine($"Closing '{file}'...");
-                }
-                catch (Exception ex)
-                {
-                    m_Logger.WriteLine($"Error while processing '{file}': {ex.Message}");
-                    if (!opts.ContinueOnError) 
-                    {
-                        throw ex;
-                    }
+                    m_ProgressHandler?.Report(++curJob / (double)totalJobs);
                 }
             }
 
             m_Logger.WriteLine($"Exporting completed in {DateTime.Now.Subtract(curTime).ToString(@"hh\:mm\:ss")}");
         }
 
-        private async Task ExportFile(string outFile, bool continueOnError)
+        private Task<bool> StartWaitProcessAsync(ProcessStartInfo prcStartInfo,
+            CancellationToken cancellationToken = default(CancellationToken))
         {
-            try
-            {
-                var ext = Path.GetExtension(outFile);
+            var tcs = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
 
-                if (!string.Equals(ext, ".pdf", StringComparison.CurrentCultureIgnoreCase))
-                {
-                    await m_EdrawingsControl.SaveDocument(outFile).ConfigureAwait(false);
-                }
-                else
-                {
-                    await m_EdrawingsControl.PrintToFile(outFile).ConfigureAwait(false);
-                }
-            }
-            catch (Exception ex)
-            {
-                m_Logger.WriteLine($"Error while exporting to '{outFile}': {ex.Message}");
+            var process = new Process();
 
-                if (!continueOnError)
+            var isCancelled = false;
+
+            process.StartInfo = prcStartInfo;
+            process.EnableRaisingEvents = true;
+            prcStartInfo.RedirectStandardOutput = true;
+            process.OutputDataReceived += (sender, e) =>
+            {
+                var tag = StandAloneExporter.Program.LOG_MESSAGE_TAG;
+                if (e.Data?.StartsWith(tag) == true)
                 {
-                    throw ex;
+                    m_Logger.WriteLine(e.Data.Substring(tag.Length));
                 }
+            };
+            process.Exited += (sender, args) =>
+            {
+                if (!isCancelled)
+                {
+                    tcs.SetResult(process.ExitCode == 0);
+                }
+            };
+
+            if (cancellationToken != default(CancellationToken))
+            {
+                cancellationToken.Register(() =>
+                {
+                    isCancelled = true;
+                    process.Kill();
+                    tcs.SetCanceled();
+                });
             }
+
+            process.Start();
+            process.BeginOutputReadLine();
+            return tcs.Task;
         }
 
         private Dictionary<string, string[]> ParseOptions(ExportOptions opts)
@@ -115,14 +151,12 @@ namespace Xarial.XTools.Xport.Core
 
             var outDir = opts.OutputDirectory;
 
-            if (!Directory.Exists(outDir))
+            if (!string.IsNullOrEmpty(outDir))
             {
-                Directory.CreateDirectory(outDir);
-            }
-
-            if (string.IsNullOrEmpty(outDir))
-            {
-                outDir = "";
+                if (!Directory.Exists(outDir))
+                {
+                    Directory.CreateDirectory(outDir);
+                }
             }
 
             var filter = opts.Filter;
@@ -194,7 +228,6 @@ namespace Xarial.XTools.Xport.Core
         
         public void Dispose()
         {
-            m_EdrawingsControl.Dispose();
         }
     }
 }
