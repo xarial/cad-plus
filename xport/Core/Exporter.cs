@@ -79,7 +79,13 @@ namespace Xarial.XTools.Xport.Core
                             Arguments = $"\"{file}\" \"{outFile}\""
                         };
 
-                        var res = await StartWaitProcessAsync(prcStartInfo, token).ConfigureAwait(false);
+                        var tcs = CancellationTokenSource.CreateLinkedTokenSource(token);
+                        if (opts.Timeout > 0)
+                        {
+                            tcs.CancelAfter(TimeSpan.FromSeconds(opts.Timeout));
+                        }
+                        
+                        var res = await StartWaitProcessAsync(prcStartInfo, tcs.Token).ConfigureAwait(false);
 
                         if (!res)
                         {

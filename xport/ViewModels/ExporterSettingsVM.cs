@@ -216,10 +216,6 @@ namespace Xarial.XTools.Xport.ViewModels
             Input = new ObservableCollection<string>();
             Format = Format_e.Html;
             Filter = "*.*";
-
-            //
-            Input.Add(@"D:\Demo\chest-of-drawer\STOWE_COD_Apaksa.SLDPRT");
-            //
         }
 
         private async void Export() 
@@ -255,7 +251,6 @@ namespace Xarial.XTools.Xport.ViewModels
             }
             finally 
             {
-                Progress = 0;
                 IsExportInProgress = false;
             }
         }

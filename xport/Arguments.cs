@@ -31,5 +31,8 @@ namespace Xarial.XTools.Xport
 
         [Option('e', "error", Required = false, HelpText = "If this option is used export will continue if any of the files or formats failed to process, otherwise the export will terminate")]
         public bool ContinueOnError { get; set; }
+
+        [Option('t', "timeout", Required = false, HelpText = "Timeout in seconds for processing a single item (e.g. exporting single file to a single format)")]
+        public int Timeout { get; set; }
     }
 }

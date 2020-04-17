@@ -102,6 +102,7 @@ namespace Xarial.XTools.Xport
                 Input = args.Input?.ToArray(),
                 Filter = args.Filter,
                 Format = args.Format?.ToArray(),
+                Timeout = args.Timeout,
                 OutputDirectory = args.OutputDirectory,
                 ContinueOnError = args.ContinueOnError
             };

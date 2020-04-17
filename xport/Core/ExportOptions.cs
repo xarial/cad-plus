@@ -20,5 +20,6 @@ namespace Xarial.XTools.Xport.Core
         public string OutputDirectory { get; set; }
         public string[] Format { get; set; }
         public bool ContinueOnError { get; set; }
+        public int Timeout { get; set; }
     }
 }

@@ -25,14 +25,12 @@ namespace Xarial.XTools.Xport.SwEDrawingsHost
         private readonly Process m_Process;
         private readonly string m_PopupClassName;
 
-        public PopupKiller(Process prc) : this(prc, TimeSpan.FromSeconds(3))
+        public PopupKiller(Process prc) : this(prc, TimeSpan.FromSeconds(1))
         {
         }
 
         public PopupKiller(Process prc, TimeSpan period, string popupClassName = "#32770")
         {
-            Debug.Assert(false);
-
             m_Process = prc;
             m_PopupClassName = popupClassName;
 
