@@ -135,8 +135,11 @@ namespace Xarial.XTools.Xport.Core
                 cancellationToken.Register(() =>
                 {
                     isCancelled = true;
-                    process.Kill();
-                    tcs.SetCanceled();
+                    if (!process.HasExited)
+                    {
+                        process.Kill();
+                    }
+                    tcs.TrySetCanceled();
                 });
             }
 

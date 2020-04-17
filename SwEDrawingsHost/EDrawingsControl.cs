@@ -1,6 +1,7 @@
 ﻿using eDrawings.Interop.EModelViewControl;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -20,8 +21,12 @@ namespace Xarial.XTools.Xport.EDrawingsHost
 
         private readonly EModelViewControl m_Control;
 
+        private readonly PopupKiller m_PopupKiller;
+
         public EDrawingsControl()
         {
+            m_PopupKiller = new PopupKiller(Process.GetCurrentProcess());
+
             m_Control = Load();
 
             m_Control.OnFinishedLoadingDocument += OnFinishedLoadingDocument;
@@ -111,6 +116,8 @@ namespace Xarial.XTools.Xport.EDrawingsHost
 
         public void Dispose()
         {
+            m_PopupKiller.Dispose();
+
             m_Control.OnFinishedLoadingDocument -= OnFinishedLoadingDocument;
             m_Control.OnFailedLoadingDocument -= OnFailedLoadingDocument;
 

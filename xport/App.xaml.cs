@@ -36,8 +36,6 @@ namespace Xarial.XTools.Xport
         
         protected override void OnStartup(StartupEventArgs e)
         {
-            System.Diagnostics.Debug.Assert(false);
-
             Application.Current.DispatcherUnhandledException += OnDispatcherUnhandledException;
             AppDomain.CurrentDomain.UnhandledException += OnDomainUnhandledException;
 
