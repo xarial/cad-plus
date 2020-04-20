@@ -1,4 +1,11 @@
-﻿using eDrawings.Interop.EModelViewControl;
+﻿//*********************************************************************
+//xTools
+//Copyright(C) 2020 Xarial Pty Limited
+//Product URL: https://xtools.xarial.com
+//License: https://xtools.xarial.com/license/
+//*********************************************************************
+
+using eDrawings.Interop.EModelViewControl;
 using System;
 using System.Collections.Generic;
 using System.Linq;

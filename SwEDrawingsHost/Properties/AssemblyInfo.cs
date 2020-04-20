@@ -1,4 +1,11 @@
-﻿using System.Reflection;
+﻿//*********************************************************************
+//xTools
+//Copyright(C) 2020 Xarial Pty Limited
+//Product URL: https://xtools.xarial.com
+//License: https://xtools.xarial.com/license/
+//*********************************************************************
+
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 

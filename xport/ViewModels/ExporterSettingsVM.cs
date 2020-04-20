@@ -1,127 +1,31 @@
-﻿using System;
+﻿//*********************************************************************
+//xTools
+//Copyright(C) 2020 Xarial Pty Limited
+//Product URL: https://xtools.xarial.com
+//License: https://xtools.xarial.com/license/
+//*********************************************************************
+
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using Xarial.XToolkit.Reflection;
+using Xarial.XToolkit.Wpf;
+using Xarial.XToolkit.Wpf.Extensions;
+using Xarial.XToolkit.Wpf.Utils;
 using Xarial.XTools.Xport.Core;
-using Xarial.XTools.Xport.Reflection;
-using Xarial.XTools.Xport.UI;
 
 namespace Xarial.XTools.Xport.ViewModels
 {
-    [AttributeUsage(AttributeTargets.Field)]
-    public class FormatExtensionAttribute : DisplayNameAttribute
+    public class ExporterSettingsVM : INotifyPropertyChanged
     {
-        public string Extension { get; }
-
-        public FormatExtensionAttribute(string ext) : base(ext)
-        {
-            Extension = ext;
-        }
-    }
-
-    [AttributeUsage(AttributeTargets.Field)]
-    public class EnumDisplayNameAttribute : DescriptionAttribute 
-    {
-        public EnumDisplayNameAttribute(string dispName) : base(dispName)
-        {
-        }
-    }
-
-    [Flags]
-    public enum Format_e 
-    {
-        [EnumDisplayName("eDrawings Files (*.eprt, *.easm, *.edrw)")]
-        [FormatExtension("e")]
-        Edrw = 1 << 0,
-
-        [EnumDisplayName("eDrawings Zip Files (*.zip)")]
-        [FormatExtension("zip")]
-        Zip = 1 << 1,
-
-        [EnumDisplayName("eDrawings Executable Files (*.exe)")]
-        [FormatExtension("exe")]
-        Exe = 1 << 2,
-
-        [EnumDisplayName("eDrawings Web Html Files (*.html)")]
-        [FormatExtension("html")]
-        Html = 1 << 3,
-
-        [EnumDisplayName("eDrawings ActiveX Html Files (*.htm)")]
-        [FormatExtension("htm")]
-        Htm = 1 << 4,
-
-        [EnumDisplayName("Stereolithography Files (*.stl)")]
-        [FormatExtension("stl")]
-        Stl = 1 << 5,
-
-        [EnumDisplayName("Bitmap Files (*.bmp)")]
-        [FormatExtension("bmp")]
-        Bmp = 1 << 6,
-
-        [EnumDisplayName("TIFF Image Files (*.tif)")]
-        [FormatExtension("tif")]
-        Tiff = 1 << 7,
-
-        [EnumDisplayName("JPEG Image Files (*.jpg)")]
-        [FormatExtension("jpg")]
-        Jpeg = 1 << 8,
-
-        [EnumDisplayName("PNG Image Files (*.png)")]
-        [FormatExtension("png")]
-        Png = 1 << 9,
-
-        [EnumDisplayName("GIF Image Files (*.gif)")]
-        [FormatExtension("gif")]
-        Gif = 1 << 10,
-
-        [EnumDisplayName("PDF Files (*.pdf)")]
-        [FormatExtension("pdf")]
-        Pdf = 1 << 11,
-    }
-
-    public class LogWriter : TextWriter
-    {
-        private readonly ExporterSettingsVM m_Vm;
-
-        internal LogWriter(ExporterSettingsVM vm)
-        {
-            m_Vm = vm;
-        }
-
-        public override void WriteLine(string value)
-        {
-            m_Vm.Log += !string.IsNullOrEmpty(m_Vm.Log) ? Environment.NewLine + value : value;
-        }
-
-        public override Encoding Encoding => Encoding.Default;
-    }
-
-    public class ProgressHandler : IProgress<double>
-    {
-        private readonly ExporterSettingsVM m_Vm;
-
-        internal ProgressHandler(ExporterSettingsVM vm)
-        {
-            m_Vm = vm;
-        }
-
-        public void Report(double value)
-        {
-            m_Vm.Progress = value;
-        }
-    }
-
-    public class ExporterSettingsVM : NotifyPropertyChanged
-    {
-        public Format_e Format { get; set; }
+        public event PropertyChangedEventHandler PropertyChanged;
 
         private string m_Log;
         private bool m_IsExportInProgress;
@@ -131,13 +35,22 @@ namespace Xarial.XTools.Xport.ViewModels
         private CancellationTokenSource m_CurrentCancellationToken;
         private bool m_IsSameDirectoryOutput;
 
+        private ICommand m_ExportCommand;
+        private ICommand m_CancelExportCommand;
+        private ICommand m_BrowseOutputDirectoryCommand;
+        private ICommand m_AddFileCommand;
+        private ICommand m_AddFolderCommand;
+        private ICommand m_DeleteInputCommand;
+
+        public Format_e Format { get; set; }
+
         public string Log
         {
             get => m_Log;
             set
             {
                 m_Log = value;
-                NotifyChanged();
+                this.NotifyChanged();
             }
         }
 
@@ -147,7 +60,7 @@ namespace Xarial.XTools.Xport.ViewModels
             set
             {
                 m_OutputDirectory = value;
-                NotifyChanged();
+                this.NotifyChanged();
             }
         }
 
@@ -157,7 +70,7 @@ namespace Xarial.XTools.Xport.ViewModels
             set
             {
                 m_IsExportInProgress = value;
-                NotifyChanged();
+                this.NotifyChanged();
             }
         }
 
@@ -167,7 +80,7 @@ namespace Xarial.XTools.Xport.ViewModels
             set 
             {
                 m_IsSameDirectoryOutput = value;
-                NotifyChanged();
+                this.NotifyChanged();
             }
         }
 
@@ -177,7 +90,7 @@ namespace Xarial.XTools.Xport.ViewModels
             set 
             {
                 m_Progress = value;
-                NotifyChanged();
+                this.NotifyChanged();
             }
         }
 
@@ -186,13 +99,6 @@ namespace Xarial.XTools.Xport.ViewModels
         public string Filter { get; set; }
 
         public bool ContinueOnError { get; set; }
-
-        private ICommand m_ExportCommand;
-        private ICommand m_CancelExportCommand;
-        private ICommand m_BrowseOutputDirectoryCommand;
-        private ICommand m_AddFileCommand;
-        private ICommand m_AddFolderCommand;
-        private ICommand m_DeleteInputCommand;
 
         public ICommand ExportCommand => m_ExportCommand ?? (m_ExportCommand = new RelayCommand(Export, () => !IsExportInProgress && Input.Any() && Format != 0));
         public ICommand CancelExportCommand => m_CancelExportCommand ?? (m_CancelExportCommand = new RelayCommand(CancelExport, () => IsExportInProgress));
@@ -207,7 +113,7 @@ namespace Xarial.XTools.Xport.ViewModels
             set 
             {
                 m_ActiveTabIndex = value;
-                NotifyChanged();
+                this.NotifyChanged();
             }
         }
 

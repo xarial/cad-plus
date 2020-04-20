@@ -6,17 +6,15 @@
 //*********************************************************************
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.ComponentModel;
 
-namespace Xarial.XTools.Xport.SwEDrawingsHost
+namespace Xarial.XTools.Xport.ViewModels
 {
-    public interface IPublisher : IDisposable
+    [AttributeUsage(AttributeTargets.Field)]
+    public class EnumDisplayNameAttribute : DescriptionAttribute 
     {
-        Task OpenDocument(string path);
-        Task SaveDocument(string path);
-        Task CloseDocument();
+        public EnumDisplayNameAttribute(string dispName) : base(dispName)
+        {
+        }
     }
 }

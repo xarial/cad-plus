@@ -3,11 +3,12 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:ui="clr-namespace:Xarial.XTools.Xport.UI"
+             xmlns:conv="clr-namespace:Xarial.XToolkit.Wpf.Converters;assembly=Xarial.XToolkit.Wpf"
+             xmlns:ctrls="clr-namespace:Xarial.XToolkit.Wpf.Controls;assembly=Xarial.XToolkit.Wpf"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="500">
     <UserControl.Resources>
-        <ui:BooleanUniversalConverter x:Key="revBoolConv" TrueValue="False" FalseValue="True"/>
+        <conv:BooleanUniversalConverter x:Key="revBoolConv" TrueValue="False" FalseValue="True"/>
     </UserControl.Resources>
     <Grid>
         <Grid.RowDefinitions>
@@ -63,7 +64,7 @@
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
                         <TextBlock Text="Format:" Grid.Column="0" Margin="2"/>
-                        <ui:EnumComboBox Value="{Binding Path=Format}" Margin="2" Grid.Column="2" />
+                        <ctrls:EnumComboBox Value="{Binding Path=Format}" Margin="2" Grid.Column="2" />
                     </Grid>
                     <Grid Grid.Row="3">
                         <Grid.ColumnDefinitions>

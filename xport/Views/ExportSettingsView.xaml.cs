@@ -1,4 +1,11 @@
-﻿using System;
+﻿//*********************************************************************
+//xTools
+//Copyright(C) 2020 Xarial Pty Limited
+//Product URL: https://xtools.xarial.com
+//License: https://xtools.xarial.com/license/
+//*********************************************************************
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -15,9 +22,6 @@ using System.Windows.Shapes;
 
 namespace Xarial.XTools.Xport.Views
 {
-    /// <summary>
-    /// Interaction logic for ExportSettingsView.xaml
-    /// </summary>
     public partial class ExportSettingsView : UserControl
     {
         public ExportSettingsView()

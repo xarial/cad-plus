@@ -1,4 +1,11 @@
-﻿using System;
+﻿//*********************************************************************
+//xTools
+//Copyright(C) 2020 Xarial Pty Limited
+//Product URL: https://xtools.xarial.com
+//License: https://xtools.xarial.com/license/
+//*********************************************************************
+
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
