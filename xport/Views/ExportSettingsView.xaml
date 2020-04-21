@@ -1,104 +1,104 @@
-﻿<UserControl x:Class="Xarial.XTools.Xport.Views.ExportSettingsView"
+﻿<UserControl x:Class="Xarial.CadPlus.Xport.Views.ExportSettingsView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:conv="clr-namespace:Xarial.XToolkit.Wpf.Converters;assembly=Xarial.XToolkit.Wpf"
              xmlns:ctrls="clr-namespace:Xarial.XToolkit.Wpf.Controls;assembly=Xarial.XToolkit.Wpf"
-             mc:Ignorable="d" 
+             mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="500">
     <UserControl.Resources>
-        <conv:BooleanUniversalConverter x:Key="revBoolConv" TrueValue="False" FalseValue="True"/>
+        <conv:BooleanUniversalConverter x:Key="revBoolConv" TrueValue="False" FalseValue="True" />
     </UserControl.Resources>
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <TabControl Margin="2" SelectedIndex="{Binding Path=ActiveTabIndex}">
             <TabItem Header="Settings">
                 <Grid Grid.IsSharedSizeScope="True" IsEnabled="{Binding Path=IsExportInProgress, Converter={StaticResource revBoolConv}}">
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="*"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
                     <Grid Grid.Row="0">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="*"/>
-                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="Auto" />
                         </Grid.RowDefinitions>
                         <ListBox Margin="2" Grid.ColumnSpan="3" ItemsSource="{Binding Path=Input}" SelectionMode="Extended">
                             <ListBox.InputBindings>
-                                <KeyBinding Key="Delete" Command="{Binding Path=DeleteInputCommand}" 
+                                <KeyBinding Key="Delete" Command="{Binding Path=DeleteInputCommand}"
                                             CommandParameter="{Binding Path=SelectedItems, RelativeSource={RelativeSource AncestorType={x:Type ListBox}}}"></KeyBinding>
                             </ListBox.InputBindings>
                         </ListBox>
                         <Button Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2"
                             Command="{Binding Path=AddFileCommand}">
-                            <TextBlock Text="Add File..." Margin="2"/>
+                            <TextBlock Text="Add File..." Margin="2" />
                         </Button>
                         <Button Grid.Row="1" Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2"
                             Command="{Binding Path=AddFolderCommand}">
-                            <TextBlock Text="Add Folder..." Margin="2"/>
+                            <TextBlock Text="Add Folder..." Margin="2" />
                         </Button>
                     </Grid>
                     <Grid Grid.Row="1">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto" SharedSizeGroup="Label"/>
-                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto" SharedSizeGroup="Label" />
+                            <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
-                        <TextBlock Text="Filter:" Grid.Column="0" Margin="2"/>
-                        <TextBox Text="{Binding Path=Filter, UpdateSourceTrigger=PropertyChanged}" Grid.Column="1" Margin="2"/>
+                        <TextBlock Text="Filter:" Grid.Column="0" Margin="2" />
+                        <TextBox Text="{Binding Path=Filter, UpdateSourceTrigger=PropertyChanged}" Grid.Column="1" Margin="2" />
                     </Grid>
                     <Grid Grid.Row="2">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto" SharedSizeGroup="Label"/>
-                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto" SharedSizeGroup="Label" />
+                            <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
-                        <TextBlock Text="Format:" Grid.Column="0" Margin="2"/>
+                        <TextBlock Text="Format:" Grid.Column="0" Margin="2" />
                         <ctrls:EnumComboBox Value="{Binding Path=Format}" Margin="2" Grid.Column="2" />
                     </Grid>
                     <Grid Grid.Row="3">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto" SharedSizeGroup="Label"/>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto" SharedSizeGroup="Label" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
-                        <TextBlock Text="Output Folder:" Grid.Column="0" Margin="2"/>
-                        <TextBox Text="{Binding Path=OutputDirectory, UpdateSourceTrigger=PropertyChanged}" 
+                        <TextBlock Text="Output Folder:" Grid.Column="0" Margin="2" />
+                        <TextBox Text="{Binding Path=OutputDirectory, UpdateSourceTrigger=PropertyChanged}"
                                  IsEnabled="{Binding Path=IsSameDirectoryOutput, Converter={StaticResource revBoolConv}}"
-                                 Grid.Column="1" Margin="2"/>
+                                 Grid.Column="1" Margin="2" />
                         <Button Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2"
                                 IsEnabled="{Binding Path=IsSameDirectoryOutput, Converter={StaticResource revBoolConv}}"
                                 Command="{Binding Path=BrowseOutputDirectoryCommand}">
-                            <TextBlock Text="Browse..." Margin="2"/>
+                            <TextBlock Text="Browse..." Margin="2" />
                         </Button>
                         <CheckBox Grid.Column="3" VerticalAlignment="Center" Margin="2" IsChecked="{Binding Path=IsSameDirectoryOutput}">Same directory</CheckBox>
                     </Grid>
                     <Expander Grid.Row="4" Margin="0,2" Header="Additional Settings">
                         <Grid Margin="2">
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto" SharedSizeGroup="Label"/>
-                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto" SharedSizeGroup="Label" />
+                                <ColumnDefinition Width="*" />
                             </Grid.ColumnDefinitions>
                             <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
                             </Grid.RowDefinitions>
                             <CheckBox Grid.ColumnSpan="2" Margin="2" IsChecked="{Binding Path=ContinueOnError}">Continue on error</CheckBox>
                             <CheckBox Grid.Row="1" Grid.Column="0" Margin="2" IsChecked="{Binding Path=IsTimeoutEnabled}">
-                                <TextBlock Text="Timeout (sec):"/>
+                                <TextBlock Text="Timeout (sec):" />
                             </CheckBox>
-                            <ctrls:NumberBoxInteger Grid.Row="1" Grid.Column="1" Value="{Binding Path=Timeout}" IsEnabled="{Binding Path=IsTimeoutEnabled}"/>
+                            <ctrls:NumberBoxInteger Grid.Row="1" Grid.Column="1" Value="{Binding Path=Timeout}" IsEnabled="{Binding Path=IsTimeoutEnabled}" />
                         </Grid>
                     </Expander>
                 </Grid>
@@ -106,27 +106,27 @@
             <TabItem Header="Log">
                 <Grid>
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="*"/>
-                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
                     <TextBox Margin="2" AcceptsReturn="True" AcceptsTab="True" Grid.ColumnSpan="2"
                              Text="{Binding Path=Log, Mode=OneWay}" IsReadOnly="True"
-                             VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto"/>
-                    <ProgressBar Grid.Row="1" Value="{Binding Path=Progress}" Minimum="0" Margin="2" Maximum="1"/>
+                             VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" />
+                    <ProgressBar Grid.Row="1" Value="{Binding Path=Progress}" Minimum="0" Margin="2" Maximum="1" />
                     <Button Grid.Row="1" Grid.Column="1" VerticalAlignment="Stretch" Margin="2" Width="75"
                             Command="{Binding Path=CancelExportCommand}">
-                        <TextBlock Text="Cancel" Margin="2"/>
+                        <TextBlock Text="Cancel" Margin="2" />
                     </Button>
                 </Grid>
             </TabItem>
         </TabControl>
         <Button Grid.Row="1" VerticalAlignment="Center" Width="75" HorizontalAlignment="Center" Margin="2"
                 Command="{Binding Path=ExportCommand}">
-            <TextBlock Text="Export" Margin="2"/>
+            <TextBlock Text="Export" Margin="2" />
         </Button>
     </Grid>
 </UserControl>

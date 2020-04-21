@@ -1,13 +1,13 @@
 ﻿//*********************************************************************
-//xTools
+//CAD+ Toolset
 //Copyright(C) 2020 Xarial Pty Limited
-//Product URL: https://xtools.xarial.com
-//License: https://xtools.xarial.com/license/
+//Product URL: https://cadplus.xarial.com
+//License: https://cadplus.xarial.com/license/
 //*********************************************************************
 
 using System;
 
-namespace Xarial.XTools.Xport.ViewModels
+namespace Xarial.CadPlus.Xport.ViewModels
 {
     public class ProgressHandler : IProgress<double>
     {

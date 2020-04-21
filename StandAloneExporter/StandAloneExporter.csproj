@@ -6,7 +6,7 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{48464D5E-3C1E-4858-93C9-4F25311F85D3}</ProjectGuid>
     <OutputType>Exe</OutputType>
-    <RootNamespace>Xarial.XTools.Xport.StandAloneExporter</RootNamespace>
+    <RootNamespace>Xarial.CadPlus.Xport.StandAloneExporter</RootNamespace>
     <AssemblyName>StandAloneExporter</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>

@@ -1,19 +1,15 @@
 ﻿//*********************************************************************
-//xTools
+//CAD+ Toolset
 //Copyright(C) 2020 Xarial Pty Limited
-//Product URL: https://xtools.xarial.com
-//License: https://xtools.xarial.com/license/
+//Product URL: https://cadplus.xarial.com
+//License: https://cadplus.xarial.com/license/
 //*********************************************************************
 
 using eDrawings.Interop.EModelViewControl;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace Xarial.XTools.Xport.EDrawingsHost
+namespace Xarial.CadPlus.Xport.EDrawingsHost
 {
     public class EDrawingsAxHost : AxHost
     {

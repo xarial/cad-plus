@@ -1,8 +1,8 @@
 ﻿//*********************************************************************
-//xTools
+//CAD+ Toolset
 //Copyright(C) 2020 Xarial Pty Limited
-//Product URL: https://xtools.xarial.com
-//License: https://xtools.xarial.com/license/
+//Product URL: https://cadplus.xarial.com
+//License: https://cadplus.xarial.com/license/
 //*********************************************************************
 
 using System;
@@ -10,13 +10,10 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Runtime.ExceptionServices;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows.Forms;
 
-namespace Xarial.XTools.Xport.Core
+namespace Xarial.CadPlus.Xport.Core
 {
     public class Exporter : IDisposable
     {
@@ -28,8 +25,8 @@ namespace Xarial.XTools.Xport.Core
             m_Logger = logger;
             m_ProgressHandler = progressHandler;
         }
-        
-        public async Task Export(ExportOptions opts, CancellationToken token = default) 
+
+        public async Task Export(ExportOptions opts, CancellationToken token = default)
         {
             m_Logger.WriteLine($"Exporting Started");
 
@@ -84,7 +81,7 @@ namespace Xarial.XTools.Xport.Core
                         {
                             tcs.CancelAfter(TimeSpan.FromSeconds(opts.Timeout));
                         }
-                        
+
                         var res = await StartWaitProcessAsync(prcStartInfo, tcs.Token).ConfigureAwait(false);
 
                         if (!res)
@@ -203,7 +200,7 @@ namespace Xarial.XTools.Xport.Core
                 for (int i = 0; i < opts.Format.Length; i++)
                 {
                     var ext = opts.Format[i];
-                    
+
                     if (!ext.StartsWith("."))
                     {
                         ext = "." + ext;
@@ -216,12 +213,15 @@ namespace Xarial.XTools.Xport.Core
                             case ".sldprt":
                                 ext = ".eprt";
                                 break;
+
                             case ".sldasm":
                                 ext = ".easm";
                                 break;
+
                             case ".slddrw":
                                 ext = ".edrw";
                                 break;
+
                             default:
                                 throw new ArgumentException($"{EDRW_FORMAT} format is only applicable for SOLIDWORKS files");
                         }
@@ -234,7 +234,7 @@ namespace Xarial.XTools.Xport.Core
 
             return jobs;
         }
-        
+
         public void Dispose()
         {
         }

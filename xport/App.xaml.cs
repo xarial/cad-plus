@@ -1,23 +1,19 @@
 ﻿//*********************************************************************
-//xTools
+//CAD+ Toolset
 //Copyright(C) 2020 Xarial Pty Limited
-//Product URL: https://xtools.xarial.com
-//License: https://xtools.xarial.com/license/
+//Product URL: https://cadplus.xarial.com
+//License: https://cadplus.xarial.com/license/
 //*********************************************************************
 
 using CommandLine;
-using CommandLine.Text;
 using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Data;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using System.Windows;
-using Xarial.XTools.Xport.Core;
+using Xarial.CadPlus.Xport.Core;
 
-namespace Xarial.XTools.Xport
+namespace Xarial.CadPlus.Xport
 {
     public partial class App : Application
     {
@@ -33,7 +29,7 @@ namespace Xarial.XTools.Xport
                 Console.ResetColor();
             }
         }
-        
+
         protected override void OnStartup(StartupEventArgs e)
         {
             Application.Current.DispatcherUnhandledException += OnDispatcherUnhandledException;
@@ -61,7 +57,7 @@ namespace Xarial.XTools.Xport
 
                 var res = false;
 
-                if (!hasError) 
+                if (!hasError)
                 {
                     try
                     {
@@ -92,10 +88,9 @@ namespace Xarial.XTools.Xport
 
         private void OnDispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
         {
-            
         }
 
-        private async Task RunConsoleExporter(Arguments args) 
+        private async Task RunConsoleExporter(Arguments args)
         {
             var opts = new ExportOptions()
             {

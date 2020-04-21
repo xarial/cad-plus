@@ -7,7 +7,7 @@
     <ProjectGuid>{EEB31586-D2C6-40F4-A8B1-B60F1051ABF5}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Xarial.XTools.Xport.SwEDrawingsHost</RootNamespace>
+    <RootNamespace>Xarial.CadPlus.Xport.SwEDrawingsHost</RootNamespace>
     <AssemblyName>SwEDrawingsHost</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>

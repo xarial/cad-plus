@@ -1,17 +1,17 @@
 ﻿//*********************************************************************
-//xTools
+//CAD+ Toolset
 //Copyright(C) 2020 Xarial Pty Limited
-//Product URL: https://xtools.xarial.com
-//License: https://xtools.xarial.com/license/
+//Product URL: https://cadplus.xarial.com
+//License: https://cadplus.xarial.com/license/
 //*********************************************************************
 
 using System;
 using System.ComponentModel;
 
-namespace Xarial.XTools.Xport.ViewModels
+namespace Xarial.CadPlus.Xport.ViewModels
 {
     [AttributeUsage(AttributeTargets.Field)]
-    public class EnumDisplayNameAttribute : DescriptionAttribute 
+    public class EnumDisplayNameAttribute : DescriptionAttribute
     {
         public EnumDisplayNameAttribute(string dispName) : base(dispName)
         {

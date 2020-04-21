@@ -1,8 +1,8 @@
 ﻿//*********************************************************************
-//xTools
+//CAD+ Toolset
 //Copyright(C) 2020 Xarial Pty Limited
-//Product URL: https://xtools.xarial.com
-//License: https://xtools.xarial.com/license/
+//Product URL: https://cadplus.xarial.com
+//License: https://cadplus.xarial.com/license/
 //*********************************************************************
 
 using System;
@@ -12,16 +12,15 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using Xarial.CadPlus.Xport.Core;
 using Xarial.XToolkit.Reflection;
 using Xarial.XToolkit.Wpf;
 using Xarial.XToolkit.Wpf.Extensions;
 using Xarial.XToolkit.Wpf.Utils;
-using Xarial.XTools.Xport.Core;
 
-namespace Xarial.XTools.Xport.ViewModels
+namespace Xarial.CadPlus.Xport.ViewModels
 {
     public class ExporterSettingsVM : INotifyPropertyChanged
     {
@@ -75,20 +74,20 @@ namespace Xarial.XTools.Xport.ViewModels
             }
         }
 
-        public bool IsSameDirectoryOutput 
+        public bool IsSameDirectoryOutput
         {
             get => m_IsSameDirectoryOutput;
-            set 
+            set
             {
                 m_IsSameDirectoryOutput = value;
                 this.NotifyChanged();
             }
         }
 
-        public double Progress 
+        public double Progress
         {
             get => m_Progress;
-            set 
+            set
             {
                 m_Progress = value;
                 this.NotifyChanged();
@@ -102,11 +101,11 @@ namespace Xarial.XTools.Xport.ViewModels
         public bool ContinueOnError { get; set; }
 
         public int Timeout { get; set; }
-        
-        public bool IsTimeoutEnabled 
+
+        public bool IsTimeoutEnabled
         {
             get => m_IsTimeoutEnabled;
-            set 
+            set
             {
                 m_IsTimeoutEnabled = value;
                 this.NotifyChanged();
@@ -123,14 +122,14 @@ namespace Xarial.XTools.Xport.ViewModels
         public int ActiveTabIndex
         {
             get => m_ActiveTabIndex;
-            set 
+            set
             {
                 m_ActiveTabIndex = value;
                 this.NotifyChanged();
             }
         }
 
-        public ExporterSettingsVM() 
+        public ExporterSettingsVM()
         {
             Input = new ObservableCollection<string>();
             Format = Format_e.Html;
@@ -139,8 +138,8 @@ namespace Xarial.XTools.Xport.ViewModels
             Timeout = 600;
         }
 
-        private async void Export() 
-        {   
+        private async void Export()
+        {
             try
             {
                 ActiveTabIndex = 1;
@@ -171,7 +170,7 @@ namespace Xarial.XTools.Xport.ViewModels
             {
                 MessageBox.Show("Processing error", "xPort", MessageBoxButton.OK, MessageBoxImage.Error);
             }
-            finally 
+            finally
             {
                 IsExportInProgress = false;
             }
@@ -181,11 +180,11 @@ namespace Xarial.XTools.Xport.ViewModels
         {
             var res = new List<string>();
 
-            foreach (Enum val in Enum.GetValues(typeof(Format_e))) 
+            foreach (Enum val in Enum.GetValues(typeof(Format_e)))
             {
-                if (Format.HasFlag(val)) 
+                if (Format.HasFlag(val))
                 {
-                    if (!val.TryGetAttribute<FormatExtensionAttribute>(a => res.Add(a.Extension))) 
+                    if (!val.TryGetAttribute<FormatExtensionAttribute>(a => res.Add(a.Extension)))
                     {
                         throw new Exception("Invalid format");
                     }
@@ -195,7 +194,7 @@ namespace Xarial.XTools.Xport.ViewModels
             return res.ToArray();
         }
 
-        private void CancelExport() 
+        private void CancelExport()
         {
             m_CurrentCancellationToken.Cancel();
         }
@@ -222,7 +221,7 @@ namespace Xarial.XTools.Xport.ViewModels
                 new FileFilter("SOLIDWORKS Files", "*.sldprt", "*.sldasm", "*.slddrw"),
                 FileFilter.AllFiles);
 
-            if (FsoBrowser.BrowseForFileOpen(out string path, "Select file to process", filter)) 
+            if (FsoBrowser.BrowseForFileOpen(out string path, "Select file to process", filter))
             {
                 Input.Add(path);
             }
@@ -230,7 +229,7 @@ namespace Xarial.XTools.Xport.ViewModels
 
         private void DeleteInput(IEnumerable inputs)
         {
-            foreach (var input in inputs.Cast<string>().ToArray()) 
+            foreach (var input in inputs.Cast<string>().ToArray())
             {
                 Input.Remove(input);
             }

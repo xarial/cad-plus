@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
-	<Product Id="*" Name="xTools" Language="1033" Version="0.1.0.0" Manufacturer="Xarial Pty Limited" UpgradeCode="{1B7A19E1-B6B6-42D0-8DC6-0993E6E5468C}">
+	<Product Id="*" Name="CAD+ Toolset" Language="1033" Version="0.1.0.0" Manufacturer="Xarial Pty Limited" UpgradeCode="{1B7A19E1-B6B6-42D0-8DC6-0993E6E5468C}">
 		<Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
 
-		<MajorUpgrade DowngradeErrorMessage="A newer version of xTools is already installed." />
+		<MajorUpgrade DowngradeErrorMessage="A newer version of CAD+ Toolset is already installed." />
 		<MediaTemplate EmbedCab="yes" />
 
-    <Property Id="ARPHELPLINK" Value="https://xtools.xarial.com" />
+    <Property Id="ARPHELPLINK" Value="https://cadplus.xarial.com" />
     
 		<UIRef Id="WixUI_InstallDir" />
 		<UIRef Id="WixUI_Common" />
@@ -26,11 +26,11 @@
     <Directory Id="TARGETDIR" Name="SourceDir">
       <Directory Id="ProgramFiles64Folder">
         <Directory Id="XarialDirId" Name="Xarial">
-          <Directory Id="INSTALLFOLDER" Name="xTools" />
+          <Directory Id="INSTALLFOLDER" Name="CAD+ Toolset" />
         </Directory>
       </Directory>
       <Directory Id="ProgramMenuFolder">
-        <Directory Id="ApplicationProgramsFolder" Name="xTools"/>
+        <Directory Id="ApplicationProgramsFolder" Name="CAD+ Toolset"/>
       </Directory>
     </Directory>
     
@@ -39,7 +39,7 @@
         <Shortcut Id="ApplicationStartMenuShortcut" Name="xPort" Description="Batch Export Utility"
             Target="[#xport.exe]" WorkingDirectory="APPLICATIONROOTDIRECTORY"/>
         <RemoveFolder Id="ApplicationProgramsFolder" On="uninstall"/>
-        <RegistryValue Root="HKCU" Key="Software\Xarial\xTools" Name="installed" Type="integer" Value="1" KeyPath="yes"/>
+        <RegistryValue Root="HKCU" Key="Software\Xarial\CAD+ Toolset" Name="installed" Type="integer" Value="1" KeyPath="yes"/>
       </Component>
     </DirectoryRef>
     
