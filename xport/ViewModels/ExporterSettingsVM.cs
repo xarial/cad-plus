@@ -34,6 +34,7 @@ namespace Xarial.XTools.Xport.ViewModels
         private double m_Progress;
         private CancellationTokenSource m_CurrentCancellationToken;
         private bool m_IsSameDirectoryOutput;
+        private bool m_IsTimeoutEnabled;
 
         private ICommand m_ExportCommand;
         private ICommand m_CancelExportCommand;
@@ -100,6 +101,18 @@ namespace Xarial.XTools.Xport.ViewModels
 
         public bool ContinueOnError { get; set; }
 
+        public int Timeout { get; set; }
+        
+        public bool IsTimeoutEnabled 
+        {
+            get => m_IsTimeoutEnabled;
+            set 
+            {
+                m_IsTimeoutEnabled = value;
+                this.NotifyChanged();
+            }
+        }
+
         public ICommand ExportCommand => m_ExportCommand ?? (m_ExportCommand = new RelayCommand(Export, () => !IsExportInProgress && Input.Any() && Format != 0));
         public ICommand CancelExportCommand => m_CancelExportCommand ?? (m_CancelExportCommand = new RelayCommand(CancelExport, () => IsExportInProgress));
         public ICommand BrowseOutputDirectoryCommand => m_BrowseOutputDirectoryCommand ?? (m_BrowseOutputDirectoryCommand = new RelayCommand(BrowseOutputDirectory));
@@ -122,6 +135,8 @@ namespace Xarial.XTools.Xport.ViewModels
             Input = new ObservableCollection<string>();
             Format = Format_e.Html;
             Filter = "*.*";
+            IsTimeoutEnabled = true;
+            Timeout = 600;
         }
 
         private async void Export() 
@@ -139,7 +154,8 @@ namespace Xarial.XTools.Xport.ViewModels
                     Filter = Filter,
                     Format = ExtractFormats(),
                     OutputDirectory = IsSameDirectoryOutput ? "" : OutputDirectory,
-                    ContinueOnError = ContinueOnError
+                    ContinueOnError = ContinueOnError,
+                    Timeout = IsTimeoutEnabled ? Timeout : -1
                 };
 
                 m_CurrentCancellationToken = new CancellationTokenSource();
