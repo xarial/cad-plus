@@ -7,7 +7,7 @@
     <ProductVersion>3.11.2</ProductVersion>
     <ProjectGuid>{3ACEE95C-C190-4F6E-A581-D8F37E126998}</ProjectGuid>
     <SchemaVersion>2.0</SchemaVersion>
-    <OutputName>CAD+ Toolset</OutputName>
+    <OutputName>CADPlusToolset</OutputName>
     <OutputType>Package</OutputType>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x64' ">
