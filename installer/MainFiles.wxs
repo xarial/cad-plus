@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+    <Fragment>
+        <DirectoryRef Id="INSTALLFOLDER">
+          <Component Id="xport" Guid="*">
+            <File Id="xport.exe" KeyPath="yes" Source="$(var.SourceOutDir)\xport.exe" />
+          </Component>
+        </DirectoryRef>
+    </Fragment>
+    <Fragment>
+        <ComponentGroup Id="MainFilesRegGroup">
+            <ComponentRef Id="xport" />
+        </ComponentGroup>
+    </Fragment>
+</Wix>
