@@ -73,7 +73,7 @@ namespace Xarial.CadPlus.Xport.Core
                             CreateNoWindow = true,
                             UseShellExecute = false,
                             FileName = typeof(StandAloneExporter.Program).Assembly.Location,
-                            Arguments = $"\"{file}\" \"{outFile}\""
+                            Arguments = $"\"{file}\" \"{desFile}\""
                         };
 
                         var tcs = CancellationTokenSource.CreateLinkedTokenSource(token);

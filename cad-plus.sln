@@ -3,15 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29613.14
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Xport", "xport\Xport.csproj", "{10B86DA1-4256-4F3E-A21F-A39942354AB4}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Xport", "src\xport\Xport.csproj", "{10B86DA1-4256-4F3E-A21F-A39942354AB4}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Installer", "installer\Installer.csproj", "{3ACEE95C-C190-4F6E-A581-D8F37E126998}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Xport", "Xport", "{44577B98-DBC0-4368-BB5E-E118FCB7AA43}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SwEDrawingsHost", "SwEDrawingsHost\SwEDrawingsHost.csproj", "{EEB31586-D2C6-40F4-A8B1-B60F1051ABF5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SwEDrawingsHost", "src\SwEDrawingsHost\SwEDrawingsHost.csproj", "{EEB31586-D2C6-40F4-A8B1-B60F1051ABF5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StandAloneExporter", "StandAloneExporter\StandAloneExporter.csproj", "{48464D5E-3C1E-4858-93C9-4F25311F85D3}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StandAloneExporter", "src\StandAloneExporter\StandAloneExporter.csproj", "{48464D5E-3C1E-4858-93C9-4F25311F85D3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

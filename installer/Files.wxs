@@ -11,12 +11,6 @@
             <Component Id="cmpBC4FC00A26E7D32479D42D3411317FC5" Guid="*">
                 <File Id="fil90A8AAD9FC612906D405476D61CEA3F4" KeyPath="yes" Source="$(var.SourceOutDir)\Newtonsoft.Json.dll" />
             </Component>
-            <Component Id="cmpEF86E2629039DB2786CC63F33FB23EF1" Guid="*">
-                <File Id="fil2395A2B4DF29C0DE1F4C8BD59DEF202D" KeyPath="yes" Source="$(var.SourceOutDir)\StandAloneExporter.exe" />
-            </Component>
-            <Component Id="cmpC4CA80F734C83FD7D1F432FF0C647DB1" Guid="*">
-                <File Id="filA83475E713BC28BDE9B2E6DF14F2C2F8" KeyPath="yes" Source="$(var.SourceOutDir)\StandAloneExporter.exe.config" />
-            </Component>
             <Component Id="cmp968E6701DCBC68610EBB1F9D89291DD0" Guid="*">
                 <File Id="fil73BCA1EF0594E8C88F1F62A559B066AF" KeyPath="yes" Source="$(var.SourceOutDir)\SwEDrawingsHost.dll" />
             </Component>
@@ -36,8 +30,6 @@
             <ComponentRef Id="cmpCC5600A0E0013FC2479752FF2E317D0E" />
             <ComponentRef Id="cmp01717950957F7944BD3CB4B4BD99A14E" />
             <ComponentRef Id="cmpBC4FC00A26E7D32479D42D3411317FC5" />
-            <ComponentRef Id="cmpEF86E2629039DB2786CC63F33FB23EF1" />
-            <ComponentRef Id="cmpC4CA80F734C83FD7D1F432FF0C647DB1" />
             <ComponentRef Id="cmp968E6701DCBC68610EBB1F9D89291DD0" />
             <ComponentRef Id="cmpA57D036B0C39DD5A02A85B352D4A6900" />
             <ComponentRef Id="cmp5978C9160A39C99DB8040C5EA45C4891" />

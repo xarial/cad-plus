@@ -69,7 +69,8 @@ namespace Xarial.CadPlus.Xport.EDrawingsHost
             {
                 m_PrintTcs = new TaskCompletionSource<bool>();
                 var fileName = m_Control.FileName;
-                m_Control.Print5(false, fileName, false, false, true, EMVPrintType.eOneToOne, 1, 0, 0, true, 1, 1, path);
+                m_Control.Print5(false, fileName, false, false, 
+                    true, EMVPrintType.eScaleToFit, 1, 0, 0, true, 1, 1, path);
                 return m_PrintTcs.Task;
             }
         }
