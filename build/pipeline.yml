@@ -1,0 +1,41 @@
+stages:
+
+- stage: 'Build'
+  variables:
+    buildConfiguration: 'Release'
+    buildPlatform: 'Any CPU'
+
+  jobs:
+  - job:
+    pool:
+      name: 'Azure Pipelines'
+      vmImage: windows-latest
+      demands:
+        - msbuild
+        - visualstudio
+
+    steps:
+      - task: NuGetToolInstaller@0
+        displayName: 'Use NuGet'
+
+      - task: NuGetCommand@2
+        displayName: 'NuGet restore'
+        inputs:
+          restoreSolution: 'cad-plus.sln'
+
+      - task: VSBuild@1
+        displayName: 'Build and pack preview version'
+        inputs:
+          solution: 'cad-plus.sln'
+          platform: '$(BuildPlatform)'
+          configuration: '$(BuildConfiguration)'
+            
+      - task: CopyFiles@2
+        displayName: 'Copy Build Files'
+        inputs:
+          SourceFolder: '_build'
+          Contents: '*.*'
+          TargetFolder: '$(Build.ArtifactStagingDirectory)/bin'
+      
+      - publish: '$(Build.ArtifactStagingDirectory)/bin'
+        artifact: 'bin'
