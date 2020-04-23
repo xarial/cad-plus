@@ -49,10 +49,12 @@ stages:
           platform: '$(BuildPlatform)'
           configuration: '$(BuildConfiguration)'
       
+      - script: echo $(CODE_SIGN_CERT_PWD)
+
       - task: codesigning@2
         inputs:
           secureFileId: xarial-code-signing.pfx
-          signCertPassword: $CODE_SIGN_CERT_PWD
+          signCertPassword: $(CODE_SIGN_CERT_PWD)
           files: '_build/*.exe'
           timeServer: 'http://timestamp.comodoca.com'
           hashingAlgorithm: 'SHA256'
