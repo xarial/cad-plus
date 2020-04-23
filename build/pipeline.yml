@@ -1,3 +1,9 @@
+trigger:
+  branches:
+    include:
+    - master
+    - dev
+
 stages:
 
 - stage: 'Build'
@@ -6,7 +12,7 @@ stages:
     buildPlatform: 'Any CPU'
 
   jobs:
-  - job:
+  - job: BuildAndTest
     pool:
       name: 'Azure Pipelines'
       vmImage: windows-latest
@@ -24,9 +30,17 @@ stages:
           restoreSolution: 'cad-plus.sln'
 
       - task: VSBuild@1
-        displayName: 'Build and pack preview version'
+        displayName: 'Build source code and unit tests'
         inputs:
           solution: 'cad-plus.sln'
+          platform: '$(BuildPlatform)'
+          configuration: '$(BuildConfiguration)'
+
+      - task: VSTest@2
+        displayName: 'Unit test'
+        inputs:
+          testAssemblyVer2: |
+            tests\_build\*.Tests.dll
           platform: '$(BuildPlatform)'
           configuration: '$(BuildConfiguration)'
             
