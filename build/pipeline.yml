@@ -47,6 +47,8 @@ stages:
             
   - job: BuildInstaller
     dependsOn: 'BuildAndTest'
+    pool:
+      vmImage: windows-latest
     steps:
       - task: NuGetCommand@2
         displayName: 'NuGet restore'
