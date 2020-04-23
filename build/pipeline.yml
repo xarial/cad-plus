@@ -8,10 +8,13 @@ stages:
 
 - stage: 'Build'
   variables:
-    buildConfiguration: 'Release'
-    buildPlatform: 'Any CPU'
-    installerPlatform: 'x64'
-  - group: 'build-vars'
+  - group: build-vars
+  - name: buildConfiguration
+    value: 'Release'
+  - name: buildPlatform
+    value: 'Any CPU'
+  - name: installerPlatform
+    value: 'x64'
 
   jobs:
   - job: BuildTestInstaller
