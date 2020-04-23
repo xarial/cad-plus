@@ -13,7 +13,7 @@ stages:
     installerPlatform: 'x64'
 
   jobs:
-  - job: BuildAndTest
+  - job: BuildTestInstaller
     pool:
       name: 'Azure Pipelines'
       vmImage: windows-latest
@@ -45,11 +45,6 @@ stages:
           platform: '$(BuildPlatform)'
           configuration: '$(BuildConfiguration)'
             
-  - job: BuildInstaller
-    dependsOn: 'BuildAndTest'
-    pool:
-      vmImage: windows-latest
-    steps:
       - task: NuGetCommand@2
         displayName: 'NuGet restore'
         inputs:
