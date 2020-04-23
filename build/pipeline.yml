@@ -11,6 +11,7 @@ stages:
     buildConfiguration: 'Release'
     buildPlatform: 'Any CPU'
     installerPlatform: 'x64'
+  - group: 'build-vars'
 
   jobs:
   - job: BuildTestInstaller
@@ -44,7 +45,16 @@ stages:
             tests\_build\*.Tests.dll
           platform: '$(BuildPlatform)'
           configuration: '$(BuildConfiguration)'
-            
+      
+      - task: codesigning@2
+        inputs:
+          secureFileId: xarial-code-signing.pfx
+          signCertPassword: $CODE_SIGN_CERT_PWD
+          files: '_build/*.exe'
+          timeServer: 'http://timestamp.comodoca.com'
+          hashingAlgorithm: 'SHA256'
+          description: 'CAD+ Toolset'
+
       - task: NuGetCommand@2
         displayName: 'NuGet restore'
         inputs:
@@ -56,6 +66,15 @@ stages:
           solution: 'installer\Installer.sln'
           platform: '$(InstallerPlatform)'
           configuration: '$(BuildConfiguration)'
+
+      - task: codesigning@2
+        inputs:
+          secureFileId: xarial-code-signing.pfx
+          signCertPassword: $CODE_SIGN_CERT_PWD
+          files: '_build/*.msi'
+          timeServer: 'http://timestamp.comodoca.com'
+          hashingAlgorithm: 'SHA256'
+          description: 'CAD+ Toolset'
 
       - task: CopyFiles@2
         displayName: 'Copy Installer Files'
