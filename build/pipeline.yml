@@ -45,20 +45,22 @@ stages:
           platform: '$(BuildPlatform)'
           configuration: '$(BuildConfiguration)'
             
+  - job: BuildInstaller
+    steps:
       - task: NuGetCommand@2
         displayName: 'NuGet restore'
         inputs:
           restoreSolution: 'installer\Installer.sln'
 
       - task: VSBuild@1
-        displayName: 'Build source code and unit tests'
+        displayName: 'Build installer'
         inputs:
           solution: 'installer\Installer.sln'
           platform: '$(InstallerPlatform)'
           configuration: '$(BuildConfiguration)'
 
       - task: CopyFiles@2
-        displayName: 'Copy Build Files'
+        displayName: 'Copy Installer Files'
         inputs:
           SourceFolder: '_build'
           Contents: '*.msi'
