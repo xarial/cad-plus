@@ -10,6 +10,7 @@ stages:
   variables:
     buildConfiguration: 'Release'
     buildPlatform: 'Any CPU'
+    installerPlatform: 'x64'
 
   jobs:
   - job: BuildAndTest
@@ -44,12 +45,24 @@ stages:
           platform: '$(BuildPlatform)'
           configuration: '$(BuildConfiguration)'
             
+      - task: NuGetCommand@2
+        displayName: 'NuGet restore'
+        inputs:
+          restoreSolution: 'installer\Installer.sln'
+
+      - task: VSBuild@1
+        displayName: 'Build source code and unit tests'
+        inputs:
+          solution: 'installer\Installer.sln'
+          platform: '$(InstallerPlatform)'
+          configuration: '$(BuildConfiguration)'
+
       - task: CopyFiles@2
         displayName: 'Copy Build Files'
         inputs:
           SourceFolder: '_build'
-          Contents: '*.*'
-          TargetFolder: '$(Build.ArtifactStagingDirectory)/bin'
+          Contents: '*.msi'
+          TargetFolder: '$(Build.ArtifactStagingDirectory)/installer'
       
-      - publish: '$(Build.ArtifactStagingDirectory)/bin'
-        artifact: 'bin'
+      - publish: '$(Build.ArtifactStagingDirectory)/installer'
+        artifact: 'installer'
