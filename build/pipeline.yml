@@ -46,6 +46,7 @@ stages:
           configuration: '$(BuildConfiguration)'
             
   - job: BuildInstaller
+    dependsOn: 'BuildAndTest'
     steps:
       - task: NuGetCommand@2
         displayName: 'NuGet restore'
