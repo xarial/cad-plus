@@ -17,6 +17,8 @@ stages:
     value: 'Any CPU'
   - name: installerPlatform
     value: 'x64'
+  - name: buildNumber
+    value: '1.0.0-CI-$(Build.BuildNumber)-$(Build.Date:yyyyMMdd)-$(Build.Rev:.r)'
 
   jobs:
   - job: BuildTestInstaller
@@ -29,9 +31,7 @@ stages:
     
     steps:
       - bash: echo $(Build.BuildNumber)
-      - bash: echo $(Build.BuildId)
-      - bash: echo $(Build.Date)
-      - bash: echo $(Build.Rev)
+      - bash: echo $(BuildNumber)
       - bash: exit 1
       
       - task: NuGetToolInstaller@0
