@@ -130,7 +130,7 @@ stages:
         serverEndpoint: 'App Center'
         appSlug: 'xarial/CAD-Toolset'
         appFile: '$(Pipeline.Workspace)/installer/CADPlusToolset.msi'
-        buildVersion: '0.1.$(BuildConfiguration)'
+        buildVersion: '$(Version.Major).$(Version.Minor).$(Build.BuildId).$(Version.Revision)'
         releaseNotesOption: 'input'
         releaseNotesInput: '-'
         isMandatory: true
