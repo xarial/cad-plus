@@ -6,7 +6,7 @@ trigger:
     - master
     - dev
 
-name: '$(Build.Date:yyyyMMdd)$(Build.Rev:.r)'
+name: '$(Date:yyyyMMdd)$(Rev:.r)'
 
 stages:
 
