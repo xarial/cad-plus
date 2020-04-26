@@ -6,6 +6,8 @@ trigger:
     - master
     - dev
 
+name: '$(Build.Date:yyyyMMdd)$(Build.Rev:.r)'
+
 stages:
 
 - stage: 'Build'
@@ -17,9 +19,7 @@ stages:
     value: 'Any CPU'
   - name: installerPlatform
     value: 'x64'
-  - name: buildNumber
-    value: '1.0.0-CI-$(Build.BuildNumber)-$(Build.Date:yyyyMMdd)-$(Build.Rev:.r)'
-
+    
   jobs:
   - job: BuildTestInstaller
     pool:
@@ -31,7 +31,6 @@ stages:
     
     steps:
       - bash: echo $(Build.BuildNumber)
-      - bash: echo $(BuildNumber)
       - bash: exit 1
       
       - task: NuGetToolInstaller@0
