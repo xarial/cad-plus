@@ -36,11 +36,11 @@ stages:
         inputs:
           restoreSolution: 'cad-plus.sln'
 
-    - task: PowerShell@2
-      inputs:
-        filePath: 'build/set-version.ps1'
-        arguments: '-build "$(Date:yyyyMMdd)$(Rev:.r)5" -revision "2"'
-        
+      - task: PowerShell@2
+        inputs:
+          filePath: 'build/set-version.ps1'
+          arguments: '-build "$(Date:yyyyMMdd)$(Rev:.r)5" -revision "2"'
+
       - task: VSBuild@1
         displayName: 'Build source code and unit tests'
         inputs:
