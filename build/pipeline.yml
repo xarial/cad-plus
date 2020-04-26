@@ -103,7 +103,7 @@ stages:
       - task: CopyFiles@2
         displayName: 'Copy Version File'
         inputs:
-          SourceFolder: '/'
+          SourceFolder: '$(System.DefaultWorkingDirectory)'
           Contents: 'version.json'
           TargetFolder: '$(Build.ArtifactStagingDirectory)/installer'
 
