@@ -51,7 +51,7 @@ stages:
         displayName: 'Set assembly version'
         inputs:
           filePath: 'build/set-assembly-version.ps1'
-          arguments: '-version "$(Version.Major).$(Version.Minor).$(Build.BuildId).$(Version.Revision)1"
+          arguments: '-version "$(Version.Major).$(Version.Minor).$(Build.BuildId).$(Version.Revision)1'
 
       - task: VSBuild@1
         displayName: 'Build source code and unit tests'
