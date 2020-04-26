@@ -29,9 +29,10 @@ stages:
     
     steps:
       - bash: echo $(Build.BuildNumber)
-      - bash: $(Build.BuildId)
-      - bash: $(Build.Date:yyyyMMdd)
-      - bash: $(Build.Rev:.r)
+      - bash: echo $(Build.BuildId)
+      - bash: echo $(Build.Date:yyyyMMdd)
+      - bash: echo $(Build.Rev:.r)
+      - bash: exit 1
       
       - task: NuGetToolInstaller@0
         displayName: 'Use NuGet'
