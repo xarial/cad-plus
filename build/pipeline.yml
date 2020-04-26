@@ -30,8 +30,8 @@ stages:
     steps:
       - bash: echo $(Build.BuildNumber)
       - bash: echo $(Build.BuildId)
-      - bash: echo $(Build.Date:yyyyMMdd)
-      - bash: echo $(Build.Rev:.r)
+      - bash: echo $(Build.Date)
+      - bash: echo $(Build.Rev)
       - bash: exit 1
       
       - task: NuGetToolInstaller@0
