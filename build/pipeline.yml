@@ -118,4 +118,4 @@ stages:
         releaseNotesInput: '-'
         isMandatory: true
         destinationType: 'groups'
-        distributionGroupId: '5f7506b4-03a6-40f7-8a54-57685986f953''
+        distributionGroupId: '5f7506b4-03a6-40f7-8a54-57685986f953'
