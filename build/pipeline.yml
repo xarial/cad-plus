@@ -101,6 +101,13 @@ stages:
           description: 'CAD+ Toolset'
 
       - task: CopyFiles@2
+        displayName: 'Copy Version File'
+        inputs:
+          SourceFolder: '/'
+          Contents: 'version.json'
+          TargetFolder: '$(Build.ArtifactStagingDirectory)/installer'
+
+      - task: CopyFiles@2
         displayName: 'Copy Installer Files'
         inputs:
           SourceFolder: '_build'
@@ -124,6 +131,13 @@ stages:
 
     - download: current
       artifact: 'installer'
+
+    - task: oneLuckiDevJson2Variable@1
+      displayName: 'Read version information'
+      inputs:
+        jsonFile: '$(Pipeline.Workspace)/installer/version.json'
+        shouldPrefixVariables: true
+        variablePrefix: 'Version'
 
     - task: AppCenterDistribute@3
       inputs:
