@@ -1,4 +1,5 @@
 #Install CodeSigning task from https://marketplace.visualstudio.com/items?itemName=stefankert.codesigning
+#Install version reading task https://marketplace.visualstudio.com/items?itemName=OneLuckiDev.json2variable
 
 trigger:
   branches:
@@ -6,7 +7,7 @@ trigger:
     - master
     - dev
 
-name: '$(Date:yyyyMMdd)$(Rev:r)'
+name: '$(Date:yyyyMMdd).$(Rev:r)'
 
 stages:
 
@@ -39,11 +40,18 @@ stages:
         inputs:
           restoreSolution: 'cad-plus.sln'
 
+      - task: oneLuckiDevJson2Variable@1
+        displayName: 'Read version information'
+        inputs:
+          jsonFile: 'version.json'
+          shouldPrefixVariables: true
+          variablePrefix: 'Version'
+
       - task: PowerShell@2
         displayName: 'Set assembly version'
         inputs:
           filePath: 'build/set-assembly-version.ps1'
-          arguments: '-build "$(Build.BuildNumber)" -revision "2"'
+          arguments: '-version "$(Version.Major).$(Version.Minor).$(Build.BuildId).$(Version.Revision)1"
 
       - task: VSBuild@1
         displayName: 'Build source code and unit tests'
