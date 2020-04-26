@@ -26,8 +26,13 @@ stages:
       demands:
         - msbuild
         - visualstudio
-
+    
     steps:
+      - bash: echo $(Build.BuildNumber)
+      - bash: $(Build.BuildId)
+      - bash: $(Build.Date:yyyyMMdd)
+      - bash: $(Build.Rev:.r)
+      
       - task: NuGetToolInstaller@0
         displayName: 'Use NuGet'
 
