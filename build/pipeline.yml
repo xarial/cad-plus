@@ -1,3 +1,5 @@
+#Install CodeSigning task from https://marketplace.visualstudio.com/items?itemName=stefankert.codesigning
+
 trigger:
   branches:
     include:
@@ -90,3 +92,30 @@ stages:
       
       - publish: '$(Build.ArtifactStagingDirectory)/installer'
         artifact: 'installer'
+
+- stage: 'PublishToAppStore'
+  displayName: 'Publish To App Store'
+  dependsOn: 'Build'
+  condition: succeeded()
+  jobs:
+  - job:
+    pool:
+      vmImage: 'ubuntu-latest'
+
+    steps:
+    - checkout: none
+
+    - download: current
+      artifact: 'installer'
+
+    - task: AppCenterDistribute@3
+      inputs:
+        serverEndpoint: 'App Center'
+        appSlug: 'xarial/CAD-Toolset'
+        appFile: '$(Pipeline.Workspace)/installer/CADPlusToolset.msi'
+        buildVersion: '0.2'
+        releaseNotesOption: 'input'
+        releaseNotesInput: '-'
+        isMandatory: true
+        destinationType: 'groups'
+        distributionGroupId: '5f7506b4-03a6-40f7-8a54-57685986f953''
