@@ -36,6 +36,11 @@ stages:
         inputs:
           restoreSolution: 'cad-plus.sln'
 
+    - task: PowerShell@2
+      inputs:
+        filePath: 'build/set-version.ps1'
+        arguments: '-build "$(Date:yyyyMMdd)$(Rev:.r)5" -revision "2"'
+        
       - task: VSBuild@1
         displayName: 'Build source code and unit tests'
         inputs:
@@ -43,23 +48,23 @@ stages:
           platform: '$(BuildPlatform)'
           configuration: '$(BuildConfiguration)'
 
-      - task: VSTest@2
-        displayName: 'Unit test'
-        inputs:
-          testAssemblyVer2: |
-            tests\_build\*.Tests.dll
-          platform: '$(BuildPlatform)'
-          configuration: '$(BuildConfiguration)'
+      # - task: VSTest@2
+      #   displayName: 'Unit test'
+      #   inputs:
+      #     testAssemblyVer2: |
+      #       tests\_build\*.Tests.dll
+      #     platform: '$(BuildPlatform)'
+      #     configuration: '$(BuildConfiguration)'
 
-      - task: codesigning@2
-        displayName: 'Signing .exe files'
-        inputs:
-          secureFileId: xarial-code-signing.pfx
-          signCertPassword: $(CODE_SIGN_CERT_PWD)
-          files: '_build/*.exe'
-          timeServer: 'http://timestamp.comodoca.com'
-          hashingAlgorithm: 'SHA256'
-          description: 'CAD+ Toolset'
+      # - task: codesigning@2
+      #   displayName: 'Signing .exe files'
+      #   inputs:
+      #     secureFileId: xarial-code-signing.pfx
+      #     signCertPassword: $(CODE_SIGN_CERT_PWD)
+      #     files: '_build/*.exe'
+      #     timeServer: 'http://timestamp.comodoca.com'
+      #     hashingAlgorithm: 'SHA256'
+      #     description: 'CAD+ Toolset'
 
       - task: NuGetCommand@2
         displayName: 'NuGet restore'
@@ -73,15 +78,15 @@ stages:
           platform: '$(InstallerPlatform)'
           configuration: '$(BuildConfiguration)'
 
-      - task: codesigning@2
-        displayName: 'Signing .msi installers'
-        inputs:
-          secureFileId: xarial-code-signing.pfx
-          signCertPassword: $(CODE_SIGN_CERT_PWD)
-          files: '_build/*.msi'
-          timeServer: 'http://timestamp.comodoca.com'
-          hashingAlgorithm: 'SHA256'
-          description: 'CAD+ Toolset'
+      # - task: codesigning@2
+      #   displayName: 'Signing .msi installers'
+      #   inputs:
+      #     secureFileId: xarial-code-signing.pfx
+      #     signCertPassword: $(CODE_SIGN_CERT_PWD)
+      #     files: '_build/*.msi'
+      #     timeServer: 'http://timestamp.comodoca.com'
+      #     hashingAlgorithm: 'SHA256'
+      #     description: 'CAD+ Toolset'
 
       - task: CopyFiles@2
         displayName: 'Copy Installer Files'
@@ -93,29 +98,29 @@ stages:
       - publish: '$(Build.ArtifactStagingDirectory)/installer'
         artifact: 'installer'
 
-- stage: 'PublishToAppStore'
-  displayName: 'Publish To App Store'
-  dependsOn: 'Build'
-  condition: succeeded()
-  jobs:
-  - job:
-    pool:
-      vmImage: 'ubuntu-latest'
+# - stage: 'PublishToAppStore'
+#   displayName: 'Publish To App Store'
+#   dependsOn: 'Build'
+#   condition: succeeded()
+#   jobs:
+#   - job:
+#     pool:
+#       vmImage: 'ubuntu-latest'
 
-    steps:
-    - checkout: none
+#     steps:
+#     - checkout: none
 
-    - download: current
-      artifact: 'installer'
+#     - download: current
+#       artifact: 'installer'
 
-    - task: AppCenterDistribute@3
-      inputs:
-        serverEndpoint: 'App Center'
-        appSlug: 'xarial/CAD-Toolset'
-        appFile: '$(Pipeline.Workspace)/installer/CADPlusToolset.msi'
-        buildVersion: '0.2'
-        releaseNotesOption: 'input'
-        releaseNotesInput: '-'
-        isMandatory: true
-        destinationType: 'groups'
-        distributionGroupId: '5f7506b4-03a6-40f7-8a54-57685986f953'
+#     - task: AppCenterDistribute@3
+#       inputs:
+#         serverEndpoint: 'App Center'
+#         appSlug: 'xarial/CAD-Toolset'
+#         appFile: '$(Pipeline.Workspace)/installer/CADPlusToolset.msi'
+#         buildVersion: '0.2'
+#         releaseNotesOption: 'input'
+#         releaseNotesInput: '-'
+#         isMandatory: true
+#         destinationType: 'groups'
+#         distributionGroupId: '5f7506b4-03a6-40f7-8a54-57685986f953'
