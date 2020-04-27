@@ -68,22 +68,22 @@ stages:
 
       # compile production if required
       - task: DeleteFiles@1
-        condition: eq(variables['Build.SourceBranch'], 'refs/heads/master')
+        condition: $(isProd)
         inputs:
           SourceFolder: '_build'
           Contents: '*.*'
           RemoveSourceFolder: true
-
-      - template: templates/compile-binaries.yml
-        parameters:
-          version: '$(prodVersion)'
-          enabled: eq($(isProd), 'True')
       
-      - template: templates/compile-installer.yml
-        parameters:
-          version: '$(prodVersion)'
-          artifactName: prod
-          enabled: eq($(isProd), 'True')
+      - ${{ if eq($(isProd), 'True') }}:
+        - template: templates/compile-binaries.yml
+          parameters:
+            version: '$(prodVersion)'
+      
+      - ${{ if eq($(isProd), 'True') }}:
+        - template: templates/compile-installer.yml
+          parameters:
+            version: '$(prodVersion)'
+            artifactName: prod
 
       # add version file and publish artifact
       - task: CopyFiles@2

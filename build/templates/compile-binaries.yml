@@ -4,20 +4,16 @@ parameters:
 - name: version
   type: string
   default: ''
-- name: enabled
-  default: true
 
 steps:
         
   - task: PowerShell@2
-    condition: and(succeeded(), eq('${{ parameters.enabled }}', true))
     displayName: 'Set assembly version'
     inputs:
       filePath: 'build/set-assembly-version.ps1'
       arguments: '-version "${{ parameters.version }}"'
 
   - task: VSBuild@1
-    condition: and(succeeded(), eq('${{ parameters.enabled }}', true))
     displayName: 'Build source code and unit tests'
     inputs:
       solution: 'cad-plus.sln'
@@ -25,7 +21,6 @@ steps:
       configuration: 'Release'
 
   - task: codesigning@2
-    condition: and(succeeded(), eq('${{ parameters.enabled }}', true))
     displayName: 'Signing .exe files'
     inputs:
       secureFileId: xarial-code-signing.pfx
