@@ -78,14 +78,12 @@ stages:
       - template: templates/compile-binaries.yml
         parameters:
           version: '$(prodVersion)'
-          enabled: '$(isProd)'
 
     - ${{ if eq(variables.isProd, true) }}:
       - template: templates/compile-installer.yml
         parameters:
           version: '$(prodVersion)'
           artifactName: prod
-          enabled: '$(isProd)'
 
     # add version file and publish artifact
     - task: CopyFiles@2
