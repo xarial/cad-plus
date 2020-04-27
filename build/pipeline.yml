@@ -89,6 +89,7 @@ stages:
           solution: 'installer\Installer.sln'
           platform: '$(InstallerPlatform)'
           configuration: '$(BuildConfiguration)'
+          msbuildArgs: '/p:PackageVersion=$(Version.Major).$(Version.Minor).$(Build.BuildId).$(Version.Revision) "/p:PackageNameSuffix= (Preview)"'
 
       - task: codesigning@2
         displayName: 'Signing .msi installers'
