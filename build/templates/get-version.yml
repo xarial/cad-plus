@@ -6,17 +6,18 @@ parameters:
   default: ''
 
 steps:
-  - task: oneLuckiDevJson2Variable@1
-    displayName: 'Read version information'
-    inputs:
-      jsonFile: '${{ parameters.versionFile }}'
-      shouldPrefixVariables: true
-      variablePrefix: 'Version'
 
-  - task: Bash@3
-    displayName: 'Write version information to variable'
-    inputs:
-      targetType: 'inline'
-      script: |
-        set +x
-        echo "##vso[task.setvariable variable=previewVersion]$(Version.Major).$(Version.Minor).$(Build.BuildId).$(Version.Revision)3"
+- task: oneLuckiDevJson2Variable@1
+  displayName: 'Read version information'
+  inputs:
+    jsonFile: '${{ parameters.versionFile }}'
+    shouldPrefixVariables: true
+    variablePrefix: 'Version'
+
+- task: Bash@3
+  displayName: 'Write version information to variable'
+  inputs:
+    targetType: 'inline'
+    script: |
+      set +x
+      echo "##vso[task.setvariable variable=previewVersion]$(Version.Major).$(Version.Minor).$(Build.BuildId).$(Version.Revision)3"

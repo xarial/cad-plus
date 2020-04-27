@@ -15,30 +15,30 @@ parameters:
   
 steps:
 
-  - task: VSBuild@1
-    #condition: and(succeeded(), eq('${{ parameters.enabled }}', true))
-    displayName: 'Build installer'
-    inputs:
-      solution: 'installer\Installer.sln'
-      platform: 'x64'
-      configuration: 'Release'
-      msbuildArgs: '/p:PackageVersion=${{ parameters.version }} "/p:PackageNameSuffix=${{ parameters.packageSuffix }}"'
+- task: VSBuild@1
+  #condition: and(succeeded(), eq('${{ parameters.enabled }}', true))
+  displayName: 'Build installer'
+  inputs:
+    solution: 'installer\Installer.sln'
+    platform: 'x64'
+    configuration: 'Release'
+    msbuildArgs: '/p:PackageVersion=${{ parameters.version }} "/p:PackageNameSuffix=${{ parameters.packageSuffix }}"'
 
-  - task: codesigning@2
-    #condition: and(succeeded(), eq('${{ parameters.enabled }}', true))
-    displayName: 'Signing .msi installers'
-    inputs:
-      secureFileId: xarial-code-signing.pfx
-      signCertPassword: $(CODE_SIGN_CERT_PWD)
-      files: '_build/*.msi'
-      timeServer: 'http://timestamp.comodoca.com'
-      hashingAlgorithm: 'SHA256'
-      description: 'CAD+ Toolset'
+- task: codesigning@2
+  #condition: and(succeeded(), eq('${{ parameters.enabled }}', true))
+  displayName: 'Signing .msi installers'
+  inputs:
+    secureFileId: xarial-code-signing.pfx
+    signCertPassword: $(CODE_SIGN_CERT_PWD)
+    files: '_build/*.msi'
+    timeServer: 'http://timestamp.comodoca.com'
+    hashingAlgorithm: 'SHA256'
+    description: 'CAD+ Toolset'
 
-  - task: CopyFiles@2
-    #condition: and(succeeded(), eq('${{ parameters.enabled }}', true))
-    displayName: 'Copy Installer Files'
-    inputs:
-      SourceFolder: '_build'
-      Contents: '*.msi'
-      TargetFolder: '$(Build.ArtifactStagingDirectory)/installer/${{ parameters.artifactName }}'
+- task: CopyFiles@2
+  #condition: and(succeeded(), eq('${{ parameters.enabled }}', true))
+  displayName: 'Copy Installer Files'
+  inputs:
+    SourceFolder: '_build'
+    Contents: '*.msi'
+    TargetFolder: '$(Build.ArtifactStagingDirectory)/installer/${{ parameters.artifactName }}'

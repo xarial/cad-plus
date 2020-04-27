@@ -68,27 +68,24 @@ stages:
 
     # compile production if required
     - task: DeleteFiles@1
-      #condition: $(isProd)
+      condition: $(isProd)
       inputs:
         SourceFolder: '_build'
         Contents: '*.*'
         RemoveSourceFolder: true
     
-    - ${{ if eq(true, true) }}:
+    - ${{ if eq(variables.isProd, true) }}:
       - template: templates/compile-binaries.yml
-    - ${{ if eq(false, true) }}:
-      - template: templates/compile-installer.yml
+        parameters:
+          version: '$(prodVersion)'
+          enabled: '$(isProd)'
 
-    # - template: templates/compile-binaries.yml
-    #   parameters:
-    #     version: '$(prodVersion)'
-    #     enabled: '$(isProd)'
-  
-    # - template: templates/compile-installer.yml
-    #   parameters:
-    #     version: '$(prodVersion)'
-    #     artifactName: prod
-    #     enabled: '$(isProd)'
+    - ${{ if eq(variables.isProd, true) }}:
+      - template: templates/compile-installer.yml
+        parameters:
+          version: '$(prodVersion)'
+          artifactName: prod
+          enabled: '$(isProd)'
 
     # add version file and publish artifact
     - task: CopyFiles@2

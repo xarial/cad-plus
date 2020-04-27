@@ -9,28 +9,28 @@ parameters:
 
 steps:
         
-  - task: PowerShell@2
-    #condition: and(succeeded(), eq('${{ parameters.enabled }}', true))
-    displayName: 'Set assembly version'
-    inputs:
-      filePath: 'build/set-assembly-version.ps1'
-      arguments: '-version "${{ parameters.version }}"'
+- task: PowerShell@2
+  #condition: and(succeeded(), eq('${{ parameters.enabled }}', true))
+  displayName: 'Set assembly version'
+  inputs:
+    filePath: 'build/set-assembly-version.ps1'
+    arguments: '-version "${{ parameters.version }}"'
 
-  - task: VSBuild@1
-    #condition: and(succeeded(), eq('${{ parameters.enabled }}', true))
-    displayName: 'Build source code and unit tests'
-    inputs:
-      solution: 'cad-plus.sln'
-      platform: 'Any CPU'
-      configuration: 'Release'
+- task: VSBuild@1
+  #condition: and(succeeded(), eq('${{ parameters.enabled }}', true))
+  displayName: 'Build source code and unit tests'
+  inputs:
+    solution: 'cad-plus.sln'
+    platform: 'Any CPU'
+    configuration: 'Release'
 
-  - task: codesigning@2
-    #condition: and(succeeded(), eq('${{ parameters.enabled }}', true))
-    displayName: 'Signing .exe files'
-    inputs:
-      secureFileId: xarial-code-signing.pfx
-      signCertPassword: $(CODE_SIGN_CERT_PWD)
-      files: '_build/*.exe'
-      timeServer: 'http://timestamp.comodoca.com'
-      hashingAlgorithm: 'SHA256'
-      description: 'CAD+ Toolset'
+- task: codesigning@2
+  #condition: and(succeeded(), eq('${{ parameters.enabled }}', true))
+  displayName: 'Signing .exe files'
+  inputs:
+    secureFileId: xarial-code-signing.pfx
+    signCertPassword: $(CODE_SIGN_CERT_PWD)
+    files: '_build/*.exe'
+    timeServer: 'http://timestamp.comodoca.com'
+    hashingAlgorithm: 'SHA256'
+    description: 'CAD+ Toolset'
