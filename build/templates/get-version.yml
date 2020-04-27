@@ -13,5 +13,6 @@ steps:
       shouldPrefixVariables: true
       variablePrefix: 'Version'
 
-  - script: echo '##vso[task.setvariable variable=previewVersion]$(Version.Major).$(Version.Minor).$(Build.BuildId).$(Version.Revision)3
-    displayName: 'Writing the version variable value'
+  - script: |
+    set +x
+    echo "##vso[task.setvariable variable=previewVersion]$(Version.Major).$(Version.Minor).$(Build.BuildId).$(Version.Revision)3"
