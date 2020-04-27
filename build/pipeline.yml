@@ -63,6 +63,26 @@ stages:
           packageSuffix: ' (Preview)'
           artifactName: preview
 
+      # compile production if required
+      - task: DeleteFiles@1
+        condition: eq(variables['Build.SourceBranch'], 'refs/heads/master')
+        inputs:
+          SourceFolder: '_build'
+          Contents: '*.*'
+          RemoveSourceFolder: true
+
+      - template: templates/compile-binaries.yml
+        condition: eq(variables['Build.SourceBranch'], 'refs/heads/master')
+        parameters:
+          version: '$(prodVersion)'
+      
+      - template: templates/compile-installer.yml
+        condition: eq(variables['Build.SourceBranch'], 'refs/heads/master')
+        parameters:
+          version: '$(prodVersion)'
+          artifactName: prod
+
+      # add version file and publish artifact
       - task: CopyFiles@2
         displayName: 'Copy Version File'
         inputs:
@@ -73,8 +93,47 @@ stages:
       - publish: '$(Build.ArtifactStagingDirectory)/installer'
         artifact: 'installer'
 
+- stage: 'PublishToPreviewAppStore'
+  displayName: 'Publish To Preview App Store'
+  variables:
+  - group: build-vars
+  - name: previewVersion #filled in get-version template
+    value: 0.0.0.0
+  dependsOn: 'Build'
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/build-pipeline'))
+  jobs:
+  - job:
+    pool:
+      vmImage: 'ubuntu-latest'
+
+    steps:
+    - checkout: none
+
+    - download: current
+      artifact: 'installer'
+
+    - template: templates/get-version.yml
+      parameters:
+        versionFile: '$(Pipeline.Workspace)/installer/version.json'
+
+    - task: AppCenterDistribute@3
+      inputs:
+        serverEndpoint: 'App Center'
+        appSlug: 'xarial/CAD-Toolset'
+        appFile: '$(Pipeline.Workspace)/installer/preview/CADPlusToolset.msi'
+        buildVersion: '$(previewVersion)'
+        releaseNotesOption: 'input'
+        releaseNotesInput: '-'
+        isMandatory: true
+        destinationType: 'groups'
+        distributionGroupId: $(APPCENTER_GRP_PREVIEW)
+
 - stage: 'PublishToProdAppStore'
   displayName: 'Publish To Production App Store'
+  variables:
+  - group: build-vars
+  - name: prodVersion #filled in get-version template
+    value: 0.0.0.0
   dependsOn: 'Build'
   condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
   jobs:
@@ -88,19 +147,16 @@ stages:
     - download: current
       artifact: 'installer'
 
-    - task: oneLuckiDevJson2Variable@1
-      displayName: 'Read version information'
-      inputs:
-        jsonFile: '$(Pipeline.Workspace)/installer/version.json'
-        shouldPrefixVariables: true
-        variablePrefix: 'Version'
+    - template: templates/get-version.yml
+      parameters:
+        versionFile: '$(Pipeline.Workspace)/installer/version.json'
 
     - task: AppCenterDistribute@3
       inputs:
         serverEndpoint: 'App Center'
         appSlug: 'xarial/CAD-Toolset'
         appFile: '$(Pipeline.Workspace)/installer/prod/CADPlusToolset.msi'
-        buildVersion: '$(Version.Major).$(Version.Minor).$(Build.BuildId).$(Version.Revision)'
+        buildVersion: '$(prodVersion)'
         releaseNotesOption: 'input'
         releaseNotesInput: '-'
         isMandatory: true
