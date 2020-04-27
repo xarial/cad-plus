@@ -29,77 +29,77 @@ stages:
     
     steps:
             
-      - script: echo $(isProd)
+    - script: echo $(isProd)
 
-      - task: NuGetToolInstaller@0
-        displayName: 'Use NuGet'
+    - task: NuGetToolInstaller@0
+      displayName: 'Use NuGet'
 
-      - task: NuGetCommand@2
-        displayName: 'NuGet restore'
-        inputs:
-          restoreSolution: 'cad-plus.sln'
+    - task: NuGetCommand@2
+      displayName: 'NuGet restore'
+      inputs:
+        restoreSolution: 'cad-plus.sln'
 
-      - template: templates/get-version.yml
-        parameters:
-          versionFile: 'version.json'
+    - template: templates/get-version.yml
+      parameters:
+        versionFile: 'version.json'
 
-      - template: templates/compile-binaries.yml
-        parameters:
-          version: '$(previewVersion)'
+    - template: templates/compile-binaries.yml
+      parameters:
+        version: '$(previewVersion)'
+  
+    - task: VSTest@2
+      displayName: 'Unit test'
+      inputs:
+        testAssemblyVer2: |
+          tests\_build\*.Tests.dll
+        platform: '$(BuildPlatform)'
+        configuration: '$(BuildConfiguration)'
+
+    - task: NuGetCommand@2
+      displayName: 'NuGet restore'
+      inputs:
+        restoreSolution: 'installer\Installer.sln'
+
+    - template: templates/compile-installer.yml
+      parameters:
+        version: '$(previewVersion)'
+        packageSuffix: ' (Preview)'
+        artifactName: preview
+
+    # compile production if required
+    - task: DeleteFiles@1
+      #condition: $(isProd)
+      inputs:
+        SourceFolder: '_build'
+        Contents: '*.*'
+        RemoveSourceFolder: true
     
-      - task: VSTest@2
-        displayName: 'Unit test'
-        inputs:
-          testAssemblyVer2: |
-            tests\_build\*.Tests.dll
-          platform: '$(BuildPlatform)'
-          configuration: '$(BuildConfiguration)'
-
-      - task: NuGetCommand@2
-        displayName: 'NuGet restore'
-        inputs:
-          restoreSolution: 'installer\Installer.sln'
-
-      - template: templates/compile-installer.yml
-        parameters:
-          version: '$(previewVersion)'
-          packageSuffix: ' (Preview)'
-          artifactName: preview
-
-      # compile production if required
-      - task: DeleteFiles@1
-        #condition: $(isProd)
-        inputs:
-          SourceFolder: '_build'
-          Contents: '*.*'
-          RemoveSourceFolder: true
-      
     - ${{ if eq(true, true) }}:
       - template: templates/compile-binaries.yml
     - ${{ if eq(false, true) }}:
       - template: templates/compile-installer.yml
 
-      # - template: templates/compile-binaries.yml
-      #   parameters:
-      #     version: '$(prodVersion)'
-      #     enabled: '$(isProd)'
-    
-      # - template: templates/compile-installer.yml
-      #   parameters:
-      #     version: '$(prodVersion)'
-      #     artifactName: prod
-      #     enabled: '$(isProd)'
+    # - template: templates/compile-binaries.yml
+    #   parameters:
+    #     version: '$(prodVersion)'
+    #     enabled: '$(isProd)'
+  
+    # - template: templates/compile-installer.yml
+    #   parameters:
+    #     version: '$(prodVersion)'
+    #     artifactName: prod
+    #     enabled: '$(isProd)'
 
-      # add version file and publish artifact
-      - task: CopyFiles@2
-        displayName: 'Copy Version File'
-        inputs:
-          SourceFolder: '$(System.DefaultWorkingDirectory)'
-          Contents: 'version.json'
-          TargetFolder: '$(Build.ArtifactStagingDirectory)/installer'
-      
-      - publish: '$(Build.ArtifactStagingDirectory)/installer'
-        artifact: 'installer'
+    # add version file and publish artifact
+    - task: CopyFiles@2
+      displayName: 'Copy Version File'
+      inputs:
+        SourceFolder: '$(System.DefaultWorkingDirectory)'
+        Contents: 'version.json'
+        TargetFolder: '$(Build.ArtifactStagingDirectory)/installer'
+    
+    - publish: '$(Build.ArtifactStagingDirectory)/installer'
+      artifact: 'installer'
 
 - stage: 'PublishToPreviewAppStore'
   displayName: 'Publish To Preview App Store'
