@@ -16,7 +16,8 @@ stages:
     value: 0.0.0.0
   - name: prodVersion #filled in get-version template
     value: 0.0.0.0
-
+  - name: isProd
+    value: eq(variables['Build.SourceBranchName'], 'refs/heads/master') }}
   jobs:
   - job: BuildTestInstaller
     pool:
@@ -74,15 +75,13 @@ stages:
       - template: templates/compile-binaries.yml
         parameters:
           version: '$(prodVersion)'
-          ${{ if ne(variables['Build.SourceBranchName'], 'refs/heads/master') }}:
-          enabled: false
+          enabled: $(isProd)
       
       - template: templates/compile-installer.yml
         parameters:
           version: '$(prodVersion)'
           artifactName: prod
-          ${{ if ne(variables['Build.SourceBranchName'], 'refs/heads/master') }}:
-          enabled: false
+          enabled: $(isProd)
 
       # add version file and publish artifact
       - task: CopyFiles@2
