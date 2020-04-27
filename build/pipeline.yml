@@ -17,6 +17,8 @@ stages:
 
   jobs:
   - job: BuildTestInstaller
+    variables:
+      previewVersion: 0.0.0.0
     pool:
       name: 'Azure Pipelines'
       vmImage: windows-latest

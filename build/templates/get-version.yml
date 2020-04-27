@@ -12,4 +12,4 @@ steps:
       variablePrefix: 'Version'
 
   - bash: |
-    echo "##vso[task.setvariable variable=previewVersion]$(Version.Major).$(Version.Minor).$(Build.BuildId).$(Version.Revision)3"
+    echo '##vso[task.setvariable variable=previewVersion]$(Version.Major).$(Version.Minor).$(Build.BuildId).$(Version.Revision)3'
