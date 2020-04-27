@@ -30,7 +30,7 @@ stages:
     steps:
             
       - script: echo $(isProd)
-      
+
       - task: NuGetToolInstaller@0
         displayName: 'Use NuGet'
 
@@ -102,6 +102,8 @@ stages:
   - group: build-vars
   - name: previewVersion #filled in get-version template
     value: 0.0.0.0
+  - name: prodVersion #not used
+    value: 0.0.0.0
   dependsOn: 'Build'
   condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/build-pipeline'))
   jobs:
@@ -135,6 +137,8 @@ stages:
   displayName: 'Publish To Production App Store'
   variables:
   - group: build-vars
+  - name: previewVersion #not used
+    value: 0.0.0.0
   - name: prodVersion #filled in get-version template
     value: 0.0.0.0
   dependsOn: 'Build'
