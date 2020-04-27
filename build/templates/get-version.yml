@@ -11,5 +11,4 @@ steps:
       shouldPrefixVariables: true
       variablePrefix: 'Version'
 
-  - bash: |
-    echo '##vso[task.setvariable variable=previewVersion]$(Version.Major).$(Version.Minor).$(Build.BuildId).$(Version.Revision)3'
+  - script: echo "##vso[task.setvariable variable=previewVersion]$(Version.Major).$(Version.Minor).$(Build.BuildId).$(Version.Revision)3"
