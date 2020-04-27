@@ -12,13 +12,14 @@ name: '$(Date:yyyyMMdd).$(Rev:r)'
 stages:
 
 - stage: 'Build'
+    
   variables:
   - group: build-vars
+  previewVersion: 0.0.0.0
+  prodVersion: 0.0.0.0
 
   jobs:
   - job: BuildTestInstaller
-    variables:
-      previewVersion: 0.0.0.0
     pool:
       name: 'Azure Pipelines'
       vmImage: windows-latest
