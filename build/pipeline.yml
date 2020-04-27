@@ -67,12 +67,12 @@ stages:
         artifactName: preview
 
     # compile production if required
-    - task: DeleteFiles@1
-      condition: '$(isProd)'
-      inputs:
-        SourceFolder: '_build'
-        Contents: '*.*'
-        RemoveSourceFolder: true
+    - ${{ if eq(variables['isProd'], true) }}:
+      - task: DeleteFiles@1
+        inputs:
+          SourceFolder: '_build'
+          Contents: '*.*'
+          RemoveSourceFolder: true
     
     - ${{ if eq(variables['isProd'], true) }}:
       - template: templates/compile-binaries.yml
