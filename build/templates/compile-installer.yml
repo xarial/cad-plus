@@ -10,13 +10,13 @@ parameters:
 - name: artifactName
   type: string
   default: ''
-- name: enabled
-  default: true
+# - name: enabled
+#   default: true
   
 steps:
 
   - task: VSBuild@1
-    condition: and(succeeded(), eq('${{ parameters.enabled }}', true))
+    #condition: and(succeeded(), eq('${{ parameters.enabled }}', true))
     displayName: 'Build installer'
     inputs:
       solution: 'installer\Installer.sln'
@@ -25,7 +25,7 @@ steps:
       msbuildArgs: '/p:PackageVersion=${{ parameters.version }} "/p:PackageNameSuffix=${{ parameters.packageSuffix }}"'
 
   - task: codesigning@2
-    condition: and(succeeded(), eq('${{ parameters.enabled }}', true))
+    #condition: and(succeeded(), eq('${{ parameters.enabled }}', true))
     displayName: 'Signing .msi installers'
     inputs:
       secureFileId: xarial-code-signing.pfx
@@ -36,7 +36,7 @@ steps:
       description: 'CAD+ Toolset'
 
   - task: CopyFiles@2
-    condition: and(succeeded(), eq('${{ parameters.enabled }}', true))
+    #condition: and(succeeded(), eq('${{ parameters.enabled }}', true))
     displayName: 'Copy Installer Files'
     inputs:
       SourceFolder: '_build'

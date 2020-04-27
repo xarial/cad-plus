@@ -74,16 +74,16 @@ stages:
           Contents: '*.*'
           RemoveSourceFolder: true
       
-      - template: templates/compile-binaries.yml
-        parameters:
-          version: '$(prodVersion)'
-          enabled: '$(isProd)'
+      # - template: templates/compile-binaries.yml
+      #   parameters:
+      #     version: '$(prodVersion)'
+      #     enabled: '$(isProd)'
     
-      - template: templates/compile-installer.yml
-        parameters:
-          version: '$(prodVersion)'
-          artifactName: prod
-          enabled: '$(isProd)'
+      # - template: templates/compile-installer.yml
+      #   parameters:
+      #     version: '$(prodVersion)'
+      #     artifactName: prod
+      #     enabled: '$(isProd)'
 
       # add version file and publish artifact
       - task: CopyFiles@2
