@@ -9,20 +9,14 @@ parameters:
   type: string
   default: ''
 
-variables:
-- name: buildConfiguration
-  value: 'Release'
-- name: buildPlatform
-  value: 'x64'
-
 steps:
 
   - task: VSBuild@1
     displayName: 'Build installer'
     inputs:
       solution: 'installer\Installer.sln'
-      platform: '$(BuildPlatform)'
-      configuration: '$(BuildConfiguration)'
+      platform: 'x64'
+      configuration: 'Release'
       msbuildArgs: '/p:PackageVersion=${{ parameters.version }} "/p:PackageNameSuffix=${{ parameters.packageSuffix }}"'
 
   - task: codesigning@2

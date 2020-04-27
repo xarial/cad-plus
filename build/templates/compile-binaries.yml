@@ -3,12 +3,6 @@ parameters:
   type: string
   default: ''
 
-variables:
-- name: buildConfiguration
-  value: 'Release'
-- name: buildPlatform
-  value: 'Any CPU'
-
 steps:
         
   - task: PowerShell@2
@@ -21,8 +15,8 @@ steps:
     displayName: 'Build source code and unit tests'
     inputs:
       solution: 'cad-plus.sln'
-      platform: '$(BuildPlatform)'
-      configuration: '$(BuildConfiguration)'
+      platform: 'Any CPU'
+      configuration: 'Release'
 
   - task: codesigning@2
     displayName: 'Signing .exe files'
