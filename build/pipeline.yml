@@ -72,15 +72,15 @@ stages:
           RemoveSourceFolder: true
 
       - template: templates/compile-binaries.yml
-        enabled: eq(variables['Build.SourceBranch'], 'refs/heads/master')
         parameters:
           version: '$(prodVersion)'
+          enabled: eq(variables['Build.SourceBranch'], 'refs/heads/master')
       
       - template: templates/compile-installer.yml
-        enabled: eq(variables['Build.SourceBranch'], 'refs/heads/master')
         parameters:
           version: '$(prodVersion)'
           artifactName: prod
+          enabled: eq(variables['Build.SourceBranch'], 'refs/heads/master')
 
       # add version file and publish artifact
       - task: CopyFiles@2
