@@ -7,7 +7,7 @@ steps:
   - task: oneLuckiDevJson2Variable@1
     displayName: 'Read version information'
     inputs:
-      jsonFile: '${{ parameters.version }}'
+      jsonFile: '${{ parameters.versionFile }}'
       shouldPrefixVariables: true
       variablePrefix: 'Version'
 
