@@ -68,18 +68,18 @@ stages:
 
     # compile production if required
     - task: DeleteFiles@1
-      condition: $(isProd)
+      #condition: $(isProd)
       inputs:
         SourceFolder: '_build'
         Contents: '*.*'
         RemoveSourceFolder: true
     
-    - ${{ if eq(variables.isProd, true) }}:
+    - ${{ if eq(true, true) }}:
       - template: templates/compile-binaries.yml
         parameters:
           version: '$(prodVersion)'
 
-    - ${{ if eq(variables.isProd, true) }}:
+    - ${{ if eq(true, true) }}:
       - template: templates/compile-installer.yml
         parameters:
           version: '$(prodVersion)'
