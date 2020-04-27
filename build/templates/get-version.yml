@@ -1,0 +1,15 @@
+parameters:
+- name: versionFile
+  type: string
+  default: ''
+
+steps:
+  - task: oneLuckiDevJson2Variable@1
+    displayName: 'Read version information'
+    inputs:
+      jsonFile: ${{ parameters.version }}
+      shouldPrefixVariables: true
+      variablePrefix: 'Version'
+
+  - bash: |
+    echo "##vso[task.setvariable variable=previewVersion]$(Version.Major).$(Version.Minor).$(Build.BuildId).$(Version.Revision)3"

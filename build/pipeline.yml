@@ -34,16 +34,13 @@ stages:
         inputs:
           restoreSolution: 'cad-plus.sln'
 
-      - task: oneLuckiDevJson2Variable@1
-        displayName: 'Read version information'
-        inputs:
-          jsonFile: 'version.json'
-          shouldPrefixVariables: true
-          variablePrefix: 'Version'
+      - template: templates/get-version.yml
+        parameters:
+          versionFile: 'version.json'
 
       - template: templates/compile-binaries.yml
         parameters:
-          version: '$(Version.Major).$(Version.Minor).$(Build.BuildId).$(Version.Revision)1'
+          version: '$(previewVersion)'
     
       - task: VSTest@2
         displayName: 'Unit test'
@@ -60,7 +57,7 @@ stages:
 
       - template: templates/compile-installer.yml
         parameters:
-          version: '$(Version.Major).$(Version.Minor).$(Build.BuildId).$(Version.Revision)1'
+          version: '$(previewVersion)'
           packageSuffix: ' (Preview)'
           artifactName: preview
 
