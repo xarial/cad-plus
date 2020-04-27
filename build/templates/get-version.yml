@@ -14,6 +14,7 @@ steps:
       variablePrefix: 'Version'
 
   - task: Bash@3
+    displayName: 'Write version information to variable'
     inputs:
       targetType: 'inline'
       script: |
