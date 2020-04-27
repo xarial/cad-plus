@@ -77,13 +77,13 @@ stages:
       - template: templates/compile-binaries.yml
         parameters:
           version: '$(prodVersion)'
-          enabled: $(isProd)
+          enabled: eq($(isProd), 'True')
       
       - template: templates/compile-installer.yml
         parameters:
           version: '$(prodVersion)'
           artifactName: prod
-          enabled: $(isProd)
+          enabled: eq($(isProd), 'True')
 
       # add version file and publish artifact
       - task: CopyFiles@2
