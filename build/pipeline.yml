@@ -68,7 +68,7 @@ stages:
 
     # compile production if required
     - task: DeleteFiles@1
-      condition: $(isProd)
+      #condition: $(isProd)
       inputs:
         SourceFolder: '_build'
         Contents: '*.*'
