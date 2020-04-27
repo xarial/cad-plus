@@ -17,7 +17,7 @@ stages:
   - name: prodVersion #filled in get-version template
     value: 0.0.0.0
   - name: isProd
-    value: eq(variables['Build.SourceBranchName'], 'refs/heads/master') }}
+    value: ${{eq(variables['Build.SourceBranch'], 'refs/heads/master')}}
   jobs:
   - job: BuildTestInstaller
     pool:
