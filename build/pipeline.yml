@@ -74,16 +74,16 @@ stages:
           Contents: '*.*'
           RemoveSourceFolder: true
       
-      - ${{ if eq($(isProd), 'True') }}:
-        - template: templates/compile-binaries.yml
-          parameters:
-            version: '$(prodVersion)'
-      
-      - ${{ if eq($(isProd), 'True') }}:
-        - template: templates/compile-installer.yml
-          parameters:
-            version: '$(prodVersion)'
-            artifactName: prod
+    - ${{ if eq($(isProd), 'True') }}:
+      - template: templates/compile-binaries.yml
+        parameters:
+          version: '$(prodVersion)'
+    
+    - ${{ if eq($(isProd), 'True') }}:
+      - template: templates/compile-installer.yml
+        parameters:
+          version: '$(prodVersion)'
+          artifactName: prod
 
       # add version file and publish artifact
       - task: CopyFiles@2
