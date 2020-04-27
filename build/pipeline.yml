@@ -138,7 +138,7 @@ stages:
   - name: prodVersion #filled in get-version template
     value: 0.0.0.0
   dependsOn: 'Build'
-  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/build-pipeline'))
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
   jobs:
   - job:
     pool:
