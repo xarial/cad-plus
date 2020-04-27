@@ -14,13 +14,7 @@ stages:
 - stage: 'Build'
   variables:
   - group: build-vars
-  - name: buildConfiguration
-    value: 'Release'
-  - name: buildPlatform
-    value: 'Any CPU'
-  - name: installerPlatform
-    value: 'x64'
-    
+
   jobs:
   - job: BuildTestInstaller
     pool:
@@ -47,19 +41,10 @@ stages:
           shouldPrefixVariables: true
           variablePrefix: 'Version'
 
-      - task: PowerShell@2
-        displayName: 'Set assembly version'
-        inputs:
-          filePath: 'build/set-assembly-version.ps1'
-          arguments: '-version "$(Version.Major).$(Version.Minor).$(Build.BuildId).$(Version.Revision)1"'
-
-      - task: VSBuild@1
-        displayName: 'Build source code and unit tests'
-        inputs:
-          solution: 'cad-plus.sln'
-          platform: '$(BuildPlatform)'
-          configuration: '$(BuildConfiguration)'
-
+      - template: templates/compile-binaries.yml
+        parameters:
+          version: '$(Version.Major).$(Version.Minor).$(Build.BuildId).$(Version.Revision)1'
+    
       - task: VSTest@2
         displayName: 'Unit test'
         inputs:
@@ -68,38 +53,16 @@ stages:
           platform: '$(BuildPlatform)'
           configuration: '$(BuildConfiguration)'
 
-      - task: codesigning@2
-        displayName: 'Signing .exe files'
-        inputs:
-          secureFileId: xarial-code-signing.pfx
-          signCertPassword: $(CODE_SIGN_CERT_PWD)
-          files: '_build/*.exe'
-          timeServer: 'http://timestamp.comodoca.com'
-          hashingAlgorithm: 'SHA256'
-          description: 'CAD+ Toolset'
-
       - task: NuGetCommand@2
         displayName: 'NuGet restore'
         inputs:
           restoreSolution: 'installer\Installer.sln'
 
-      - task: VSBuild@1
-        displayName: 'Build installer'
-        inputs:
-          solution: 'installer\Installer.sln'
-          platform: '$(InstallerPlatform)'
-          configuration: '$(BuildConfiguration)'
-          msbuildArgs: '/p:PackageVersion=$(Version.Major).$(Version.Minor).$(Build.BuildId).$(Version.Revision) "/p:PackageNameSuffix= (Preview)"'
-
-      - task: codesigning@2
-        displayName: 'Signing .msi installers'
-        inputs:
-          secureFileId: xarial-code-signing.pfx
-          signCertPassword: $(CODE_SIGN_CERT_PWD)
-          files: '_build/*.msi'
-          timeServer: 'http://timestamp.comodoca.com'
-          hashingAlgorithm: 'SHA256'
-          description: 'CAD+ Toolset'
+      - template: templates/compile-installer.yml
+        parameters:
+          version: '$(Version.Major).$(Version.Minor).$(Build.BuildId).$(Version.Revision)1'
+          packageSuffix: ' (Preview)'
+          artifactName: preview
 
       - task: CopyFiles@2
         displayName: 'Copy Version File'
@@ -107,21 +70,14 @@ stages:
           SourceFolder: '$(System.DefaultWorkingDirectory)'
           Contents: 'version.json'
           TargetFolder: '$(Build.ArtifactStagingDirectory)/installer'
-
-      - task: CopyFiles@2
-        displayName: 'Copy Installer Files'
-        inputs:
-          SourceFolder: '_build'
-          Contents: '*.msi'
-          TargetFolder: '$(Build.ArtifactStagingDirectory)/installer'
       
       - publish: '$(Build.ArtifactStagingDirectory)/installer'
         artifact: 'installer'
 
-- stage: 'PublishToAppStore'
-  displayName: 'Publish To App Store'
+- stage: 'PublishToProdAppStore'
+  displayName: 'Publish To Production App Store'
   dependsOn: 'Build'
-  condition: succeeded()
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
   jobs:
   - job:
     pool:
@@ -144,10 +100,10 @@ stages:
       inputs:
         serverEndpoint: 'App Center'
         appSlug: 'xarial/CAD-Toolset'
-        appFile: '$(Pipeline.Workspace)/installer/CADPlusToolset.msi'
+        appFile: '$(Pipeline.Workspace)/installer/prod/CADPlusToolset.msi'
         buildVersion: '$(Version.Major).$(Version.Minor).$(Build.BuildId).$(Version.Revision)'
         releaseNotesOption: 'input'
         releaseNotesInput: '-'
         isMandatory: true
         destinationType: 'groups'
-        distributionGroupId: '5f7506b4-03a6-40f7-8a54-57685986f953'
+        distributionGroupId: $(APPCENTER_GRP_PROD)

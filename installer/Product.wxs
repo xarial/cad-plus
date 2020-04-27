@@ -3,7 +3,7 @@
 	<Product Id="*" Name="CAD+ Toolset$(var.PackageNameSuffix)" Language="1033" Version="$(var.PackageVersion)" Manufacturer="Xarial Pty Limited" UpgradeCode="{1B7A19E1-B6B6-42D0-8DC6-0993E6E5468C}">
 		<Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
 
-		<MajorUpgrade DowngradeErrorMessage="A newer version of CAD+ Toolset is already installed." />
+		<MajorUpgrade AllowSameVersionUpgrades="yes" DowngradeErrorMessage="A newer version of CAD+ Toolset is already installed." />
 		<MediaTemplate EmbedCab="yes" />
 
     <Property Id="ARPHELPLINK" Value="https://cadplus.xarial.com" />

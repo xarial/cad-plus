@@ -1,0 +1,43 @@
+parameters:
+- name: version
+  type: string
+  default: ''
+- name: packageSuffix
+  type: string
+  default: ''
+- name: artifactName
+  type: string
+  default: ''
+
+variables:
+- name: buildConfiguration
+  value: 'Release'
+- name: buildPlatform
+  value: 'x64'
+
+steps:
+
+  - task: VSBuild@1
+    displayName: 'Build installer'
+    inputs:
+      solution: 'installer\Installer.sln'
+      platform: '$(BuildPlatform)'
+      configuration: '$(BuildConfiguration)'
+      msbuildArgs: '/p:PackageVersion=${{ parameters.version }} "/p:PackageNameSuffix=${{ parameters.packageSuffix }}"'
+
+  - task: codesigning@2
+    displayName: 'Signing .msi installers'
+    inputs:
+      secureFileId: xarial-code-signing.pfx
+      signCertPassword: $(CODE_SIGN_CERT_PWD)
+      files: '_build/*.msi'
+      timeServer: 'http://timestamp.comodoca.com'
+      hashingAlgorithm: 'SHA256'
+      description: 'CAD+ Toolset'
+
+  - task: CopyFiles@2
+    displayName: 'Copy Installer Files'
+    inputs:
+      SourceFolder: '_build'
+      Contents: '*.msi'
+      TargetFolder: '$(Build.ArtifactStagingDirectory)/installer/${{ parameters.artifactName }}'
