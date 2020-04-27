@@ -67,7 +67,6 @@ stages:
           artifactName: preview
 
       # compile production if required
-    - ${{ if eq(true, true) }}:
       - task: DeleteFiles@1
         #condition: $(isProd)
         inputs:
@@ -75,6 +74,11 @@ stages:
           Contents: '*.*'
           RemoveSourceFolder: true
       
+      - ${{ if eq(true, true) }}:
+       - template: templates/compile-binaries.yml
+      - ${{ if eq(false, true) }}:
+        - template: templates/compile-installer.yml
+        
       # - template: templates/compile-binaries.yml
       #   parameters:
       #     version: '$(prodVersion)'
