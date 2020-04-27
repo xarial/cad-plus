@@ -21,3 +21,4 @@ steps:
     script: |
       set +x
       echo "##vso[task.setvariable variable=previewVersion]$(Version.Major).$(Version.Minor).$(Build.BuildId).$(Version.Revision)3"
+      echo "##vso[task.setvariable variable=prodVersion]$(Version.Major).$(Version.Minor).$(Build.BuildId).$(Version.Revision)9"
