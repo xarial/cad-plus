@@ -64,20 +64,20 @@ stages:
           artifactName: preview
 
       # compile production if required
+      ${{ if eq(variables['Build.SourceBranchName'], 'refs/heads/master') }}:
       - task: DeleteFiles@1
-        condition: eq(variables['Build.SourceBranch'], 'refs/heads/master')
         inputs:
           SourceFolder: '_build'
           Contents: '*.*'
           RemoveSourceFolder: true
 
+      ${{ if eq(variables['Build.SourceBranchName'], 'refs/heads/master') }}:
       - template: templates/compile-binaries.yml
-        condition: eq(variables['Build.SourceBranch'], 'refs/heads/master')
         parameters:
           version: '$(prodVersion)'
       
+      ${{ if eq(variables['Build.SourceBranchName'], 'refs/heads/master') }}:
       - template: templates/compile-installer.yml
-        condition: eq(variables['Build.SourceBranch'], 'refs/heads/master')
         parameters:
           version: '$(prodVersion)'
           artifactName: prod
