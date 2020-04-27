@@ -1,3 +1,5 @@
+#Install CodeSigning task from https://marketplace.visualstudio.com/items?itemName=stefankert.codesigning
+
 parameters:
 - name: version
   type: string

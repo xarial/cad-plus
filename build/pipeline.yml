@@ -1,6 +1,3 @@
-#Install CodeSigning task from https://marketplace.visualstudio.com/items?itemName=stefankert.codesigning
-#Install version reading task https://marketplace.visualstudio.com/items?itemName=OneLuckiDev.json2variable
-
 trigger:
   branches:
     include:
@@ -15,8 +12,10 @@ stages:
     
   variables:
   - group: build-vars
-  previewVersion: 0.0.0.0
-  prodVersion: 0.0.0.0
+  - name: previewVersion #filled in get-version template
+    value: 0.0.0.0
+  - name: prodVersion #filled in get-version template
+    value: 0.0.0.0
 
   jobs:
   - job: BuildTestInstaller

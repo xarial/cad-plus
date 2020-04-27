@@ -1,3 +1,5 @@
+#Install version reading task https://marketplace.visualstudio.com/items?itemName=OneLuckiDev.json2variable
+
 parameters:
 - name: versionFile
   type: string
