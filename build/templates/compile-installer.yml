@@ -11,8 +11,9 @@ parameters:
   type: string
   default: ''
 - name: enabled
+  type: boolean
   default: true
-
+  
 steps:
 
   - task: VSBuild@1

@@ -74,13 +74,15 @@ stages:
       - template: templates/compile-binaries.yml
         parameters:
           version: '$(prodVersion)'
-          enabled: eq(variables['Build.SourceBranch'], 'refs/heads/master')
+          ${{ if ne(variables['Build.SourceBranchName'], 'refs/heads/master') }}:
+          enabled: false
       
       - template: templates/compile-installer.yml
         parameters:
           version: '$(prodVersion)'
           artifactName: prod
-          enabled: eq(variables['Build.SourceBranch'], 'refs/heads/master')
+          ${{ if ne(variables['Build.SourceBranchName'], 'refs/heads/master') }}:
+          enabled: false
 
       # add version file and publish artifact
       - task: CopyFiles@2
