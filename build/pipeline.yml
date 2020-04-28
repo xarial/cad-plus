@@ -68,19 +68,19 @@ stages:
         artifactName: preview
 
     # compile production if required
-    - ${{ if eq(variables['isProd'], true) }}:
+    - ${{ if and(eq(variables['isProd'], true), ne(variables['Build.Reason'], 'PullRequest')) }}:
       - task: DeleteFiles@1
         inputs:
           SourceFolder: '_build'
           Contents: '*.*'
           RemoveSourceFolder: true
     
-    - ${{ if eq(variables['isProd'], true) }}:
+    - ${{ if and(eq(variables['isProd'], true), ne(variables['Build.Reason'], 'PullRequest')) }}:
       - template: templates/compile-binaries.yml
         parameters:
           version: '$(prodVersion)'
 
-    - ${{ if eq(variables['isProd'], true) }}:
+    - ${{ if and(eq(variables['isProd'], true), ne(variables['Build.Reason'], 'PullRequest')) }}:
       - template: templates/compile-installer.yml
         parameters:
           version: '$(prodVersion)'
@@ -88,6 +88,7 @@ stages:
 
     # add version file and publish artifact
     - task: CopyFiles@2
+      condition: ne(variables['Build.Reason'], 'PullRequest')
       displayName: 'Copy Version File'
       inputs:
         SourceFolder: '$(System.DefaultWorkingDirectory)'
@@ -95,6 +96,7 @@ stages:
         TargetFolder: '$(Build.ArtifactStagingDirectory)/installer'
     
     - publish: '$(Build.ArtifactStagingDirectory)/installer'
+      condition: ne(variables['Build.Reason'], 'PullRequest')
       artifact: 'installer'
 
 - stage: 'PreviewDeploy'
@@ -106,7 +108,7 @@ stages:
   - name: previewVersionName #filled in get-version template
     value: ''
   dependsOn: 'Build'
-  condition: succeeded()
+  condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
   jobs:
   - deployment:
     pool:
@@ -144,7 +146,7 @@ stages:
   - name: prodVersion #filled in get-version template
     value: 0.0.0.0
   dependsOn: 'Build'
-  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'), ne(variables['Build.Reason'], 'PullRequest'))
   jobs:
   - deployment:
     pool:
