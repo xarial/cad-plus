@@ -42,7 +42,6 @@ stages:
     - template: templates/get-version.yml
       parameters:
         versionFile: 'version.json'
-        isProd: $(isProd)
 
     - template: templates/compile-binaries.yml
       parameters:
