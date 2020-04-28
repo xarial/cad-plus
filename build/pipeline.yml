@@ -97,7 +97,6 @@ stages:
       artifact: 'installer'
 
 - stage: 'Deploy'
-  displayName: 'Deploy installers to App Center'
   variables:
   - group: build-vars
   - name: previewVersion #filled in get-version template
@@ -162,7 +161,7 @@ stages:
 
           - task: AppCenterDistribute@3
             inputs:
-              serverEndpoint: app-center-prod
+              serverEndpoint: app-center
               appSlug: 'xarial/CAD-Toolset'
               appFile: '$(Pipeline.Workspace)/installer/prod/CADPlusToolset.msi'
               buildVersion: '$(prodVersion)'
