@@ -145,7 +145,6 @@ stages:
   - job:
     pool:
       vmImage: 'ubuntu-latest'
-    environment: 'app-center-prod'
 
     steps:
     - checkout: none
