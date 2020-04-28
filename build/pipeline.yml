@@ -19,7 +19,7 @@ stages:
   - name: previewVersionName #filled in get-version template
     value: ''
   - name: isProd
-    value: ${{eq(variables['Build.SourceBranch'], 'refs/heads/master')}}
+    value: ${{eq(variables['Build.SourceBranch'], 'refs/heads/build-pipeline')}}
   jobs:
   - job: BuildTestInstaller
     pool:
@@ -140,11 +140,12 @@ stages:
   - name: prodVersion #filled in get-version template
     value: 0.0.0.0
   dependsOn: 'Build'
-  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/build-pipeline'))
   jobs:
   - job:
     pool:
       vmImage: 'ubuntu-latest'
+    environment: 'app-center-prod'
 
     steps:
     - checkout: none
