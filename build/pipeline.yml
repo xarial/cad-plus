@@ -21,7 +21,8 @@ stages:
   - name: isProd
     value: ${{eq(variables['Build.SourceBranch'], 'refs/heads/master')}}
   jobs:
-  - job: BuildTestInstaller
+  - job: BuildUnitTestInstaller
+    displayName: 'Build, Unit Test, Installer'
     pool:
       name: 'Azure Pipelines'
       vmImage: windows-latest
@@ -96,8 +97,8 @@ stages:
     - publish: '$(Build.ArtifactStagingDirectory)/installer'
       artifact: 'installer'
 
-- stage: 'PublishToPreviewAppStore'
-  displayName: 'Publish To Preview App Store'
+- stage: 'PreviewDeploy'
+  displayName: 'Preview Deploy'
   variables:
   - group: build-vars
   - name: previewVersion #filled in get-version template
@@ -136,8 +137,8 @@ stages:
                 destinationType: 'groups'
                 distributionGroupId: $(APPCENTER_GRP_PREVIEW)
 
-- stage: 'PublishToProdAppStore'
-  displayName: 'Publish To Production App Store'
+- stage: 'ProductionDeploy'
+  displayName: 'Production Deploy'
   variables:
   - group: build-vars
   - name: prodVersion #filled in get-version template
