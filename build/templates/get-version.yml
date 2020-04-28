@@ -15,18 +15,14 @@ steps:
     variablePrefix: 'Version'
 
 - task: Bash@3
-  variables:
-  - name: previewVersionIndex
-    value: 3
-  - name: previewVersionName
-    value: 'Preview'
-  - name: prodVersionIndex
-    value: 9
   displayName: 'Write version information to variable'
   inputs:
     targetType: 'inline'
     script: |
       set +x
-      echo "##vso[task.setvariable variable=previewVersion]$(Version.Major).$(Version.Minor).$(Build.BuildId).$(Version.Revision)$(prodVersionIndex)"
-      echo "##vso[task.setvariable variable=prodVersion]$(Version.Major).$(Version.Minor).$(Build.BuildId).$(Version.Revision)$(prodVersionIndex)"
-      echo "##vso[task.setvariable variable=previewVersionName]$(previewVersionName)"
+      let previewVersionIndex = 3
+      let prodVersionIndex = 9
+      let previewVersionName = "Preview"
+      echo "##vso[task.setvariable variable=previewVersion]$(Version.Major).$(Version.Minor).$(Build.BuildId).$(Version.Revision)$previewVersionIndex"
+      echo "##vso[task.setvariable variable=prodVersion]$(Version.Major).$(Version.Minor).$(Build.BuildId).$(Version.Revision)$prodVersionIndex"
+      echo "##vso[task.setvariable variable=previewVersionName]$previewVersionName"
