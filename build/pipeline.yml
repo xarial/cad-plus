@@ -96,22 +96,18 @@ stages:
     - publish: '$(Build.ArtifactStagingDirectory)/installer'
       artifact: 'installer'
 
-- stage: 'Deploy'
+- stage: 'PublishToPreviewAppStore'
+  displayName: 'Publish To Preview App Store'
   variables:
   - group: build-vars
   - name: previewVersion #filled in get-version template
-    value: 0.0.0.0
-  - name: prodVersion #filled in get-version template
     value: 0.0.0.0
   - name: previewVersionName #filled in get-version template
     value: ''
   dependsOn: 'Build'
   condition: succeeded()
-
   jobs:
-  
-  - deployment: preview
-    displayName: 'Deploying preview version to App Center'
+  - deployment:
     pool:
       vmImage: 'ubuntu-latest'
     environment: preview
@@ -139,13 +135,20 @@ stages:
                 isMandatory: true
                 destinationType: 'groups'
                 distributionGroupId: $(APPCENTER_GRP_PREVIEW)
-  
-  - deployment: production
-    displayName: 'Deploying production version to App Center'
+
+- stage: 'PublishToProdAppStore'
+  displayName: 'Publish To Production App Store'
+  variables:
+  - group: build-vars
+  - name: prodVersion #filled in get-version template
+    value: 0.0.0.0
+  dependsOn: 'Build'
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+  jobs:
+  - deployment:
     pool:
       vmImage: 'ubuntu-latest'
     environment: production
-    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
     strategy: 
       runOnce:
         deploy:
