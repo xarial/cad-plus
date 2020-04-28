@@ -42,6 +42,7 @@ stages:
     - template: templates/get-version.yml
       parameters:
         versionFile: 'version.json'
+        isProd: $(isProd)
 
     - template: templates/compile-binaries.yml
       parameters:
@@ -104,6 +105,8 @@ stages:
     value: 0.0.0.0
   - name: previewVersionName #filled in get-version template
     value: ''
+  - name: isProd
+    value: ${{eq(variables['Build.SourceBranch'], 'refs/heads/master')}}
   dependsOn: 'Build'
   condition: succeeded()
   jobs:
@@ -120,6 +123,7 @@ stages:
     - template: templates/get-version.yml
       parameters:
         versionFile: '$(Pipeline.Workspace)/installer/version.json'
+        isProd: $(isProd)
 
     - task: AppCenterDistribute@3
       inputs:

@@ -4,6 +4,9 @@ parameters:
 - name: versionFile
   type: string
   default: ''
+- name: isProd
+  type: boolean
+  default: false
 
 steps:
 
@@ -15,14 +18,29 @@ steps:
     variablePrefix: 'Version'
 
 - task: Bash@3
-  displayName: 'Write version information to variable'
+  displayName: 'Write production version information to variable'
   inputs:
     targetType: 'inline'
     script: |
       set +x
-      previewVersionIndex = 3
-      prodVersionIndex = 9
-      previewVersionName = Preview
-      echo "##vso[task.setvariable variable=previewVersion]$(Version.Major).$(Version.Minor).$(Build.BuildId).$(Version.Revision)$previewVersionIndex"
-      echo "##vso[task.setvariable variable=prodVersion]$(Version.Major).$(Version.Minor).$(Build.BuildId).$(Version.Revision)$prodVersionIndex"
-      echo "##vso[task.setvariable variable=previewVersionName]$previewVersionName"
+      echo "##vso[task.setvariable variable=baseVersion]$(Version.Major).$(Version.Minor).$(Build.BuildId).$(Version.Revision)9"
+
+- ${{ if ne(parameters['isProd'], true) }}:
+  - task: Bash@3
+    displayName: 'Write preview version information to variable'
+    inputs:
+      targetType: 'inline'
+      script: |
+        set +x
+        echo "##vso[task.setvariable variable=previewVersion]$(Version.Major).$(Version.Minor).$(Build.BuildId).$(Version.Revision)4"
+        echo "##vso[task.setvariable variable=previewVersionName]Preview"
+
+- ${{ if eq(parameters['isProd'], true) }}:
+  - task: Bash@3
+    displayName: 'Write pre-release version information to variable'
+    inputs:
+      targetType: 'inline'
+      script: |
+        set +x
+        echo "##vso[task.setvariable variable=previewVersion]$(Version.Major).$(Version.Minor).$(Build.BuildId).$(Version.Revision)8"
+        echo "##vso[task.setvariable variable=previewVersionName]PreRelease"
