@@ -107,31 +107,34 @@ stages:
   dependsOn: 'Build'
   condition: succeeded()
   jobs:
-  - job:
+  - deployment:
     pool:
       vmImage: 'ubuntu-latest'
 
-    steps:
-    - checkout: none
+    strategy: 
+        runOnce:
+          deploy:
+            steps:
+            - checkout: none
 
-    - download: current
-      artifact: 'installer'
+            - download: current
+              artifact: 'installer'
 
-    - template: templates/get-version.yml
-      parameters:
-        versionFile: '$(Pipeline.Workspace)/installer/version.json'
+            - template: templates/get-version.yml
+              parameters:
+                versionFile: '$(Pipeline.Workspace)/installer/version.json'
 
-    - task: AppCenterDistribute@3
-      inputs:
-        serverEndpoint: app-center
-        appSlug: 'xarial/CAD-Toolset'
-        appFile: '$(Pipeline.Workspace)/installer/preview/CADPlusToolset.msi'
-        buildVersion: '$(previewVersion) ($(previewVersionName))'
-        releaseNotesOption: 'input'
-        releaseNotesInput: '-'
-        isMandatory: true
-        destinationType: 'groups'
-        distributionGroupId: $(APPCENTER_GRP_PREVIEW)
+            - task: AppCenterDistribute@3
+              inputs:
+                serverEndpoint: app-center
+                appSlug: 'xarial/CAD-Toolset'
+                appFile: '$(Pipeline.Workspace)/installer/preview/CADPlusToolset.msi'
+                buildVersion: '$(previewVersion) ($(previewVersionName))'
+                releaseNotesOption: 'input'
+                releaseNotesInput: '-'
+                isMandatory: true
+                destinationType: 'groups'
+                distributionGroupId: $(APPCENTER_GRP_PREVIEW)
 
 - stage: 'PublishToProdAppStore'
   displayName: 'Publish To Production App Store'
@@ -142,28 +145,31 @@ stages:
   dependsOn: 'Build'
   condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
   jobs:
-  - job:
+  - deployment:
     pool:
       vmImage: 'ubuntu-latest'
 
-    steps:
-    - checkout: none
+    strategy: 
+      runOnce:
+        deploy:
+          steps:
+          - checkout: none
 
-    - download: current
-      artifact: 'installer'
+          - download: current
+            artifact: 'installer'
 
-    - template: templates/get-version.yml
-      parameters:
-        versionFile: '$(Pipeline.Workspace)/installer/version.json'
+          - template: templates/get-version.yml
+            parameters:
+              versionFile: '$(Pipeline.Workspace)/installer/version.json'
 
-    - task: AppCenterDistribute@3
-      inputs:
-        serverEndpoint: app-center-prod
-        appSlug: 'xarial/CAD-Toolset'
-        appFile: '$(Pipeline.Workspace)/installer/prod/CADPlusToolset.msi'
-        buildVersion: '$(prodVersion)'
-        releaseNotesOption: 'input'
-        releaseNotesInput: '-'
-        isMandatory: true
-        destinationType: 'groups'
-        distributionGroupId: $(APPCENTER_GRP_PROD)
+          - task: AppCenterDistribute@3
+            inputs:
+              serverEndpoint: app-center-prod
+              appSlug: 'xarial/CAD-Toolset'
+              appFile: '$(Pipeline.Workspace)/installer/prod/CADPlusToolset.msi'
+              buildVersion: '$(prodVersion)'
+              releaseNotesOption: 'input'
+              releaseNotesInput: '-'
+              isMandatory: true
+              destinationType: 'groups'
+              distributionGroupId: $(APPCENTER_GRP_PROD)
