@@ -30,8 +30,6 @@ stages:
         - visualstudio
     
     steps:
-            
-    - script: echo $(isProd)
 
     - task: NuGetToolInstaller@0
       displayName: 'Use NuGet'
