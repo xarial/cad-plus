@@ -22,7 +22,7 @@ steps:
       set +x
       echo "##vso[task.setvariable variable=prodVersion]$(Version.Major).$(Version.Minor).$(Build.BuildId).$(Version.Revision)9"
 
-- ${{ if ne(variables['Build.SourceBranch'], 'refs/heads/build-pipeline') }}:
+- ${{ if ne(variables['Build.SourceBranch'], 'refs/heads/master') }}:
   - task: Bash@3
     displayName: 'Write preview version information to variable'
     inputs:
@@ -32,7 +32,7 @@ steps:
         echo "##vso[task.setvariable variable=previewVersion]$(Version.Major).$(Version.Minor).$(Build.BuildId).$(Version.Revision)4"
         echo "##vso[task.setvariable variable=previewVersionName]Preview"
 
-- ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/build-pipeline') }}:
+- ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/master') }}:
   - task: Bash@3
     displayName: 'Write pre-release version information to variable'
     inputs:

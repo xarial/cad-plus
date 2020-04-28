@@ -4,7 +4,7 @@ trigger:
     - master
     - dev
 
-name: '$(Date:yyyyMMdd).$(Rev:r)'
+name: '$(Date:yyyyMMdd).$(Rev:r)[$(BuildID)]'
 
 stages:
 
@@ -19,7 +19,7 @@ stages:
   - name: previewVersionName #filled in get-version template
     value: ''
   - name: isProd
-    value: ${{eq(variables['Build.SourceBranch'], 'refs/heads/build-pipeline')}}
+    value: ${{eq(variables['Build.SourceBranch'], 'refs/heads/master')}}
   jobs:
   - job: BuildTestInstaller
     pool:
@@ -140,7 +140,7 @@ stages:
   - name: prodVersion #filled in get-version template
     value: 0.0.0.0
   dependsOn: 'Build'
-  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/build-pipeline'))
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
   jobs:
   - job:
     pool:
