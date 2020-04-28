@@ -110,7 +110,7 @@ stages:
   - deployment:
     pool:
       vmImage: 'ubuntu-latest'
-
+    environment: preview
     strategy: 
         runOnce:
           deploy:
@@ -148,7 +148,7 @@ stages:
   - deployment:
     pool:
       vmImage: 'ubuntu-latest'
-
+    environment: production
     strategy: 
       runOnce:
         deploy:
