@@ -20,7 +20,7 @@ steps:
     targetType: 'inline'
     script: |
       set +x
-      echo "##vso[task.setvariable variable=baseVersion]$(Version.Major).$(Version.Minor).$(Build.BuildId).$(Version.Revision)9"
+      echo "##vso[task.setvariable variable=prodVersion]$(Version.Major).$(Version.Minor).$(Build.BuildId).$(Version.Revision)9"
 
 - ${{ if ne(variables['Build.SourceBranch'], 'refs/heads/build-pipeline') }}:
   - task: Bash@3

@@ -123,7 +123,7 @@ stages:
 
     - task: AppCenterDistribute@3
       inputs:
-        serverEndpoint: 'App Center'
+        serverEndpoint: app-center
         appSlug: 'xarial/CAD-Toolset'
         appFile: '$(Pipeline.Workspace)/installer/preview/CADPlusToolset.msi'
         buildVersion: '$(previewVersion) ($(previewVersionName))'
@@ -158,7 +158,7 @@ stages:
 
     - task: AppCenterDistribute@3
       inputs:
-        serverEndpoint: 'App Center'
+        serverEndpoint: app-center-prod
         appSlug: 'xarial/CAD-Toolset'
         appFile: '$(Pipeline.Workspace)/installer/prod/CADPlusToolset.msi'
         buildVersion: '$(prodVersion)'
