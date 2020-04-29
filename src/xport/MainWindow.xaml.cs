@@ -7,6 +7,7 @@
 
 using System.Windows;
 using Xarial.CadPlus.Xport.Models;
+using Xarial.CadPlus.Xport.Services;
 using Xarial.CadPlus.Xport.ViewModels;
 
 namespace Xarial.CadPlus.Xport
@@ -16,7 +17,9 @@ namespace Xarial.CadPlus.Xport
         public MainWindow()
         {
             InitializeComponent();
-            this.DataContext = new ExporterVM(new ExporterModel());
+            this.DataContext = new ExporterVM(
+                new ExporterModel(),
+                new MessageService());
         }
     }
 }

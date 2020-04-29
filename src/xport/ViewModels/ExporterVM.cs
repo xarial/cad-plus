@@ -16,6 +16,7 @@ using System.Windows;
 using System.Windows.Input;
 using Xarial.CadPlus.Xport.Core;
 using Xarial.CadPlus.Xport.Models;
+using Xarial.CadPlus.Xport.Services;
 using Xarial.XToolkit.Reflection;
 using Xarial.XToolkit.Wpf;
 using Xarial.XToolkit.Wpf.Extensions;
@@ -130,10 +131,13 @@ namespace Xarial.CadPlus.Xport.ViewModels
         }
 
         private readonly IExporterModel m_Model;
-        
-        public ExporterVM(IExporterModel model)
+        private readonly IMessageService m_MsgSvc;
+
+        public ExporterVM(IExporterModel model, IMessageService msgSvc)
         {
             m_Model = model;
+            m_MsgSvc = msgSvc;
+
             m_Model.ProgressChanged += OnProgressChanged;
             m_Model.Log += OnLog;
             Input = new ObservableCollection<string>();
@@ -174,11 +178,11 @@ namespace Xarial.CadPlus.Xport.ViewModels
 
                 await m_Model.Export(opts).ConfigureAwait(false);
 
-                MessageBox.Show("Operation completed", "xPort", MessageBoxButton.OK, MessageBoxImage.Information);
+                m_MsgSvc.ShowInformation("Operation completed");
             }
             catch
             {
-                MessageBox.Show("Processing error", "xPort", MessageBoxButton.OK, MessageBoxImage.Error);
+                m_MsgSvc.ShowError("Processing error");
             }
             finally
             {
