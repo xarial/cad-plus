@@ -1,8 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
+﻿//*********************************************************************
+//CAD+ Toolset
+//Copyright(C) 2020 Xarial Pty Limited
+//Product URL: https://cadplus.xarial.com
+//License: https://cadplus.xarial.com/license/
+//*********************************************************************
+
+using System;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Xarial.CadPlus.Xport.SwEDrawingsHost
 {
@@ -46,7 +50,7 @@ namespace Xarial.CadPlus.Xport.SwEDrawingsHost
 
     }
 
-    public class EDrawingsControl : IEDrawingsControl
+    internal class EDrawingsControl : IEDrawingsControl
     {
         private enum EDrawingsEventDispId 
         {
@@ -58,7 +62,7 @@ namespace Xarial.CadPlus.Xport.SwEDrawingsHost
             FailedPrintingDocument = 8,
         }
 
-        public static string GetOcxGuid(EDrawingsVersion_e vers) 
+        internal static string GetOcxGuid(EDrawingsVersion_e vers) 
         {
             switch (vers) 
             {

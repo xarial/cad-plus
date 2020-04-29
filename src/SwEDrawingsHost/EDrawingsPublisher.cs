@@ -21,7 +21,7 @@ namespace Xarial.CadPlus.Xport.EDrawingsHost
         private TaskCompletionSource<bool> m_PrintTcs;
         private TaskCompletionSource<bool> m_SaveTcs;
 
-        private readonly EDrawingsControl m_Control;
+        private readonly IEDrawingsControl m_Control;
 
         private readonly PopupKiller m_PopupKiller;
 
@@ -74,7 +74,7 @@ namespace Xarial.CadPlus.Xport.EDrawingsHost
             }
         }
 
-        private EDrawingsControl Load()
+        private IEDrawingsControl Load()
         {
             m_HostForm = new Form();
             var edrwHost = new EDrawingsAxHost();

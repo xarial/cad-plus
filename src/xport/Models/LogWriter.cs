@@ -9,20 +9,15 @@ using System;
 using System.IO;
 using System.Text;
 
-namespace Xarial.CadPlus.Xport.ViewModels
+namespace Xarial.CadPlus.Xport.Models
 {
     public class LogWriter : TextWriter
     {
-        private readonly ExporterSettingsVM m_Vm;
-
-        internal LogWriter(ExporterSettingsVM vm)
-        {
-            m_Vm = vm;
-        }
+        public event Action<string> Log;
 
         public override void WriteLine(string value)
         {
-            m_Vm.Log += !string.IsNullOrEmpty(m_Vm.Log) ? Environment.NewLine + value : value;
+            Log?.Invoke(value);
         }
 
         public override Encoding Encoding => Encoding.Default;

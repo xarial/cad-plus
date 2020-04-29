@@ -15,7 +15,7 @@ namespace Xarial.CadPlus.Xport.EDrawingsHost
     {
         private bool m_IsLoaded;
 
-        public EDrawingsControl Control { get; private set; }
+        public IEDrawingsControl Control { get; private set; }
 
         public EDrawingsAxHost(EDrawingsVersion_e version = EDrawingsVersion_e.Default) 
             : base(EDrawingsControl.GetOcxGuid(version))
