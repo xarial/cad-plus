@@ -1,137 +1,195 @@
-﻿//*********************************************************************
-//CAD+ Toolset
-//Copyright(C) 2020 Xarial Pty Limited
-//Product URL: https://cadplus.xarial.com
-//License: https://cadplus.xarial.com/license/
-//*********************************************************************
-
-using eDrawings.Interop.EModelViewControl;
-using System;
-using System.Diagnostics;
-using System.IO;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Forms;
-using Xarial.CadPlus.Xport.SwEDrawingsHost;
 
-namespace Xarial.CadPlus.Xport.EDrawingsHost
+namespace Xarial.CadPlus.Xport.SwEDrawingsHost
 {
-    public class EDrawingsControl : IPublisher
+    public enum EDrawingsVersion_e 
     {
-        private Form m_HostForm;
-        private TaskCompletionSource<bool> m_OpenTcs;
-        private TaskCompletionSource<bool> m_PrintTcs;
-        private TaskCompletionSource<bool> m_SaveTcs;
+        v2019,
+        v2020,
+        Default
+    }
 
-        private readonly EModelViewControl m_Control;
+    public enum EDrawingsPrintType_e
+    {
+        WYSIWYG,
+        ScaleToFit,
+        OneToOne,
+        PrintSelection,
+        Scaled
+    }
 
-        private readonly PopupKiller m_PopupKiller;
+    public interface IEDrawingsControl 
+    {
+        event Action<string> OnFinishedLoadingDocument;
+        event Action<string, int, string> OnFailedLoadingDocument;
+        event Action OnFinishedSavingDocument;
+        event Action<string, int, string> OnFailedSavingDocument;
+        event Action<string> OnFinishedPrintingDocument;
+        event Action<string> OnFailedPrintingDocument;
 
-        public EDrawingsControl()
+        EDrawingsVersion_e Version { get; }
+
+        void OpenDoc(string fileName, bool isTemp, bool promptToSave, bool readOnly, string commandString);
+
+        void Save(string saveName, bool saveAs, string commandString);
+
+        void Print5(bool showDialog, string fileNameInPrintQueue, bool shaded, bool draftQuality, bool color,
+            EDrawingsPrintType_e printType, double scale, int centerOffsetX, int centerOffsetY,
+            bool printAll, int pageFirst, int pageLast, string printToFileName);
+
+        string FileName { get; }
+        void CloseActiveDoc(string commandString);
+
+    }
+
+    public class EDrawingsControl : IEDrawingsControl
+    {
+        private enum EDrawingsEventDispId 
         {
-            m_PopupKiller = new PopupKiller(Process.GetCurrentProcess());
-
-            m_Control = Load();
-
-            m_Control.OnFinishedLoadingDocument += OnFinishedLoadingDocument;
-            m_Control.OnFailedLoadingDocument += OnFailedLoadingDocument;
-
-            m_Control.OnFinishedSavingDocument += OnFinishedSavingDocument;
-            m_Control.OnFailedSavingDocument += OnFailedSavingDocument;
-
-            m_Control.OnFinishedPrintingDocument += OnFinishedPrintingDocument;
-            m_Control.OnFailedPrintingDocument += OnFailedPrintingDocument;
+            FinishedLoadingDocument = 3,
+            FinishedSavingDocument = 4,
+            FailedLoadingDocument = 5,
+            FailedSavingDocument = 6,
+            FinishedPrintingDocument = 7,
+            FailedPrintingDocument = 8,
         }
 
-        public Task OpenDocument(string path)
+        public static string GetOcxGuid(EDrawingsVersion_e vers) 
         {
-            m_OpenTcs = new TaskCompletionSource<bool>();
-            m_Control.OpenDoc(path, false, false, false, "");
-            return m_OpenTcs.Task;
-        }
-
-        public Task CloseDocument()
-        {
-            m_Control.CloseActiveDoc("");
-            return Task.CompletedTask;
-        }
-
-        public Task SaveDocument(string path)
-        {
-            var ext = Path.GetExtension(path);
-
-            if (!string.Equals(ext, ".pdf", StringComparison.CurrentCultureIgnoreCase))
+            switch (vers) 
             {
-                m_SaveTcs = new TaskCompletionSource<bool>();
-                m_Control.Save(path, false, "");
-                return m_SaveTcs.Task;
+                case EDrawingsVersion_e.Default:
+                    return "22945A69-1191-4DCF-9E6F-409BDE94D101";
+                case EDrawingsVersion_e.v2019:
+                    return "0DD2B893-45A4-473B-A464-82B578AAF383";
+                case EDrawingsVersion_e.v2020:
+                    return "0FEA599D-6369-4811-8D00-E52B8A59C901";
+                default:
+                    throw new NotSupportedException("This version of eDrawings is not supported");
             }
-            else
+        }
+
+        private static Guid GetEventsGuid(EDrawingsVersion_e vers)
+        {
+            switch (vers)
             {
-                m_PrintTcs = new TaskCompletionSource<bool>();
-                var fileName = m_Control.FileName;
-                m_Control.Print5(false, fileName, false, false, 
-                    true, EMVPrintType.eScaleToFit, 1, 0, 0, true, 1, 1, path);
-                return m_PrintTcs.Task;
+                case EDrawingsVersion_e.v2019:
+                    return new Guid("3BFB4A26-490D-4BBC-8C19-ED970CF4441D");
+                case EDrawingsVersion_e.v2020:
+                    return new Guid("18ADE509-EA30-4084-BF7A-6FA2C2D65A77");
+                default:
+                    throw new NotSupportedException("This version of eDrawings is not supported");
             }
         }
 
-        private EModelViewControl Load()
+        public EDrawingsVersion_e Version { get; }
+
+        public string FileName => ((dynamic)m_Ocx).FileName;
+
+        private readonly object m_Ocx;
+
+        public event Action<string> OnFinishedLoadingDocument 
         {
-            m_HostForm = new Form();
-            var edrwHost = new EDrawingsAxHost();
-            m_HostForm.Controls.Add(edrwHost);
-            edrwHost.Dock = DockStyle.Fill;
-            m_HostForm.ShowIcon = false;
-            m_HostForm.ShowInTaskbar = false;
-            m_HostForm.WindowState = FormWindowState.Minimized;
-            m_HostForm.Show();
-            return edrwHost.Control;
+            add => AttachEvent(value, EDrawingsEventDispId.FinishedLoadingDocument);
+            remove => DetachEvent(value, EDrawingsEventDispId.FinishedLoadingDocument);
         }
 
-        private void OnFinishedLoadingDocument(string fileName)
+        public event Action<string, int, string> OnFailedLoadingDocument
         {
-            m_OpenTcs.SetResult(true);
+            add => AttachEvent(value, EDrawingsEventDispId.FailedLoadingDocument);
+            remove => DetachEvent(value, EDrawingsEventDispId.FailedLoadingDocument);
         }
 
-        private void OnFailedLoadingDocument(string fileName, int errorCode, string errorString)
+        public event Action OnFinishedSavingDocument
         {
-            m_OpenTcs.SetException(new Exception($"Failed to load document '{fileName}': {errorString}. Error code: {errorCode}"));
+            add => AttachEvent(value, EDrawingsEventDispId.FinishedSavingDocument);
+            remove => DetachEvent(value, EDrawingsEventDispId.FinishedSavingDocument);
+        }
+        
+        public event Action<string, int, string> OnFailedSavingDocument
+        {
+            add => AttachEvent(value, EDrawingsEventDispId.FailedSavingDocument);
+            remove => DetachEvent(value, EDrawingsEventDispId.FailedSavingDocument);
         }
 
-        private void OnFinishedSavingDocument()
+        public event Action<string> OnFinishedPrintingDocument
         {
-            m_SaveTcs.SetResult(true);
+            add => AttachEvent(value, EDrawingsEventDispId.FinishedPrintingDocument);
+            remove => DetachEvent(value, EDrawingsEventDispId.FinishedPrintingDocument);
         }
 
-        private void OnFailedSavingDocument(string fileName, int errorCode, string errorString)
+        public event Action<string> OnFailedPrintingDocument
         {
-            m_SaveTcs.SetException(new Exception($"Failed to load document '{fileName}': {errorString}. Error code: {errorCode}"));
+            add => AttachEvent(value, EDrawingsEventDispId.FailedPrintingDocument);
+            remove => DetachEvent(value, EDrawingsEventDispId.FailedPrintingDocument);
         }
 
-        private void OnFinishedPrintingDocument(string printJobName)
+        public EDrawingsControl(object ocx) 
         {
-            m_PrintTcs.SetResult(true);
+            if (ocx == null) 
+            {
+                throw new NullReferenceException(nameof(ocx));
+            }
+
+            m_Ocx = ocx;
+
+            Version = GetVersion();
         }
 
-        private void OnFailedPrintingDocument(string printJobName)
+        private EDrawingsVersion_e GetVersion() 
         {
-            m_PrintTcs.SetException(new Exception($"Failed to print document '{printJobName}'"));
+            string buildNumber = ((dynamic)m_Ocx).BuildNumber;
+
+            var majorVer = int.Parse(buildNumber.Split('.').First());
+
+            switch (majorVer) 
+            {
+                case 27:
+                    return EDrawingsVersion_e.v2019;
+                case 28:
+                    return EDrawingsVersion_e.v2020;
+                default:
+                    throw new NotSupportedException($"Version of eDrawings '{buildNumber}' is not supported");
+            }
         }
 
-        public void Dispose()
+        public void OpenDoc(string fileName, bool isTemp, bool promptToSave, bool readOnly, string commandString)
         {
-            m_PopupKiller.Dispose();
+            ((dynamic)m_Ocx).OpenDoc(fileName, isTemp, promptToSave, readOnly, commandString);
+        }
 
-            m_Control.OnFinishedLoadingDocument -= OnFinishedLoadingDocument;
-            m_Control.OnFailedLoadingDocument -= OnFailedLoadingDocument;
+        public void Save(string saveName, bool saveAs, string commandString)
+        {
+            ((dynamic)m_Ocx).Save(saveName, saveAs, commandString);
+        }
 
-            m_Control.OnFinishedSavingDocument -= OnFinishedSavingDocument;
-            m_Control.OnFailedSavingDocument -= OnFailedSavingDocument;
+        public void Print5(bool showDialog, string fileNameInPrintQueue, bool shaded, bool draftQuality, bool color, EDrawingsPrintType_e printType, 
+            double scale, int centerOffsetX, int centerOffsetY, bool printAll, int pageFirst, int pageLast, string printToFileName)
+        {
+            ((dynamic)m_Ocx).Print5(showDialog, fileNameInPrintQueue, shaded, draftQuality, color, printType,
+                scale, centerOffsetX, centerOffsetY, printAll, pageFirst, pageLast, printToFileName);
+        }
 
-            m_Control.OnFinishedPrintingDocument -= OnFinishedPrintingDocument;
-            m_Control.OnFailedPrintingDocument -= OnFailedPrintingDocument;
+        public void CloseActiveDoc(string commandString)
+        {
+            ((dynamic)m_Ocx).CloseActiveDoc(commandString);
+        }
 
-            m_HostForm.Close();
+        private void AttachEvent(Delegate value, EDrawingsEventDispId eventId)
+        {
+            System.Runtime.InteropServices.ComEventsHelper.Combine(
+                m_Ocx,
+                GetEventsGuid(Version), (int)eventId, value);
+        }
+
+        private void DetachEvent(Delegate value, EDrawingsEventDispId eventId)
+        {
+            System.Runtime.InteropServices.ComEventsHelper.Remove(
+                m_Ocx, GetEventsGuid(Version), (int)eventId, value);
         }
     }
 }
