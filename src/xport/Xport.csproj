@@ -40,7 +40,7 @@
     </StartupObject>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>xpropsicon.ico</ApplicationIcon>
+    <ApplicationIcon>xport.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="CommandLine, Version=2.7.82.0, Culture=neutral, PublicKeyToken=5a870481e358d379, processorArchitecture=MSIL">
@@ -132,7 +132,7 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="xpropsicon.ico" />
+    <Resource Include="xport.ico" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\StandAloneExporter\StandAloneExporter.csproj">
