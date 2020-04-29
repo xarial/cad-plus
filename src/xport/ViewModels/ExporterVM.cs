@@ -178,11 +178,11 @@ namespace Xarial.CadPlus.Xport.ViewModels
 
                 await m_Model.Export(opts).ConfigureAwait(false);
 
-                m_MsgSvc.ShowInformation("Operation completed");
+                //m_MsgSvc.ShowInformation("Operation completed");
             }
             catch
             {
-                m_MsgSvc.ShowError("Processing error");
+                //m_MsgSvc.ShowError("Processing error");
             }
             finally
             {
