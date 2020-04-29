@@ -7,20 +7,15 @@
 
 using System;
 
-namespace Xarial.CadPlus.Xport.ViewModels
+namespace Xarial.CadPlus.Xport.Models
 {
     public class ProgressHandler : IProgress<double>
     {
-        private readonly ExporterSettingsVM m_Vm;
-
-        internal ProgressHandler(ExporterSettingsVM vm)
-        {
-            m_Vm = vm;
-        }
-
+        public event Action<double> ProgressChanged;
+        
         public void Report(double value)
         {
-            m_Vm.Progress = value;
+            ProgressChanged?.Invoke(value);
         }
     }
 }

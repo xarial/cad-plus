@@ -22,7 +22,7 @@ namespace Xarial.CadPlus.Xport.StandAloneExporter
                 var srcFile = args[0];
                 var outFile = args[1];
 
-                using (var publisher = new EDrawingsControl())
+                using (var publisher = new EDrawingsPublisher())
                 {
                     WriteLine($"Opening '{srcFile}'...");
                     publisher.OpenDocument(srcFile).GetAwaiter().GetResult();

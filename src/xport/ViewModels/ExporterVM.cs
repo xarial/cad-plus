@@ -15,6 +15,8 @@ using System.Threading;
 using System.Windows;
 using System.Windows.Input;
 using Xarial.CadPlus.Xport.Core;
+using Xarial.CadPlus.Xport.Models;
+using Xarial.CadPlus.Xport.Services;
 using Xarial.XToolkit.Reflection;
 using Xarial.XToolkit.Wpf;
 using Xarial.XToolkit.Wpf.Extensions;
@@ -22,7 +24,7 @@ using Xarial.XToolkit.Wpf.Utils;
 
 namespace Xarial.CadPlus.Xport.ViewModels
 {
-    public class ExporterSettingsVM : INotifyPropertyChanged
+    public class ExporterVM : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -31,7 +33,6 @@ namespace Xarial.CadPlus.Xport.ViewModels
         private int m_ActiveTabIndex;
         private string m_OutputDirectory;
         private double m_Progress;
-        private CancellationTokenSource m_CurrentCancellationToken;
         private bool m_IsSameDirectoryOutput;
         private bool m_IsTimeoutEnabled;
 
@@ -129,13 +130,31 @@ namespace Xarial.CadPlus.Xport.ViewModels
             }
         }
 
-        public ExporterSettingsVM()
+        private readonly IExporterModel m_Model;
+        private readonly IMessageService m_MsgSvc;
+
+        public ExporterVM(IExporterModel model, IMessageService msgSvc)
         {
+            m_Model = model;
+            m_MsgSvc = msgSvc;
+
+            m_Model.ProgressChanged += OnProgressChanged;
+            m_Model.Log += OnLog;
             Input = new ObservableCollection<string>();
             Format = Format_e.Html;
             Filter = "*.*";
             IsTimeoutEnabled = true;
             Timeout = 600;
+        }
+
+        private void OnProgressChanged(double prg)
+        {
+            Progress = prg;
+        }
+
+        private void OnLog(string line)
+        {
+            Log += !string.IsNullOrEmpty(Log) ? Environment.NewLine + line : line;
         }
 
         private async void Export()
@@ -157,18 +176,13 @@ namespace Xarial.CadPlus.Xport.ViewModels
                     Timeout = IsTimeoutEnabled ? Timeout : -1
                 };
 
-                m_CurrentCancellationToken = new CancellationTokenSource();
+                await m_Model.Export(opts).ConfigureAwait(false);
 
-                using (var exporter = new Exporter(new LogWriter(this), new ProgressHandler(this)))
-                {
-                    await exporter.Export(opts, m_CurrentCancellationToken.Token).ConfigureAwait(false);
-                }
-
-                MessageBox.Show("Operation completed", "xPort", MessageBoxButton.OK, MessageBoxImage.Information);
+                m_MsgSvc.ShowInformation("Operation completed");
             }
             catch
             {
-                MessageBox.Show("Processing error", "xPort", MessageBoxButton.OK, MessageBoxImage.Error);
+                m_MsgSvc.ShowError("Processing error");
             }
             finally
             {
@@ -196,7 +210,7 @@ namespace Xarial.CadPlus.Xport.ViewModels
 
         private void CancelExport()
         {
-            m_CurrentCancellationToken.Cancel();
+            m_Model.Cancel();
         }
 
         private void BrowseOutputDirectory()
