@@ -34,20 +34,27 @@
     <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Newtonsoft.Json.12.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Xaml" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
     <Reference Include="Xarial.XCad, Version=0.6.0.0, Culture=neutral, PublicKeyToken=60dcaf351d4060db, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Xarial.XCad.0.6.0-20200727.3\lib\net461\Xarial.XCad.dll</HintPath>
     </Reference>
     <Reference Include="Xarial.XToolkit, Version=0.2.1.0, Culture=neutral, PublicKeyToken=60dcaf351d4060db, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Xarial.XToolkit.0.2.1\lib\net461\Xarial.XToolkit.dll</HintPath>
+    </Reference>
+    <Reference Include="Xarial.XToolkit.Wpf, Version=0.2.1.0, Culture=neutral, PublicKeyToken=60dcaf351d4060db, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Xarial.XToolkit.Wpf.0.2.1\lib\net461\Xarial.XToolkit.Wpf.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -83,6 +90,14 @@
     <Compile Include="Structs\Locations.cs" />
     <Compile Include="Structs\MacroStartFunction.cs" />
     <Compile Include="Structs\ToolbarSettings.cs" />
+    <Compile Include="UI\Base\CommandDataTemplateSelector.cs" />
+    <Compile Include="UI\Base\CommandPropertiesDataTemplateSelector.cs" />
+    <Compile Include="UI\Base\CommandsCollection.cs" />
+    <Compile Include="UI\ViewModels\CommandGroupVM.cs" />
+    <Compile Include="UI\ViewModels\CommandMacroVM.cs" />
+    <Compile Include="UI\ViewModels\CommandManagerVM.cs" />
+    <Compile Include="UI\ViewModels\CommandVM.cs" />
+    <Compile Include="UI\ViewModels\NewCommandPlaceholderVM.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
