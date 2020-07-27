@@ -1,0 +1,58 @@
+﻿<UserControl x:Class="Xarial.CadPlus.XToolbar.UI.Views.CommandMacroView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Xarial.CadPlus.XToolbar.UI.Views"
+             xmlns:ctrls="clr-namespace:Xarial.XToolkit.Wpf.Controls;assembly=Xarial.XToolkit.Wpf"
+			 xmlns:conv="clr-namespace:Xarial.CadPlus.XToolbar.UI.Converters"
+             xmlns:vm="clr-namespace:Xarial.CadPlus.XToolbar.UI.ViewModels"
+             mc:Ignorable="d"
+             d:DataContext="{x:Type vm:CommandMacroVM}"
+             d:DesignHeight="300" d:DesignWidth="300">
+    <UserControl.Resources>
+        <conv:MacroPathToEntryPointsConverter x:Key="macroPathToEntryPtsConv" />
+    </UserControl.Resources>
+    <StackPanel Orientation="Vertical" Grid.IsSharedSizeScope="True">
+        <local:CommandBaseView />
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition SharedSizeGroup="Header" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <TextBlock Margin="2" Text="Macro Path:" Grid.Column="0" Grid.Row="0" />
+            <Grid Grid.Column="1" Grid.Row="0" Margin="2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <TextBox Grid.Column="0" Text="{Binding Path=MacroPath, UpdateSourceTrigger=PropertyChanged}" Margin="2" />
+                <Button Grid.Column="1" Margin="2" Command="{Binding Path=BrowseMacroPathCommand}">
+                    <TextBlock Text="Browse..." />
+                </Button>
+            </Grid>
+
+            <TextBlock Text="Entry Point:" Grid.Column="0" Grid.Row="1" Margin="2" />
+            <ComboBox SelectedItem="{Binding Path=EntryPoint, UpdateSourceTrigger=PropertyChanged}"
+					  Grid.Column="1" Grid.Row="1" Margin="2"
+					  IsSynchronizedWithCurrentItem="True"
+					  ItemsSource="{Binding Path=MacroPath, Converter={StaticResource macroPathToEntryPtsConv}}" />
+
+            <TextBlock Text="Scope:" Grid.Column="0" Grid.Row="2" Margin="2" />
+            <ctrls:EnumComboBox Grid.Column="1" Grid.Row="2" Margin="2" Value="{Binding Path=Scope}"/>
+
+            <TextBlock Text="Triggers:" Grid.Column="0" Grid.Row="3" Margin="2" />
+            <ctrls:EnumComboBox Grid.Column="1" Grid.Row="3" Margin="2" Value="{Binding Path=Triggers}"/>
+
+        </Grid>
+    </StackPanel>
+</UserControl>

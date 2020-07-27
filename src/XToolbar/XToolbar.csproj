@@ -99,11 +99,24 @@
     <Compile Include="UI\Converters\PathToIconConverter.cs" />
     <Compile Include="UI\Converters\SelectedCommandConverter.cs" />
     <Compile Include="UI\Converters\SelectedCommandGroupConverter.cs" />
+    <Compile Include="UI\Extensions\UIElementExtension.cs" />
+    <Compile Include="UI\Forms\CommandManagerForm.xaml.cs">
+      <DependentUpon>CommandManagerForm.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\ViewModels\CommandGroupVM.cs" />
     <Compile Include="UI\ViewModels\CommandMacroVM.cs" />
     <Compile Include="UI\ViewModels\CommandManagerVM.cs" />
     <Compile Include="UI\ViewModels\CommandVM.cs" />
     <Compile Include="UI\ViewModels\NewCommandPlaceholderVM.cs" />
+    <Compile Include="UI\Views\CommandBaseView.xaml.cs">
+      <DependentUpon>CommandBaseView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Views\CommandMacroView.xaml.cs">
+      <DependentUpon>CommandMacroView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Views\CommandManagerView.xaml.cs">
+      <DependentUpon>CommandManagerView.xaml</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
@@ -120,28 +133,46 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\configure-icon.png" />
+    <Resource Include="Resources\configure-icon.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\custom-toolbars-toolbar.png" />
+    <Resource Include="Resources\custom-toolbars-toolbar.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\icon-add-after.png" />
+    <Resource Include="Resources\icon-add-after.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\icon-add-before.png" />
+    <Resource Include="Resources\icon-add-before.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\icon-move-left.png" />
+    <Resource Include="Resources\icon-move-left.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\icon-move-right.png" />
+    <Resource Include="Resources\icon-move-right.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\icon-remove.png" />
+    <Resource Include="Resources\icon-remove.png" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\macro_icon_default.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="UI\Forms\CommandManagerForm.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\Views\CommandBaseView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\Views\CommandMacroView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\Views\CommandManagerView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
