@@ -78,6 +78,7 @@
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
     <Compile Include="Services\CommandsManager.cs" />
+    <Compile Include="Services\MacroEntryPointsExtractor.cs" />
     <Compile Include="Services\MacroRunner.cs" />
     <Compile Include="Services\MessageService.cs" />
     <Compile Include="Services\SettingsProvider.cs" />
@@ -93,6 +94,11 @@
     <Compile Include="UI\Base\CommandDataTemplateSelector.cs" />
     <Compile Include="UI\Base\CommandPropertiesDataTemplateSelector.cs" />
     <Compile Include="UI\Base\CommandsCollection.cs" />
+    <Compile Include="UI\Converters\CommandContextMenuTitleConverter.cs" />
+    <Compile Include="UI\Converters\MacroPathToEntryPointsConverter.cs" />
+    <Compile Include="UI\Converters\PathToIconConverter.cs" />
+    <Compile Include="UI\Converters\SelectedCommandConverter.cs" />
+    <Compile Include="UI\Converters\SelectedCommandGroupConverter.cs" />
     <Compile Include="UI\ViewModels\CommandGroupVM.cs" />
     <Compile Include="UI\ViewModels\CommandMacroVM.cs" />
     <Compile Include="UI\ViewModels\CommandManagerVM.cs" />
