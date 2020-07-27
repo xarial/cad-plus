@@ -1,4 +1,11 @@
-﻿using Newtonsoft.Json.Linq;
+﻿//*********************************************************************
+//CAD+ Toolset
+//Copyright(C) 2020 Xarial Pty Limited
+//Product URL: https://cadplus.xarial.com
+//License: https://cadplus.xarial.com/license/
+//*********************************************************************
+
+using Newtonsoft.Json.Linq;
 using System;
 using System.Linq;
 using Xarial.CadPlus.XToolbar.Base;

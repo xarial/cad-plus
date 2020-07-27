@@ -1,4 +1,11 @@
-﻿using System.IO;
+﻿//*********************************************************************
+//CAD+ Toolset
+//Copyright(C) 2020 Xarial Pty Limited
+//Product URL: https://cadplus.xarial.com
+//License: https://cadplus.xarial.com/license/
+//*********************************************************************
+
+using System.IO;
 using Xarial.CadPlus.XToolbar.Properties;
 using Xarial.CadPlus.XToolbar.Structs;
 using Xarial.XToolkit.Services.UserSettings;
