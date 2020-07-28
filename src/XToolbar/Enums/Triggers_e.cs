@@ -14,9 +14,11 @@ namespace Xarial.CadPlus.XToolbar.Enums
     public enum Triggers_e
     {
         [Summary("Disabled command")]
+        [Title("None")]
         None = 0,
 
         [Summary("Invoked by clicking button in the toolbar")]
+        [Title("Button")]
         Button = 1 << 0,
 
         [Title("Application Start")]

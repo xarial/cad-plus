@@ -31,7 +31,7 @@ namespace Xarial.CadPlus.XToolbar.UI.Base
 
         private readonly ObservableCollection<TCommandVM> m_Commands;
 
-        private readonly List<int> m_AvailableIds;
+        private readonly List<int> m_UsedIds;
 
         public ObservableCollection<TCommandVM> Commands
         {
@@ -54,7 +54,7 @@ namespace Xarial.CadPlus.XToolbar.UI.Base
             m_Commands = new ObservableCollection<TCommandVM>(commands);
             m_Commands.CollectionChanged += OnCommandsCollectionChanged;
 
-            m_AvailableIds = new List<int>(GetAvailableIds(m_Commands));
+            m_UsedIds = m_Commands.Select(c => c.Command.Id).ToList();
 
             Add(new CollectionContainer()
             {
@@ -84,46 +84,19 @@ namespace Xarial.CadPlus.XToolbar.UI.Base
 
             return newCmd;
         }
-
-        private IEnumerable<int> GetAvailableIds(IEnumerable<TCommandVM> commands)
-        {
-            var availableIds = new List<int>();
-
-            var usedIds = commands.Select(c => c.Command.Id).ToList();
-
-            if (usedIds.Any())
-            {
-                for (int i = 1; i < usedIds.Max(); i++)
-                {
-                    if (!usedIds.Contains(i))
-                    {
-                        availableIds.Add(i);
-                    }
-                }
-            }
-
-            return availableIds;
-        }
-
+        
         private int GetNextId()
         {
-            if (m_AvailableIds.Any())
+            int id = 1;
+
+            while (m_UsedIds.Contains(id)) 
             {
-                var id = m_AvailableIds.First();
-                m_AvailableIds.RemoveAt(0);
-                return id;
+                id++;
             }
-            else
-            {
-                if (m_Commands.Any())
-                {
-                    return m_Commands.Max(c => c.Command.Id) + 1;
-                }
-                else
-                {
-                    return 1;
-                }
-            }
+
+            m_UsedIds.Add(id);
+
+            return id;
         }
 
         private void OnCommandsCollectionChanged(object sender,

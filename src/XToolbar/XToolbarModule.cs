@@ -14,6 +14,7 @@ using Xarial.XCad.Base.Attributes;
 using Xarial.XCad.Extensions;
 using Xarial.XCad.UI.Commands;
 using Xarial.XCad.UI.Commands.Attributes;
+using Xarial.XCad.UI.Commands.Enums;
 using Xarial.XToolkit.Services.UserSettings;
 
 namespace Xarial.CadPlus.XToolbar
@@ -29,7 +30,8 @@ namespace Xarial.CadPlus.XToolbar
             [Icon(typeof(Resources), nameof(Resources.configure_icon))]
             [Title("Configure...")]
             [Description("Configure toolbar")]
-            Configuration,
+            [CommandItemInfo(true, false, WorkspaceTypes_e.All)]
+            Configuration
         }
 
         private static Autofac.IContainer m_Container;

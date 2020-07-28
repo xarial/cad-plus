@@ -146,11 +146,51 @@ namespace Xarial.CadPlus.XToolbar.Services
             {
                 if (isEditable)
                 {
+                    UpdateGroupIds(toolbarConf.Groups, oldToolbarConf.Groups);
                     m_ToolbarConfProvider.SaveToolbar(toolbarConf, toolbarSets.SpecificationFile);
                 }
                 else
                 {
                     m_Logger.Log("Skipped saving of read-only toolbar settings");
+                }
+            }
+        }
+
+        private void UpdateGroupIds(CommandGroupInfo[] curCmdGroups, CommandGroupInfo[] oldCmdGroups) 
+        {
+            var usedIds = curCmdGroups.Select(g => g.Id).ToList();
+
+            int GetAvailableGroupId() 
+            {
+                int id = 1;
+
+                while (usedIds.Contains(id)) 
+                {
+                    id++;
+                }
+
+                usedIds.Add(id);
+
+                return id;
+            }
+
+            if (curCmdGroups != null && oldCmdGroups != null) 
+            {
+                foreach (var curCmdGrp in curCmdGroups) 
+                {
+                    var corrCmdGrp = oldCmdGroups.FirstOrDefault(g => g.Id == curCmdGrp.Id);
+
+                    if (corrCmdGrp != null)
+                    {
+                        if (curCmdGrp.Commands != null && corrCmdGrp.Commands != null) 
+                        {
+                            if (!curCmdGrp.Commands.Select(c => c.Id).OrderBy(x => x)
+                                .SequenceEqual(corrCmdGrp.Commands.Select(c => c.Id).OrderBy(x => x))) 
+                            {
+                                curCmdGrp.Id = GetAvailableGroupId();
+                            }
+                        }
+                    }
                 }
             }
         }
