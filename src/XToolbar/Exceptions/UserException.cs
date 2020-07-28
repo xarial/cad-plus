@@ -14,5 +14,9 @@ namespace Xarial.CadPlus.XToolbar.Exceptions
         public UserException(string userMessage) : base(userMessage)
         {
         }
+
+        public UserException(string userMessage, Exception inner) : base(userMessage, inner)
+        {
+        }
     }
 }

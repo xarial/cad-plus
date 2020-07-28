@@ -55,8 +55,10 @@ namespace Xarial.CadPlus.XToolbar.UI.ViewModels
                     {
                         if (FileSystemBrowser.BrowseFileOpen(out string macroFile, 
                             "Select macro file",
-                            FileSystemBrowser.BuildFilterString(new FileFilter(
-                                "SOLIDWORKS Macros", "swp", "swb", "dll"))))
+                            FileSystemBrowser.BuildFilterString(
+                                new FileFilter(
+                                    "SOLIDWORKS Macros", "*.swp", "*.swb", "*.dll"), 
+                                FileFilter.AllFiles)))
                         {
                             MacroPath = macroFile;
                         }

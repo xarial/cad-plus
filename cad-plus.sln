@@ -19,6 +19,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CadPlusSwAddIn", "src\CadPl
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XToolbar", "src\XToolbar\XToolbar.csproj", "{B645A77C-D088-45EE-95CA-AD45D63060CA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExtensionModule", "src\ExtensionModule\ExtensionModule.csproj", "{6BF97F84-C902-470F-874F-4AD839CB16B9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -75,6 +77,14 @@ Global
 		{B645A77C-D088-45EE-95CA-AD45D63060CA}.Release|Any CPU.Build.0 = Release|Any CPU
 		{B645A77C-D088-45EE-95CA-AD45D63060CA}.Release|x64.ActiveCfg = Release|Any CPU
 		{B645A77C-D088-45EE-95CA-AD45D63060CA}.Release|x64.Build.0 = Release|Any CPU
+		{6BF97F84-C902-470F-874F-4AD839CB16B9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6BF97F84-C902-470F-874F-4AD839CB16B9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6BF97F84-C902-470F-874F-4AD839CB16B9}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{6BF97F84-C902-470F-874F-4AD839CB16B9}.Debug|x64.Build.0 = Debug|Any CPU
+		{6BF97F84-C902-470F-874F-4AD839CB16B9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6BF97F84-C902-470F-874F-4AD839CB16B9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6BF97F84-C902-470F-874F-4AD839CB16B9}.Release|x64.ActiveCfg = Release|Any CPU
+		{6BF97F84-C902-470F-874F-4AD839CB16B9}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

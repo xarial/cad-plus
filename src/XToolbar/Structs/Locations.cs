@@ -18,7 +18,7 @@ namespace Xarial.CadPlus.XToolbar.Structs
             get
             {
                 var appDir = Path.Combine(Environment.GetFolderPath(
-                    Environment.SpecialFolder.ApplicationData),
+                    Environment.SpecialFolder.LocalApplicationData),
                     Settings.Default.AppRootDir);
 
                 return appDir;

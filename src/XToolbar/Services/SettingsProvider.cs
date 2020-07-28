@@ -5,7 +5,9 @@
 //License: https://cadplus.xarial.com/license/
 //*********************************************************************
 
+using System;
 using System.IO;
+using Xarial.CadPlus.XToolbar.Exceptions;
 using Xarial.CadPlus.XToolbar.Properties;
 using Xarial.CadPlus.XToolbar.Structs;
 using Xarial.XToolkit.Services.UserSettings;
@@ -31,12 +33,20 @@ namespace Xarial.CadPlus.XToolbar.Services
         public ToolbarSettings GetSettings()
         {
             ToolbarSettings setts;
-            try
+            var settsFilePath = Path.Combine(Locations.AppDirectoryPath, Settings.Default.XToolbarSettingsFile);
+
+            if (File.Exists(settsFilePath)) 
             {
-                setts = m_UserSettsSrv.ReadSettings<ToolbarSettings>(
-                    Settings.Default.XToolbarSettingsFile);
+                try
+                {
+                    setts = m_UserSettsSrv.ReadSettings<ToolbarSettings>(settsFilePath);
+                }
+                catch (Exception ex)
+                {
+                    throw new UserException($"Failed to read settings file at {settsFilePath}. Remove file to clear settings", ex);
+                }
             }
-            catch
+            else
             {
                 setts = new ToolbarSettings()
                 {
@@ -49,7 +59,8 @@ namespace Xarial.CadPlus.XToolbar.Services
 
         public void SaveSettings(ToolbarSettings setts)
         {
-            m_UserSettsSrv.StoreSettings(setts, Settings.Default.XToolbarSettingsFile);
+            m_UserSettsSrv.StoreSettings(setts, 
+                Path.Combine(Locations.AppDirectoryPath, Settings.Default.XToolbarSettingsFile));
         }
 
         private string ToolbarsDefaultSpecFilePath

@@ -102,7 +102,7 @@ namespace Xarial.CadPlus.XToolbar.Services
                     
                     m_Logger.Log($"Adding command group: {cmdGrp.Title} [{cmdGrp.Id}]. Commands: {string.Join(", ", cmdGrp.Commands.Select(c => $"{c.Title} [{c.UserId}]").ToArray())}");
 
-                    var cmdGrpCad = m_AddIn.CommandManager.AddCommandGroup(new XCad.UI.Commands.Structures.CommandGroupSpec());
+                    var cmdGrpCad = m_AddIn.CommandManager.AddCommandGroup(cmdGrp);
                     cmdGrpCad.CommandClick += OnCommandClick;
                     cmdGrpCad.CommandStateResolve += OnCommandStateResolve;
                 }
