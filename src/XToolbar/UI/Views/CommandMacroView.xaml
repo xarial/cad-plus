@@ -14,45 +14,65 @@
         <conv:MacroPathToEntryPointsConverter x:Key="macroPathToEntryPtsConv" />
     </UserControl.Resources>
     <StackPanel Orientation="Vertical" Grid.IsSharedSizeScope="True">
-        <local:CommandBaseView />
-        <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition SharedSizeGroup="Header" />
-                <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-            </Grid.RowDefinitions>
-
-            <TextBlock Margin="2" Text="Macro Path:" Grid.Column="0" Grid.Row="0" />
-            <Grid Grid.Column="1" Grid.Row="0" Margin="2">
+        <GroupBox Header="Attribution">
+            <local:CommandBaseView />
+        </GroupBox>
+        <GroupBox Header="Macro">
+            <Grid>
                 <Grid.ColumnDefinitions>
+                    <ColumnDefinition SharedSizeGroup="Header" />
                     <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
-                <TextBox Grid.Column="0" Text="{Binding Path=MacroPath, UpdateSourceTrigger=PropertyChanged}" Margin="2" />
-                <Button Grid.Column="1" Margin="2" Command="{Binding Path=BrowseMacroPathCommand}">
-                    <TextBlock Text="Browse..." />
-                </Button>
-            </Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
 
-            <TextBlock Text="Entry Point:" Grid.Column="0" Grid.Row="1" Margin="2" />
-            <ComboBox SelectedItem="{Binding Path=EntryPoint, UpdateSourceTrigger=PropertyChanged}"
+                <TextBlock Margin="2" Text="Path:" Grid.Column="0" Grid.Row="0" />
+                <Grid Grid.Column="1" Grid.Row="0" Margin="2">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBox Grid.Column="0" Text="{Binding Path=MacroPath, UpdateSourceTrigger=PropertyChanged}" Margin="2" />
+                    <Button Grid.Column="1" Margin="2" Command="{Binding Path=BrowseMacroPathCommand}">
+                        <TextBlock Text="Browse" Margin="5 0" />
+                    </Button>
+                </Grid>
+
+                <TextBlock Text="Entry Point:" Grid.Column="0" Grid.Row="1" Margin="2" />
+                <ComboBox SelectedItem="{Binding Path=EntryPoint, UpdateSourceTrigger=PropertyChanged}"
 					  Grid.Column="1" Grid.Row="1" Margin="2"
 					  IsSynchronizedWithCurrentItem="True"
 					  ItemsSource="{Binding Path=MacroPath, Converter={StaticResource macroPathToEntryPtsConv}}" />
 
-            <TextBlock Text="Scope:" Grid.Column="0" Grid.Row="2" Margin="2" />
-            <ctrls:EnumComboBox Grid.Column="1" Grid.Row="2" Margin="2" Value="{Binding Path=Scope}"/>
+            </Grid>
+        </GroupBox>
+        <GroupBox Header="Behavior">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition SharedSizeGroup="Header" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
 
-            <TextBlock Text="Triggers:" Grid.Column="0" Grid.Row="3" Margin="2" />
-            <ctrls:EnumComboBox Grid.Column="1" Grid.Row="3" Margin="2" Value="{Binding Path=Triggers}"/>
+                <TextBlock Text="Location:" Grid.Column="0" Grid.Row="0" Margin="2" />
+                <ctrls:EnumComboBox Grid.Column="1" Grid.Row="0" Margin="2" Value="{Binding Path=Location}"/>
 
-        </Grid>
+                <TextBlock Text="Scope:" Grid.Column="0" Grid.Row="1" Margin="2" />
+                <ctrls:EnumComboBox Grid.Column="1" Grid.Row="1" Margin="2" Value="{Binding Path=Scope}"/>
+
+                <TextBlock Text="Triggers:" Grid.Column="0" Grid.Row="2" Margin="2" />
+                <ctrls:EnumComboBox Grid.Column="1" Grid.Row="2" Margin="2" Value="{Binding Path=Triggers}"/>
+
+                <CheckBox Margin="2" IsChecked="{Binding Path=UnloadAfterRun}" Grid.Row="3" Grid.ColumnSpan="2">Unload After Run</CheckBox>
+                
+            </Grid>
+        </GroupBox>
     </StackPanel>
 </UserControl>

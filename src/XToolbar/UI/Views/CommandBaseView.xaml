@@ -48,7 +48,7 @@
             </Grid.ColumnDefinitions>
             <TextBox Grid.Column="0" Text="{Binding Path=IconPath, UpdateSourceTrigger=PropertyChanged}" Margin="2" />
             <Button Grid.Column="1" Margin="2" Command="{Binding Path=BrowseIconCommand}">
-                <TextBlock Text="Browse..." />
+                <TextBlock Text="Browse" Margin="5 0" />
             </Button>
         </Grid>
     </Grid>

@@ -66,8 +66,8 @@
     <Reference Include="Xarial.XToolkit, Version=0.2.1.0, Culture=neutral, PublicKeyToken=60dcaf351d4060db, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Xarial.XToolkit.0.2.1\lib\net461\Xarial.XToolkit.dll</HintPath>
     </Reference>
-    <Reference Include="Xarial.XToolkit.Wpf, Version=0.2.2.0, Culture=neutral, PublicKeyToken=60dcaf351d4060db, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Xarial.XToolkit.Wpf.0.2.2\lib\net461\Xarial.XToolkit.Wpf.dll</HintPath>
+    <Reference Include="Xarial.XToolkit.Wpf, Version=0.2.3.0, Culture=neutral, PublicKeyToken=60dcaf351d4060db, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Xarial.XToolkit.Wpf.0.2.3\lib\net461\Xarial.XToolkit.Wpf.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -76,6 +76,7 @@
     <Compile Include="Base\CommandItemInfoSpec.cs" />
     <Compile Include="Base\MacroButtonIcon.cs" />
     <Compile Include="Enums\MacroScope_e.cs" />
+    <Compile Include="Enums\Location_e.cs" />
     <Compile Include="Enums\Triggers_e.cs" />
     <Compile Include="Exceptions\UserException.cs" />
     <Compile Include="Helpers\MacroScopeHelper.cs" />

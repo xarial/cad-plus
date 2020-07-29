@@ -14,11 +14,11 @@ namespace Xarial.CadPlus.XToolbar.Enums
     public enum MacroScope_e
     {
         [Summary("No Open Documents")]
-        Application = 1,
+        Application = 1 << 0,
 
-        Part = 2,
-        Assembly = 4,
-        Drawing = 8,
+        Part = 1 << 1,
+        Assembly = 1 << 2,
+        Drawing = 1 << 3,
 
         [Title("All Documents")]
         [Summary("All Documents (Part, Assembly, Drawing)")]

@@ -86,7 +86,8 @@ namespace Xarial.CadPlus.XToolbar.UI.ViewModels
                 {
                     m_BrowseIconCommand = new RelayCommand(() =>
                     {
-                        if (FileSystemBrowser.BrowseFileOpen(out string imgFile, "Select image file for icon",
+                        if (FileSystemBrowser.BrowseFileOpen(out string imgFile,
+                            "Select image file for icon",
                             FileSystemBrowser.BuildFilterString(FileFilter.ImageFiles))) 
                         {
                             IconPath = imgFile;

@@ -65,7 +65,7 @@ namespace Xarial.CadPlus.XToolbar.Services
         {
             try
             {
-                m_MacroRunner.RunMacro(cmd.MacroPath, cmd.EntryPoint, false);
+                m_MacroRunner.RunMacro(cmd.MacroPath, cmd.EntryPoint, cmd.UnloadAfterRun);
             }
             catch (Exception ex)
             {

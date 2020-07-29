@@ -1,10 +1,6 @@
 ﻿using Autofac;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Xarial.CadPlus.ExtensionModule;
 using Xarial.CadPlus.XToolbar.Properties;
 using Xarial.CadPlus.XToolbar.Services;
@@ -74,7 +70,8 @@ namespace Xarial.CadPlus.XToolbar
             builder.RegisterType<MessageService>()
                 .As<IMessageService>();
 
-            builder.RegisterType<CommandManagerVM>().SingleInstance();
+            builder.RegisterType<CommandManagerVM>()
+                .SingleInstance();
 
             builder.RegisterType<CommandsManager>()
                 .As<ICommandsManager>().SingleInstance();
@@ -87,7 +84,7 @@ namespace Xarial.CadPlus.XToolbar
             m_Container = builder.Build();
         }
 
-        private void LoadCommands() 
+        private void LoadCommands()
         {
             m_Ext.CommandManager.AddCommandGroup<Commands_e>().CommandClick += OnCommandClick;
 

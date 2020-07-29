@@ -6,6 +6,7 @@
 //*********************************************************************
 
 using System;
+using Xarial.CadPlus.XToolbar.Enums;
 using Xarial.CadPlus.XToolbar.Structs;
 using Xarial.XCad.UI.Commands.Structures;
 
@@ -23,8 +24,13 @@ namespace Xarial.CadPlus.XToolbar.Base
             Title = info.Title;
             Tooltip = info.Description;
             Icon = info.GetCommandIcon();
-            HasMenu = true;
-            HasToolbar = true;
+            HasToolbar = info.Location.HasFlag(Location_e.Toolbar);
+            HasMenu = info.Location.HasFlag(Location_e.Menu);
+            HasTabBox = info.Location.HasFlag(Location_e.TabBox);
+            if (HasTabBox) 
+            {
+                TabBoxStyle = XCad.UI.Commands.Enums.RibbonTabTextDisplay_e.TextBelow;
+            }
         }
     }
 }

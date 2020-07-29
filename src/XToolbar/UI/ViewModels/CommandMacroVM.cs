@@ -95,6 +95,32 @@ namespace Xarial.CadPlus.XToolbar.UI.ViewModels
             }
         }
 
+        public bool UnloadAfterRun
+        {
+            get
+            {
+                return Command.UnloadAfterRun;
+            }
+            set
+            {
+                Command.UnloadAfterRun = value;
+                this.NotifyChanged();
+            }
+        }
+
+        public Location_e Location
+        {
+            get
+            {
+                return Command.Location;
+            }
+            set
+            {
+                Command.Location = value;
+                this.NotifyChanged();
+            }
+        }
+
         public CommandMacroVM() : this(new CommandMacroInfo())
         {
         }

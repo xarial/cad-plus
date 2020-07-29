@@ -177,7 +177,7 @@ namespace Xarial.CadPlus.XToolbar.UI.ViewModels
                         if (FileSystemBrowser.BrowseFileOpen(out string specFile,
                             "Select toolbar specification file",
                             FileSystemBrowser.BuildFilterString(
-                                new FileFilter("Toolbar Specification File", "setts")))) 
+                                new FileFilter("Toolbar Specification File", "*.setts")))) 
                         {
                             ToolbarSpecificationPath = specFile;
                         }

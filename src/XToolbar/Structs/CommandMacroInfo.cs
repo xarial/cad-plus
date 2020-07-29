@@ -15,5 +15,7 @@ namespace Xarial.CadPlus.XToolbar.Structs
         public MacroStartFunction EntryPoint { get; set; }
         public MacroScope_e Scope { get; set; } = MacroScope_e.All;
         public Triggers_e Triggers { get; set; } = Triggers_e.Button;
+        public bool UnloadAfterRun { get; set; } = true;
+        public Location_e Location { get; set; } = Location_e.Toolbar | Location_e.Menu;
     }
 }

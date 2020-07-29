@@ -5,7 +5,9 @@
 //License: https://cadplus.xarial.com/license/
 //*********************************************************************
 
+using Newtonsoft.Json.Linq;
 using System;
+using System.Linq;
 using Xarial.XToolkit.Services.UserSettings;
 using Xarial.XToolkit.Services.UserSettings.Attributes;
 
@@ -15,11 +17,55 @@ namespace Xarial.CadPlus.XToolbar.Structs
     {
         public CustomToolbarInfoVersionTransformer()
         {
-            Add(new Version("1.0.0"), new Version("2.0.0"), t => t);
+            Add(new Version(), new Version("1.0"),
+                t =>
+                {
+                    foreach (var grp in t["Groups"].Children())
+                    {
+                        var prop = grp.Children<JProperty>().FirstOrDefault(p => p.Name == "Icons");
+                        if (prop != null)
+                        {
+                            var iconPath = prop.Children().FirstOrDefault()?["IconPath"]?.ToString();
+                            prop.Replace(new JProperty("IconPath", iconPath));
+                        }
+                    }
+
+                    return t;
+                });
+
+            Add(new Version("1.0"), new Version("2.0"),
+                t =>
+                {
+                    foreach (var group in t["Groups"])
+                    {
+                        foreach (var cmd in group["Commands"])
+                        {
+                            cmd["Scope"] = (1 << 0) + (2 << 0) + (3 << 0) + (4 << 0); //all
+                            cmd["Triggers"] = 1 << 0; //button
+                        }
+                    }
+
+                    return t;
+                });
+
+            Add(new Version("2.0"), new Version("3.0"),
+                t =>
+                {
+                    foreach (var group in t["Groups"])
+                    {
+                        foreach (JObject cmd in group["Commands"])
+                        {
+                            cmd.Add(new JProperty("UnloadAfterRun", true));
+                            cmd.Add(new JProperty("Location", (1 << 0) + (2 << 0)));
+                        }
+                    }
+
+                    return t;
+                });
         }
     }
 
-    [UserSettingVersion("2.0", typeof(CustomToolbarInfoVersionTransformer))]
+    [UserSettingVersion("3.0", typeof(CustomToolbarInfoVersionTransformer))]
     public class CustomToolbarInfo
     {
         public CommandGroupInfo[] Groups { get; set; }
