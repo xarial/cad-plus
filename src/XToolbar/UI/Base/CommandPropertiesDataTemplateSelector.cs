@@ -7,9 +7,9 @@
 
 using System.Windows;
 using System.Windows.Controls;
-using Xarial.CadPlus.XToolbar.UI.ViewModels;
+using Xarial.CadPlus.CustomToolbar.UI.ViewModels;
 
-namespace Xarial.CadPlus.XToolbar.UI.Base
+namespace Xarial.CadPlus.CustomToolbar.UI.Base
 {
     public class CommandPropertiesDataTemplateSelector : DataTemplateSelector
     {

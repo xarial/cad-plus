@@ -7,11 +7,11 @@
 
 using System.Drawing;
 using System.IO;
-using Xarial.CadPlus.XToolbar.Properties;
-using Xarial.CadPlus.XToolbar.Structs;
+using Xarial.CadPlus.CustomToolbar.Properties;
+using Xarial.CadPlus.CustomToolbar.Structs;
 using Xarial.XCad.UI;
 
-namespace Xarial.CadPlus.XToolbar.Base
+namespace Xarial.CadPlus.CustomToolbar.Base
 {
     internal static class CommandItemInfoExtension
     {

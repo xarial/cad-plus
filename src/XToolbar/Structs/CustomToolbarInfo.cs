@@ -11,7 +11,7 @@ using System.Linq;
 using Xarial.XToolkit.Services.UserSettings;
 using Xarial.XToolkit.Services.UserSettings.Attributes;
 
-namespace Xarial.CadPlus.XToolbar.Structs
+namespace Xarial.CadPlus.CustomToolbar.Structs
 {
     public class CustomToolbarInfoVersionTransformer : BaseUserSettingsVersionsTransformer
     {

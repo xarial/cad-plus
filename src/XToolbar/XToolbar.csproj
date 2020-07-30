@@ -7,8 +7,8 @@
     <ProjectGuid>{B645A77C-D088-45EE-95CA-AD45D63060CA}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Xarial.CadPlus.XToolbar</RootNamespace>
-    <AssemblyName>Xarial.CadPlus.XToolbar</AssemblyName>
+    <RootNamespace>Xarial.CadPlus.CustomToolbar</RootNamespace>
+    <AssemblyName>Xarial.CadPlus.CustomToolbar</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
@@ -131,7 +131,7 @@
     <Compile Include="UI\Views\CommandManagerView.xaml.cs">
       <DependentUpon>CommandManagerView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="XToolbarModule.cs" />
+    <Compile Include="CustomToolbarModule.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

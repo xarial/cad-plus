@@ -7,7 +7,7 @@
 
 using System.Windows.Controls;
 
-namespace Xarial.CadPlus.XToolbar.UI.Views
+namespace Xarial.CadPlus.CustomToolbar.UI.Views
 {
     public partial class CommandBaseView : UserControl
     {

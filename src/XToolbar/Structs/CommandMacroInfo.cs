@@ -5,9 +5,9 @@
 //License: https://cadplus.xarial.com/license/
 //*********************************************************************
 
-using Xarial.CadPlus.XToolbar.Enums;
+using Xarial.CadPlus.CustomToolbar.Enums;
 
-namespace Xarial.CadPlus.XToolbar.Structs
+namespace Xarial.CadPlus.CustomToolbar.Structs
 {
     public class CommandMacroInfo : CommandItemInfo
     {

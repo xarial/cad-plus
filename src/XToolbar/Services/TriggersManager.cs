@@ -8,9 +8,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Xarial.CadPlus.XToolbar.Enums;
-using Xarial.CadPlus.XToolbar.Helpers;
-using Xarial.CadPlus.XToolbar.Structs;
+using Xarial.CadPlus.CustomToolbar.Enums;
+using Xarial.CadPlus.CustomToolbar.Helpers;
+using Xarial.CadPlus.CustomToolbar.Structs;
 using Xarial.XCad;
 using Xarial.XCad.Base;
 using Xarial.XCad.Documents;
@@ -18,7 +18,7 @@ using Xarial.XCad.Documents.Enums;
 using Xarial.XCad.Documents.Structures;
 using Xarial.XToolkit.Reflection;
 
-namespace Xarial.CadPlus.XToolbar.Services
+namespace Xarial.CadPlus.CustomToolbar.Services
 {
     public interface ITriggersManager : IDisposable
     {

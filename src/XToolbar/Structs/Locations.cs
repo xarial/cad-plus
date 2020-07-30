@@ -7,9 +7,9 @@
 
 using System;
 using System.IO;
-using Xarial.CadPlus.XToolbar.Properties;
+using Xarial.CadPlus.CustomToolbar.Properties;
 
-namespace Xarial.CadPlus.XToolbar.Structs
+namespace Xarial.CadPlus.CustomToolbar.Structs
 {
     internal static class Locations
     {

@@ -10,16 +10,16 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using Xarial.CadPlus.XToolbar.Base;
-using Xarial.CadPlus.XToolbar.Enums;
-using Xarial.CadPlus.XToolbar.Helpers;
-using Xarial.CadPlus.XToolbar.Structs;
+using Xarial.CadPlus.CustomToolbar.Base;
+using Xarial.CadPlus.CustomToolbar.Enums;
+using Xarial.CadPlus.CustomToolbar.Helpers;
+using Xarial.CadPlus.CustomToolbar.Structs;
 using Xarial.XCad;
 using Xarial.XCad.Base;
 using Xarial.XCad.Extensions;
 using Xarial.XCad.UI.Commands;
 
-namespace Xarial.CadPlus.XToolbar.Services
+namespace Xarial.CadPlus.CustomToolbar.Services
 {
     public interface ICommandsManager : IDisposable
     {

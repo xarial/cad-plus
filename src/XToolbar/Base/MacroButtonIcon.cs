@@ -9,7 +9,7 @@ using System.Drawing;
 using System.IO;
 using Xarial.XCad.UI;
 
-namespace Xarial.CadPlus.XToolbar.Base
+namespace Xarial.CadPlus.CustomToolbar.Base
 {
     public class MacroButtonIcon : IXImage
     {

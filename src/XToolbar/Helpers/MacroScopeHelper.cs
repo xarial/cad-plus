@@ -10,11 +10,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Xarial.CadPlus.XToolbar.Enums;
+using Xarial.CadPlus.CustomToolbar.Enums;
 using Xarial.XCad;
 using Xarial.XCad.Documents;
 
-namespace Xarial.CadPlus.XToolbar.Helpers
+namespace Xarial.CadPlus.CustomToolbar.Helpers
 {
     public static class MacroScopeHelper
     {

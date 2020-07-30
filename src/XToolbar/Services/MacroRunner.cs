@@ -5,11 +5,11 @@
 //License: https://cadplus.xarial.com/license/
 //*********************************************************************
 
-using Xarial.CadPlus.XToolbar.Structs;
+using Xarial.CadPlus.CustomToolbar.Structs;
 using Xarial.XCad;
 using Xarial.XCad.Enums;
 
-namespace Xarial.CadPlus.XToolbar.Services
+namespace Xarial.CadPlus.CustomToolbar.Services
 {
     public interface IMacroRunner
     {

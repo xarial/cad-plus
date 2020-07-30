@@ -6,11 +6,11 @@
 //*********************************************************************
 
 using System;
-using Xarial.CadPlus.XToolbar.Exceptions;
+using Xarial.CadPlus.CustomToolbar.Exceptions;
 using Xarial.XCad;
 using Xarial.XCad.Base.Enums;
 
-namespace Xarial.CadPlus.XToolbar.Services
+namespace Xarial.CadPlus.CustomToolbar.Services
 {
     public enum MessageType_e
     {

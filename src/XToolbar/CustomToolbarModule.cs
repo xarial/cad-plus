@@ -2,10 +2,10 @@
 using System;
 using System.ComponentModel;
 using Xarial.CadPlus.ExtensionModule;
-using Xarial.CadPlus.XToolbar.Properties;
-using Xarial.CadPlus.XToolbar.Services;
-using Xarial.CadPlus.XToolbar.UI.Forms;
-using Xarial.CadPlus.XToolbar.UI.ViewModels;
+using Xarial.CadPlus.CustomToolbar.Properties;
+using Xarial.CadPlus.CustomToolbar.Services;
+using Xarial.CadPlus.CustomToolbar.UI.Forms;
+using Xarial.CadPlus.CustomToolbar.UI.ViewModels;
 using Xarial.XCad.Base.Attributes;
 using Xarial.XCad.Extensions;
 using Xarial.XCad.UI.Commands;
@@ -13,19 +13,19 @@ using Xarial.XCad.UI.Commands.Attributes;
 using Xarial.XCad.UI.Commands.Enums;
 using Xarial.XToolkit.Services.UserSettings;
 
-namespace Xarial.CadPlus.XToolbar
+namespace Xarial.CadPlus.CustomToolbar
 {
-    public class XToolbarModule : IModule
+    public class CustomToolbarModule : IModule
     {
         [CommandGroupInfo(999)]
-        [Title("XToolbar")]
-        [Description("Custom toolbar")]
+        [Title("Custom Toolbar")]
+        [Description("Custom toolbar configuration")]
         [Icon(typeof(Resources), nameof(Resources.configure_icon))]
         public enum Commands_e
         {
             [Icon(typeof(Resources), nameof(Resources.configure_icon))]
             [Title("Configure...")]
-            [Description("Configure toolbar")]
+            [Description("Configure custom toolbar")]
             [CommandItemInfo(true, false, WorkspaceTypes_e.All)]
             Configuration
         }

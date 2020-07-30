@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Xarial.XCad.Base.Attributes;
 
-namespace Xarial.CadPlus.XToolbar.Enums
+namespace Xarial.CadPlus.CustomToolbar.Enums
 {
     [Flags]
     public enum Location_e

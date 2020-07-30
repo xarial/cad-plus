@@ -9,7 +9,7 @@ using System;
 using System.Globalization;
 using System.Windows.Data;
 
-namespace Xarial.CadPlus.XToolbar.UI.Converters
+namespace Xarial.CadPlus.CustomToolbar.UI.Converters
 {
     public class SelectedCommandConverter : IMultiValueConverter
     {

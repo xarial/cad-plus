@@ -9,7 +9,7 @@ using System;
 using System.Windows.Input;
 using Xarial.XToolkit.Wpf;
 
-namespace Xarial.CadPlus.XToolbar.UI.ViewModels
+namespace Xarial.CadPlus.CustomToolbar.UI.ViewModels
 {
     public class NewCommandPlaceholderVM
     {

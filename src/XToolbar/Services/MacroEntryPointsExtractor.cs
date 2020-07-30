@@ -6,10 +6,10 @@
 //*********************************************************************
 
 using System.Linq;
-using Xarial.CadPlus.XToolbar.Structs;
+using Xarial.CadPlus.CustomToolbar.Structs;
 using Xarial.XCad;
 
-namespace Xarial.CadPlus.XToolbar.Services
+namespace Xarial.CadPlus.CustomToolbar.Services
 {
     public interface IMacroEntryPointsExtractor
     {

@@ -10,10 +10,10 @@ using System.Globalization;
 using System.IO;
 using System.Windows.Data;
 using System.Windows.Media.Imaging;
-using Xarial.CadPlus.XToolbar.Properties;
+using Xarial.CadPlus.CustomToolbar.Properties;
 using Xarial.XToolkit.Wpf.Extensions;
 
-namespace Xarial.CadPlus.XToolbar.UI.Converters
+namespace Xarial.CadPlus.CustomToolbar.UI.Converters
 {
     public class PathToIconConverter : IValueConverter
     {

@@ -10,14 +10,14 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Windows.Input;
-using Xarial.CadPlus.XToolbar.Services;
-using Xarial.CadPlus.XToolbar.Structs;
-using Xarial.CadPlus.XToolbar.UI.Base;
+using Xarial.CadPlus.CustomToolbar.Services;
+using Xarial.CadPlus.CustomToolbar.Structs;
+using Xarial.CadPlus.CustomToolbar.UI.Base;
 using Xarial.XToolkit.Wpf;
 using Xarial.XToolkit.Wpf.Extensions;
 using Xarial.XToolkit.Wpf.Utils;
 
-namespace Xarial.CadPlus.XToolbar.UI.ViewModels
+namespace Xarial.CadPlus.CustomToolbar.UI.ViewModels
 {
     public class CommandManagerVM : INotifyPropertyChanged
     {

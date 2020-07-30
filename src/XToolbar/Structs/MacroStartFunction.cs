@@ -7,7 +7,7 @@
 
 using System;
 
-namespace Xarial.CadPlus.XToolbar.Structs
+namespace Xarial.CadPlus.CustomToolbar.Structs
 {
     public class MacroStartFunction
     {

@@ -7,12 +7,12 @@
 
 using System;
 using System.Linq;
-using Xarial.CadPlus.XToolbar.Enums;
-using Xarial.CadPlus.XToolbar.Structs;
+using Xarial.CadPlus.CustomToolbar.Enums;
+using Xarial.CadPlus.CustomToolbar.Structs;
 using Xarial.XCad.UI;
 using Xarial.XCad.UI.Commands.Structures;
 
-namespace Xarial.CadPlus.XToolbar.Base
+namespace Xarial.CadPlus.CustomToolbar.Base
 {
     internal class CommandGroupInfoSpec : CommandGroupSpec
     {

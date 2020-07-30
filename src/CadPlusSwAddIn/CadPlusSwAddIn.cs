@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Runtime.InteropServices;
 using Xarial.CadPlus.ExtensionModule;
-using Xarial.CadPlus.XToolbar;
+using Xarial.CadPlus.CustomToolbar;
 using Xarial.XCad.SolidWorks;
 using Xarial.XCad.UI.Commands;
 

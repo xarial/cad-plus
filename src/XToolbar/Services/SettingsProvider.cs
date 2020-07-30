@@ -7,12 +7,12 @@
 
 using System;
 using System.IO;
-using Xarial.CadPlus.XToolbar.Exceptions;
-using Xarial.CadPlus.XToolbar.Properties;
-using Xarial.CadPlus.XToolbar.Structs;
+using Xarial.CadPlus.CustomToolbar.Exceptions;
+using Xarial.CadPlus.CustomToolbar.Properties;
+using Xarial.CadPlus.CustomToolbar.Structs;
 using Xarial.XToolkit.Services.UserSettings;
 
-namespace Xarial.CadPlus.XToolbar.Services
+namespace Xarial.CadPlus.CustomToolbar.Services
 {
     public interface ISettingsProvider
     {

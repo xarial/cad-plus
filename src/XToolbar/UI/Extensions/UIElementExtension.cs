@@ -14,7 +14,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 
-namespace Xarial.CadPlus.XToolbar.UI.Extensions
+namespace Xarial.CadPlus.CustomToolbar.UI.Extensions
 {
     public static class UIElementExtension
     {

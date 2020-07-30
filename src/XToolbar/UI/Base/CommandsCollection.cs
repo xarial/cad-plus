@@ -11,9 +11,9 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Data;
-using Xarial.CadPlus.XToolbar.UI.ViewModels;
+using Xarial.CadPlus.CustomToolbar.UI.ViewModels;
 
-namespace Xarial.CadPlus.XToolbar.UI.Base
+namespace Xarial.CadPlus.CustomToolbar.UI.Base
 {
     public interface ICommandsCollection
     {

@@ -7,7 +7,7 @@
 
 using System;
 
-namespace Xarial.CadPlus.XToolbar.Exceptions
+namespace Xarial.CadPlus.CustomToolbar.Exceptions
 {
     public class UserException : Exception
     {

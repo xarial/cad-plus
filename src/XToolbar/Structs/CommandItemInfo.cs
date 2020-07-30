@@ -5,7 +5,7 @@
 //License: https://cadplus.xarial.com/license/
 //*********************************************************************
 
-namespace Xarial.CadPlus.XToolbar.Structs
+namespace Xarial.CadPlus.CustomToolbar.Structs
 {
     public abstract class CommandItemInfo
     {

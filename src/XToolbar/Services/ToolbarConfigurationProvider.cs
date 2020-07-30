@@ -9,10 +9,10 @@ using System;
 using System.IO;
 using System.Security;
 using System.Security.Permissions;
-using Xarial.CadPlus.XToolbar.Structs;
+using Xarial.CadPlus.CustomToolbar.Structs;
 using Xarial.XToolkit.Services.UserSettings;
 
-namespace Xarial.CadPlus.XToolbar.Services
+namespace Xarial.CadPlus.CustomToolbar.Services
 {
     public interface IToolbarConfigurationProvider
     {

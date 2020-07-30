@@ -7,10 +7,10 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using Xarial.CadPlus.XToolbar.Structs;
-using Xarial.CadPlus.XToolbar.UI.Base;
+using Xarial.CadPlus.CustomToolbar.Structs;
+using Xarial.CadPlus.CustomToolbar.UI.Base;
 
-namespace Xarial.CadPlus.XToolbar.UI.ViewModels
+namespace Xarial.CadPlus.CustomToolbar.UI.ViewModels
 {
     public class CommandGroupVM : CommandVM<CommandGroupInfo>
     {

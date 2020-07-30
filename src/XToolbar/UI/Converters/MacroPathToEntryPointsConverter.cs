@@ -8,16 +8,16 @@
 using System;
 using System.Globalization;
 using System.Windows.Data;
-using Xarial.CadPlus.XToolbar.Services;
+using Xarial.CadPlus.CustomToolbar.Services;
 
-namespace Xarial.CadPlus.XToolbar.UI.Converters
+namespace Xarial.CadPlus.CustomToolbar.UI.Converters
 {
     public class MacroPathToEntryPointsConverter : IValueConverter
     {
         private readonly IMacroEntryPointsExtractor m_Extractor;
 
         public MacroPathToEntryPointsConverter()
-            : this(XToolbarModule.Resolve<IMacroEntryPointsExtractor>())
+            : this(CustomToolbarModule.Resolve<IMacroEntryPointsExtractor>())
         {
         }
 

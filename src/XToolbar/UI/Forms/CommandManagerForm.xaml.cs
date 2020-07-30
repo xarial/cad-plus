@@ -7,7 +7,7 @@
 
 using System.Windows;
 
-namespace Xarial.CadPlus.XToolbar.UI.Forms
+namespace Xarial.CadPlus.CustomToolbar.UI.Forms
 {
     public partial class CommandManagerForm : Window
     {

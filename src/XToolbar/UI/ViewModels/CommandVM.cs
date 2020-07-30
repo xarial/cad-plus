@@ -7,12 +7,12 @@
 
 using System.ComponentModel;
 using System.Windows.Input;
-using Xarial.CadPlus.XToolbar.Structs;
+using Xarial.CadPlus.CustomToolbar.Structs;
 using Xarial.XToolkit.Wpf;
 using Xarial.XToolkit.Wpf.Extensions;
 using Xarial.XToolkit.Wpf.Utils;
 
-namespace Xarial.CadPlus.XToolbar.UI.ViewModels
+namespace Xarial.CadPlus.CustomToolbar.UI.ViewModels
 {
     public interface ICommandVM
     {
