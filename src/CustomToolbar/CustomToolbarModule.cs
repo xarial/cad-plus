@@ -17,7 +17,8 @@ namespace Xarial.CadPlus.CustomToolbar
 {
     public class CustomToolbarModule : IModule
     {
-        [CommandGroupInfo(999)]
+        [CommandGroupInfo(CommandGroups.RootGroupId + 1)]
+        [CommandGroupParent(CommandGroups.RootGroupId)]
         [Title("Custom Toolbar")]
         [Description("Custom toolbar configuration")]
         [Icon(typeof(Resources), nameof(Resources.configure_icon))]

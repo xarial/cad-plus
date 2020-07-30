@@ -5,11 +5,19 @@ using Xarial.CadPlus.ExtensionModule;
 using Xarial.CadPlus.CustomToolbar;
 using Xarial.XCad.SolidWorks;
 using Xarial.XCad.UI.Commands;
+using Xarial.XCad.UI.Commands.Attributes;
+using Xarial.XCad.UI.Commands.Enums;
+using Xarial.XCad.Base.Attributes;
+using System.ComponentModel;
 
 namespace Xarial.CadPlus.SwAddIn
 {
+    [CommandGroupInfo(CommandGroups.RootGroupId)]
+    [Title("CAD+ Toolset")]
+    [Description("CAD+ Toolset features and options")]
     public enum CadPlusCommands_e 
     {
+        [CommandItemInfo(true, false, WorkspaceTypes_e.All)]
         About
     }
 
@@ -20,6 +28,9 @@ namespace Xarial.CadPlus.SwAddIn
 
         public override void OnConnect()
         {
+            var cmdGrp = this.CommandManager.AddCommandGroup<CadPlusCommands_e>();
+            cmdGrp.CommandClick += OnCommandClick;
+
             //TODO: use MEF to load modules
             m_Modules = new IModule[]
             {
@@ -33,15 +44,16 @@ namespace Xarial.CadPlus.SwAddIn
                     module.Load(this);
                 }
             }
-
-            //var cmdGrp = this.CommandManager.AddCommandGroup<CadPlusCommands_e>();
-            //cmdGrp.CommandClick += OnCommandClick;
-
-            //TODO: add about form
         }
 
         private void OnCommandClick(CadPlusCommands_e spec)
         {
+            switch (spec) 
+            {
+                case CadPlusCommands_e.About:
+                    //TODO: add about form
+                    break;
+            }
         }
 
         public override void OnDisconnect()
