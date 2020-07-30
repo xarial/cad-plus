@@ -23,7 +23,7 @@ namespace Xarial.CadPlus.SwAddIn
             //TODO: use MEF to load modules
             m_Modules = new IModule[]
             {
-                new XToolbarModule()
+                new CustomToolbarModule()
             };
 
             if (m_Modules?.Any() == true)
