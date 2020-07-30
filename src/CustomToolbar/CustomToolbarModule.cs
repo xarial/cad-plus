@@ -31,7 +31,7 @@ namespace Xarial.CadPlus.CustomToolbar
             Configuration
         }
 
-        private static Autofac.IContainer m_Container;
+        protected static Autofac.IContainer m_Container;
 
         public static TService Resolve<TService>() 
             => m_Container.Resolve<TService>();
@@ -48,7 +48,7 @@ namespace Xarial.CadPlus.CustomToolbar
             LoadCommands();
         }
 
-        private void CreateContainer()
+        protected virtual void CreateContainer()
         {
             var builder = new ContainerBuilder();
 
@@ -85,7 +85,7 @@ namespace Xarial.CadPlus.CustomToolbar
             m_Container = builder.Build();
         }
 
-        private void LoadCommands()
+        protected virtual void LoadCommands()
         {
             m_Ext.CommandManager.AddCommandGroup<Commands_e>().CommandClick += OnCommandClick;
 
