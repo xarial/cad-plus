@@ -16,9 +16,8 @@ namespace Xarial.CadPlus.XToolbar.Base
 {
     internal class CommandGroupInfoSpec : CommandGroupSpec
     {
-        internal CommandGroupInfoSpec(CommandGroupInfo info)
+        internal CommandGroupInfoSpec(CommandGroupInfo info) : base(info.Id)
         {
-            Id = info.Id;
             Title = info.Title;
             Tooltip = info.Description;
             Icon = info.GetCommandIcon();

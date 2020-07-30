@@ -7,6 +7,8 @@
 
 using Newtonsoft.Json.Linq;
 using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using Xarial.CadPlus.XToolbar.Base;
 using Xarial.CadPlus.XToolbar.Enums;
@@ -15,6 +17,7 @@ using Xarial.CadPlus.XToolbar.Structs;
 using Xarial.XCad;
 using Xarial.XCad.Base;
 using Xarial.XCad.Extensions;
+using Xarial.XCad.UI.Commands;
 
 namespace Xarial.CadPlus.XToolbar.Services
 {
@@ -70,7 +73,7 @@ namespace Xarial.CadPlus.XToolbar.Services
             catch (Exception ex)
             {
                 m_Logger.Log(ex);
-                m_Msg.ShowError(ex, "Failed to run macro");
+                m_Msg.ShowError(ex, $"Failed to run macro: '{cmd.Title}'");
             }
         }
 
@@ -103,6 +106,7 @@ namespace Xarial.CadPlus.XToolbar.Services
                     m_Logger.Log($"Adding command group: {cmdGrp.Title} [{cmdGrp.Id}]. Commands: {string.Join(", ", cmdGrp.Commands.Select(c => $"{c.Title} [{c.UserId}]").ToArray())}");
 
                     var cmdGrpCad = m_AddIn.CommandManager.AddCommandGroup(cmdGrp);
+
                     cmdGrpCad.CommandClick += OnCommandClick;
                     cmdGrpCad.CommandStateResolve += OnCommandStateResolve;
                 }
@@ -187,7 +191,11 @@ namespace Xarial.CadPlus.XToolbar.Services
                             if (!curCmdGrp.Commands.Select(c => c.Id).OrderBy(x => x)
                                 .SequenceEqual(corrCmdGrp.Commands.Select(c => c.Id).OrderBy(x => x))) 
                             {
-                                curCmdGrp.Id = GetAvailableGroupId();
+                                var newId = GetAvailableGroupId();
+                                
+                                m_Logger.Log($"Changing id of the group from {curCmdGrp.Id} to {newId}");
+
+                                curCmdGrp.Id = newId;
                             }
                         }
                     }

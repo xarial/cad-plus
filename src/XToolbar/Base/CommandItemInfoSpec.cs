@@ -16,11 +16,10 @@ namespace Xarial.CadPlus.XToolbar.Base
     {
         internal CommandMacroInfo Info { get; }
 
-        internal CommandItemInfoSpec(CommandMacroInfo info)
+        internal CommandItemInfoSpec(CommandMacroInfo info) : base(info.Id)
         {
             Info = info;
 
-            UserId = info.Id;
             Title = info.Title;
             Tooltip = info.Description;
             Icon = info.GetCommandIcon();
