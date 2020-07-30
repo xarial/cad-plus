@@ -17,7 +17,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Xport.Tests", "tests\Xport.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CadPlusSwAddIn", "src\CadPlusSwAddIn\CadPlusSwAddIn.csproj", "{F35A8149-7E4E-4C2F-BDF3-80DD6DA6BD1B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CustomToolbar", "src\XToolbar\CustomToolbar.csproj", "{B645A77C-D088-45EE-95CA-AD45D63060CA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CustomToolbar", "src\CustomToolbar\CustomToolbar.csproj", "{B645A77C-D088-45EE-95CA-AD45D63060CA}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExtensionModule", "src\ExtensionModule\ExtensionModule.csproj", "{6BF97F84-C902-470F-874F-4AD839CB16B9}"
 EndProject
