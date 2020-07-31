@@ -24,7 +24,7 @@ namespace Xarial.CadPlus.CustomToolbar.UI.ViewModels
         public event PropertyChangedEventHandler PropertyChanged;
 
         private ICommandVM m_SelectedElement;
-        private ICommand m_SelectCommandCommand;
+        //private ICommand m_SelectCommandCommand;
         private ICommand m_BrowseToolbarSpecificationCommand;
 
         private ICommand m_MoveCommandUpCommand;
@@ -188,21 +188,21 @@ namespace Xarial.CadPlus.CustomToolbar.UI.ViewModels
             }
         }
 
-        public ICommand SelectCommandCommand
-        {
-            get
-            {
-                if (m_SelectCommandCommand == null)
-                {
-                    m_SelectCommandCommand = new RelayCommand<ICommandVM>(cmd =>
-                    {
-                        SelectedElement = cmd;
-                    });
-                }
+        //public ICommand SelectCommandCommand
+        //{
+        //    get
+        //    {
+        //        if (m_SelectCommandCommand == null)
+        //        {
+        //            m_SelectCommandCommand = new RelayCommand<ICommandVM>(cmd =>
+        //            {
+        //                SelectedElement = cmd;
+        //            });
+        //        }
 
-                return m_SelectCommandCommand;
-            }
-        }
+        //        return m_SelectCommandCommand;
+        //    }
+        //}
 
         public ICommand MoveCommandUpCommand
         {

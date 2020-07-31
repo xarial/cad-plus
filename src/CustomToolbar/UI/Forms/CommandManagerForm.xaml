@@ -10,9 +10,10 @@
         mc:Ignorable="d"
         d:DataContext="{x:Type vm:CommandManagerVM}"
         Height="600" Width="600" WindowStartupLocation="CenterOwner" ShowInTaskbar="False"
-		Title="MyToolbar Configuration" Icon="/Xarial.CadPlus.CustomToolbar;component/Resources/custom-toolbars-toolbar.png">
+		Title="Custom Toolbar Configuration">
     <Window.Resources>
         <conv:CommandContextMenuTitleConverter x:Key="menuTitleConv" />
+        <conv:ObjectIsNotNullUniversalConverter x:Key="objIsNotNulToBool"/>
     </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
@@ -32,7 +33,7 @@
                 <TextBlock Text="Browse..." />
             </Button>
         </Grid>
-        <GroupBox Header="Toolbar" Grid.Row="1" IsEnabled="{Binding Path=IsEditable}">
+        <GroupBox Header="Commands" Grid.Row="1" IsEnabled="{Binding Path=IsEditable}">
             <GroupBox.Style>
                 <Style TargetType="GroupBox">
                     <Style.Triggers>
@@ -48,42 +49,23 @@
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
-                <views:CommandManagerView DataContext="{Binding}" Grid.Column="0" />
-                <GridSplitter Grid.Column="1" Width="3"
-                      HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="Gray" />
-                <Grid Grid.Column="2">
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="*"/>
-                            <RowDefinition Height="Auto"/>
-                        </Grid.RowDefinitions>
-                    </Grid>
-                    <ContentPresenter Content="{Binding Path=SelectedElement}" Grid.Row="0">
-                        <ContentPresenter.ContentTemplateSelector>
-                            <base:CommandPropertiesDataTemplateSelector>
-                                <base:CommandPropertiesDataTemplateSelector.CommandMacroTemplate>
-                                    <DataTemplate>
-                                        <views:CommandMacroView />
-                                    </DataTemplate>
-                                </base:CommandPropertiesDataTemplateSelector.CommandMacroTemplate>
-                                <base:CommandPropertiesDataTemplateSelector.CommandGroupTemplate>
-                                    <DataTemplate>
-                                        <views:CommandBaseView />
-                                    </DataTemplate>
-                                </base:CommandPropertiesDataTemplateSelector.CommandGroupTemplate>
-                                <base:CommandPropertiesDataTemplateSelector.DefaultTemplate>
-                                    <DataTemplate>
-                                        <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center"
-                                       TextAlignment="Center"
-                                       Text="Select command or toolbar to change properties. Click + button to add new element"
-                                       TextWrapping="Wrap" FontSize="15" />
-                                    </DataTemplate>
-                                </base:CommandPropertiesDataTemplateSelector.DefaultTemplate>
-                            </base:CommandPropertiesDataTemplateSelector>
-                        </ContentPresenter.ContentTemplateSelector>
-                    </ContentPresenter>
-                    <StackPanel Orientation="Horizontal" Grid.Row="1" HorizontalAlignment="Right"
-                                VerticalAlignment="Bottom">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <StackPanel Orientation="Horizontal" Grid.Row="0" HorizontalAlignment="Right"
+                                VerticalAlignment="Top" Grid.Column="0"
+                                IsEnabled="{Binding Path=SelectedElement, Converter={StaticResource objIsNotNulToBool}}">
+                        <StackPanel.Style>
+                            <Style TargetType="{x:Type StackPanel}">
+                                <Style.Triggers>
+                                    <Trigger Property="IsEnabled" Value="False">
+                                        <Setter Property="Opacity" Value="0.5" />
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </StackPanel.Style>
                         <StackPanel.Resources>
                             <Style TargetType="{x:Type Button}"
                                    x:Key="ToolbarButton"
@@ -118,6 +100,41 @@
                             <Image Source="/Xarial.CadPlus.CustomToolbar;component/Resources/icon-remove.png"/>
                         </Button>
                     </StackPanel>
+                    <views:CommandManagerView DataContext="{Binding}" Grid.Row="1" />
+                </Grid>
+                <GridSplitter Grid.Column="1" Width="3"
+                      HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="Gray" />
+                <Grid Grid.Column="2">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                    </Grid>
+                    <ContentPresenter Content="{Binding Path=SelectedElement}" Grid.Row="0">
+                        <ContentPresenter.ContentTemplateSelector>
+                            <base:CommandPropertiesDataTemplateSelector>
+                                <base:CommandPropertiesDataTemplateSelector.CommandMacroTemplate>
+                                    <DataTemplate>
+                                        <views:CommandMacroView />
+                                    </DataTemplate>
+                                </base:CommandPropertiesDataTemplateSelector.CommandMacroTemplate>
+                                <base:CommandPropertiesDataTemplateSelector.CommandGroupTemplate>
+                                    <DataTemplate>
+                                        <views:CommandBaseView />
+                                    </DataTemplate>
+                                </base:CommandPropertiesDataTemplateSelector.CommandGroupTemplate>
+                                <base:CommandPropertiesDataTemplateSelector.DefaultTemplate>
+                                    <DataTemplate>
+                                        <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center"
+                                       TextAlignment="Center"
+                                       Text="Select command or toolbar to change properties. Click + button to add new element"
+                                       TextWrapping="Wrap" FontSize="15" />
+                                    </DataTemplate>
+                                </base:CommandPropertiesDataTemplateSelector.DefaultTemplate>
+                            </base:CommandPropertiesDataTemplateSelector>
+                        </ContentPresenter.ContentTemplateSelector>
+                    </ContentPresenter>
                 </Grid>
             </Grid>
         </GroupBox>

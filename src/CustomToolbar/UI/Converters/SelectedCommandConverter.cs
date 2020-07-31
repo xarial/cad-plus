@@ -8,19 +8,27 @@
 using System;
 using System.Globalization;
 using System.Windows.Data;
+using Xarial.CadPlus.CustomToolbar.UI.ViewModels;
 
 namespace Xarial.CadPlus.CustomToolbar.UI.Converters
 {
-    public class SelectedCommandConverter : IMultiValueConverter
+    public class SelectedCommandConverter : IValueConverter
     {
-        public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return values[0] == values[1];
+            if (!(value is ICommandVM))
+            {
+                return null;
+            }
+            else
+            {
+                return value;
+            }
         }
 
-        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            throw new NotImplementedException();
+            return value;
         }
     }
 }

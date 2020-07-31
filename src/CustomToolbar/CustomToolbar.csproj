@@ -109,12 +109,12 @@
     <Compile Include="UI\Base\CommandDataTemplateSelector.cs" />
     <Compile Include="UI\Base\CommandPropertiesDataTemplateSelector.cs" />
     <Compile Include="UI\Base\CommandsCollection.cs" />
+    <Compile Include="UI\Controls\TreeViewEx.cs" />
     <Compile Include="UI\Converters\CommandContextMenuTitleConverter.cs" />
     <Compile Include="UI\Converters\MacroPathToEntryPointsConverter.cs" />
+    <Compile Include="UI\Converters\ObjectIsNotNullToBolleanConverter.cs" />
     <Compile Include="UI\Converters\PathToIconConverter.cs" />
     <Compile Include="UI\Converters\SelectedCommandConverter.cs" />
-    <Compile Include="UI\Converters\SelectedCommandGroupConverter.cs" />
-    <Compile Include="UI\Extensions\UIElementExtension.cs" />
     <Compile Include="UI\Forms\CommandManagerForm.xaml.cs">
       <DependentUpon>CommandManagerForm.xaml</DependentUpon>
     </Compile>
