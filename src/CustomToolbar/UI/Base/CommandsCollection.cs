@@ -77,6 +77,7 @@ namespace Xarial.CadPlus.CustomToolbar.UI.Base
             var newCmd = new TCommandVM();
 
             newCmd.Command.Id = GetNextId();
+            newCmd.Title = "New";
 
             m_Commands.Insert(index, newCmd);
 
