@@ -215,7 +215,7 @@ namespace Xarial.CadPlus.Xport.ViewModels
 
         private void BrowseOutputDirectory()
         {
-            if (FsoBrowser.BrowseForFolder(out string path, "Select output directory"))
+            if (FileSystemBrowser.BrowseFolder(out string path, "Select output directory"))
             {
                 OutputDirectory = path;
             }
@@ -223,7 +223,7 @@ namespace Xarial.CadPlus.Xport.ViewModels
 
         private void AddFolder()
         {
-            if (FsoBrowser.BrowseForFolder(out string path, "Select folder to process"))
+            if (FileSystemBrowser.BrowseFolder(out string path, "Select folder to process"))
             {
                 Input.Add(path);
             }
@@ -231,11 +231,11 @@ namespace Xarial.CadPlus.Xport.ViewModels
 
         private void AddFile()
         {
-            var filter = FsoBrowser.BuildFilterString(
+            var filter = FileSystemBrowser.BuildFilterString(
                 new FileFilter("SOLIDWORKS Files", "*.sldprt", "*.sldasm", "*.slddrw"),
                 FileFilter.AllFiles);
 
-            if (FsoBrowser.BrowseForFileOpen(out string path, "Select file to process", filter))
+            if (FileSystemBrowser.BrowseFileOpen(out string path, "Select file to process", filter))
             {
                 Input.Add(path);
             }
