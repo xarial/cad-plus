@@ -22,6 +22,8 @@ namespace Xarial.CadPlus.SwAddIn
     }
 
     [ComVisible(true), Guid("6C1F130E-65C3-4237-94B7-A26B3B3AD282")]
+    [Title("CAD+ Toolset")]
+    [Description("The toolset of utilities to complement SOLIDWORKS functionality")]
     public class CadPlusSwAddIn : SwAddInEx
     {
         private IModule[] m_Modules;
