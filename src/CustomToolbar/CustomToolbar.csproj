@@ -65,8 +65,8 @@
     <Reference Include="Xarial.XToolkit, Version=0.2.1.0, Culture=neutral, PublicKeyToken=60dcaf351d4060db, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Xarial.XToolkit.0.2.1\lib\net461\Xarial.XToolkit.dll</HintPath>
     </Reference>
-    <Reference Include="Xarial.XToolkit.Wpf, Version=0.2.3.0, Culture=neutral, PublicKeyToken=60dcaf351d4060db, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Xarial.XToolkit.Wpf.0.2.3\lib\net461\Xarial.XToolkit.Wpf.dll</HintPath>
+    <Reference Include="Xarial.XToolkit.Wpf, Version=0.2.4.0, Culture=neutral, PublicKeyToken=60dcaf351d4060db, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Xarial.XToolkit.Wpf.0.2.4\lib\net461\Xarial.XToolkit.Wpf.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -107,10 +107,8 @@
     <Compile Include="UI\Base\CommandDataTemplateSelector.cs" />
     <Compile Include="UI\Base\CommandPropertiesDataTemplateSelector.cs" />
     <Compile Include="UI\Base\CommandsCollection.cs" />
-    <Compile Include="UI\Controls\TreeViewEx.cs" />
     <Compile Include="UI\Converters\CommandContextMenuTitleConverter.cs" />
     <Compile Include="UI\Converters\MacroPathToEntryPointsConverter.cs" />
-    <Compile Include="UI\Converters\ObjectIsNotNullToBolleanConverter.cs" />
     <Compile Include="UI\Converters\PathToIconConverter.cs" />
     <Compile Include="UI\Converters\SelectedCommandConverter.cs" />
     <Compile Include="UI\Forms\CommandManagerForm.xaml.cs">

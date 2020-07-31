@@ -31,16 +31,8 @@
         <TextBox Text="{Binding Path=Description, UpdateSourceTrigger=PropertyChanged}"
                  Grid.Column="1" Grid.Row="1" Margin="2" />
 
-        <Grid Grid.Column="0" Grid.Row="2">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="Auto" />
-            </Grid.ColumnDefinitions>
-            <TextBlock Grid.Column="0" Text="Icon:" Margin="2" />
-            <Image Grid.Column="1" Width="16" Height="16"
-                   Source="{Binding Path=IconPath, Converter={StaticResource pathToIconConv}}"
-                   Margin="2" />
-        </Grid>
+        <TextBlock Grid.Column="0" Grid.Row="2" Text="Icon:" Margin="2" />
+        
         <Grid Grid.Column="1" Grid.Row="2" Margin="2">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />

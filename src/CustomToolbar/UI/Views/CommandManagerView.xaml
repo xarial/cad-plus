@@ -7,7 +7,7 @@
              xmlns:conv="clr-namespace:Xarial.CadPlus.CustomToolbar.UI.Converters"
              xmlns:base="clr-namespace:Xarial.CadPlus.CustomToolbar.UI.Base"
              xmlns:vm="clr-namespace:Xarial.CadPlus.CustomToolbar.UI.ViewModels"
-             xmlns:ctrls="clr-namespace:Xarial.CadPlus.CustomToolbar.UI.Controls"
+             xmlns:ctrls="clr-namespace:Xarial.XToolkit.Wpf.Controls;assembly=Xarial.XToolkit.Wpf"
              mc:Ignorable="d"
              d:DataContext="{x:Type vm:CommandManagerVM}"
              d:DesignHeight="300" d:DesignWidth="300">

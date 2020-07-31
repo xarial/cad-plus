@@ -7,13 +7,14 @@
         xmlns:vm="clr-namespace:Xarial.CadPlus.CustomToolbar.UI.ViewModels"
         xmlns:base="clr-namespace:Xarial.CadPlus.CustomToolbar.UI.Base"
         xmlns:conv="clr-namespace:Xarial.CadPlus.CustomToolbar.UI.Converters"
+        xmlns:xconv="clr-namespace:Xarial.XToolkit.Wpf.Converters;assembly=Xarial.XToolkit.Wpf"
         mc:Ignorable="d"
         d:DataContext="{x:Type vm:CommandManagerVM}"
         Height="600" Width="600" WindowStartupLocation="CenterOwner" ShowInTaskbar="False"
 		Title="Custom Toolbar Configuration">
     <Window.Resources>
         <conv:CommandContextMenuTitleConverter x:Key="menuTitleConv" />
-        <conv:ObjectIsNotNullUniversalConverter x:Key="objIsNotNulToBool"/>
+        <xconv:ObjectIsNotNullUniversalConverter x:Key="objIsNotNulToBool"/>
     </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>

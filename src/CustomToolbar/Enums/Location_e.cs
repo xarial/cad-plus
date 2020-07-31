@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -27,6 +28,11 @@ namespace Xarial.CadPlus.CustomToolbar.Enums
 
         [Summary("Create command in command tab box")]
         [Title("Tab Box")]
-        TabBox = 1 << 2
-    } 
+        [Browsable(false), EditorBrowsable(EditorBrowsableState.Never)]
+        TabBoxHidden = 1 << 2,
+
+        [Summary("Create command in command tab box")]
+        [Title("Tab Box")]
+        TabBox = Toolbar | TabBoxHidden
+    }
 }
