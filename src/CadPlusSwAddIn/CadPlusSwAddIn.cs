@@ -1,4 +1,11 @@
-﻿using System;
+﻿//*********************************************************************
+//CAD+ Toolset
+//Copyright(C) 2020 Xarial Pty Limited
+//Product URL: https://cadplus.xarial.com
+//License: https://cadplus.xarial.com/license/
+//*********************************************************************
+
+using System;
 using System.Linq;
 using System.Runtime.InteropServices;
 using Xarial.CadPlus.ExtensionModule;
@@ -21,7 +28,7 @@ namespace Xarial.CadPlus.SwAddIn
         About
     }
 
-    [ComVisible(true), Guid("6C1F130E-65C3-4237-94B7-A26B3B3AD282")]
+    [ComVisible(true), Guid("AC45BDF0-66CB-4B08-8127-06C1F0C9452F")]
     [Title("CAD+ Toolset")]
     [Description("The toolset of utilities to complement SOLIDWORKS functionality")]
     public class CadPlusSwAddIn : SwAddInEx
