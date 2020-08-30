@@ -38,6 +38,8 @@ stages:
     - task: NuGetCommand@2
       displayName: 'NuGet restore'
       inputs:
+        feedsToUse: config
+        includeNuGetOrg: true
         restoreSolution: 'cad-plus.sln'
 
     - template: templates/get-version.yml

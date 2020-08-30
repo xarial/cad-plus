@@ -12,9 +12,14 @@
 
   <xsl:key
       name="xPortToRemove"
-      match="wix:Component[ substring( wix:File/@Source, string-length( wix:File/@Source ) - 8 ) = 'xport.exe' ]"
+      match="wix:Component[ wix:File/@Source = '$(var.SourceOutDir)\xport.exe']"
       use="@Id" />
 
+  <xsl:key
+        name="AddInToRemove"
+        match="wix:Component[ wix:File/@Source = '$(var.SourceOutDir)\Xarial.CadPlus.SwAddIn.dll']"
+        use="@Id" />
+  
   <xsl:key
       name="TlbToRemove"
       match="wix:Component[ substring( wix:File/@Source, string-length( wix:File/@Source ) - 3 ) = '.tlb' ]"
@@ -37,6 +42,7 @@
   </xsl:template>
 
   <xsl:template match="*[ self::wix:Component or self::wix:ComponentRef ][ key( 'xPortToRemove', @Id ) ]" />
+  <xsl:template match="*[ self::wix:Component or self::wix:ComponentRef ][ key( 'AddInToRemove', @Id ) ]" />
   <xsl:template match="*[ self::wix:Component or self::wix:ComponentRef ][ key( 'TlbToRemove', @Id ) ]" />
   <xsl:template match="*[ self::wix:Component or self::wix:ComponentRef ][ key( 'XmlToRemove', @Id ) ]" />
   <xsl:template match="*[ self::wix:Component or self::wix:ComponentRef ][ key( 'PdbToRemove', @Id ) ]" />
