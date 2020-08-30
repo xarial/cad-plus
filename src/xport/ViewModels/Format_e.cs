@@ -58,6 +58,6 @@ namespace Xarial.CadPlus.Xport.ViewModels
 
         [EnumDisplayName("PDF Files (*.pdf)")]
         [FormatExtension("pdf")]
-        Pdf = 1 << 11,
+        Pdf = 1 << 11
     }
 }
