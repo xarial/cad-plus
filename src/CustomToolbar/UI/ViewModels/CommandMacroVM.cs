@@ -57,7 +57,7 @@ namespace Xarial.CadPlus.CustomToolbar.UI.ViewModels
                             "Select macro file",
                             FileSystemBrowser.BuildFilterString(
                                 new FileFilter(
-                                    "SOLIDWORKS Macros", "*.swp", "*.swb", "*.dll"), 
+                                    "SOLIDWORKS Macros", "*.swp", "*.swb", "*.dll"), //TODO: make the extensions list a dependency
                                 FileFilter.AllFiles)))
                         {
                             MacroPath = macroFile;

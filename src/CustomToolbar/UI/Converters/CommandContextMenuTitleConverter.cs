@@ -36,10 +36,10 @@ namespace Xarial.CadPlus.CustomToolbar.UI.Converters
                         switch (type)
                         {
                             case CommandContextMenu_e.MoveUp:
-                                return "Move Left";
+                                return "Move Up";
 
                             case CommandContextMenu_e.MoveDown:
-                                return "Move Right";
+                                return "Move Down";
 
                             case CommandContextMenu_e.InsertBefore:
                                 return "Insert New Macro Button Before";

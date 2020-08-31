@@ -32,7 +32,14 @@ namespace Xarial.CadPlus.CustomToolbar.Base
 
             if (icon == null)
             {
-                icon = Resources.macro_icon_default;
+                if (info is CommandMacroInfo)
+                {
+                    icon = Resources.macro_icon_default;
+                }
+                else if (info is CommandGroupInfo) 
+                {
+                    icon = Resources.group_icon_default;
+                }
             }
 
             return new MacroButtonIcon(icon);

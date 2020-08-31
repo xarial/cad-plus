@@ -8,9 +8,6 @@
              mc:Ignorable="d"
              d:DataContext="{x:Type vm:ICommandVM}"
              d:DesignHeight="300" d:DesignWidth="300">
-    <UserControl.Resources>
-        <conv:PathToIconConverter x:Key="pathToIconConv" />
-    </UserControl.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto" SharedSizeGroup="Header" />

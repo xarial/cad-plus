@@ -88,8 +88,14 @@
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
                 <Image Width="18" Height="18" Margin="2" 
-                       Source="{Binding Path=IconPath, Converter={StaticResource pathToIconConv}}"
-                       Grid.Column="0"/>
+                       Grid.Column="0">
+                    <Image.Source>
+                        <MultiBinding Converter="{StaticResource pathToIconConv}">
+                            <Binding Path="IconPath"/>
+                            <Binding/>
+                        </MultiBinding>
+                    </Image.Source>
+                </Image>
                 <TextBlock Text="{Binding Path=Title}" Grid.Column="1" VerticalAlignment="Center"/>
                 <Grid.ToolTip>
                     <Grid MaxWidth="300">
@@ -112,7 +118,10 @@
     </UserControl.Resources>
     <Grid>
         <ctrls:TreeViewEx ItemsSource="{Binding Path=Groups}" 
-                          SelectedItem="{Binding Path=SelectedElement, Converter={StaticResource selCmdConv}}">
+                          SelectedItem="{Binding Path=SelectedElement, Converter={StaticResource selCmdConv}}" 
+                          AllowDrop="True" 
+                          DragOver="OnDragOver" DragEnter="OnDragEnter" Drop="OnDrop" 
+                          Background="White">
             <ctrls:TreeViewEx.ItemTemplateSelector>
                 <base:CommandDataTemplateSelector
 					        NewCommandTemplate="{StaticResource NewCommandTemplate}"
