@@ -16,7 +16,7 @@ $cookie-consent:
   enable: true
   message: This website uses cookies to ensure you get the best experience on our website. By using our website you agree on the following <a href="/cookies-policy">Cookie Policy</a>, <a href="/privacy-policy">Privacy Policy</a>, and <a href="/terms-of-use">Terms Of Use</a>
 $site-header:
-  show_title: false
+  show-title: false
 ^tipue-search:
   page-content-node: //article
   search-page-layout: default
@@ -24,17 +24,23 @@ $site-header:
   minify-css: true
   minify-js: true
   assets-scope-paths:
-    - /assets/styles/*
-    - /assets/scripts/*
+    - /_assets/styles/*
+    - /_assets/scripts/*
   delete-unused-css: true
   delete-unused-js: true
   bundles:
-    /assets/styles/main.min.css:
-      - /assets/styles/social-share.css
-      - /assets/styles/youtube.css
-      - /assets/styles/base.css
-      - /assets/styles/toc.css
-      - /assets/styles/theme.css
-      - /assets/styles/user-guide.css
-      - /assets/styles/code-snippet.css
-      - /assets/styles/responsive-image.css
+    /_assets/styles/main.min.css:
+      - /_assets/styles/social-share.css
+      - /_assets/styles/youtube.css
+      - /_assets/styles/base.css
+      - /_assets/styles/toc.css
+      - /_assets/styles/theme.css
+      - /_assets/styles/user-guide.css
+      - /_assets/styles/code-snippet.css
+      - /_assets/styles/responsive-image.css
+      - /_assets/styles/site-header.css
+      - /_assets/styles/social-links.css
+      - /_assets/styles/syntax-highlight.css
+    /_assets/scripts/main.min.js:
+      - /_assets/scripts/code-snippet.js
+      - /_assets/scripts/toc.js
