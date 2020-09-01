@@ -11,22 +11,25 @@ using System.IO;
 using System.Windows.Data;
 using System.Windows.Media.Imaging;
 using Xarial.CadPlus.CustomToolbar.Properties;
+using Xarial.CadPlus.CustomToolbar.UI.ViewModels;
 using Xarial.XToolkit.Wpf.Extensions;
 
 namespace Xarial.CadPlus.CustomToolbar.UI.Converters
 {
-    public class PathToIconConverter : IValueConverter
+    public class PathToIconConverter : IMultiValueConverter
     {
-        private static readonly BitmapImage m_DefaultIcon;
+        private static readonly BitmapImage m_DefaultMacroIcon;
+        private static readonly BitmapImage m_DefaultGroupIcon;
 
         static PathToIconConverter()
         {
-            m_DefaultIcon = Resources.macro_icon_default.ToBitmapImage();
+            m_DefaultMacroIcon = Resources.macro_icon_default.ToBitmapImage();
+            m_DefaultGroupIcon = Resources.group_icon_default.ToBitmapImage();
         }
         
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {
-            var iconPath = value as string;
+            var iconPath = values[0] as string;
 
             BitmapImage icon = null;
 
@@ -43,13 +46,20 @@ namespace Xarial.CadPlus.CustomToolbar.UI.Converters
 
             if (icon == null)
             {
-                icon = m_DefaultIcon;
+                if (values[1] is CommandMacroVM) 
+                {
+                    icon = m_DefaultMacroIcon;
+                }
+                else if (values[1] is CommandGroupVM)
+                {
+                    icon = m_DefaultGroupIcon;
+                }
             }
 
             return icon;
         }
 
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
         {
             throw new NotImplementedException();
         }

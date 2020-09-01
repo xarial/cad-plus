@@ -16,6 +16,8 @@ using Xarial.XCad.UI.Commands.Attributes;
 using Xarial.XCad.UI.Commands.Enums;
 using Xarial.XCad.Base.Attributes;
 using System.ComponentModel;
+using Xarial.CadPlus.SwAddIn.Properties;
+using Xarial.XToolkit.Wpf.Dialogs;
 
 namespace Xarial.CadPlus.SwAddIn
 {
@@ -25,6 +27,11 @@ namespace Xarial.CadPlus.SwAddIn
     public enum CadPlusCommands_e 
     {
         [CommandItemInfo(true, false, WorkspaceTypes_e.All)]
+        [Icon(typeof(Resources), nameof(Resources.help_icon))]
+        Help,
+
+        [CommandItemInfo(true, false, WorkspaceTypes_e.All)]
+        [Icon(typeof(Resources), nameof(Resources.about_icon))]
         About
     }
 
@@ -59,8 +66,19 @@ namespace Xarial.CadPlus.SwAddIn
         {
             switch (spec) 
             {
+                case CadPlusCommands_e.Help:
+                    try
+                    {
+                        System.Diagnostics.Process.Start(Resources.HelpLink);
+                    }
+                    catch 
+                    { 
+                    }
+                    break;
+
                 case CadPlusCommands_e.About:
-                    //TODO: add about form
+                    AboutDialog.Show(this.GetType().Assembly, Resources.logo,
+                        (IntPtr)Application.Sw.IFrameObject().GetHWndx64());
                     break;
             }
         }

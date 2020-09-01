@@ -29,14 +29,14 @@
                 </Grid.RowDefinitions>
 
                 <TextBlock Margin="2" Text="Path:" Grid.Column="0" Grid.Row="0" />
-                <Grid Grid.Column="1" Grid.Row="0" Margin="2">
+                <Grid Grid.Column="1" Grid.Row="0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
                     <TextBox Grid.Column="0" Text="{Binding Path=MacroPath, UpdateSourceTrigger=PropertyChanged}" Margin="2" />
                     <Button Grid.Column="1" Margin="2" Command="{Binding Path=BrowseMacroPathCommand}">
-                        <TextBlock Text="Browse" Margin="5 0" />
+                        <TextBlock Text="Browse..." Margin="5 0" />
                     </Button>
                 </Grid>
 

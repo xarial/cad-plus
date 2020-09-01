@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Windows.Input;
 using Xarial.CadPlus.CustomToolbar.Services;
@@ -24,7 +25,6 @@ namespace Xarial.CadPlus.CustomToolbar.UI.ViewModels
         public event PropertyChangedEventHandler PropertyChanged;
 
         private ICommandVM m_SelectedElement;
-        //private ICommand m_SelectCommandCommand;
         private ICommand m_BrowseToolbarSpecificationCommand;
 
         private ICommand m_MoveCommandUpCommand;
@@ -32,16 +32,13 @@ namespace Xarial.CadPlus.CustomToolbar.UI.ViewModels
         private ICommand m_InsertCommandAfterCommand;
         private ICommand m_InsertCommandBeforeCommand;
         private ICommand m_CommandRemoveCommand;
+        private ICommand m_MacroDropCommand;
 
         private CommandsCollection<CommandGroupVM> m_Groups;
 
         private readonly IToolbarConfigurationProvider m_ConfsProvider;
         private readonly ISettingsProvider m_SettsProvider;
         private readonly IMessageService m_MsgService;
-
-        private readonly ToolbarSettings m_Settings;
-
-        private CustomToolbarInfo m_ToolbarInfo;
         private bool m_IsEditable;
 
         public CommandManagerVM(IToolbarConfigurationProvider confsProvider,
@@ -51,7 +48,7 @@ namespace Xarial.CadPlus.CustomToolbar.UI.ViewModels
             m_SettsProvider = settsProvider;
             m_MsgService = msgService;
 
-            m_Settings = m_SettsProvider.GetSettings();
+            Settings = m_SettsProvider.GetSettings();
 
             LoadCommands();
         }
@@ -62,7 +59,7 @@ namespace Xarial.CadPlus.CustomToolbar.UI.ViewModels
 
             try
             {
-                m_ToolbarInfo = m_ConfsProvider.GetToolbar(out isReadOnly, ToolbarSpecificationPath);
+                ToolbarInfo = m_ConfsProvider.GetToolbar(out isReadOnly, ToolbarSpecificationPath);
             }
             catch
             {
@@ -80,7 +77,7 @@ namespace Xarial.CadPlus.CustomToolbar.UI.ViewModels
             }
 
             Groups = new CommandsCollection<CommandGroupVM>(
-                (m_ToolbarInfo.Groups ?? new CommandGroupInfo[0])
+                (ToolbarInfo.Groups ?? new CommandGroupInfo[0])
                 .Select(g => new CommandGroupVM(g)));
 
             HandleCommandGroupCommandCreation(Groups.Commands);
@@ -107,21 +104,9 @@ namespace Xarial.CadPlus.CustomToolbar.UI.ViewModels
             }
         }
 
-        public CustomToolbarInfo ToolbarInfo
-        {
-            get
-            {
-                return m_ToolbarInfo;
-            }
-        }
+        public CustomToolbarInfo ToolbarInfo { get; private set; }
 
-        public ToolbarSettings Settings
-        {
-            get
-            {
-                return m_Settings;
-            }
-        }
+        public ToolbarSettings Settings { get; }
 
         public CommandsCollection<CommandGroupVM> Groups
         {
@@ -188,22 +173,6 @@ namespace Xarial.CadPlus.CustomToolbar.UI.ViewModels
             }
         }
 
-        //public ICommand SelectCommandCommand
-        //{
-        //    get
-        //    {
-        //        if (m_SelectCommandCommand == null)
-        //        {
-        //            m_SelectCommandCommand = new RelayCommand<ICommandVM>(cmd =>
-        //            {
-        //                SelectedElement = cmd;
-        //            });
-        //        }
-
-        //        return m_SelectCommandCommand;
-        //    }
-        //}
-
         public ICommand MoveCommandUpCommand
         {
             get
@@ -214,7 +183,7 @@ namespace Xarial.CadPlus.CustomToolbar.UI.ViewModels
                     {
                         try
                         {
-                            MoveCommand(x, true);
+                            MoveCommand(x, false);
                         }
                         catch(Exception ex)
                         {
@@ -237,7 +206,7 @@ namespace Xarial.CadPlus.CustomToolbar.UI.ViewModels
                     {
                         try
                         {
-                            MoveCommand(x, false);
+                            MoveCommand(x, true);
                         }
                         catch (Exception ex)
                         {
@@ -319,6 +288,56 @@ namespace Xarial.CadPlus.CustomToolbar.UI.ViewModels
             }
         }
 
+        public ICommand MacroDropCommand
+        {
+            get
+            {
+                if (m_MacroDropCommand == null)
+                {
+                    m_MacroDropCommand = new RelayCommand<Views.CommandManagerView.MacroDropArgs>(a =>
+                    {
+                        ICommandsCollection targetColl = null;
+                        int index = -1;
+                        
+                        if (a.TargetCommand is CommandGroupVM)
+                        {
+                            targetColl = (a.TargetCommand as CommandGroupVM).Commands;
+                            index = 0;
+                        }
+                        else if (a.TargetCommand == null)
+                        {
+                            var newGrp = (CommandGroupVM)Groups.AddNewCommand(Groups.Commands.Count);
+                            targetColl = newGrp.Commands;
+                            index = 0;
+                        }
+                        else if (a.TargetCommand is CommandMacroVM)
+                        {
+                            index = CalculateCommandIndex(a.TargetCommand, true, out targetColl);
+                        }
+                        else 
+                        {
+                            throw new NotSupportedException("Invalid drop argument");
+                        }
+
+                        for (int i = 0; i < a.FilePaths.Length; i++)
+                        {
+                            var cmd = (CommandMacroVM)targetColl.AddNewCommand(index + i);
+                            cmd.MacroPath = a.FilePaths[i];
+                            cmd.Title = Path.GetFileNameWithoutExtension(a.FilePaths[i]);
+                        }
+                    },
+                    a => IsValidFilesDrop(a.FilePaths));
+                }
+
+                return m_MacroDropCommand;
+            }
+        }
+
+        private bool IsValidFilesDrop(string[] files)
+            => files?.All(f =>
+            new string[] { ".swp", ".swb", ".dll" }
+            .Contains(Path.GetExtension(f), StringComparer.CurrentCultureIgnoreCase)) == true;
+
         private void MoveCommand(ICommandVM cmd, bool forward)
         {
             ICommandsCollection coll;
@@ -341,25 +360,32 @@ namespace Xarial.CadPlus.CustomToolbar.UI.ViewModels
         {
             ICommandsCollection coll;
 
-            var index = CalculateCommandIndex(cmd, !after, out coll);
+            var index = CalculateCommandIndex(cmd, after, out coll);
 
             if (!after)
             {
                 index++;//insert to current position
             }
 
-            var newCmd = coll.AddNewCommand(index);
+            coll.AddNewCommand(index);
         }
 
         private void RemoveCommand(ICommandVM cmd)
         {
             var coll = FindCommandCollection(cmd);
             coll.Commands.Remove(cmd);
+            
+            if (Groups.Commands.Count == 1 && Groups.Commands[0].Commands.Commands.Count == 0)//TODO: temp solution until Tree View can have selected element binding
+            {
+                return;   
+            }
+
+            SelectedElement = null;
         }
 
         private int CalculateCommandIndex(ICommandVM cmd, bool forward, out ICommandsCollection coll)
         {
-            var offset = forward ? -1 : 1;
+            var offset = forward ? 1 : -1;
             coll = FindCommandCollection(cmd);
 
             var index = coll.Commands.IndexOf(cmd);
@@ -397,7 +423,7 @@ namespace Xarial.CadPlus.CustomToolbar.UI.ViewModels
 
         private void OnGroupsCollectionChanged(IEnumerable<CommandGroupVM> grps)
         {
-            m_ToolbarInfo.Groups = grps
+            ToolbarInfo.Groups = grps
                 .Select(g => g.Command).ToArray();
 
             HandleCommandGroupCommandCreation(grps);
