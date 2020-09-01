@@ -1,8 +1,8 @@
 ---
-layout: article
 caption: xPort
 title: xPort | Stand-Alone Batch Exporter Utility
 description: Stand-alone utility to publish SOLIDWORKS files to html, pdf, images etc. via eDrawings applications
+order: 1
 ---
 {% youtube id: KPBQ8RnvNpQ %}
 

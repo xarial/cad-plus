@@ -17,6 +17,7 @@ $cookie-consent:
   message: This website uses cookies to ensure you get the best experience on our website. By using our website you agree on the following <a href="/cookies-policy">Cookie Policy</a>, <a href="/privacy-policy">Privacy Policy</a>, and <a href="/terms-of-use">Terms Of Use</a>
 $site-header:
   show-title: false
+default-layout: article
 ^tipue-search:
   page-content-node: //article
   search-page-layout: default

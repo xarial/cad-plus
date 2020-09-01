@@ -1,5 +1,4 @@
 ---
-layout: article
 caption: User Interface
 title: User Interface for running and configuring xProps
 description: Technical documentation for configuring and running the publishing job of xProps using User Interface

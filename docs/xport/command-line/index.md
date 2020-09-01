@@ -1,5 +1,4 @@
 ---
-layout: article
 caption: Command Line
 title: Command line for running and configuring xProps
 description: Technical documentation for configuring and running the publishing job of xProps using command line
