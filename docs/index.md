@@ -1,6 +1,6 @@
 ---
 layout: article
-caption: CAD+ Toolset
+caption: CAD+ Toolset (Beta)
 title: CAD+ Toolset | Utilities for SOLIDWORKS automation
 description: SOLIDWORKS utilities for improving your productivity in SOLIDWORKS. Automate properties, geometry, export and much more
 image: /logo.svg
@@ -9,7 +9,7 @@ image: /logo.svg
 
 ![CAD+ Toolset](/logo.svg){ width=200 }
 
-**CAD+ Toolset** application complements functionality of SOLIDWORKS by enabling additional toolsets. Application allows to automate various areas of SOLIDWORKS application. This includes but not limited to custom properties automation, geometry features, custom toolbars, export and import capabilities etc.
+**CAD+ Toolset (Beta)** application complements functionality of SOLIDWORKS by enabling additional toolsets. Application allows to automate various areas of SOLIDWORKS application. This includes but not limited to custom properties automation, geometry features, custom toolbars, export and import capabilities etc.
 
 ## Features
 
@@ -21,11 +21,12 @@ image: /logo.svg
 
 Please see the table below for the list of features and their availability in the specific editions.
 
-| Feature                                        | Community Edition | Professional Edition |
-|------------------------------------------------|-------------------|----------------------|
+| Feature                                      | Community Edition | Professional Edition |
+|----------------------------------------------|-------------------|----------------------|
 | [xPort User Interface](/xport/command-line/) | 🗸                | 🗸                   |
 | [xPort Command Line](/xport/user-interface/) | 🗸                | 🗸                   |
-| *More features coming soon...*                 |                   |                      |
+| [Custom Toolbar](/custom-toolbar/)           | 🗸                | 🗸                   |
+| *More features coming soon...*               |                   |                      |
 
 ## Download
 
