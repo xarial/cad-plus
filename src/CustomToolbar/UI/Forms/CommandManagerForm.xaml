@@ -8,6 +8,8 @@
         xmlns:base="clr-namespace:Xarial.CadPlus.CustomToolbar.UI.Base"
         xmlns:conv="clr-namespace:Xarial.CadPlus.CustomToolbar.UI.Converters"
         xmlns:xconv="clr-namespace:Xarial.XToolkit.Wpf.Converters;assembly=Xarial.XToolkit.Wpf"
+        xmlns:sys="clr-namespace:System;assembly=mscorlib"
+        xmlns:win="clr-namespace:System.Windows;assembly=PresentationCore"
         mc:Ignorable="d"
         d:DataContext="{x:Type vm:CommandManagerVM}"
         Height="600" Width="600" WindowStartupLocation="CenterOwner" ShowInTaskbar="False"
@@ -15,6 +17,13 @@
     <Window.Resources>
         <conv:CommandContextMenuTitleConverter x:Key="menuTitleConv" />
         <xconv:ObjectIsNotNullUniversalConverter x:Key="objIsNotNulToBool"/>
+        <xconv:MatchValueUniversalConverter x:Key="groupsIsEmpty" 
+                                           TrueValue="{x:Static win:Visibility.Visible}"
+                                           FalseValue="{x:Static win:Visibility.Collapsed}">
+            <xconv:MatchValueUniversalConverter.TargetValue>
+                <sys:Int32>0</sys:Int32>
+            </xconv:MatchValueUniversalConverter.TargetValue>
+        </xconv:MatchValueUniversalConverter>
     </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
@@ -102,6 +111,12 @@
                         </Button>
                     </StackPanel>
                     <views:CommandManagerView DataContext="{Binding}" Grid.Row="1" Margin="2" />
+                    <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Row="1" Margin="2"
+                               IsHitTestVisible="False"
+                               TextAlignment="Center"
+                               Text="Drag-n-drop macro or click + button to create new command"
+                               Visibility="{Binding Path=Groups.Commands.Count, Converter={StaticResource groupsIsEmpty}}"
+                               TextWrapping="Wrap" FontSize="15" />
                 </Grid>
                 <GridSplitter Grid.Column="1" Width="3"
                       HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="Gray" />
@@ -128,9 +143,9 @@
                                 <base:CommandPropertiesDataTemplateSelector.DefaultTemplate>
                                     <DataTemplate>
                                         <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center"
-                                       TextAlignment="Center"
-                                       Text="Select command or toolbar to change properties. Click + button to add new element"
-                                       TextWrapping="Wrap" FontSize="15" />
+                                           TextAlignment="Center"
+                                           Text="Select command or toolbar to change properties"
+                                           TextWrapping="Wrap" FontSize="15" />
                                     </DataTemplate>
                                 </base:CommandPropertiesDataTemplateSelector.DefaultTemplate>
                             </base:CommandPropertiesDataTemplateSelector>
