@@ -1,0 +1,33 @@
+﻿html {
+    font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";
+    color:rgb(82, 82, 82); 
+    background-color: #fdfdfd;
+    font-size: 18px;
+    line-height: 1.5;
+}
+
+.header-title {
+    color: rgb(110, 50, 110);
+    font-size: 22px;
+    font-weight: bold;
+}
+
+pre.code-snippet {
+	font-size: 13px;
+}
+
+a.download-button {
+    background-color: DodgerBlue;
+    text-decoration : none;
+    border: none;
+    color: white;
+    padding: 12px 30px;
+    cursor: pointer;
+    font-size: 20px;
+  }
+  
+  a.download-button:hover {
+    background-color: RoyalBlue;
+  }
+
+  
