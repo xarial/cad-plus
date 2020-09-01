@@ -6,11 +6,10 @@
 //*********************************************************************
 
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 [assembly: AssemblyTitle("CadPlusSwAddIn")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("The toolset of utilities to complement SOLIDWORKS functionality")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

@@ -30,14 +30,14 @@
 
         <TextBlock Grid.Column="0" Grid.Row="2" Text="Icon:" Margin="2" />
         
-        <Grid Grid.Column="1" Grid.Row="2" Margin="2">
+        <Grid Grid.Column="1" Grid.Row="2">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
             <TextBox Grid.Column="0" Text="{Binding Path=IconPath, UpdateSourceTrigger=PropertyChanged}" Margin="2" />
             <Button Grid.Column="1" Margin="2" Command="{Binding Path=BrowseIconCommand}">
-                <TextBlock Text="Browse" Margin="5 0" />
+                <TextBlock Text="Browse..." Margin="5 0" />
             </Button>
         </Grid>
     </Grid>

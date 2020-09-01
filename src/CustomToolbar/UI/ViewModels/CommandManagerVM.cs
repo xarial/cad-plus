@@ -306,7 +306,8 @@ namespace Xarial.CadPlus.CustomToolbar.UI.ViewModels
                         }
                         else if (a.TargetCommand == null)
                         {
-                            targetColl = ((CommandGroupVM)Groups.AddNewCommand(Groups.Count)).Commands;
+                            var newGrp = (CommandGroupVM)Groups.AddNewCommand(Groups.Commands.Count);
+                            targetColl = newGrp.Commands;
                             index = 0;
                         }
                         else if (a.TargetCommand is CommandMacroVM)
@@ -366,7 +367,7 @@ namespace Xarial.CadPlus.CustomToolbar.UI.ViewModels
                 index++;//insert to current position
             }
 
-            var newCmd = coll.AddNewCommand(index);
+            coll.AddNewCommand(index);
         }
 
         private void RemoveCommand(ICommandVM cmd)

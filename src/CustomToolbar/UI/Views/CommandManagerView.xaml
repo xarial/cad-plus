@@ -119,7 +119,7 @@
     <Grid>
         <ctrls:TreeViewEx ItemsSource="{Binding Path=Groups}" 
                           SelectedItem="{Binding Path=SelectedElement, Converter={StaticResource selCmdConv}}" 
-                          AllowDrop="True" 
+                          AllowDrop="True" BorderThickness="0"
                           DragOver="OnDragOver" DragEnter="OnDragEnter" Drop="OnDrop" 
                           Background="White">
             <ctrls:TreeViewEx.ItemTemplateSelector>

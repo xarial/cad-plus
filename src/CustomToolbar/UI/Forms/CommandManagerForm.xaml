@@ -11,7 +11,7 @@
         mc:Ignorable="d"
         d:DataContext="{x:Type vm:CommandManagerVM}"
         Height="600" Width="600" WindowStartupLocation="CenterOwner" ShowInTaskbar="False"
-		Title="Custom Toolbar Configuration">
+		Title="Custom Toolbar Configuration" WindowStyle="ToolWindow">
     <Window.Resources>
         <conv:CommandContextMenuTitleConverter x:Key="menuTitleConv" />
         <xconv:ObjectIsNotNullUniversalConverter x:Key="objIsNotNulToBool"/>
@@ -101,7 +101,7 @@
                             <Image Source="/Xarial.CadPlus.CustomToolbar;component/Resources/icon-remove.png"/>
                         </Button>
                     </StackPanel>
-                    <views:CommandManagerView DataContext="{Binding}" Grid.Row="1" />
+                    <views:CommandManagerView DataContext="{Binding}" Grid.Row="1" Margin="2" />
                 </Grid>
                 <GridSplitter Grid.Column="1" Width="3"
                       HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="Gray" />
@@ -112,7 +112,7 @@
                             <RowDefinition Height="Auto"/>
                         </Grid.RowDefinitions>
                     </Grid>
-                    <ContentPresenter Content="{Binding Path=SelectedElement}" Grid.Row="0">
+                    <ContentPresenter Content="{Binding Path=SelectedElement}" Grid.Row="0" Margin="2">
                         <ContentPresenter.ContentTemplateSelector>
                             <base:CommandPropertiesDataTemplateSelector>
                                 <base:CommandPropertiesDataTemplateSelector.CommandMacroTemplate>
