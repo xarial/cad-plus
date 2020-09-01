@@ -115,12 +115,10 @@
     <None Include="Resources\logo.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Import Project="..\..\packages\Xarial.XCad.SolidWorks.0.6.0-20200730.4\build\Xarial.XCad.SolidWorks.targets" Condition="Exists('..\..\packages\Xarial.XCad.SolidWorks.0.6.0-20200730.4\build\Xarial.XCad.SolidWorks.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\..\packages\Xarial.XCad.SolidWorks.0.6.0-20200730.4\build\Xarial.XCad.SolidWorks.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Xarial.XCad.SolidWorks.0.6.0-20200730.4\build\Xarial.XCad.SolidWorks.targets'))" />
     <Error Condition="!Exists('..\..\packages\Xarial.XCad.SolidWorks.0.5.8\build\Xarial.XCad.SolidWorks.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Xarial.XCad.SolidWorks.0.5.8\build\Xarial.XCad.SolidWorks.targets'))" />
   </Target>
   <Import Project="..\..\packages\Xarial.XCad.SolidWorks.0.5.8\build\Xarial.XCad.SolidWorks.targets" Condition="Exists('..\..\packages\Xarial.XCad.SolidWorks.0.5.8\build\Xarial.XCad.SolidWorks.targets')" />
