@@ -21,7 +21,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CustomToolbar", "src\Custom
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExtensionModule", "src\ExtensionModule\ExtensionModule.csproj", "{6BF97F84-C902-470F-874F-4AD839CB16B9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CustomToolbar.Tests", "tests\CustomToolbar.Tests\CustomToolbar.Tests.csproj", "{0312168C-2B71-4650-9DF6-992E762698E2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CustomToolbar.Tests", "tests\CustomToolbar.Tests\CustomToolbar.Tests.csproj", "{0312168C-2B71-4650-9DF6-992E762698E2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common", "src\Common\Common.csproj", "{CB753A98-59D1-4058-B486-E1DFD86FB5BB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -95,6 +97,14 @@ Global
 		{0312168C-2B71-4650-9DF6-992E762698E2}.Release|Any CPU.Build.0 = Release|Any CPU
 		{0312168C-2B71-4650-9DF6-992E762698E2}.Release|x64.ActiveCfg = Release|Any CPU
 		{0312168C-2B71-4650-9DF6-992E762698E2}.Release|x64.Build.0 = Release|Any CPU
+		{CB753A98-59D1-4058-B486-E1DFD86FB5BB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CB753A98-59D1-4058-B486-E1DFD86FB5BB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CB753A98-59D1-4058-B486-E1DFD86FB5BB}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{CB753A98-59D1-4058-B486-E1DFD86FB5BB}.Debug|x64.Build.0 = Debug|Any CPU
+		{CB753A98-59D1-4058-B486-E1DFD86FB5BB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CB753A98-59D1-4058-B486-E1DFD86FB5BB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CB753A98-59D1-4058-B486-E1DFD86FB5BB}.Release|x64.ActiveCfg = Release|Any CPU
+		{CB753A98-59D1-4058-B486-E1DFD86FB5BB}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

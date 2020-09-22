@@ -137,6 +137,10 @@
     <Resource Include="xport.ico" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Common\Common.csproj">
+      <Project>{cb753a98-59d1-4058-b486-e1dfd86fb5bb}</Project>
+      <Name>Common</Name>
+    </ProjectReference>
     <ProjectReference Include="..\StandAloneExporter\StandAloneExporter.csproj">
       <Project>{48464d5e-3c1e-4858-93c9-4f25311f85d3}</Project>
       <Name>StandAloneExporter</Name>

@@ -39,9 +39,9 @@ namespace Xarial.CadPlus.Xport.ViewModels
         private ICommand m_ExportCommand;
         private ICommand m_CancelExportCommand;
         private ICommand m_BrowseOutputDirectoryCommand;
-        private ICommand m_AddFileCommand;
-        private ICommand m_AddFolderCommand;
-        private ICommand m_DeleteInputCommand;
+        //private ICommand m_AddFileCommand;
+        //private ICommand m_AddFolderCommand;
+        //private ICommand m_DeleteInputCommand;
 
         public Format_e Format { get; set; }
 
@@ -116,9 +116,9 @@ namespace Xarial.CadPlus.Xport.ViewModels
         public ICommand ExportCommand => m_ExportCommand ?? (m_ExportCommand = new RelayCommand(Export, () => !IsExportInProgress && Input.Any() && Format != 0));
         public ICommand CancelExportCommand => m_CancelExportCommand ?? (m_CancelExportCommand = new RelayCommand(CancelExport, () => IsExportInProgress));
         public ICommand BrowseOutputDirectoryCommand => m_BrowseOutputDirectoryCommand ?? (m_BrowseOutputDirectoryCommand = new RelayCommand(BrowseOutputDirectory));
-        public ICommand AddFileCommand => m_AddFileCommand ?? (m_AddFileCommand = new RelayCommand(AddFile));
-        public ICommand AddFolderCommand => m_AddFolderCommand ?? (m_AddFolderCommand = new RelayCommand(AddFolder));
-        public ICommand DeleteInputCommand => m_DeleteInputCommand ?? (m_DeleteInputCommand = new RelayCommand<IEnumerable>(DeleteInput));
+        //public ICommand AddFileCommand => m_AddFileCommand ?? (m_AddFileCommand = new RelayCommand(AddFile));
+        //public ICommand AddFolderCommand => m_AddFolderCommand ?? (m_AddFolderCommand = new RelayCommand(AddFolder));
+        //public ICommand DeleteInputCommand => m_DeleteInputCommand ?? (m_DeleteInputCommand = new RelayCommand<IEnumerable>(DeleteInput));
 
         public int ActiveTabIndex
         {
@@ -221,32 +221,32 @@ namespace Xarial.CadPlus.Xport.ViewModels
             }
         }
 
-        private void AddFolder()
-        {
-            if (FileSystemBrowser.BrowseFolder(out string path, "Select folder to process"))
-            {
-                Input.Add(path);
-            }
-        }
+        //private void AddFolder()
+        //{
+        //    if (FileSystemBrowser.BrowseFolder(out string path, "Select folder to process"))
+        //    {
+        //        Input.Add(path);
+        //    }
+        //}
 
-        private void AddFile()
-        {
-            var filter = FileSystemBrowser.BuildFilterString(
-                new FileFilter("SOLIDWORKS Files", "*.sldprt", "*.sldasm", "*.slddrw"),
-                FileFilter.AllFiles);
+        //private void AddFile()
+        //{
+        //    var filter = FileSystemBrowser.BuildFilterString(
+        //        new FileFilter("SOLIDWORKS Files", "*.sldprt", "*.sldasm", "*.slddrw"),
+        //        FileFilter.AllFiles);
 
-            if (FileSystemBrowser.BrowseFileOpen(out string path, "Select file to process", filter))
-            {
-                Input.Add(path);
-            }
-        }
+        //    if (FileSystemBrowser.BrowseFileOpen(out string path, "Select file to process", filter))
+        //    {
+        //        Input.Add(path);
+        //    }
+        //}
 
-        private void DeleteInput(IEnumerable inputs)
-        {
-            foreach (var input in inputs.Cast<string>().ToArray())
-            {
-                Input.Remove(input);
-            }
-        }
+        //private void DeleteInput(IEnumerable inputs)
+        //{
+        //    foreach (var input in inputs.Cast<string>().ToArray())
+        //    {
+        //        Input.Remove(input);
+        //    }
+        //}
     }
 }
