@@ -27,31 +27,6 @@
                         <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
                     <cmnctrls:PathListBox Grid.Row="0" PathsSource="{Binding Path=Input}"/>
-                    <!--<Grid Grid.Row="0">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="*" />
-                            <RowDefinition Height="Auto" />
-                        </Grid.RowDefinitions>
-                        <ListBox Margin="2" Grid.ColumnSpan="3" ItemsSource="{Binding Path=Input}" SelectionMode="Extended">
-                            <ListBox.InputBindings>
-                                <KeyBinding Key="Delete" Command="{Binding Path=DeleteInputCommand}"
-                                            CommandParameter="{Binding Path=SelectedItems, RelativeSource={RelativeSource AncestorType={x:Type ListBox}}}"></KeyBinding>
-                            </ListBox.InputBindings>
-                        </ListBox>
-                        <Button Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2"
-                            Command="{Binding Path=AddFileCommand}">
-                            <TextBlock Text="Add File..." Margin="2" />
-                        </Button>
-                        <Button Grid.Row="1" Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2"
-                            Command="{Binding Path=AddFolderCommand}">
-                            <TextBlock Text="Add Folder..." Margin="2" />
-                        </Button>
-                    </Grid>-->
                     <Grid Grid.Row="1">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto" SharedSizeGroup="Label" />
