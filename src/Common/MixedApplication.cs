@@ -1,4 +1,11 @@
-﻿using CommandLine;
+﻿//*********************************************************************
+//CAD+ Toolset
+//Copyright(C) 2020 Xarial Pty Limited
+//Product URL: https://cadplus.xarial.com
+//License: https://cadplus.xarial.com/license/
+//*********************************************************************
+
+using CommandLine;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,9 +32,7 @@ namespace Xarial.CadPlus.Common
             if (e.Args.Any())
             {
                 WindowsApi.AttachConsole(-1);
-
-                Console.WriteLine("Hello");
-
+                
                 var parser = new Parser(p =>
                 {
                     p.CaseInsensitiveEnumValues = true;
