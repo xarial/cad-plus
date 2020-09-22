@@ -3,6 +3,9 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="/Xarial.CadPlus.Common;component/Themes/PathListBox.xaml" />
+        <ResourceDictionary Source="/Xarial.CadPlus.Common;component/Themes/TaskDashboard.xaml" />
     </ResourceDictionary.MergedDictionaries>
+
+    
 </ResourceDictionary>
 

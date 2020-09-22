@@ -50,8 +50,8 @@ namespace Xarial.CadPlus.Xport.Models
             }
             finally
             {
-                logWriter.Log += OnLog;
-                prgHander.ProgressChanged += OnProgressChanged;
+                logWriter.Log -= OnLog;
+                prgHander.ProgressChanged -= OnProgressChanged;
             }
         }
 

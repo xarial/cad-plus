@@ -106,24 +106,10 @@
                 </Grid>
             </TabItem>
             <TabItem Header="Log">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="*" />
-                        <RowDefinition Height="Auto" />
-                    </Grid.RowDefinitions>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
-                    <TextBox Margin="2" AcceptsReturn="True" AcceptsTab="True" Grid.ColumnSpan="2"
-                             Text="{Binding Path=Log, Mode=OneWay}" IsReadOnly="True"
-                             VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" />
-                    <ProgressBar Grid.Row="1" Value="{Binding Path=Progress}" Minimum="0" Margin="2" Maximum="1" />
-                    <Button Grid.Row="1" Grid.Column="1" VerticalAlignment="Stretch" Margin="2" Width="75"
-                            Command="{Binding Path=CancelExportCommand}">
-                        <TextBlock Text="Cancel" Margin="2" />
-                    </Button>
-                </Grid>
+                <cmnctrls:TaskDashboard 
+                    LogSource="{Binding Path=Log}"
+                    Progress="{Binding Path=Progress}"
+                    CancelCommand="{Binding Path=CancelExportCommand}"/>
             </TabItem>
         </TabControl>
         <Button Grid.Row="1" VerticalAlignment="Center" Width="75" HorizontalAlignment="Center" Margin="2"

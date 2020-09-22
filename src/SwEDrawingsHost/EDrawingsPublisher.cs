@@ -84,6 +84,7 @@ namespace Xarial.CadPlus.Xport.EDrawingsHost
             m_HostForm.ShowInTaskbar = false;
             m_HostForm.WindowState = FormWindowState.Maximized;
             m_HostForm.Show();
+            m_HostForm.SendToBack();
             return edrwHost.Control;
         }
 
