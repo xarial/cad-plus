@@ -4,8 +4,8 @@ using Xarial.CadPlus.Xport.Core;
 using Xarial.CadPlus.Xport.Models;
 using Xarial.CadPlus.Xport.ViewModels;
 using System.Linq;
-using Xarial.CadPlus.Xport.Services;
 using System;
+using Xarial.CadPlus.Common.Services;
 
 namespace Xport.Tests
 {

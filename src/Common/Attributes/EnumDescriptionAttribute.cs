@@ -6,16 +6,15 @@
 //*********************************************************************
 
 using System;
+using System.ComponentModel;
 
-namespace Xarial.CadPlus.Xport.Models
+namespace Xarial.CadPlus.Common.Attributes
 {
-    public class ProgressHandler : IProgress<double>
+    [AttributeUsage(AttributeTargets.Field)]
+    public class EnumDescriptionAttribute : DescriptionAttribute
     {
-        public event Action<double> ProgressChanged;
-        
-        public void Report(double value)
+        public EnumDescriptionAttribute(string desc) : base(desc)
         {
-            ProgressChanged?.Invoke(value);
         }
     }
 }

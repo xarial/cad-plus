@@ -54,9 +54,14 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Attributes\EnumDescriptionAttribute.cs" />
+    <Compile Include="Attributes\EnumDisplayNameAttribute.cs" />
     <Compile Include="Controls\PathListBox.cs" />
     <Compile Include="Controls\TaskDashboard.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Services\LogWirter.cs" />
+    <Compile Include="Services\MessageService.cs" />
+    <Compile Include="Services\ProgressHandler.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

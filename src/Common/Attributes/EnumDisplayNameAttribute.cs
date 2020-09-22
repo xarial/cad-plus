@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Xarial.CadPlus.Xport.ViewModels
+namespace Xarial.CadPlus.Common.Attributes
 {
     [AttributeUsage(AttributeTargets.Field)]
     public class EnumDisplayNameAttribute : DisplayNameAttribute

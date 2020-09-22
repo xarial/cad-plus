@@ -6,6 +6,7 @@
 //*********************************************************************
 
 using System;
+using Xarial.CadPlus.Common.Attributes;
 
 namespace Xarial.CadPlus.Xport.ViewModels
 {
