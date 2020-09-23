@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Xarial.CadPlus.SwAddIn.Properties {
+namespace Xarial.CadPlus.AddIn.Base.Properties {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace Xarial.CadPlus.SwAddIn.Properties {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Xarial.CadPlus.SwAddIn.Properties.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Xarial.CadPlus.AddIn.Base.Properties.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -81,7 +81,7 @@ namespace Xarial.CadPlus.SwAddIn.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to https://cadplus.xarial.com/.
+        ///   Looks up a localized string similar to https://cadplus.xarial.com.
         /// </summary>
         internal static string HelpLink {
             get {

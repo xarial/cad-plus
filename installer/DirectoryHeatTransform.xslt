@@ -17,7 +17,7 @@
 
   <xsl:key
         name="AddInToRemove"
-        match="wix:Component[ wix:File/@Source = '$(var.SourceOutDir)\Xarial.CadPlus.SwAddIn.dll']"
+        match="wix:Component[ wix:File/@Source = '$(var.SourceOutDir)\Xarial.CadPlus.AddIn.Sw.dll']"
         use="@Id" />
   
   <xsl:key

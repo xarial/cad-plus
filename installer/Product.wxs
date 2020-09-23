@@ -20,7 +20,7 @@
 		<Feature Id="ProductFeature" Title="Setup" Level="1">
       <ComponentGroupRef Id="FilesRegGroup" />
       <ComponentGroupRef Id="MainFilesRegGroup" />
-      <ComponentGroupRef Id="AddInComRegGroup" />
+      <ComponentGroupRef Id="SwAddInComRegGroup" />
       <ComponentRef Id="ApplicationShortcut" />
     </Feature>
 
