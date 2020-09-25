@@ -15,7 +15,7 @@ namespace Xarial.CadPlus.AddIn.Base
     public class AddInController : IDisposable
     {
         private readonly IXExtension m_Ext;
-        private IModule[] m_Modules;
+        private readonly IModule[] m_Modules;
 
         public AddInController(IXExtension ext) 
         {

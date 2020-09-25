@@ -24,10 +24,16 @@ namespace Xarial.CadPlus.Common
 
     public abstract class MixedApplication<TArgs> : Application
     {
+        protected virtual void OnAppStart()
+        {
+        }
+
         protected override void OnStartup(StartupEventArgs e)
         {
             this.DispatcherUnhandledException += OnDispatcherUnhandledException;
             AppDomain.CurrentDomain.UnhandledException += OnDomainUnhandledException;
+
+            OnAppStart();
 
             if (e.Args.Any())
             {
