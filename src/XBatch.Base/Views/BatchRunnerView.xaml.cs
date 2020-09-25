@@ -19,18 +19,17 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using Xarial.CadPlus.Common.Services;
-using Xarial.CadPlus.XBatch.Base.ViewModels;
 
-namespace Xarial.CadPlus.XBatch.Base
+namespace Xarial.CadPlus.XBatch.Base.Views
 {
-    public partial class MainWindow : Window
+    /// <summary>
+    /// Interaction logic for BatchRunnerView.xaml
+    /// </summary>
+    public partial class BatchRunnerView : UserControl
     {
-        public MainWindow()
+        public BatchRunnerView()
         {
             InitializeComponent();
-            var appProvider = (Application.Current as XBatchApp).GetApplicationProvider();
-            this.DataContext = new BatchRunnerVM(new Models.BatchRunnerModel(), new MessageService("xBatch"));
         }
     }
 }

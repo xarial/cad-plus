@@ -10,22 +10,22 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Xarial.CadPlus.Common;
+using Xarial.CadPlus.XBatch.Base.Core;
 
-namespace Xarial.CadPlus.XBatch.Base
+namespace Xarial.CadPlus.XBatch.Base.Models
 {
-    public abstract class XBatchApp : MixedApplication<Arguments>
+    public class BatchRunnerModel
     {
-        protected override void OnAppStart()
-        {
-            this.StartupUri = new Uri("/XBatch.Base;component/MainWindow.xaml", UriKind.Relative);
-        }
+        public event Action<double> ProgressChanged;
+        public event Action<string> Log;
 
-        protected override Task RunConsole(Arguments args)
+        public Task BatchRun(BatchRunnerOptions opts)
         {
             return Task.CompletedTask;
         }
 
-        public abstract IApplicationProvider GetApplicationProvider();
+        public void Cancel()
+        {
+        }
     }
 }
