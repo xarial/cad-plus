@@ -23,12 +23,15 @@ namespace Xarial.CadPlus.XBatch.Base
         public string Filter { get; set; }
 
         [Option('m', "macros", Required = true, HelpText = "List of macros to run")]
-        public IEnumerable<string> String { get; set; }
+        public IEnumerable<string> Macros { get; set; }
 
         [Option('e', "error", Required = false, HelpText = "If this option is used execution will continue if any of the macros failed to process, otherwise the process will terminate")]
         public bool ContinueOnError { get; set; }
 
         [Option('t', "timeout", Required = false, HelpText = "Timeout in seconds for processing a single item (e.g. running macro on a single file)")]
         public int Timeout { get; set; }
+
+        [Option('p', "parallel", Required = false, HelpText = "Nume")]
+        public int ParallelJobsCount { get; set; }
     }
 }

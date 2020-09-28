@@ -30,7 +30,7 @@ namespace Xarial.CadPlus.XBatch.Base
         {
             InitializeComponent();
             var appProvider = (Application.Current as XBatchApp).GetApplicationProvider();
-            this.DataContext = new BatchRunnerVM(new Models.BatchRunnerModel(), new MessageService("xBatch"));
+            this.DataContext = new BatchRunnerVM(new Models.BatchRunnerModel(appProvider), new MessageService("xBatch"));
         }
     }
 }

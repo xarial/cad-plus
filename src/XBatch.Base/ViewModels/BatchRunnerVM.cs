@@ -67,6 +67,8 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
 
         public int Timeout { get; set; }
 
+        public int ParallelJobsCount { get; set; }
+
         public bool IsTimeoutEnabled
         {
             get => m_IsTimeoutEnabled;
@@ -135,7 +137,8 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
                     Macros = Macros?.ToArray(),
                     Filter = Filter,
                     ContinueOnError = ContinueOnError,
-                    Timeout = IsTimeoutEnabled ? Timeout : -1
+                    Timeout = IsTimeoutEnabled ? Timeout : -1,
+                    ParallelJobsCount = ParallelJobsCount
                 };
 
                 await m_Model.BatchRun(opts).ConfigureAwait(false);

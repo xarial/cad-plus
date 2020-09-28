@@ -10,13 +10,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Xarial.XCad;
+using Xarial.XToolkit.Reporting;
 
-namespace Xarial.CadPlus.XBatch.Base
+namespace Xarial.CadPlus.XBatch.Base.Exceptions
 {
-    public interface IApplicationProvider
+    public class UserMessageException : Exception, IUserMessageException
     {
-        IEnumerable<AppVersionInfo> GetInstalledVersions();
-        Task<IXApplication> StartApplicationAsync(AppVersionInfo vers);
+        public UserMessageException(string err, Exception inner) : base(err, inner) 
+        {
+        }
     }
 }
