@@ -69,6 +69,12 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
 
         public int ParallelJobsCount { get; set; }
 
+        public bool RunInBackground { get; set; }
+
+        public AppVersionInfo Version { get; set; }
+
+        public AppVersionInfo[] InstalledVersions { get; set; }
+
         public bool IsTimeoutEnabled
         {
             get => m_IsTimeoutEnabled;
@@ -110,6 +116,9 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
             Filter = "*.*";
             IsTimeoutEnabled = true;
             Timeout = 600;
+
+            InstalledVersions = m_Model.InstalledVersions;
+            Version = InstalledVersions.FirstOrDefault();
         }
 
         private void OnProgressChanged(double prg)
@@ -138,7 +147,9 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
                     Filter = Filter,
                     ContinueOnError = ContinueOnError,
                     Timeout = IsTimeoutEnabled ? Timeout : -1,
-                    ParallelJobsCount = ParallelJobsCount
+                    ParallelJobsCount = ParallelJobsCount,
+                    RunInBackground = RunInBackground,
+                    Version = Version
                 };
 
                 await m_Model.BatchRun(opts).ConfigureAwait(false);

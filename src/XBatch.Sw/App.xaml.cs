@@ -19,8 +19,6 @@ namespace Xarial.CadPlus.XBatch.Sw
     public class XBatchSwApp : XBatchApp
     {
         public override IApplicationProvider GetApplicationProvider()
-        {
-            return null;
-        }
+            => new SwApplicationProvider();
     }
 }

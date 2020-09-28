@@ -28,7 +28,10 @@ namespace Xarial.CadPlus.XBatch.Base.Models
         public BatchRunnerModel(IApplicationProvider appProvider) 
         {
             m_AppProvider = appProvider;
+            InstalledVersions = m_AppProvider.GetInstalledVersions().ToArray();
         }
+
+        public AppVersionInfo[] InstalledVersions { get; }
 
         public async Task BatchRun(BatchRunnerOptions opts)
         {

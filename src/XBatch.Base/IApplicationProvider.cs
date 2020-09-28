@@ -17,6 +17,7 @@ namespace Xarial.CadPlus.XBatch.Base
     public interface IApplicationProvider
     {
         IEnumerable<AppVersionInfo> GetInstalledVersions();
-        Task<IXApplication> StartApplicationAsync(AppVersionInfo vers);
+        Task<IXApplication> StartApplicationAsync(AppVersionInfo vers, bool background);
+        AppVersionInfo ParseVersion(string version);
     }
 }

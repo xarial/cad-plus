@@ -70,7 +70,7 @@ namespace Xarial.CadPlus.XBatch.Base.Core
 
             await Task.WhenAll(jobs);
 
-            m_Logger.WriteLine($"Exporting completed in {DateTime.Now.Subtract(curTime).ToString(@"hh\:mm\:ss")}");
+            m_Logger.WriteLine($"Batch running completed in {DateTime.Now.Subtract(curTime).ToString(@"hh\:mm\:ss")}");
         }
 
         private List<string> SelectAllFiles(IEnumerable<string> inputs, string filter) 
@@ -114,6 +114,24 @@ namespace Xarial.CadPlus.XBatch.Base.Core
                 }
             }
 
+            bool PopNextDocument(out string nextDocPath) 
+            {
+                lock (m_LockObj)
+                {
+                    if (data.Files.Any())
+                    {
+                        nextDocPath = data.Files.First();
+                        data.Files.RemoveAt(0);
+                        return true;
+                    }
+                    else
+                    {
+                        nextDocPath = "";
+                        return false;
+                    }
+                }
+            }
+
             if (cancellationToken != default)
             {
                 tcs = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
@@ -128,16 +146,15 @@ namespace Xarial.CadPlus.XBatch.Base.Core
 
             while (true)
             {
-                string nextFile = "";
-
+                string nextDocPath = "";
+                
                 try
                 {
                     if (app == null)
                     {
                         try
                         {
-                            //TODO: get version from options
-                            app = await m_AppProvider.StartApplicationAsync(null);
+                            app = await m_AppProvider.StartApplicationAsync(opts.Version, opts.RunInBackground);
                         }
                         catch (Exception ex)
                         {
@@ -145,19 +162,11 @@ namespace Xarial.CadPlus.XBatch.Base.Core
                         }
                     }
 
-                    lock (m_LockObj)
+                    if (!PopNextDocument(out nextDocPath)) 
                     {
-                        if (data.Files.Any())
-                        {
-                            nextFile = data.Files.First();
-                            data.Files.RemoveAt(0);
-                        }
-                        else
-                        {
-                            break;
-                        }
+                        break;
                     }
-
+                    
                     ResetTimeout();
 
                     if (tcs.IsCancellationRequested)
@@ -172,7 +181,7 @@ namespace Xarial.CadPlus.XBatch.Base.Core
                     {
                         doc = app.Documents.Open(new DocumentOpenArgs()
                         {
-                            Path = nextFile
+                            Path = nextDocPath
                         });
 
                         foreach (var macroPath in opts.Macros)
@@ -216,7 +225,7 @@ namespace Xarial.CadPlus.XBatch.Base.Core
                     var userErr = ex.ParseUserError(out _);
                     //TODO: add trace logger
 
-                    m_Logger.WriteLine($"Error while processing: {nextFile}: {userErr}");
+                    m_Logger.WriteLine($"Error while processing: {nextDocPath}: {userErr}");
 
                     if (opts.ContinueOnError)
                     {

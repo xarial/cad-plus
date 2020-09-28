@@ -25,6 +25,8 @@ namespace Xarial.CadPlus.XBatch.Base
 
         protected override async Task RunConsole(Arguments args)
         {
+            var appProvider = GetApplicationProvider();
+
             var opts = new BatchRunnerOptions()
             {
                 Input = args.Input?.ToArray(),
@@ -32,11 +34,12 @@ namespace Xarial.CadPlus.XBatch.Base
                 Macros = args.Macros?.ToArray(),
                 Timeout = args.Timeout,
                 ContinueOnError = args.ContinueOnError,
-                ParallelJobsCount = args.ParallelJobsCount
-
+                RunInBackground = args.RunInBackground,
+                ParallelJobsCount = args.ParallelJobsCount,
+                Version = appProvider.ParseVersion(args.Version)
             };
 
-            using (var batchRunner = new BatchRunner(GetApplicationProvider(), Console.Out, new ConsoleProgressWriter()))
+            using (var batchRunner = new BatchRunner(appProvider, Console.Out, new ConsoleProgressWriter()))
             {
                 await batchRunner.BatchRun(opts).ConfigureAwait(false);
             }
