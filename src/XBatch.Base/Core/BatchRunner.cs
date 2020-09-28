@@ -69,7 +69,8 @@ namespace Xarial.CadPlus.XBatch.Base.Core
 
             for (int i = 0; i < jobs.Length; i++) 
             {
-                jobs[i] = ProcessFiles(progressData, opts, i, token);
+                var jobId = i + 1;
+                jobs[i] = Task.Run(() => ProcessFiles(progressData, opts, jobId, token));
             }
 
             await Task.WhenAll(jobs);
@@ -99,7 +100,7 @@ namespace Xarial.CadPlus.XBatch.Base.Core
             }
         }
 
-        private async Task ProcessFiles(BatchRunnerProgressData data, BatchRunnerOptions opts, int jobId,
+        private void ProcessFiles(BatchRunnerProgressData data, BatchRunnerOptions opts, int jobId,
             CancellationToken cancellationToken = default)
         {
             IXApplication app = null;
@@ -121,7 +122,7 @@ namespace Xarial.CadPlus.XBatch.Base.Core
 
                 tcs.Token.Register(() =>
                 {
-                    m_Logger.WriteLine("Cancelled by the user");
+                    m_Logger.WriteLine($"Job {jobId}: cancelled by the user");
                     TryShutDownApplication(app);
                 });
             }
@@ -137,11 +138,12 @@ namespace Xarial.CadPlus.XBatch.Base.Core
                     {
                         try
                         {
-                            app = await m_AppProvider.StartApplicationAsync(opts.Version, opts.RunInBackground);
+                            m_Logger.WriteLine($"Job {jobId}: starting host application");
+                            app = m_AppProvider.StartApplication(opts.Version, opts.RunInBackground);
                         }
                         catch (Exception ex)
                         {
-                            throw new UserMessageException("Failed to start application", ex);
+                            throw new UserMessageException($"Job {jobId}: Failed to start application", ex);
                         }
                     }
 
@@ -160,16 +162,18 @@ namespace Xarial.CadPlus.XBatch.Base.Core
                         return;
                     }
 
-                    m_Logger.WriteLine($"Processing file {nextDocPath} with job: {jobId}");
+                    m_Logger.WriteLine($"Job {jobId}: processing file {nextDocPath}");
 
                     RunMacrosForDocument(app, nextDocPath, nextMacrosStack, tcs, timeout);
+
+                    IncrementProgress(data);
                 }
                 catch (Exception ex)
                 {
                     var userErr = ex.ParseUserError(out _);
                     //TODO: add trace logger
 
-                    m_Logger.WriteLine($"Error while processing: {nextDocPath}: {userErr}");
+                    m_Logger.WriteLine($"Job {jobId}: error while processing: {nextDocPath}: {userErr}");
 
                     if (opts.ContinueOnError)
                     {
@@ -178,6 +182,8 @@ namespace Xarial.CadPlus.XBatch.Base.Core
                             TryShutDownApplication(app);
                             app = null;
                         }
+
+                        IncrementProgress(data);
                     }
                     else
                     {
@@ -185,17 +191,18 @@ namespace Xarial.CadPlus.XBatch.Base.Core
                         throw ex;
                     }
                 }
-                finally 
-                {
-                    lock (m_LockObj)
-                    {
-                        data.CurJob = data.CurJob + 1;
-                        m_ProgressHandler?.Report(data.CurJob / (double)data.TotalJobs);
-                    }
-                }
             }
 
             TryShutDownApplication(app);
+        }
+
+        private void IncrementProgress(BatchRunnerProgressData data)
+        {
+            lock (m_LockObj)
+            {
+                data.CurJob = data.CurJob + 1;
+                m_ProgressHandler?.Report(data.CurJob / (double)data.TotalJobs);
+            }
         }
 
         void ResetTimeout(CancellationTokenSource tcs, TimeSpan timeout)

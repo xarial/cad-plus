@@ -46,7 +46,7 @@ namespace Xarial.CadPlus.XBatch.Sw
             }
         }
 
-        public async Task<IXApplication> StartApplicationAsync(AppVersionInfo vers, bool background)
-            => await SwApplication.StartAsync(((SwAppVersionInfo)vers).Version, background ? "/b" : "");
+        public IXApplication StartApplication(AppVersionInfo vers, bool background)
+            => SwApplication.StartAsync(((SwAppVersionInfo)vers).Version, background ? "/b" : "").Result;
     }
 }
