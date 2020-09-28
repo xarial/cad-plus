@@ -85,7 +85,7 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
             }
         }
 
-        public ICommand ExportCommand => m_RunBatchCommand ?? (m_RunBatchCommand = new RelayCommand(RunBatch, () => !IsBatchInProgress && Input.Any()));
+        public ICommand RunBatchCommand => m_RunBatchCommand ?? (m_RunBatchCommand = new RelayCommand(RunBatch, () => !IsBatchInProgress && Input.Any()));
         public ICommand CancelBatchCommand => m_CancelBatchCommand ?? (m_CancelBatchCommand = new RelayCommand(CancelExport, () => IsBatchInProgress));
         public ICommand AddMacroCommand => m_AddMacroCommand ?? (m_AddMacroCommand = new RelayCommand(AddMacro, () => !IsBatchInProgress));
 
@@ -116,9 +116,17 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
             Filter = "*.*";
             IsTimeoutEnabled = true;
             Timeout = 600;
+            ContinueOnError = true;
+            ParallelJobsCount = 1;
 
             InstalledVersions = m_Model.InstalledVersions;
             Version = InstalledVersions.FirstOrDefault();
+
+            //
+            Input.Add(@"D:\Demo\xbatch\models");
+            Macros.Add(@"D:\Demo\xbatch\macros\SimpleMacro.swp");
+            Macros.Add(@"D:\Demo\xbatch\macros\SimpleMacro1.swp");
+            //
         }
 
         private void OnProgressChanged(double prg)

@@ -6,6 +6,7 @@
 //*********************************************************************
 
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -26,7 +27,7 @@ namespace Xarial.CadPlus.XBatch.Base.Core
     {
         private class BatchRunnerProgressData 
         {
-            internal List<string> Files { get; set; }
+            internal ConcurrentStack<string> Files { get; set; }
             internal int CurJob { get; set; }
             internal int TotalJobs { get; set; }
         }
@@ -58,10 +59,13 @@ namespace Xarial.CadPlus.XBatch.Base.Core
 
             var progressData = new BatchRunnerProgressData()
             {
-                Files = allFiles,
-                CurJob = 0,
-                TotalJobs = allFiles.Count
+                Files = new ConcurrentStack<string>(allFiles),
+                CurJob = 0
             };
+
+            progressData.TotalJobs = progressData.Files.Count;
+
+            m_Logger.WriteLine($"Running {jobs.Length} parallel job(s) for {progressData.TotalJobs} file(s)");
 
             for (int i = 0; i < jobs.Length; i++) 
             {
@@ -73,27 +77,26 @@ namespace Xarial.CadPlus.XBatch.Base.Core
             m_Logger.WriteLine($"Batch running completed in {DateTime.Now.Subtract(curTime).ToString(@"hh\:mm\:ss")}");
         }
 
-        private List<string> SelectAllFiles(IEnumerable<string> inputs, string filter) 
+        private IEnumerable<string> SelectAllFiles(IEnumerable<string> inputs, string filter) 
         {
-            var files = new List<string>();
-
             foreach (var input in inputs)
             {
                 if (Directory.Exists(input))
                 {
-                    files.AddRange(Directory.GetFiles(input, filter, SearchOption.AllDirectories).ToList());
+                    foreach (var file in Directory.EnumerateFiles(input, filter, SearchOption.AllDirectories))
+                    {
+                        yield return file;
+                    }
                 }
                 else if (File.Exists(input))
                 {
-                    files.Add(input);
+                    yield return input;
                 }
                 else
                 {
                     throw new Exception("Specify input file or directory");
                 }
             }
-
-            return files;
         }
 
         private async Task ProcessFiles(BatchRunnerProgressData data, BatchRunnerOptions opts, int jobId,
@@ -103,43 +106,22 @@ namespace Xarial.CadPlus.XBatch.Base.Core
 
             CancellationTokenSource tcs = null;
 
-            void ResetTimeout()
-            {
-                if (tcs != null)
-                {
-                    if (opts.Timeout > 0)
-                    {
-                        tcs.CancelAfter(TimeSpan.FromSeconds(opts.Timeout));
-                    }
-                }
-            }
+            TimeSpan timeout = default;
 
-            bool PopNextDocument(out string nextDocPath) 
+            if (opts.Timeout > 0) 
             {
-                lock (m_LockObj)
-                {
-                    if (data.Files.Any())
-                    {
-                        nextDocPath = data.Files.First();
-                        data.Files.RemoveAt(0);
-                        return true;
-                    }
-                    else
-                    {
-                        nextDocPath = "";
-                        return false;
-                    }
-                }
+                timeout = TimeSpan.FromSeconds(opts.Timeout);
             }
 
             if (cancellationToken != default)
             {
                 tcs = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
                 
-                ResetTimeout();
+                ResetTimeout(tcs, timeout);
 
                 tcs.Token.Register(() =>
                 {
+                    m_Logger.WriteLine("Cancelled by the user");
                     TryShutDownApplication(app);
                 });
             }
@@ -147,7 +129,8 @@ namespace Xarial.CadPlus.XBatch.Base.Core
             while (true)
             {
                 string nextDocPath = "";
-                
+                var nextMacrosStack = new ConcurrentStack<string>();
+
                 try
                 {
                     if (app == null)
@@ -162,12 +145,14 @@ namespace Xarial.CadPlus.XBatch.Base.Core
                         }
                     }
 
-                    if (!PopNextDocument(out nextDocPath)) 
+                    if (!data.Files.TryPop(out nextDocPath))
                     {
                         break;
                     }
-                    
-                    ResetTimeout();
+
+                    nextMacrosStack = new ConcurrentStack<string>(opts.Macros);
+
+                    ResetTimeout(tcs, timeout);
 
                     if (tcs.IsCancellationRequested)
                     {
@@ -175,50 +160,9 @@ namespace Xarial.CadPlus.XBatch.Base.Core
                         return;
                     }
 
-                    IXDocument doc = null;
+                    m_Logger.WriteLine($"Processing file {nextDocPath} with job: {jobId}");
 
-                    try
-                    {
-                        doc = app.Documents.Open(new DocumentOpenArgs()
-                        {
-                            Path = nextDocPath
-                        });
-
-                        foreach (var macroPath in opts.Macros)
-                        {
-                            ResetTimeout();
-
-                            if (tcs.IsCancellationRequested)
-                            {
-                                TryShutDownApplication(app);
-                                return;
-                            }
-
-                            try
-                            {
-                                var macro = app.OpenMacro(macroPath);
-                                macro.Run();
-                            }
-                            catch (MacroRunFailedException ex)
-                            {
-                                throw new UserMessageException(ex.Message, ex);
-                            }
-                            catch (OpenDocumentFailedException ex)
-                            {
-                                throw new UserMessageException(ex.Message, ex);
-                            }
-                        }
-                    }
-                    finally
-                    {
-                        TryCloseDocument(doc);
-                    }
-
-                    lock (m_LockObj)
-                    {
-                        data.CurJob = data.CurJob + 1;
-                        m_ProgressHandler?.Report(data.CurJob / (double)data.TotalJobs);
-                    }
+                    RunMacrosForDocument(app, nextDocPath, nextMacrosStack, tcs, timeout);
                 }
                 catch (Exception ex)
                 {
@@ -229,16 +173,24 @@ namespace Xarial.CadPlus.XBatch.Base.Core
 
                     if (opts.ContinueOnError)
                     {
-                        if (app.Process.HasExited || !app.Process.Responding) 
+                        if (app.Process.HasExited || !app.Process.Responding)
                         {
                             TryShutDownApplication(app);
                             app = null;
                         }
                     }
-                    else 
+                    else
                     {
                         TryShutDownApplication(app);
                         throw ex;
+                    }
+                }
+                finally 
+                {
+                    lock (m_LockObj)
+                    {
+                        data.CurJob = data.CurJob + 1;
+                        m_ProgressHandler?.Report(data.CurJob / (double)data.TotalJobs);
                     }
                 }
             }
@@ -246,7 +198,61 @@ namespace Xarial.CadPlus.XBatch.Base.Core
             TryShutDownApplication(app);
         }
 
-        private static void TryCloseDocument(IXDocument doc)
+        void ResetTimeout(CancellationTokenSource tcs, TimeSpan timeout)
+        {
+            if (tcs != null)
+            {
+                if (timeout != default)
+                {
+                    tcs.CancelAfter(timeout);
+                }
+            }
+        }
+
+        private void RunMacrosForDocument(IXApplication app, string filePath, ConcurrentStack<string> macros,
+            CancellationTokenSource tcs, TimeSpan timeout) 
+        {
+            IXDocument doc = null;
+
+            try
+            {
+                doc = app.Documents.Open(new DocumentOpenArgs()
+                {
+                    Path = filePath
+                });
+
+                while (macros.TryPop(out string macroPath)) 
+                {
+                    ResetTimeout(tcs, timeout);
+
+                    if (tcs.IsCancellationRequested)
+                    {
+                        TryShutDownApplication(app);
+                        return;
+                    }
+
+                    try
+                    {
+                        var macro = app.OpenMacro(macroPath);
+                        macro.Run();
+                    }
+                    catch (MacroRunFailedException ex)
+                    {
+                        throw new UserMessageException(ex.Message, ex);
+                    }
+                    catch (OpenDocumentFailedException ex)
+                    {
+                        throw new UserMessageException(ex.Message, ex);
+                    }
+                }
+            }
+            finally
+            {
+                TryCloseDocument(doc);
+            }
+        }
+
+        private void TryCloseDocument(IXDocument doc)
         {
             if (doc != null)
             {
@@ -262,6 +268,8 @@ namespace Xarial.CadPlus.XBatch.Base.Core
 
         private void TryShutDownApplication(IXApplication app)
         {
+            m_Logger.WriteLine("Closing host application");
+
             Process appPrc = null;
 
             try

@@ -106,7 +106,7 @@ namespace Xarial.CadPlus.Xport.Core
         }
 
         private Task<bool> StartWaitProcessAsync(ProcessStartInfo prcStartInfo,
-            CancellationToken cancellationToken = default(CancellationToken))
+            CancellationToken cancellationToken = default)
         {
             var tcs = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
 
