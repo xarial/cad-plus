@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:views="clr-namespace:Xarial.CadPlus.XBatch.Base.Views"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="xBatch" Height="450" Width="800">
     <Grid>
         <views:BatchRunnerView/>
     </Grid>

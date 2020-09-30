@@ -76,8 +76,7 @@ namespace Xarial.CadPlus.XBatch.Base.Core
                     {
                         var res = AttemptProcessFile(ref app, ref appPrc, allFiles[i], opts, cancellationToken);
                         m_ProgressHandler?.Report((i + 1) / (double)allFiles.Length);
-                        m_Logger.WriteLine($"Processing file {allFiles[i]} result: {res}");
-                        
+                                                
                         if (!res && !opts.ContinueOnError) 
                         {
                             throw new UserMessageException("Cancelling the job. Set 'Continue On Error' option to continue job if file failed");
@@ -264,7 +263,7 @@ namespace Xarial.CadPlus.XBatch.Base.Core
 
                     AttempRunMacros(app, doc, macrosStack);
 
-                    m_Logger.WriteLine($"Processing file {filePath} completed in {DateTime.Now.Subtract(fileProcessStartTime).ToString(@"hh\:mm\:ss")}");
+                    m_Logger.WriteLine($"Processing file '{filePath}' successfully completed. Failed macros: {macrosStack.Count}. Execution time {DateTime.Now.Subtract(fileProcessStartTime).ToString(@"hh\:mm\:ss")}");
 
                     return true;
                 }
@@ -304,6 +303,7 @@ namespace Xarial.CadPlus.XBatch.Base.Core
                 }
             }
 
+            m_Logger.WriteLine($"Processing file '{filePath}' failed");
             return false;
         }
 
