@@ -46,7 +46,7 @@
     </WixExtension>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AddInReg.wxs" />
+    <Compile Include="SwAddInReg.wxs" />
   </ItemGroup>
   <Import Project="$(WixTargetsPath)" Condition=" '$(WixTargetsPath)' != '' " />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\WiX\v3.x\Wix.targets" Condition=" '$(WixTargetsPath)' == '' AND Exists('$(MSBuildExtensionsPath32)\Microsoft\WiX\v3.x\Wix.targets') " />
@@ -55,7 +55,7 @@
   </Target>
   <Target Name="BeforeBuild">
     <HeatDirectory Directory="..\_build" Transforms="DirectoryHeatTransform.xslt" PreprocessorVariable="var.SourceOutDir" OutputFile="Files.wxs" ComponentGroupName="FilesRegGroup" DirectoryRefId="INSTALLFOLDER" AutogenerateGuids="true" ToolPath="$(WixToolPath)" SuppressFragments="true" SuppressRegistry="true" SuppressCom="true" SuppressRootDirectory="true" />
-    <HeatFile File="..\_build\Xarial.CadPlus.SwAddIn.dll" PreprocessorVariable="var.SourceOutDir" OutputFile="AddInReg.wxs" ComponentGroupName="AddInComRegGroup" DirectoryRefId="INSTALLFOLDER" AutogenerateGuids="true" ToolPath="$(WixToolPath)" SuppressFragments="false" SuppressRegistry="false" SuppressCom="false" SuppressRootDirectory="true" />
+    <HeatFile File="..\_build\Xarial.CadPlus.AddIn.Sw.dll" PreprocessorVariable="var.SourceOutDir" OutputFile="SwAddInReg.wxs" ComponentGroupName="SwAddInComRegGroup" DirectoryRefId="INSTALLFOLDER" AutogenerateGuids="true" ToolPath="$(WixToolPath)" SuppressFragments="false" SuppressRegistry="false" SuppressCom="false" SuppressRootDirectory="true" />
   </Target>
   <PropertyGroup>
     <PreBuildEvent />
