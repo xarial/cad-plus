@@ -16,6 +16,10 @@ namespace Xarial.CadPlus.XBatch.Base.Exceptions
 {
     public class UserMessageException : Exception, IUserMessageException
     {
+        public UserMessageException(string err) : base(err)
+        {
+        }
+
         public UserMessageException(string err, Exception inner) : base(err, inner) 
         {
         }

@@ -25,57 +25,68 @@ namespace Xarial.CadPlus.XBatch.Base.Core
 {
     public class BatchRunner : IDisposable
     {
-        private class BatchRunnerProgressData 
-        {
-            internal ConcurrentStack<string> Files { get; set; }
-            internal int CurJob { get; set; }
-            internal int TotalJobs { get; set; }
-        }
+        private const int MAX_ATTEMPTS = 3;
 
         private readonly TextWriter m_Logger;
         private readonly IProgress<double> m_ProgressHandler;
         private readonly IApplicationProvider m_AppProvider;
 
-        private readonly object m_LockObj;
-
         public BatchRunner(IApplicationProvider appProvider, TextWriter logger, IProgress<double> progressHandler)
         {
             m_Logger = logger;
             m_ProgressHandler = progressHandler;
-            m_AppProvider = appProvider;
-            
-            m_LockObj = new object();
+            m_AppProvider = appProvider;   
         }
 
-        public async Task BatchRun(BatchRunnerOptions opts, CancellationToken token = default)
+        public async Task BatchRun(BatchRunnerOptions opts, CancellationToken cancellationToken = default)
         {
             m_Logger.WriteLine($"Batch macro running started");
 
-            var curTime = DateTime.Now;
+            var batchStartTime = DateTime.Now;
             
-            var jobs = new Task[opts.ParallelJobsCount];
+            var allFiles = SelectAllFiles(opts.Input, opts.Filter).ToArray();
 
-            var allFiles = SelectAllFiles(opts.Input, opts.Filter);
+            m_Logger.WriteLine($"Running batch processing for {allFiles.Length} file(s)");
+            
+            TimeSpan timeout = default;
 
-            var progressData = new BatchRunnerProgressData()
+            if (opts.Timeout > 0)
             {
-                Files = new ConcurrentStack<string>(allFiles),
-                CurJob = 0
-            };
-
-            progressData.TotalJobs = progressData.Files.Count;
-
-            m_Logger.WriteLine($"Running {jobs.Length} parallel job(s) for {progressData.TotalJobs} file(s)");
-
-            for (int i = 0; i < jobs.Length; i++) 
-            {
-                var jobId = i + 1;
-                jobs[i] = Task.Run(() => ProcessFiles(progressData, opts, jobId, token));
+                timeout = TimeSpan.FromSeconds(opts.Timeout);
             }
 
-            await Task.WhenAll(jobs);
+            IXApplication app = null;
+            Process appPrc = null;
 
-            m_Logger.WriteLine($"Batch running completed in {DateTime.Now.Subtract(curTime).ToString(@"hh\:mm\:ss")}");
+            if (cancellationToken != default)
+            {
+                cancellationToken.Register(() =>
+                {
+                    m_Logger.WriteLine($"Cancelled by the user");
+                    TryShutDownApplication(appPrc);
+                });
+            }
+
+            try
+            {
+                await Task.Run(() =>
+                {
+                    for (int i = 0; i < allFiles.Length; i++)
+                    {
+                        var res = AttemptProcessFile(ref app, ref appPrc, allFiles[i], opts, cancellationToken);
+                        m_ProgressHandler?.Report((i + 1) / (double)allFiles.Length);
+                    }
+                });
+            }
+            catch 
+            {
+            }
+            finally
+            {
+                TryShutDownApplication(appPrc);
+            }
+
+            m_Logger.WriteLine($"Batch running completed in {DateTime.Now.Subtract(batchStartTime).ToString(@"hh\:mm\:ss")}");
         }
 
         private IEnumerable<string> SelectAllFiles(IEnumerable<string> inputs, string filter) 
@@ -100,165 +111,6 @@ namespace Xarial.CadPlus.XBatch.Base.Core
             }
         }
 
-        private void ProcessFiles(BatchRunnerProgressData data, BatchRunnerOptions opts, int jobId,
-            CancellationToken cancellationToken = default)
-        {
-            IXApplication app = null;
-
-            CancellationTokenSource tcs = null;
-
-            TimeSpan timeout = default;
-
-            if (opts.Timeout > 0) 
-            {
-                timeout = TimeSpan.FromSeconds(opts.Timeout);
-            }
-
-            if (cancellationToken != default)
-            {
-                tcs = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-                
-                ResetTimeout(tcs, timeout);
-
-                tcs.Token.Register(() =>
-                {
-                    m_Logger.WriteLine($"Job {jobId}: cancelled by the user");
-                    TryShutDownApplication(app);
-                });
-            }
-
-            while (true)
-            {
-                string nextDocPath = "";
-                var nextMacrosStack = new ConcurrentStack<string>();
-
-                try
-                {
-                    if (app == null)
-                    {
-                        try
-                        {
-                            m_Logger.WriteLine($"Job {jobId}: starting host application");
-                            app = m_AppProvider.StartApplication(opts.Version, opts.RunInBackground);
-                        }
-                        catch (Exception ex)
-                        {
-                            throw new UserMessageException($"Job {jobId}: Failed to start application", ex);
-                        }
-                    }
-
-                    if (!data.Files.TryPop(out nextDocPath))
-                    {
-                        break;
-                    }
-
-                    nextMacrosStack = new ConcurrentStack<string>(opts.Macros);
-
-                    ResetTimeout(tcs, timeout);
-
-                    if (tcs.IsCancellationRequested)
-                    {
-                        TryShutDownApplication(app);
-                        return;
-                    }
-
-                    m_Logger.WriteLine($"Job {jobId}: processing file {nextDocPath}");
-
-                    RunMacrosForDocument(app, nextDocPath, nextMacrosStack, tcs, timeout);
-
-                    IncrementProgress(data);
-                }
-                catch (Exception ex)
-                {
-                    var userErr = ex.ParseUserError(out _);
-                    //TODO: add trace logger
-
-                    m_Logger.WriteLine($"Job {jobId}: error while processing: {nextDocPath}: {userErr}");
-
-                    if (opts.ContinueOnError)
-                    {
-                        if (app.Process.HasExited || !app.Process.Responding)
-                        {
-                            TryShutDownApplication(app);
-                            app = null;
-                        }
-
-                        IncrementProgress(data);
-                    }
-                    else
-                    {
-                        TryShutDownApplication(app);
-                        throw ex;
-                    }
-                }
-            }
-
-            TryShutDownApplication(app);
-        }
-
-        private void IncrementProgress(BatchRunnerProgressData data)
-        {
-            lock (m_LockObj)
-            {
-                data.CurJob = data.CurJob + 1;
-                m_ProgressHandler?.Report(data.CurJob / (double)data.TotalJobs);
-            }
-        }
-
-        void ResetTimeout(CancellationTokenSource tcs, TimeSpan timeout)
-        {
-            if (tcs != null)
-            {
-                if (timeout != default)
-                {
-                    tcs.CancelAfter(timeout);
-                }
-            }
-        }
-
-        private void RunMacrosForDocument(IXApplication app, string filePath, ConcurrentStack<string> macros,
-            CancellationTokenSource tcs, TimeSpan timeout) 
-        {
-            IXDocument doc = null;
-
-            try
-            {
-                doc = app.Documents.Open(new DocumentOpenArgs()
-                {
-                    Path = filePath
-                });
-
-                while (macros.TryPop(out string macroPath)) 
-                {
-                    ResetTimeout(tcs, timeout);
-
-                    if (tcs.IsCancellationRequested)
-                    {
-                        TryShutDownApplication(app);
-                        return;
-                    }
-
-                    try
-                    {
-                        var macro = app.OpenMacro(macroPath);
-                        macro.Run();
-                    }
-                    catch (MacroRunFailedException ex)
-                    {
-                        throw new UserMessageException(ex.Message, ex);
-                    }
-                    catch (OpenDocumentFailedException ex)
-                    {
-                        throw new UserMessageException(ex.Message, ex);
-                    }
-                }
-            }
-            finally
-            {
-                TryCloseDocument(doc);
-            }
-        }
-
         private void TryCloseDocument(IXDocument doc)
         {
             if (doc != null)
@@ -273,32 +125,248 @@ namespace Xarial.CadPlus.XBatch.Base.Core
             }
         }
 
-        private void TryShutDownApplication(IXApplication app)
+        private void TryShutDownApplication(Process appPrc)
         {
-            m_Logger.WriteLine("Closing host application");
-
-            Process appPrc = null;
-
             try
-            {
-                if (app != null)
-                {
-                    appPrc = app.Process;
-                    app.Close();
-                }
-            }
-            catch 
-            {
-            }
-            finally
             {
                 if (appPrc != null)
                 {
                     if (!appPrc.HasExited)
                     {
+                        m_Logger.WriteLine("Closing host application");
                         appPrc.Kill();
                     }
                 }
+            }
+            catch 
+            {
+            }
+        }
+
+        private IXApplication AttemptStartApplication(AppVersionInfo versionInfo, bool background, 
+            CancellationToken cancellationToken, TimeSpan? timeout) 
+        {   
+            int curAttempt = 1;
+
+            CancellationTokenSource appStartCancellationTokenSrc = null;
+
+            while (curAttempt <= MAX_ATTEMPTS) 
+            {
+                try
+                {
+                    var appStartTimeout = timeout.HasValue ? timeout.Value : TimeSpan.FromMinutes(5);
+                    
+                    if (cancellationToken != default)
+                    {
+                        appStartCancellationTokenSrc = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+                    }
+                    else
+                    {
+                        appStartCancellationTokenSrc = new CancellationTokenSource();
+                    }
+
+                    appStartCancellationTokenSrc.CancelAfter(appStartTimeout);
+
+                    m_Logger.WriteLine($"Starting host application");
+
+                    var app = m_AppProvider.StartApplication(versionInfo,
+                        background, appStartCancellationTokenSrc.Token);
+
+                    return app;
+                }
+                catch
+                {
+                    if (cancellationToken.IsCancellationRequested)
+                    {
+                        throw new UserMessageException("Cancelled by the user");
+                    }
+                    
+                    m_Logger.WriteLine($"Failed to start application from attempt {curAttempt}");
+
+                    curAttempt++;
+                }
+                finally 
+                {
+                    appStartCancellationTokenSrc?.Dispose();
+                }
+            }
+
+            throw new UserMessageException("Failed to start application. Operation is aborted");
+        }
+
+        private bool AttemptProcessFile(ref IXApplication app, ref Process appPrc, 
+            string filePath, BatchRunnerOptions opts, CancellationToken cancellationToken = default)
+        {
+            int curAttempt = 1;
+
+            var macrosStack = new List<string>(opts.Macros);
+
+            TimeSpan? timeout = null;
+            
+            if (opts.Timeout > 0)
+            {
+                timeout = TimeSpan.FromSeconds(opts.Timeout);
+            }
+
+            while (curAttempt <= MAX_ATTEMPTS)
+            {
+                if (app == null || !IsAppAlive(app, appPrc))
+                {
+                    TryShutDownApplication(appPrc);
+
+                    app = AttemptStartApplication(opts.Version, opts.RunInBackground, cancellationToken, timeout);
+                    
+                    appPrc = app.Process;
+                }
+
+                IXDocument doc = null;
+                CancellationTokenSource cancellationTokenSrc = null;
+
+                CancellationToken timeoutCancellationToken = default;
+
+                try
+                {
+                    if (timeout.HasValue) 
+                    {
+                        cancellationTokenSrc = new CancellationTokenSource(timeout.Value);
+                        timeoutCancellationToken = cancellationTokenSrc.Token;
+
+                        var thisAppPrc = appPrc;
+                        
+                        timeoutCancellationToken.Register(() =>
+                        {
+                            TryShutDownApplication(thisAppPrc);
+                        });
+                    }
+
+                    var fileProcessStartTime = DateTime.Now;
+                    m_Logger.WriteLine($"Started processing file {filePath}");
+                    
+                    doc = app.Documents.FirstOrDefault(d => string.Equals(d.Path, filePath));
+
+                    if (doc == null)
+                    {
+                        doc = app.Documents.Open(new DocumentOpenArgs()
+                        {
+                            Path = filePath
+                        });
+                    }
+
+                    app.Documents.Active = doc;
+
+                    AttempRunMacros(app, doc, macrosStack);
+
+                    m_Logger.WriteLine($"Processing file {filePath} completed in {DateTime.Now.Subtract(fileProcessStartTime).ToString(@"hh\:mm\:ss")}");
+
+                    return true;
+                }
+                catch(Exception ex)
+                {
+                    var errDesc = "";
+
+                    if (cancellationToken.IsCancellationRequested) 
+                    {
+                        throw new UserMessageException("Cancelled by the user");
+                    }
+
+                    if (timeoutCancellationToken.IsCancellationRequested)
+                    {
+                        errDesc = "Timeout processing document";
+                    }
+
+                    else
+                    {
+                        if (ex is OpenDocumentFailedException)
+                        {
+                            errDesc = $"Failed to open document {filePath}: {(ex as OpenDocumentFailedException).Message}";
+                        }
+                        else
+                        {
+                            errDesc = "Failed to process document";
+                        }
+                    }
+
+                    m_Logger.WriteLine($"{errDesc}. Attempt: {curAttempt}");
+                    curAttempt++;
+                }
+                finally 
+                {
+                    cancellationTokenSrc?.Dispose();
+                    TryCloseDocument(doc);
+                }
+            }
+
+            return false;
+        }
+
+        private void AttempRunMacros(IXApplication app, IXDocument doc, List<string> macrosStack)
+        {
+            while (macrosStack.Any())
+            {
+                var macroPath = macrosStack.First();
+
+                try
+                {
+                    m_Logger.WriteLine($"Running {macroPath} macro");
+
+                    var macro = app.OpenMacro(macroPath);
+                    macro.Run();
+                }
+                catch (Exception ex)
+                {
+                    string errorDesc;
+
+                    if (ex is MacroRunFailedException)
+                    {
+                        errorDesc = (ex as MacroRunFailedException).Message;
+                    }
+                    else
+                    {
+                        errorDesc = "Unknown error";
+                    }
+
+                    m_Logger.WriteLine($"Failed to run macro '{macroPath}': {errorDesc}");
+
+                    if (!IsDocAlive(doc))
+                    {
+                        throw new UserMessageException("Document has been disconnected");
+                    }
+                }
+
+                macrosStack.RemoveAt(0);
+            }
+        }
+
+        private bool IsAppAlive(IXApplication app, Process prc) 
+        {
+            if (prc.HasExited || !prc.Responding)
+            {
+                return false;
+            }
+            else 
+            {
+                try
+                {
+                    var testWnd = app.WindowHandle;
+                    return true;
+                }
+                catch 
+                {
+                    return false;
+                }
+            }
+        }
+
+        private bool IsDocAlive(IXDocument doc) 
+        {
+            try
+            {
+                var testTitle = doc.Title;
+                return true;
+            }
+            catch 
+            {
+                return false;
             }
         }
 

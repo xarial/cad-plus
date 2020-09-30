@@ -1,7 +1,15 @@
-﻿using System;
+﻿//*********************************************************************
+//CAD+ Toolset
+//Copyright(C) 2020 Xarial Pty Limited
+//Product URL: https://cadplus.xarial.com
+//License: https://cadplus.xarial.com/license/
+//*********************************************************************
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Xarial.CadPlus.XBatch.Base;
 using Xarial.XCad;
@@ -46,7 +54,9 @@ namespace Xarial.CadPlus.XBatch.Sw
             }
         }
 
-        public IXApplication StartApplication(AppVersionInfo vers, bool background)
-            => SwApplication.StartAsync(((SwAppVersionInfo)vers).Version, background ? "/b" : "").Result;
+        public IXApplication StartApplication(AppVersionInfo vers, bool background, CancellationToken cancellationToken)
+            => SwApplication.Start(((SwAppVersionInfo)vers).Version, 
+                background ? "/b" : "",
+                cancellationToken);
     }
 }

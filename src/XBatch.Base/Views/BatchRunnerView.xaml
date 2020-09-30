@@ -69,14 +69,11 @@
                             </CheckBox>
                             <ctrls:NumberBoxInteger Grid.Row="1" Grid.Column="1" Value="{Binding Path=Timeout}" Margin="2" IsEnabled="{Binding Path=IsTimeoutEnabled}" />
 
-                            <TextBlock Grid.Row="2" Grid.Column="0" Margin="2" Text="Parallel Jobs:" />
-                            <ctrls:NumberBoxInteger Grid.Row="2" Grid.Column="1" Value="{Binding Path=ParallelJobsCount}" Margin="2"/>
-
-                            <TextBlock Grid.Row="3" Grid.Column="0" Margin="2" Text="Version:" />
+                            <TextBlock Grid.Row="2" Grid.Column="0" Margin="2" Text="Version:" />
                             <ComboBox ItemsSource="{Binding Path=InstalledVersions}" DisplayMemberPath="DisplayName"
-                                      SelectedItem="{Binding Path=Version}" Grid.Row="3" Grid.Column="1" Margin="2"/>
+                                      SelectedItem="{Binding Path=Version}" Grid.Row="2" Grid.Column="1" Margin="2"/>
 
-                            <CheckBox Grid.ColumnSpan="2" Margin="2" Grid.Row="4" IsChecked="{Binding Path=RunInBackground}">Run in background</CheckBox>
+                            <CheckBox Grid.ColumnSpan="2" Margin="2" Grid.Row="3" IsChecked="{Binding Path=RunInBackground}">Run in background</CheckBox>
                         </Grid>
                     </Expander>
                 </Grid>

@@ -47,7 +47,9 @@ namespace Xarial.CadPlus.XBatch.Base.Models
             {
                 using (var batchRunner = new BatchRunner(m_AppProvider, logWriter, prgHander))
                 {
-                    await batchRunner.BatchRun(opts, m_CurrentCancellationToken.Token).ConfigureAwait(false);
+                    var cancellationToken = m_CurrentCancellationToken.Token;
+
+                    await batchRunner.BatchRun(opts, cancellationToken).ConfigureAwait(false);
                 }
             }
             finally

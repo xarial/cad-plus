@@ -35,7 +35,6 @@ namespace Xarial.CadPlus.XBatch.Base
                 Timeout = args.Timeout,
                 ContinueOnError = args.ContinueOnError,
                 RunInBackground = args.RunInBackground,
-                ParallelJobsCount = args.ParallelJobsCount,
                 Version = appProvider.ParseVersion(args.Version)
             };
 

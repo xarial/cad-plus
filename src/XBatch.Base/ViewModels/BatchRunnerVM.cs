@@ -19,6 +19,7 @@ using Xarial.CadPlus.XBatch.Base.Models;
 using Xarial.XToolkit.Wpf;
 using Xarial.XToolkit.Wpf.Extensions;
 using Xarial.XToolkit.Wpf.Utils;
+using Xarial.XToolkit.Reporting;
 
 namespace Xarial.CadPlus.XBatch.Base.ViewModels
 {
@@ -66,8 +67,6 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
         public bool ContinueOnError { get; set; }
 
         public int Timeout { get; set; }
-
-        public int ParallelJobsCount { get; set; }
 
         public bool RunInBackground { get; set; }
 
@@ -117,7 +116,6 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
             IsTimeoutEnabled = true;
             Timeout = 600;
             ContinueOnError = true;
-            ParallelJobsCount = 1;
 
             InstalledVersions = m_Model.InstalledVersions;
             Version = InstalledVersions.FirstOrDefault();
@@ -126,6 +124,8 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
             Input.Add(@"D:\Demo\xbatch\models");
             Macros.Add(@"D:\Demo\xbatch\macros\SimpleMacro.swp");
             Macros.Add(@"D:\Demo\xbatch\macros\SimpleMacro1.swp");
+            RunInBackground = true;
+            Version = InstalledVersions.Last();
             //
         }
 
@@ -155,7 +155,6 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
                     Filter = Filter,
                     ContinueOnError = ContinueOnError,
                     Timeout = IsTimeoutEnabled ? Timeout : -1,
-                    ParallelJobsCount = ParallelJobsCount,
                     RunInBackground = RunInBackground,
                     Version = Version
                 };
@@ -164,9 +163,10 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
 
                 m_MsgSvc.ShowInformation("Operation completed");
             }
-            catch
+            catch(Exception ex)
             {
-                m_MsgSvc.ShowError("Processing error");
+                //TODO: add log
+                m_MsgSvc.ShowError(ex.ParseUserError(out _));
             }
             finally
             {

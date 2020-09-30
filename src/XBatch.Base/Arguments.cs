@@ -33,10 +33,7 @@ namespace Xarial.CadPlus.XBatch.Base
 
         [Option('b', "background", Required = false, HelpText = "If this option is specified application is run in the background")]
         public bool RunInBackground { get; set; }
-
-        [Option('p', "parallel", Required = false, HelpText = "Number of parallel jobs to execute batch operation")]
-        public int ParallelJobsCount { get; set; } = 1;
-
+        
         [Option('v', "version", Required = false, HelpText = "Version of host application")]
         public string Version { get; set; }
     }

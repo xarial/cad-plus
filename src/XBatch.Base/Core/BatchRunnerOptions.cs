@@ -20,7 +20,6 @@ namespace Xarial.CadPlus.XBatch.Base.Core
         public bool ContinueOnError { get; set; }
         public int Timeout { get; set; }
         public string[] Macros { get; set; }
-        public int ParallelJobsCount { get; set; }
         public AppVersionInfo Version { get; set; }
         public bool RunInBackground { get; set; }
     }
