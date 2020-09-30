@@ -34,7 +34,7 @@ namespace Xarial.CadPlus.XBatch.Base
                 Macros = args.Macros?.ToArray(),
                 Timeout = args.Timeout,
                 ContinueOnError = args.ContinueOnError,
-                RunInBackground = args.RunInBackground,
+                StartupOptions = args.StartupOptions,
                 Version = appProvider.ParseVersion(args.Version)
             };
 

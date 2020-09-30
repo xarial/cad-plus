@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Xarial.CadPlus.XBatch.Base.Core;
 
 namespace Xarial.CadPlus.XBatch.Base
 {
@@ -31,8 +32,8 @@ namespace Xarial.CadPlus.XBatch.Base
         [Option('t', "timeout", Required = false, HelpText = "Timeout in seconds for processing a single item (e.g. running macro on a single file)")]
         public int Timeout { get; set; }
 
-        [Option('b', "background", Required = false, HelpText = "If this option is specified application is run in the background")]
-        public bool RunInBackground { get; set; }
+        [Option('s', "startup", Required = false, HelpText = "Specifies the startup options (e.g. silent, background, safe) for the host application")]
+        public StartupOptions_e StartupOptions { get; set; }
         
         [Option('v', "version", Required = false, HelpText = "Version of host application")]
         public string Version { get; set; }

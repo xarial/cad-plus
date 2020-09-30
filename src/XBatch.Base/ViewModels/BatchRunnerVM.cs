@@ -67,7 +67,7 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
 
         public int Timeout { get; set; }
 
-        public bool RunInBackground { get; set; }
+        public StartupOptions_e StartupOptions { get; set; }
 
         public AppVersionInfo Version { get; set; }
 
@@ -118,6 +118,7 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
             IsTimeoutEnabled = true;
             Timeout = 600;
             ContinueOnError = true;
+            StartupOptions = StartupOptions_e.Silent | StartupOptions_e.Safe;
 
             InstalledVersions = m_Model.InstalledVersions;
             Version = InstalledVersions.FirstOrDefault();
@@ -149,7 +150,7 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
                     Filter = Filter,
                     ContinueOnError = ContinueOnError,
                     Timeout = IsTimeoutEnabled ? Timeout : -1,
-                    RunInBackground = RunInBackground,
+                    StartupOptions = StartupOptions,
                     Version = Version
                 };
 

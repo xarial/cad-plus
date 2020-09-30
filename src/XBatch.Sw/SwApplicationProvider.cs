@@ -12,6 +12,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Xarial.CadPlus.XBatch.Base;
+using Xarial.CadPlus.XBatch.Base.Core;
 using Xarial.XCad;
 using Xarial.XCad.SolidWorks;
 using Xarial.XCad.SolidWorks.Enums;
@@ -80,10 +81,27 @@ namespace Xarial.CadPlus.XBatch.Sw
             }
         }
 
-        public IXApplication StartApplication(AppVersionInfo vers, bool background, CancellationToken cancellationToken)
+        public IXApplication StartApplication(AppVersionInfo vers, StartupOptions_e opts, CancellationToken cancellationToken)
         {
+            var args = new List<string>();
+
+            if (opts.HasFlag(StartupOptions_e.Safe))
+            {
+                args.Add(SwApplication.CommandLineArguments.SafeMode);
+            }
+
+            if (opts.HasFlag(StartupOptions_e.Background))
+            {
+                args.Add(SwApplication.CommandLineArguments.BackgroundMode);
+            }
+
+            if (opts.HasFlag(StartupOptions_e.Silent))
+            {
+                args.Add(SwApplication.CommandLineArguments.SilentMode);
+            }
+
             var app = SwApplication.Start(((SwAppVersionInfo)vers).Version,
-                  background ? "/b" : "",
+                  string.Join(" ", args),
                   cancellationToken);
             
             app.Sw.CommandInProgress = true;

@@ -150,7 +150,7 @@ namespace Xarial.CadPlus.XBatch.Base.Core
             }
         }
 
-        private IXApplication AttemptStartApplication(AppVersionInfo versionInfo, bool background, 
+        private IXApplication AttemptStartApplication(AppVersionInfo versionInfo, StartupOptions_e opts, 
             CancellationToken cancellationToken, TimeSpan? timeout) 
         {   
             int curAttempt = 1;
@@ -177,7 +177,7 @@ namespace Xarial.CadPlus.XBatch.Base.Core
                     m_Logger.WriteLine($"Starting host application");
 
                     var app = m_AppProvider.StartApplication(versionInfo,
-                        background, appStartCancellationTokenSrc.Token);
+                        opts, appStartCancellationTokenSrc.Token);
 
                     return app;
                 }
@@ -221,7 +221,7 @@ namespace Xarial.CadPlus.XBatch.Base.Core
                 {
                     TryShutDownApplication(appPrc);
 
-                    app = AttemptStartApplication(opts.Version, opts.RunInBackground, cancellationToken, timeout);
+                    app = AttemptStartApplication(opts.Version, opts.StartupOptions, cancellationToken, timeout);
                     
                     appPrc = app.Process;
                 }
