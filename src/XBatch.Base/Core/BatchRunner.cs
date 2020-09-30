@@ -268,7 +268,7 @@ namespace Xarial.CadPlus.XBatch.Base.Core
 
                     AttempRunMacros(app, doc, macrosStack);
 
-                    m_Logger.WriteLine($"Processing file '{filePath}' successfully completed. Failed macros: {macrosStack.Count}. Execution time {DateTime.Now.Subtract(fileProcessStartTime).ToString(@"hh\:mm\:ss")}");
+                    m_Logger.WriteLine($"Processing file '{filePath}' completed. Execution time {DateTime.Now.Subtract(fileProcessStartTime).ToString(@"hh\:mm\:ss")}");
 
                     return true;
                 }
