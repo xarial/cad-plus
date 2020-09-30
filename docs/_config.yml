@@ -2,6 +2,7 @@
 plugins:
   - $
   - script-style-optimizer
+  - files-promoter
 $legal:
   company: Xarial Pty Limited
   links:
@@ -21,6 +22,9 @@ default-layout: article
 ^tipue-search:
   page-content-node: //article
   search-page-layout: default
+^files-promoter:
+  folders:
+    - _legal
 ^script-style-optimizer:
   minify-css: true
   minify-js: true
