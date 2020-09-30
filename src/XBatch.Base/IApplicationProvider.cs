@@ -12,6 +12,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Xarial.XCad;
+using Xarial.XToolkit.Wpf.Utils;
 
 namespace Xarial.CadPlus.XBatch.Base
 {
@@ -20,5 +21,7 @@ namespace Xarial.CadPlus.XBatch.Base
         IEnumerable<AppVersionInfo> GetInstalledVersions();
         IXApplication StartApplication(AppVersionInfo vers, bool background, CancellationToken cancellationToken);
         AppVersionInfo ParseVersion(string version);
+        FileFilter[] InputFilesFilter { get; }
+        FileFilter[] MacroFilesFilter { get; }
     }
 }

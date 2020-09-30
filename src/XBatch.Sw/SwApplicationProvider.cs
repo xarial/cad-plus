@@ -15,11 +15,37 @@ using Xarial.CadPlus.XBatch.Base;
 using Xarial.XCad;
 using Xarial.XCad.SolidWorks;
 using Xarial.XCad.SolidWorks.Enums;
+using Xarial.XToolkit.Wpf.Utils;
 
 namespace Xarial.CadPlus.XBatch.Sw
 {
     public class SwApplicationProvider : IApplicationProvider
     {
+        public FileFilter[] InputFilesFilter { get; }
+
+        public FileFilter[] MacroFilesFilter { get; }
+
+        public SwApplicationProvider()
+        {
+            InputFilesFilter = new FileFilter[]
+            {
+                new FileFilter("SOLIDWORKS Parts", "*.sldprt"),
+                new FileFilter("SOLIDWORKS Assemblies", "*.sldasm"),
+                new FileFilter("SOLIDWORKS Drawings", "*.slddrw"),
+                new FileFilter("SOLIDWORKS Files", "*.sldprt", "*.sldasm", "*.slddrw"),
+                FileFilter.AllFiles
+            };
+
+            MacroFilesFilter = new FileFilter[]
+            {
+                new FileFilter("VBA Macros", "*.swp"),
+                new FileFilter("SWBasic Macros", "*.swb"),
+                new FileFilter("VSTA Macros", "*.dll"),
+                new FileFilter("All Macros", "*.swp", "*.swb", "*.dll"),
+                FileFilter.AllFiles
+            };
+        }
+
         public IEnumerable<AppVersionInfo> GetInstalledVersions() 
             => SwApplication.GetInstalledVersions()
             .Select(x => new SwAppVersionInfo(x));
@@ -55,8 +81,14 @@ namespace Xarial.CadPlus.XBatch.Sw
         }
 
         public IXApplication StartApplication(AppVersionInfo vers, bool background, CancellationToken cancellationToken)
-            => SwApplication.Start(((SwAppVersionInfo)vers).Version, 
-                background ? "/b" : "",
-                cancellationToken);
+        {
+            var app = SwApplication.Start(((SwAppVersionInfo)vers).Version,
+                  background ? "/b" : "",
+                  cancellationToken);
+            
+            app.Sw.CommandInProgress = true;
+
+            return app;
+        }
     }
 }

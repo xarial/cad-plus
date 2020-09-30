@@ -13,6 +13,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Xarial.CadPlus.Common.Services;
 using Xarial.CadPlus.XBatch.Base.Core;
+using Xarial.XToolkit.Wpf.Utils;
 
 namespace Xarial.CadPlus.XBatch.Base.Models
 {
@@ -31,9 +32,13 @@ namespace Xarial.CadPlus.XBatch.Base.Models
             InstalledVersions = m_AppProvider.GetInstalledVersions().ToArray();
         }
 
+        public FileFilter[] InputFilesFilter => m_AppProvider.InputFilesFilter;
+
+        public FileFilter[] MacroFilesFilter => m_AppProvider.MacroFilesFilter;
+
         public AppVersionInfo[] InstalledVersions { get; }
 
-        public async Task BatchRun(BatchRunnerOptions opts)
+        public async Task<bool> BatchRun(BatchRunnerOptions opts)
         {
             m_CurrentCancellationToken = new CancellationTokenSource();
 
@@ -49,7 +54,7 @@ namespace Xarial.CadPlus.XBatch.Base.Models
                 {
                     var cancellationToken = m_CurrentCancellationToken.Token;
 
-                    await batchRunner.BatchRun(opts, cancellationToken).ConfigureAwait(false);
+                    return await batchRunner.BatchRun(opts, cancellationToken).ConfigureAwait(false);
                 }
             }
             finally

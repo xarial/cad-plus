@@ -34,7 +34,6 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
 
         private ICommand m_RunBatchCommand;
         private ICommand m_CancelBatchCommand;
-        private ICommand m_AddMacroCommand;
 
         public ObservableCollection<string> Log { get; }
         
@@ -74,6 +73,10 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
 
         public AppVersionInfo[] InstalledVersions { get; set; }
 
+        public FileFilter[] InputFilesFilter => m_Model.InputFilesFilter;
+
+        public FileFilter[] MacroFilesFilter => m_Model.MacroFilesFilter;
+
         public bool IsTimeoutEnabled
         {
             get => m_IsTimeoutEnabled;
@@ -86,8 +89,7 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
 
         public ICommand RunBatchCommand => m_RunBatchCommand ?? (m_RunBatchCommand = new RelayCommand(RunBatch, () => !IsBatchInProgress && Input.Any()));
         public ICommand CancelBatchCommand => m_CancelBatchCommand ?? (m_CancelBatchCommand = new RelayCommand(CancelExport, () => IsBatchInProgress));
-        public ICommand AddMacroCommand => m_AddMacroCommand ?? (m_AddMacroCommand = new RelayCommand(AddMacro, () => !IsBatchInProgress));
-
+        
         public int ActiveTabIndex
         {
             get => m_ActiveTabIndex;
@@ -119,14 +121,6 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
 
             InstalledVersions = m_Model.InstalledVersions;
             Version = InstalledVersions.FirstOrDefault();
-
-            //
-            Input.Add(@"D:\Demo\xbatch\models");
-            Macros.Add(@"D:\Demo\xbatch\macros\SimpleMacro.swp");
-            Macros.Add(@"D:\Demo\xbatch\macros\SimpleMacro1.swp");
-            RunInBackground = true;
-            Version = InstalledVersions.Last();
-            //
         }
 
         private void OnProgressChanged(double prg)
@@ -159,9 +153,14 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
                     Version = Version
                 };
 
-                await m_Model.BatchRun(opts).ConfigureAwait(false);
-
-                m_MsgSvc.ShowInformation("Operation completed");
+                if (await m_Model.BatchRun(opts).ConfigureAwait(false))
+                {
+                    m_MsgSvc.ShowInformation("Job completed successfully");
+                }
+                else 
+                {
+                    m_MsgSvc.ShowError("Job failed");
+                }
             }
             catch(Exception ex)
             {
@@ -177,16 +176,6 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
         private void CancelExport()
         {
             m_Model.Cancel();
-        }
-
-        private void AddMacro()
-        {
-            if (FileSystemBrowser.BrowseFileOpen(out string macroPath, 
-                "Select macro file", 
-                FileSystemBrowser.BuildFilterString(new FileFilter("SOLIDWORKS Macro", "*.swp"), FileFilter.AllFiles))) 
-            {
-                Macros.Add(macroPath);
-            }
         }
     }
 }

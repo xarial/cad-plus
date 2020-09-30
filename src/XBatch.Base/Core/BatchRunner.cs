@@ -6,7 +6,6 @@
 //*********************************************************************
 
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -38,7 +37,7 @@ namespace Xarial.CadPlus.XBatch.Base.Core
             m_AppProvider = appProvider;   
         }
 
-        public async Task BatchRun(BatchRunnerOptions opts, CancellationToken cancellationToken = default)
+        public async Task<bool> BatchRun(BatchRunnerOptions opts, CancellationToken cancellationToken = default)
         {
             m_Logger.WriteLine($"Batch macro running started");
 
@@ -67,6 +66,8 @@ namespace Xarial.CadPlus.XBatch.Base.Core
                 });
             }
 
+            var jobResult = false;
+
             try
             {
                 await Task.Run(() =>
@@ -75,11 +76,15 @@ namespace Xarial.CadPlus.XBatch.Base.Core
                     {
                         var res = AttemptProcessFile(ref app, ref appPrc, allFiles[i], opts, cancellationToken);
                         m_ProgressHandler?.Report((i + 1) / (double)allFiles.Length);
+                        m_Logger.WriteLine($"Processing file {allFiles[i]} result: {res}");
+                        
+                        if (!res && !opts.ContinueOnError) 
+                        {
+                            throw new UserMessageException("Cancelling the job. Set 'Continue On Error' option to continue job if file failed");
+                        }
                     }
                 });
-            }
-            catch 
-            {
+                jobResult = true;
             }
             finally
             {
@@ -87,6 +92,8 @@ namespace Xarial.CadPlus.XBatch.Base.Core
             }
 
             m_Logger.WriteLine($"Batch running completed in {DateTime.Now.Subtract(batchStartTime).ToString(@"hh\:mm\:ss")}");
+
+            return jobResult;
         }
 
         private IEnumerable<string> SelectAllFiles(IEnumerable<string> inputs, string filter) 
@@ -248,7 +255,8 @@ namespace Xarial.CadPlus.XBatch.Base.Core
                     {
                         doc = app.Documents.Open(new DocumentOpenArgs()
                         {
-                            Path = filePath
+                            Path = filePath,
+                            Silent = true
                         });
                     }
 
@@ -307,7 +315,7 @@ namespace Xarial.CadPlus.XBatch.Base.Core
 
                 try
                 {
-                    m_Logger.WriteLine($"Running {macroPath} macro");
+                    m_Logger.WriteLine($"Running '{macroPath}' macro");
 
                     var macro = app.OpenMacro(macroPath);
                     macro.Run();
@@ -341,6 +349,7 @@ namespace Xarial.CadPlus.XBatch.Base.Core
         {
             if (prc.HasExited || !prc.Responding)
             {
+                m_Logger.WriteLine("Application host is not responding or exited");
                 return false;
             }
             else 
@@ -352,6 +361,7 @@ namespace Xarial.CadPlus.XBatch.Base.Core
                 }
                 catch 
                 {
+                    m_Logger.WriteLine("Application host is corrupted");
                     return false;
                 }
             }

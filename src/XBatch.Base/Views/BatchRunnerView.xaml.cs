@@ -22,9 +22,6 @@ using System.Windows.Shapes;
 
 namespace Xarial.CadPlus.XBatch.Base.Views
 {
-    /// <summary>
-    /// Interaction logic for BatchRunnerView.xaml
-    /// </summary>
     public partial class BatchRunnerView : UserControl
     {
         public BatchRunnerView()

@@ -47,6 +47,39 @@ namespace Xarial.CadPlus.Common.Controls
             set { SetValue(PathsSourceProperty, value); }
         }
 
+        public static readonly DependencyProperty ShowAddFileButtonProperty =
+            DependencyProperty.Register(
+            nameof(ShowAddFileButton), typeof(bool),
+            typeof(PathListBox), new PropertyMetadata(true));
+
+        public bool ShowAddFileButton
+        {
+            get { return (bool)GetValue(ShowAddFileButtonProperty); }
+            set { SetValue(ShowAddFileButtonProperty, value); }
+        }
+
+        public static readonly DependencyProperty ShowAddFolderButtonProperty =
+            DependencyProperty.Register(
+            nameof(ShowAddFolderButton), typeof(bool),
+            typeof(PathListBox), new PropertyMetadata(true));
+
+        public static readonly DependencyProperty FiltersProperty =
+            DependencyProperty.Register(
+            nameof(Filters), typeof(FileFilter[]),
+            typeof(PathListBox));
+
+        public FileFilter[] Filters
+        {
+            get { return (FileFilter[])GetValue(FiltersProperty); }
+            set { SetValue(FiltersProperty, value); }
+        }
+
+        public bool ShowAddFolderButton
+        {
+            get { return (bool)GetValue(ShowAddFolderButtonProperty); }
+            set { SetValue(ShowAddFolderButtonProperty, value); }
+        }
+
         public override void OnApplyTemplate()
         {
             m_ListBox = (ListBox)this.Template.FindName("PART_ListBox", this);
@@ -78,9 +111,12 @@ namespace Xarial.CadPlus.Common.Controls
 
         private void AddFile()
         {
-            var filter = FileSystemBrowser.BuildFilterString(
-                new FileFilter("SOLIDWORKS Files", "*.sldprt", "*.sldasm", "*.slddrw"),
-                FileFilter.AllFiles);
+            var filter = "";
+
+            if (Filters != null)
+            {
+                filter = FileSystemBrowser.BuildFilterString(Filters);
+            }
 
             if (FileSystemBrowser.BrowseFileOpen(out string path, "Select file to process", filter))
             {

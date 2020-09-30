@@ -20,13 +20,13 @@
             <TabItem Header="Settings">
                 <Grid Grid.IsSharedSizeScope="True" IsEnabled="{Binding Path=IsBatchInProgress, Converter={StaticResource revBoolConv}}">
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="2*" />
+                        <RowDefinition Height="*" />
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="*" />
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
-                    <cmnctrls:PathListBox Grid.Row="0" PathsSource="{Binding Path=Input}"/>
+                    <cmnctrls:PathListBox Filters="{Binding Path=InputFilesFilter}" Grid.Row="0" PathsSource="{Binding Path=Input}"/>
                     <Grid Grid.Row="1">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto" SharedSizeGroup="Label" />
@@ -42,11 +42,9 @@
                             <RowDefinition Height="Auto"/>
                         </Grid.RowDefinitions>
                         <TextBlock Text="Macros:" Grid.Column="0" Margin="2" />
-                        <ListBox Grid.Row="1" ItemsSource="{Binding Path=Macros}"/>
-                        <Button Grid.Row="2" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0 2" 
-                                Command="{Binding Path=AddMacroCommand}">
-                            <TextBlock Text="Add Macro..." Margin="2" />
-                        </Button>
+                        <cmnctrls:PathListBox Filters="{Binding Path=MacrosFilesFilter}" 
+                                              Grid.Row="1" ShowAddFolderButton="False" 
+                                              PathsSource="{Binding Path=Macros}"/>
                     </Grid>
                     
                     <Expander Grid.Row="4" Margin="0,2" Header="Additional Settings">
