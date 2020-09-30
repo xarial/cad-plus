@@ -16,6 +16,11 @@
       use="@Id" />
 
   <xsl:key
+      name="xBatchToRemove"
+      match="wix:Component[ wix:File/@Source = '$(var.SourceOutDir)\xbatch.exe']"
+      use="@Id" />
+
+  <xsl:key
         name="AddInToRemove"
         match="wix:Component[ wix:File/@Source = '$(var.SourceOutDir)\Xarial.CadPlus.AddIn.Sw.dll']"
         use="@Id" />
@@ -42,6 +47,7 @@
   </xsl:template>
 
   <xsl:template match="*[ self::wix:Component or self::wix:ComponentRef ][ key( 'xPortToRemove', @Id ) ]" />
+  <xsl:template match="*[ self::wix:Component or self::wix:ComponentRef ][ key( 'xBatchToRemove', @Id ) ]" />
   <xsl:template match="*[ self::wix:Component or self::wix:ComponentRef ][ key( 'AddInToRemove', @Id ) ]" />
   <xsl:template match="*[ self::wix:Component or self::wix:ComponentRef ][ key( 'TlbToRemove', @Id ) ]" />
   <xsl:template match="*[ self::wix:Component or self::wix:ComponentRef ][ key( 'XmlToRemove', @Id ) ]" />
