@@ -23,7 +23,12 @@ namespace Xarial.CadPlus.XBatch.Base
             this.StartupUri = new Uri("/XBatch.Base;component/MainWindow.xaml", UriKind.Relative);
         }
 
-        protected override async Task RunConsole(Arguments args)
+        protected override Task RunConsole(Arguments args)
+        {
+            return RunConsoleBatch(args);
+        }
+
+        private async Task RunConsoleBatch(Arguments args)
         {
             var appProvider = GetApplicationProvider();
 

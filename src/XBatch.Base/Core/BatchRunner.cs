@@ -82,7 +82,7 @@ namespace Xarial.CadPlus.XBatch.Base.Core
                             throw new UserMessageException("Cancelling the job. Set 'Continue On Error' option to continue job if file failed");
                         }
                     }
-                });
+                }).ConfigureAwait(false);
                 jobResult = true;
             }
             finally
@@ -97,6 +97,11 @@ namespace Xarial.CadPlus.XBatch.Base.Core
 
         private IEnumerable<string> SelectAllFiles(IEnumerable<string> inputs, string filter) 
         {
+            if (string.IsNullOrEmpty(filter)) 
+            {
+                filter = "*.*";
+            }
+
             foreach (var input in inputs)
             {
                 if (Directory.Exists(input))
@@ -173,7 +178,7 @@ namespace Xarial.CadPlus.XBatch.Base.Core
 
                     appStartCancellationTokenSrc.CancelAfter(appStartTimeout);
 
-                    m_Logger.WriteLine($"Starting host application");
+                    m_Logger.WriteLine($"Starting host application: {versionInfo.DisplayName}");
 
                     var app = m_AppProvider.StartApplication(versionInfo,
                         opts, appStartCancellationTokenSrc.Token);

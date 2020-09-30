@@ -67,7 +67,8 @@ namespace Xarial.CadPlus.XBatch.Sw
             }
             else if (int.TryParse(version, out int rev))
             {
-                return new SwAppVersionInfo((SwVersion_e)rev);
+                var swVers = (SwVersion_e)Enum.Parse(typeof(SwVersion_e), $"Sw{rev}");
+                return new SwAppVersionInfo(swVers);
             }
             else if (version.StartsWith("solidworks", StringComparison.CurrentCultureIgnoreCase))
             {

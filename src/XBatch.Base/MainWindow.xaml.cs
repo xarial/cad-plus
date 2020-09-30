@@ -21,6 +21,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Xarial.CadPlus.Common.Services;
 using Xarial.CadPlus.XBatch.Base.ViewModels;
+using Xarial.XToolkit.Reporting;
 
 namespace Xarial.CadPlus.XBatch.Base
 {
@@ -29,8 +30,16 @@ namespace Xarial.CadPlus.XBatch.Base
         public MainWindow()
         {
             InitializeComponent();
-            var appProvider = (Application.Current as XBatchApp).GetApplicationProvider();
-            this.DataContext = new BatchRunnerVM(new Models.BatchRunnerModel(appProvider), new MessageService("xBatch"));
+            var msgService = new MessageService("xBatch");
+            try
+            {
+                var appProvider = (Application.Current as XBatchApp).GetApplicationProvider();
+                this.DataContext = new BatchRunnerVM(new Models.BatchRunnerModel(appProvider), msgService);
+            }
+            catch (Exception ex)
+            {
+                msgService.ShowError(ex.ParseUserError(out _));
+            }
         }
     }
 }

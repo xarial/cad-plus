@@ -41,7 +41,7 @@
                         </Grid>
                     </GroupBox>
                     <GroupBox Header="Macros" Grid.Row="1">
-                        <cmnctrls:PathListBox Filters="{Binding Path=MacrosFilesFilter}" 
+                        <cmnctrls:PathListBox Filters="{Binding Path=MacroFilesFilter}" 
                                               Grid.Row="1" ShowAddFolderButton="False" 
                                               PathsSource="{Binding Path=Macros}"/>
                     </GroupBox>

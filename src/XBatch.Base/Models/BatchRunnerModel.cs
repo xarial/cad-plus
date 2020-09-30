@@ -13,6 +13,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Xarial.CadPlus.Common.Services;
 using Xarial.CadPlus.XBatch.Base.Core;
+using Xarial.CadPlus.XBatch.Base.Exceptions;
 using Xarial.XToolkit.Wpf.Utils;
 
 namespace Xarial.CadPlus.XBatch.Base.Models
@@ -30,6 +31,11 @@ namespace Xarial.CadPlus.XBatch.Base.Models
         {
             m_AppProvider = appProvider;
             InstalledVersions = m_AppProvider.GetInstalledVersions().ToArray();
+
+            if (!InstalledVersions.Any()) 
+            {
+                throw new UserMessageException("Failed to detect any installed version of the host application");
+            }
         }
 
         public FileFilter[] InputFilesFilter => m_AppProvider.InputFilesFilter;
