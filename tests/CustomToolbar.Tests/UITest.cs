@@ -1,4 +1,11 @@
-﻿using Autofac;
+﻿//*********************************************************************
+//CAD+ Toolset
+//Copyright(C) 2020 Xarial Pty Limited
+//Product URL: https://cadplus.xarial.com
+//License: https://cadplus.xarial.com/license/
+//*********************************************************************
+
+using Autofac;
 using Moq;
 using NUnit.Framework;
 using System;

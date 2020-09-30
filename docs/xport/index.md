@@ -25,7 +25,7 @@ The following output formats are supported:
 * JPEG Image Files (*.jpg)
 * PNG Image Files (*.png)
 * GIF Image Files (*.gif)
-* PDF Files (*.pdf) - drawing files only on Windows 10
+* PDF Files (*.pdf). This option is currently EXPERIMENTAL. This option is not stable. Refer issues [#12 - PDF output is not consistent](https://github.com/xarial/cad-plus/issues/12) and [#15 - PDF export is corrupt\zero size](https://github.com/xarial/cad-plus/issues/15)
 
 ## Notes
 

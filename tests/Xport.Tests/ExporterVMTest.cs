@@ -1,11 +1,18 @@
+//*********************************************************************
+//CAD+ Toolset
+//Copyright(C) 2020 Xarial Pty Limited
+//Product URL: https://cadplus.xarial.com
+//License: https://cadplus.xarial.com/license/
+//*********************************************************************
+
 using Moq;
 using NUnit.Framework;
 using Xarial.CadPlus.Xport.Core;
 using Xarial.CadPlus.Xport.Models;
 using Xarial.CadPlus.Xport.ViewModels;
 using System.Linq;
-using Xarial.CadPlus.Xport.Services;
 using System;
+using Xarial.CadPlus.Common.Services;
 
 namespace Xport.Tests
 {
