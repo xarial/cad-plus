@@ -137,7 +137,7 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
         {
             try
             {
-                ActiveTabIndex = 1;
+                ActiveTabIndex = 2;
                 IsBatchInProgress = true;
                 Progress = 0;
                 Log.Clear();

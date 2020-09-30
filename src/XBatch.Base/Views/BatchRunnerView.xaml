@@ -17,73 +17,71 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <TabControl Margin="2" SelectedIndex="{Binding Path=ActiveTabIndex}">
-            <TabItem Header="Settings">
-                <Grid Grid.IsSharedSizeScope="True" IsEnabled="{Binding Path=IsBatchInProgress, Converter={StaticResource revBoolConv}}">
+            <TabItem Header="Input">
+                <Grid IsEnabled="{Binding Path=IsBatchInProgress, Converter={StaticResource revBoolConv}}">
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="*" />
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="*" />
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
-                    <cmnctrls:PathListBox Filters="{Binding Path=InputFilesFilter}" Grid.Row="0" PathsSource="{Binding Path=Input}"/>
-                    <Grid Grid.Row="1">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto" SharedSizeGroup="Label" />
-                            <ColumnDefinition Width="*" />
-                        </Grid.ColumnDefinitions>
-                        <TextBlock Text="Filter:" Grid.Column="0" Margin="2" />
-                        <TextBox Text="{Binding Path=Filter, UpdateSourceTrigger=PropertyChanged}" Grid.Column="1" Margin="2" />
-                    </Grid>
-                    <Grid Grid.Row="2">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="*"/>
-                            <RowDefinition Height="Auto"/>
-                        </Grid.RowDefinitions>
-                        <TextBlock Text="Macros:" Grid.Column="0" Margin="2" />
+                    <GroupBox Header="Input Files And Folders" Grid.Row="0">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <cmnctrls:PathListBox Filters="{Binding Path=InputFilesFilter}" Grid.Row="0" PathsSource="{Binding Path=Input}"/>
+                            <Grid Grid.Row="1">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" SharedSizeGroup="Label" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="Filter:" Grid.Column="0" Margin="2" />
+                                <TextBox Text="{Binding Path=Filter, UpdateSourceTrigger=PropertyChanged}" Grid.Column="1" Margin="2" />
+                            </Grid>
+                        </Grid>
+                    </GroupBox>
+                    <GroupBox Header="Macros" Grid.Row="1">
                         <cmnctrls:PathListBox Filters="{Binding Path=MacrosFilesFilter}" 
                                               Grid.Row="1" ShowAddFolderButton="False" 
                                               PathsSource="{Binding Path=Macros}"/>
-                    </Grid>
-                    
-                    <Expander Grid.Row="4" Margin="0,2" Header="Additional Settings">
-                        <Grid Margin="2">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto" SharedSizeGroup="Label" />
-                                <ColumnDefinition Width="*" />
-                            </Grid.ColumnDefinitions>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="Auto" />
-                            </Grid.RowDefinitions>
-                            <CheckBox Grid.ColumnSpan="2" Margin="2" IsChecked="{Binding Path=ContinueOnError}">Continue on error</CheckBox>
-
-                            <CheckBox Grid.Row="1" Grid.Column="0" Margin="2" IsChecked="{Binding Path=IsTimeoutEnabled}">
-                                <TextBlock Text="Timeout (sec):" />
-                            </CheckBox>
-                            <ctrls:NumberBoxInteger Grid.Row="1" Grid.Column="1" Value="{Binding Path=Timeout}" Margin="2" IsEnabled="{Binding Path=IsTimeoutEnabled}" />
-
-                            <TextBlock Grid.Row="2" Grid.Column="0" Margin="2" Text="Version:" />
-                            <ComboBox ItemsSource="{Binding Path=InstalledVersions}" DisplayMemberPath="DisplayName"
-                                      SelectedItem="{Binding Path=Version}" Grid.Row="2" Grid.Column="1" Margin="2"/>
-
-                            <CheckBox Grid.ColumnSpan="2" Margin="2" Grid.Row="3" IsChecked="{Binding Path=RunInBackground}">Run in background</CheckBox>
-                        </Grid>
-                    </Expander>
+                    </GroupBox>
                 </Grid>
             </TabItem>
-            <TabItem Header="Log">
-                <cmnctrls:TaskDashboard 
-                    LogSource="{Binding Path=Log}"
-                    Progress="{Binding Path=Progress}"
-                    CancelCommand="{Binding Path=CancelBatchCommand}"/>
+            <TabItem Header="Settings">
+                <Grid Margin="2">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="Label" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <CheckBox Grid.ColumnSpan="2" Margin="2" IsChecked="{Binding Path=ContinueOnError}">Continue on error</CheckBox>
+
+                    <CheckBox Grid.Row="1" Grid.Column="0" Margin="2" IsChecked="{Binding Path=IsTimeoutEnabled}">
+                        <TextBlock Text="Timeout (sec):" />
+                    </CheckBox>
+                    <ctrls:NumberBoxInteger Grid.Row="1" Grid.Column="1" Value="{Binding Path=Timeout}" Margin="2" IsEnabled="{Binding Path=IsTimeoutEnabled}" />
+
+                    <TextBlock Grid.Row="2" Grid.Column="0" Margin="2" Text="Version:" />
+                    <ComboBox ItemsSource="{Binding Path=InstalledVersions}" DisplayMemberPath="DisplayName"
+                                      SelectedItem="{Binding Path=Version}" Grid.Row="2" Grid.Column="1" Margin="2"/>
+
+                    <CheckBox Grid.ColumnSpan="2" Margin="2" Grid.Row="3" IsChecked="{Binding Path=RunInBackground}">Run in background</CheckBox>
+                </Grid>
+            </TabItem>
+            <TabItem Header="Results">
+            <cmnctrls:TaskDashboard 
+                LogSource="{Binding Path=Log}"
+                Progress="{Binding Path=Progress}"
+                CancelCommand="{Binding Path=CancelBatchCommand}"/>
             </TabItem>
         </TabControl>
-        <Button Grid.Row="1" VerticalAlignment="Center" Width="75" HorizontalAlignment="Center" Margin="2"
+        <Button Grid.Row="1" VerticalAlignment="Center" Width="75" Height="30" HorizontalAlignment="Center" Margin="2"
                 Command="{Binding Path=RunBatchCommand}">
             <TextBlock Text="Run Batch" Margin="2" />
         </Button>
