@@ -5,11 +5,15 @@
           <Component Id="xport" Guid="*">
             <File Id="xport.exe" KeyPath="yes" Source="$(var.SourceOutDir)\xport.exe" />
           </Component>
+          <Component Id="xbatch" Guid="*">
+            <File Id="xbatch.exe" KeyPath="yes" Source="$(var.SourceOutDir)\xbatch.exe" />
+          </Component>
         </DirectoryRef>
     </Fragment>
     <Fragment>
         <ComponentGroup Id="MainFilesRegGroup">
             <ComponentRef Id="xport" />
+            <ComponentRef Id="xbatch" />
         </ComponentGroup>
     </Fragment>
 </Wix>

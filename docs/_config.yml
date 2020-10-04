@@ -1,0 +1,51 @@
+﻿theme: user-guide
+plugins:
+  - $
+  - script-style-optimizer
+  - files-promoter
+$legal:
+  company: Xarial Pty Limited
+  links:
+    Terms Of Use: /terms-of-use
+    Privacy: /privacy-policy
+    Cookies: /cookies-policy
+$google-analytics:
+  traking-code: UA-160707877-2
+$disqus:
+  short-name: cad-plus
+$cookie-consent:
+  enable: true
+  message: This website uses cookies to ensure you get the best experience on our website. By using our website you agree on the following <a href="/cookies-policy">Cookie Policy</a>, <a href="/privacy-policy">Privacy Policy</a>, and <a href="/terms-of-use">Terms Of Use</a>
+$site-header:
+  show-title: false
+default-layout: article
+^tipue-search:
+  page-content-node: //article
+  search-page-layout: default
+^files-promoter:
+  folders:
+    - _legal
+^script-style-optimizer:
+  minify-css: true
+  minify-js: true
+  assets-scope-paths:
+    - /_assets/styles/*
+    - /_assets/scripts/*
+  delete-unused-css: true
+  delete-unused-js: true
+  bundles:
+    /_assets/styles/main.min.css:
+      - /_assets/styles/social-share.css
+      - /_assets/styles/youtube.css
+      - /_assets/styles/base.css
+      - /_assets/styles/toc.css
+      - /_assets/styles/theme.css
+      - /_assets/styles/user-guide.css
+      - /_assets/styles/code-snippet.css
+      - /_assets/styles/responsive-image.css
+      - /_assets/styles/site-header.css
+      - /_assets/styles/social-links.css
+      - /_assets/styles/syntax-highlight.css
+    /_assets/scripts/main.min.js:
+      - /_assets/scripts/code-snippet.js
+      - /_assets/scripts/toc.js

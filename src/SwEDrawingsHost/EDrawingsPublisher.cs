@@ -82,8 +82,9 @@ namespace Xarial.CadPlus.Xport.EDrawingsHost
             edrwHost.Dock = DockStyle.Fill;
             m_HostForm.ShowIcon = false;
             m_HostForm.ShowInTaskbar = false;
-            m_HostForm.WindowState = FormWindowState.Minimized;
+            m_HostForm.WindowState = FormWindowState.Maximized;
             m_HostForm.Show();
+            m_HostForm.SendToBack();
             return edrwHost.Control;
         }
 

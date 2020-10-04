@@ -11,6 +11,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Xarial.CadPlus.Common.Services;
 using Xarial.CadPlus.Xport.Core;
 using Xarial.CadPlus.Xport.ViewModels;
 
@@ -50,8 +51,8 @@ namespace Xarial.CadPlus.Xport.Models
             }
             finally
             {
-                logWriter.Log += OnLog;
-                prgHander.ProgressChanged += OnProgressChanged;
+                logWriter.Log -= OnLog;
+                prgHander.ProgressChanged -= OnProgressChanged;
             }
         }
 
