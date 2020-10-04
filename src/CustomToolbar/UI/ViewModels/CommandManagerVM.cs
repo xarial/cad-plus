@@ -374,13 +374,15 @@ namespace Xarial.CadPlus.CustomToolbar.UI.ViewModels
         {
             var coll = FindCommandCollection(cmd);
             coll.Commands.Remove(cmd);
-            
-            if (Groups.Commands.Count == 1 && Groups.Commands[0].Commands.Commands.Count == 0)//TODO: temp solution until Tree View can have selected element binding
-            {
-                return;   
-            }
 
-            SelectedElement = null;
+            if (coll.Commands.Count > 0)
+            {
+                SelectedElement = coll.Commands[0] as ICommandVM;
+            }
+            else 
+            {
+                SelectedElement = null;
+            }
         }
 
         private int CalculateCommandIndex(ICommandVM cmd, bool forward, out ICommandsCollection coll)

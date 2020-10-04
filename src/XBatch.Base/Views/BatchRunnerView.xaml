@@ -72,7 +72,7 @@
                                       SelectedItem="{Binding Path=Version}" Grid.Row="2" Grid.Column="1" Margin="2"/>
 
                     <TextBlock Grid.Row="3" Grid.Column="0" Margin="2" Text="Startup Options:" />
-                    <ctrls:EnumComboBox Value="{Binding Path=StartupOptions}" Grid.Row="3" Grid.Column="1" Margin="2"/>
+                    <ctrls:FlagEnumComboBox Value="{Binding Path=StartupOptions}" Grid.Row="3" Grid.Column="1" Margin="2"/>
                 </Grid>
             </TabItem>
             <TabItem Header="Results">

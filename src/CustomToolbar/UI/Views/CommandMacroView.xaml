@@ -5,16 +5,31 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Xarial.CadPlus.CustomToolbar.UI.Views"
              xmlns:ctrls="clr-namespace:Xarial.XToolkit.Wpf.Controls;assembly=Xarial.XToolkit.Wpf"
+             xmlns:xconv="clr-namespace:Xarial.XToolkit.Wpf.Converters;assembly=Xarial.XToolkit.Wpf"
 			 xmlns:conv="clr-namespace:Xarial.CadPlus.CustomToolbar.UI.Converters"
              xmlns:vm="clr-namespace:Xarial.CadPlus.CustomToolbar.UI.ViewModels"
+             xmlns:enums="clr-namespace:Xarial.CadPlus.CustomToolbar.Enums"
+             xmlns:sys="clr-namespace:System;assembly=mscorlib"
              mc:Ignorable="d"
              d:DataContext="{x:Type vm:CommandMacroVM}"
-             d:DesignHeight="300" d:DesignWidth="300">
+             d:DesignHeight="500" d:DesignWidth="300">
     <UserControl.Resources>
         <conv:MacroPathToEntryPointsConverter x:Key="macroPathToEntryPtsConv" />
+        <xconv:MatchValueUniversalConverter TargetValue="{x:Static enums:ToggleButtonStateCode_e.None}" x:Key="stateCodeEnabledConv">
+            <xconv:MatchValueUniversalConverter.TrueValue>
+                <sys:Boolean>
+                    False
+                </sys:Boolean>
+            </xconv:MatchValueUniversalConverter.TrueValue>
+            <xconv:MatchValueUniversalConverter.FalseValue>
+                <sys:Boolean>
+                    True
+                </sys:Boolean>
+            </xconv:MatchValueUniversalConverter.FalseValue>
+        </xconv:MatchValueUniversalConverter>
     </UserControl.Resources>
     <StackPanel Orientation="Vertical" Grid.IsSharedSizeScope="True">
-        <GroupBox Header="Attribution">
+        <GroupBox Header="Style">
             <local:CommandBaseView />
         </GroupBox>
         <GroupBox Header="Macro">
@@ -28,7 +43,7 @@
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
-                <TextBlock Margin="2" Text="Path:" Grid.Column="0" Grid.Row="0" />
+                <TextBlock Margin="2" VerticalAlignment="Center"  Text="Path:" Grid.Column="0" Grid.Row="0" />
                 <Grid Grid.Column="1" Grid.Row="0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
@@ -40,7 +55,7 @@
                     </Button>
                 </Grid>
 
-                <TextBlock Text="Entry Point:" Grid.Column="0" Grid.Row="1" Margin="2" />
+                <TextBlock Text="Entry Point:" VerticalAlignment="Center"  Grid.Column="0" Grid.Row="1" Margin="2" />
                 <ComboBox SelectedItem="{Binding Path=EntryPoint, UpdateSourceTrigger=PropertyChanged}"
 					  Grid.Column="1" Grid.Row="1" Margin="2"
 					  IsSynchronizedWithCurrentItem="True"
@@ -61,17 +76,42 @@
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
-                <TextBlock Text="Location:" Grid.Column="0" Grid.Row="0" Margin="2" />
-                <ctrls:EnumComboBox Grid.Column="1" Grid.Row="0" Margin="2" Value="{Binding Path=Location}"/>
+                <TextBlock Text="Location:" VerticalAlignment="Center" Grid.Column="0" Grid.Row="0" Margin="2" />
+                <ctrls:FlagEnumComboBox Grid.Column="1" Grid.Row="0" Margin="2" Value="{Binding Path=Location}"/>
 
-                <TextBlock Text="Scope:" Grid.Column="0" Grid.Row="1" Margin="2" />
-                <ctrls:EnumComboBox Grid.Column="1" Grid.Row="1" Margin="2" Value="{Binding Path=Scope}"/>
+                <TextBlock Text="Scope:" VerticalAlignment="Center" Grid.Column="0" Grid.Row="1" Margin="2" />
+                <ctrls:FlagEnumComboBox Grid.Column="1" Grid.Row="1" Margin="2" Value="{Binding Path=Scope}"/>
 
-                <TextBlock Text="Triggers:" Grid.Column="0" Grid.Row="2" Margin="2" />
-                <ctrls:EnumComboBox Grid.Column="1" Grid.Row="2" Margin="2" Value="{Binding Path=Triggers}"/>
-
+                <TextBlock Text="Triggers:" VerticalAlignment="Center"  Grid.Column="0" Grid.Row="2" Margin="2" />
+                <ctrls:FlagEnumComboBox Grid.Column="1" Grid.Row="2" Margin="2" Value="{Binding Path=Triggers}"/>
+                
                 <CheckBox Margin="2" IsChecked="{Binding Path=UnloadAfterRun}" Grid.Row="3" Grid.ColumnSpan="2">Unload After Run</CheckBox>
                 
+            </Grid>
+        </GroupBox>
+        <GroupBox>
+            <GroupBox.Header>
+                <CheckBox IsChecked="{Binding Path=IsToggleButton}">Toggle Button</CheckBox>
+            </GroupBox.Header>
+            <Grid IsEnabled="{Binding Path=IsToggleButton}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition SharedSizeGroup="Header" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                
+                <TextBlock Margin="2" VerticalAlignment="Center" Text="State Resolve Code:" Grid.Row="0" Grid.Column="0"/>
+                <ctrls:EnumComboBox Margin="2" Grid.Row="0" Grid.Column="1" Value="{Binding Path=ToggleButtonStateCodeType}"/>
+
+                <TextBox Grid.Row="1" Margin="2" 
+                         IsEnabled="{Binding Path=ToggleButtonStateCodeType, Converter={StaticResource stateCodeEnabledConv}}" 
+                         AcceptsReturn="True" Text="{Binding Path=ToggleButtonStateCode}" Height="40" Grid.ColumnSpan="2"></TextBox>
+                <CheckBox Grid.Row="2" Grid.ColumnSpan="2" 
+                          IsEnabled="{Binding Path=ToggleButtonStateCodeType, Converter={StaticResource stateCodeEnabledConv}}" IsChecked="{Binding Path=ResolveButtonStateCodeOnce}" Margin="2">Resolve Once</CheckBox>
             </Grid>
         </GroupBox>
     </StackPanel>

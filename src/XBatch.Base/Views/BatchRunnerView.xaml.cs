@@ -16,13 +16,6 @@ namespace Xarial.CadPlus.XBatch.Base.Views
         public BatchRunnerView()
         {
             InitializeComponent();
-            this.DataContextChanged += BatchRunnerView_DataContextChanged;
-        }
-
-        private void BatchRunnerView_DataContextChanged(object sender, System.Windows.DependencyPropertyChangedEventArgs e)
-        {
-            var z = new EnumValueToHeaderConverter();
-            z.Convert(null, null, null, CultureInfo.InvariantCulture);
         }
     }
 }
