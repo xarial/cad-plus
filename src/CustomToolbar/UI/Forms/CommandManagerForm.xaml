@@ -12,7 +12,7 @@
         xmlns:win="clr-namespace:System.Windows;assembly=PresentationCore"
         mc:Ignorable="d"
         d:DataContext="{x:Type vm:CommandManagerVM}"
-        Height="600" Width="600" WindowStartupLocation="CenterOwner" ShowInTaskbar="False"
+        Height="600" Width="800" WindowStartupLocation="CenterOwner" ShowInTaskbar="False"
 		Title="Custom Toolbar Configuration" WindowStyle="ToolWindow">
     <Window.Resources>
         <conv:CommandContextMenuTitleConverter x:Key="menuTitleConv" />

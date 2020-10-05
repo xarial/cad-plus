@@ -65,8 +65,8 @@
     <Reference Include="Xarial.XToolkit, Version=0.2.2.0, Culture=neutral, PublicKeyToken=60dcaf351d4060db, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Xarial.XToolkit.0.2.2\lib\net461\Xarial.XToolkit.dll</HintPath>
     </Reference>
-    <Reference Include="Xarial.XToolkit.Wpf, Version=0.2.9.0, Culture=neutral, PublicKeyToken=60dcaf351d4060db, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Xarial.XToolkit.Wpf.0.2.9\lib\net461\Xarial.XToolkit.Wpf.dll</HintPath>
+    <Reference Include="Xarial.XToolkit.Wpf, Version=0.2.10.0, Culture=neutral, PublicKeyToken=60dcaf351d4060db, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Xarial.XToolkit.Wpf.0.2.10\lib\net461\Xarial.XToolkit.Wpf.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -109,6 +109,7 @@
     <Compile Include="UI\Base\CommandPropertiesDataTemplateSelector.cs" />
     <Compile Include="UI\Base\CommandsCollection.cs" />
     <Compile Include="UI\Converters\CommandContextMenuTitleConverter.cs" />
+    <Compile Include="UI\Converters\HasEnumFlagToVisibilityConverter.cs" />
     <Compile Include="UI\Converters\MacroPathToEntryPointsConverter.cs" />
     <Compile Include="UI\Converters\PathToIconConverter.cs" />
     <Compile Include="UI\Converters\SelectedCommandConverter.cs" />

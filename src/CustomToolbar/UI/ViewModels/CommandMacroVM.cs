@@ -102,17 +102,7 @@ namespace Xarial.CadPlus.CustomToolbar.UI.ViewModels
                 this.NotifyChanged();
             }
         }
-
-        public bool IsToggleButton 
-        {
-            get => Command.IsToggleButton;
-            set 
-            {
-                Command.IsToggleButton = value;
-                this.NotifyChanged();
-            }
-        }
-        
+                
         public ToggleButtonStateCode_e ToggleButtonStateCodeType
         {
             get => Command.ToggleButtonStateCodeType;

@@ -70,7 +70,6 @@ namespace Xarial.CadPlus.CustomToolbar.Structs
                     {
                         foreach (JObject cmd in group["Commands"])
                         {
-                            cmd.Add(new JProperty("IsToggleButton", false));
                             cmd.Add(new JProperty("ToggleButtonStateCodeType", 0));
                             cmd.Add(new JProperty("ToggleButtonStateCode", null));
                             cmd.Add(new JProperty("ResolveButtonStateCodeOnce", true));
