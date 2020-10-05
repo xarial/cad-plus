@@ -5,16 +5,19 @@
 //License: https://cadplus.xarial.com/license/
 //*********************************************************************
 
+using Microsoft.CodeDom.Providers.DotNetCompilerPlatform;
 using Microsoft.CSharp;
 using Microsoft.VisualBasic;
 using Newtonsoft.Json.Linq;
 using System;
 using System.CodeDom.Compiler;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 using Xarial.CadPlus.CustomToolbar.Base;
 using Xarial.CadPlus.CustomToolbar.Enums;
 using Xarial.CadPlus.CustomToolbar.Exceptions;
@@ -25,7 +28,8 @@ using Xarial.CadPlus.ExtensionModule;
 using Xarial.XCad;
 using Xarial.XCad.Base;
 using Xarial.XCad.Extensions;
-using Xarial.XCad.UI.Commands;
+using CSharpCodeProvider = Microsoft.CodeDom.Providers.DotNetCompilerPlatform.CSharpCodeProvider;
+using VBCodeProvider = Microsoft.CodeDom.Providers.DotNetCompilerPlatform.VBCodeProvider;
 
 namespace Xarial.CadPlus.CustomToolbar.Services
 {
@@ -47,7 +51,7 @@ namespace Xarial.CadPlus.CustomToolbar.Services
         private readonly IXLogger m_Logger;
 
         private readonly Dictionary<CommandMacroInfo, bool> m_CachedToggleStates;
-        private readonly Dictionary<CommandMacroInfo, IToggleBuggonStateResolver> m_CachedStateResolvers;
+        private readonly ConcurrentDictionary<CommandMacroInfo, IToggleBuggonStateResolver> m_StateResolvers;
 
         public CustomToolbarInfo ToolbarInfo { get; }
 
@@ -66,7 +70,7 @@ namespace Xarial.CadPlus.CustomToolbar.Services
             m_Logger = logger;
 
             m_CachedToggleStates = new Dictionary<CommandMacroInfo, bool>();
-            m_CachedStateResolvers = new Dictionary<CommandMacroInfo, IToggleBuggonStateResolver>();
+            m_StateResolvers = new ConcurrentDictionary<CommandMacroInfo, IToggleBuggonStateResolver>();
 
             try
             {
@@ -127,9 +131,125 @@ namespace Xarial.CadPlus.CustomToolbar.Services
                     cmdGrpCad.CommandClick += OnCommandClick;
                     cmdGrpCad.CommandStateResolve += OnCommandStateResolve;
                 }
+
+                LoadToggleStateResolvers(
+                    toolbarInfo.Groups.SelectMany(
+                        g => g.Commands ?? Enumerable.Empty<CommandMacroInfo>())
+                    .Where(m => m.Triggers.HasFlag(Triggers_e.ToggleButton) && m.ToggleButtonStateCodeType != ToggleButtonStateCode_e.None));
             }
 
             return toolbarInfo;
+        }
+
+        private async void LoadToggleStateResolvers(IEnumerable<CommandMacroInfo> toggleMacros) 
+        {
+            try
+            {
+                await Task.Run(() => CompileStateResolveCodeCode(toggleMacros));
+            }
+            catch (Exception ex)
+            {
+                m_Logger.Log($"Toggle state code compilation errors");
+                m_Logger.Log(ex);
+
+                m_Msg.ShowMessage($"Failed to compile the toggle state code", MessageType_e.Error);
+            }
+        }
+
+        private void CompileStateResolveCodeCode(IEnumerable<CommandMacroInfo> macroInfos)
+        {
+            var compilerDirPath = Path.Combine(Path.GetDirectoryName(this.GetType().Assembly.Location), "roslyn");
+
+            foreach (var grp in macroInfos.GroupBy(x => x.ToggleButtonStateCodeType))
+            {
+                CodeDomProvider codeProvider = null;
+
+                switch (grp.Key)
+                {
+                    case ToggleButtonStateCode_e.CSharp:
+                        codeProvider = new CSharpCodeProvider(
+                            new ProviderOptions(Path.Combine(compilerDirPath, "csc.exe"), 0));
+                        break;
+                    case ToggleButtonStateCode_e.VBNET:
+                        codeProvider = new VBCodeProvider(
+                            new ProviderOptions(Path.Combine(compilerDirPath, "vbc.exe"), 0));
+                        break;
+                    default:
+                        throw new NotSupportedException("Not supported language");
+                }
+
+                var classToMacroMap = new Dictionary<string, CommandMacroInfo>();
+                var codes = new List<string>();
+
+                foreach (var macroInfo in grp) 
+                {
+                    var className = "CT_" + Guid.NewGuid().ToString().TrimStart('{').TrimEnd('}').Replace("-", "");
+
+                    var code = "";
+
+                    switch (macroInfo.ToggleButtonStateCodeType)
+                    {
+                        case ToggleButtonStateCode_e.CSharp:
+                            code = string.Format(Settings.Default.ToggleButtonResolverCSharp, className, macroInfo.ToggleButtonStateCode);
+                            break;
+
+                        case ToggleButtonStateCode_e.VBNET:
+                            code = string.Format(Settings.Default.ToggleButtonResolverVBNET, className, macroInfo.ToggleButtonStateCode);
+                            break;
+
+                        default:
+                            throw new Exception("Code type is not supported");
+                    }
+
+                    classToMacroMap.Add(className, macroInfo);
+                    codes.Add(code);
+                }
+                
+                var parameters = new CompilerParameters()
+                {
+                    GenerateExecutable = false,
+                    GenerateInMemory = true
+                };
+
+                parameters.ReferencedAssemblies.Add(typeof(IModule).Assembly.Location);
+                parameters.ReferencedAssemblies.Add(typeof(IXApplication).Assembly.Location);
+                                
+                var results = codeProvider.CompileAssemblyFromSource(parameters, codes.ToArray());
+
+                if (!results.Errors.HasErrors)
+                {
+                    var assm = results.CompiledAssembly;
+
+                    Assembly AssemblyResolve(object sender, ResolveEventArgs args)
+                    {
+                        var resolvedAssm = AppDomain.CurrentDomain.GetAssemblies()
+                            .FirstOrDefault(a => a.GetName().FullName == args.Name);
+
+                        return resolvedAssm;
+                    }
+
+                    AppDomain.CurrentDomain.AssemblyResolve += AssemblyResolve;
+
+                    foreach (var type in assm.GetTypes().Where(t => typeof(IToggleBuggonStateResolver).IsAssignableFrom(t))) 
+                    {
+                        if (classToMacroMap.TryGetValue(type.Name, out CommandMacroInfo macroInfo))
+                        {
+                            var stateResolver = (IToggleBuggonStateResolver)Activator.CreateInstance(type, m_App);
+                            m_StateResolvers.TryAdd(macroInfo, stateResolver);
+                        }
+                        else 
+                        {
+                            Debug.Assert(false, "Unregistered type");
+                        }
+                    }
+                    
+                    AppDomain.CurrentDomain.AssemblyResolve -= AssemblyResolve;
+                }
+                else
+                {
+                    throw new CustomResolverCodeCompileFailedException(results.Errors);
+                }
+            }
         }
 
         private void OnCommandStateResolve(XCad.UI.Commands.Structures.CommandSpec spec, XCad.UI.Commands.Structures.CommandState state)
@@ -298,84 +418,7 @@ namespace Xarial.CadPlus.CustomToolbar.Services
                 {
                     IToggleBuggonStateResolver stateResolver = null;
 
-                    if (!m_CachedStateResolvers.TryGetValue(macroInfo, out stateResolver))
-                    {
-                        var compilerDirPath = Path.Combine(Path.GetDirectoryName(this.GetType().Assembly.Location), "roslyn");
-
-                        var compilerFileName = "";
-
-                        switch (macroInfo.ToggleButtonStateCodeType)
-                        {
-                            case ToggleButtonStateCode_e.CSharp:
-                                compilerFileName = "csc.exe";
-                                break;
-                            case ToggleButtonStateCode_e.VBNET:
-                                compilerFileName = "vbc.exe";
-                                break;
-                        }
-
-                        var opts = new Microsoft.CodeDom.Providers.DotNetCompilerPlatform.ProviderOptions(
-                            Path.Combine(compilerDirPath, compilerFileName), 0);
-                        
-                        CodeDomProvider codeProvider = null;
-
-                        var className = "CT_" + Guid.NewGuid().ToString().TrimStart('{').TrimEnd('}').Replace("-", "");
-
-                        var fullCode = "";
-                        
-                        switch (macroInfo.ToggleButtonStateCodeType)
-                        {
-                            case ToggleButtonStateCode_e.CSharp:
-                                codeProvider = new Microsoft.CodeDom.Providers.DotNetCompilerPlatform.CSharpCodeProvider(opts);
-                                fullCode = string.Format(Settings.Default.ToggleButtonResolverCSharp, className, macroInfo.ToggleButtonStateCode);
-                                break;
-
-                            case ToggleButtonStateCode_e.VBNET:
-                                codeProvider = new Microsoft.CodeDom.Providers.DotNetCompilerPlatform.VBCodeProvider(opts);
-                                fullCode = string.Format(Settings.Default.ToggleButtonResolverVBNET, className, macroInfo.ToggleButtonStateCode);
-                                break;
-
-                            default:
-                                throw new Exception("Code type is not supported");
-                        }
-
-                        var parameters = new CompilerParameters()
-                        {
-                            GenerateExecutable = false,
-                            GenerateInMemory = true
-                        };
-
-                        parameters.ReferencedAssemblies.Add(typeof(IModule).Assembly.Location);
-                        parameters.ReferencedAssemblies.Add(typeof(IXApplication).Assembly.Location);
-
-                        var results = codeProvider.CompileAssemblyFromSource(parameters, fullCode);
-
-                        if (!results.Errors.HasErrors)
-                        {
-                            var assm = results.CompiledAssembly;
-
-                            Assembly AssemblyResolve(object sender, ResolveEventArgs args) 
-                            {
-                                var resolvedAssm = AppDomain.CurrentDomain.GetAssemblies()
-                                    .FirstOrDefault(a => a.GetName().FullName == args.Name);
-
-                                return resolvedAssm;
-                            }
-
-                            AppDomain.CurrentDomain.AssemblyResolve += AssemblyResolve;
-
-                            var stateResolverType = assm.GetTypes().First(t => typeof(IToggleBuggonStateResolver).IsAssignableFrom(t));
-                            stateResolver = (IToggleBuggonStateResolver)Activator.CreateInstance(stateResolverType, m_App);
-
-                            AppDomain.CurrentDomain.AssemblyResolve -= AssemblyResolve;
-
-                            m_CachedStateResolvers.Add(macroInfo, stateResolver);
-                        }
-                        else
-                        {
-                            throw new CustomResolverCodeCompileFailedException(results.Errors);
-                        }
-                    }
+                    m_StateResolvers.TryGetValue(macroInfo, out stateResolver);
 
                     if (stateResolver != null)
                     {
@@ -385,14 +428,6 @@ namespace Xarial.CadPlus.CustomToolbar.Services
                     {
                         return false;
                     }
-                }
-                catch (CustomResolverCodeCompileFailedException compileEx) 
-                {
-                    m_CachedStateResolvers.Add(macroInfo, null);
-                    m_Logger.Log($"'{macroInfo.Title}' toggle state code compilation errors");
-                    m_Logger.Log(compileEx);
-                    m_Msg.ShowMessage($"Failed to compile the toggle state code for '{macroInfo.Title}'", MessageType_e.Error);
-                    return false;
                 }
                 catch(Exception ex)
                 {

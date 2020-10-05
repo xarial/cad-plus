@@ -12,23 +12,26 @@
       <Value Profile="(Default)">xtoolbar.json</Value>
     </Setting>
     <Setting Name="ToggleButtonResolverCSharp" Type="System.String" Scope="User">
-      <Value Profile="(Default)">namespace Xarial.CadPlus.CustomToolbar.Services.ToggleButton
-{
+      <Value Profile="(Default)">using Xarial.CadPlus.ExtensionModule;
+using Xarial.XCad;
+
+namespace Xarial.CadPlus.CustomToolbar.Services.ToggleButton
+{{
     public class {0}: IToggleBuggonStateResolver
-    {
-        public IXApplication Application { get; }
+    {{
+        public IXApplication Application {{ get; }}
 
         public {0}(IXApplication app)
-        {
+        {{
             Application = app;
-        }
+        }}
 
         public bool Resolve()
-        {
+        {{
             {1}
-        }
-    }
-}</Value>
+        }}
+    }}
+}}</Value>
     </Setting>
     <Setting Name="ToggleButtonResolverVBNET" Type="System.String" Scope="User">
       <Value Profile="(Default)">Imports Xarial.CadPlus.ExtensionModule

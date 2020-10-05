@@ -61,23 +61,26 @@ namespace Xarial.CadPlus.CustomToolbar.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute(@"namespace Xarial.CadPlus.CustomToolbar.Services.ToggleButton
-{
+        [global::System.Configuration.DefaultSettingValueAttribute(@"using Xarial.CadPlus.ExtensionModule;
+using Xarial.XCad;
+
+namespace Xarial.CadPlus.CustomToolbar.Services.ToggleButton
+{{
     public class {0}: IToggleBuggonStateResolver
-    {
-        public IXApplication Application { get; }
+    {{
+        public IXApplication Application {{ get; }}
 
         public {0}(IXApplication app)
-        {
+        {{
             Application = app;
-        }
+        }}
 
         public bool Resolve()
-        {
+        {{
             {1}
-        }
-    }
-}")]
+        }}
+    }}
+}}")]
         public string ToggleButtonResolverCSharp {
             get {
                 return ((string)(this["ToggleButtonResolverCSharp"]));
