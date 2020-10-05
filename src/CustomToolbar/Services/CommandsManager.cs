@@ -5,19 +5,31 @@
 //License: https://cadplus.xarial.com/license/
 //*********************************************************************
 
+using Microsoft.CodeDom.Providers.DotNetCompilerPlatform;
+using Microsoft.CSharp;
+using Microsoft.VisualBasic;
 using Newtonsoft.Json.Linq;
 using System;
+using System.CodeDom.Compiler;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
+using System.Reflection;
+using System.Threading.Tasks;
 using Xarial.CadPlus.CustomToolbar.Base;
 using Xarial.CadPlus.CustomToolbar.Enums;
+using Xarial.CadPlus.CustomToolbar.Exceptions;
 using Xarial.CadPlus.CustomToolbar.Helpers;
+using Xarial.CadPlus.CustomToolbar.Properties;
 using Xarial.CadPlus.CustomToolbar.Structs;
+using Xarial.CadPlus.ExtensionModule;
 using Xarial.XCad;
 using Xarial.XCad.Base;
 using Xarial.XCad.Extensions;
-using Xarial.XCad.UI.Commands;
+using CSharpCodeProvider = Microsoft.CodeDom.Providers.DotNetCompilerPlatform.CSharpCodeProvider;
+using VBCodeProvider = Microsoft.CodeDom.Providers.DotNetCompilerPlatform.VBCodeProvider;
 
 namespace Xarial.CadPlus.CustomToolbar.Services
 {
@@ -25,7 +37,7 @@ namespace Xarial.CadPlus.CustomToolbar.Services
     {
         CustomToolbarInfo ToolbarInfo { get; }
         void UpdatedToolbarConfiguration(ToolbarSettings toolbarSets, CustomToolbarInfo toolbarConf, bool isEditable);
-        void RunMacroCommand(CommandMacroInfo cmd);
+        bool RunMacroCommand(CommandMacroInfo cmd, out Exception err);
     }
 
     public class CommandsManager : ICommandsManager
@@ -37,6 +49,9 @@ namespace Xarial.CadPlus.CustomToolbar.Services
         private readonly ISettingsProvider m_SettsProvider;
         private readonly IToolbarConfigurationProvider m_ToolbarConfProvider;
         private readonly IXLogger m_Logger;
+
+        private readonly Dictionary<CommandMacroInfo, bool> m_CachedToggleStates;
+        private readonly ConcurrentDictionary<CommandMacroInfo, IToggleBuggonStateResolver> m_StateResolvers;
 
         public CustomToolbarInfo ToolbarInfo { get; }
 
@@ -54,6 +69,9 @@ namespace Xarial.CadPlus.CustomToolbar.Services
             m_ToolbarConfProvider = toolbarConfProvider;
             m_Logger = logger;
 
+            m_CachedToggleStates = new Dictionary<CommandMacroInfo, bool>();
+            m_StateResolvers = new ConcurrentDictionary<CommandMacroInfo, IToggleBuggonStateResolver>();
+
             try
             {
                 ToolbarInfo = LoadUserToolbar();
@@ -64,16 +82,19 @@ namespace Xarial.CadPlus.CustomToolbar.Services
             }
         }
 
-        public void RunMacroCommand(CommandMacroInfo cmd)
+        public bool RunMacroCommand(CommandMacroInfo cmd, out Exception err)
         {
             try
             {
                 m_MacroRunner.RunMacro(cmd.MacroPath, cmd.EntryPoint, cmd.UnloadAfterRun);
+                err = null;
+                return true;
             }
             catch (Exception ex)
             {
                 m_Logger.Log(ex);
-                m_Msg.ShowError(ex, $"Failed to run macro: '{cmd.Title}'");
+                err = ex;
+                return false;
             }
         }
 
@@ -110,21 +131,165 @@ namespace Xarial.CadPlus.CustomToolbar.Services
                     cmdGrpCad.CommandClick += OnCommandClick;
                     cmdGrpCad.CommandStateResolve += OnCommandStateResolve;
                 }
+
+                LoadToggleStateResolvers(
+                    toolbarInfo.Groups.SelectMany(
+                        g => g.Commands ?? Enumerable.Empty<CommandMacroInfo>())
+                    .Where(m => m.Triggers.HasFlag(Triggers_e.ToggleButton) && m.ToggleButtonStateCodeType != ToggleButtonStateCode_e.None));
             }
 
             return toolbarInfo;
+        }
+
+        private async void LoadToggleStateResolvers(IEnumerable<CommandMacroInfo> toggleMacros) 
+        {
+            try
+            {
+                await Task.Run(() => CompileStateResolveCodeCode(toggleMacros));
+            }
+            catch (Exception ex)
+            {
+                m_Logger.Log($"Toggle state code compilation errors");
+                m_Logger.Log(ex);
+
+                m_Msg.ShowMessage($"Failed to compile the toggle state code", MessageType_e.Error);
+            }
+        }
+
+        private void CompileStateResolveCodeCode(IEnumerable<CommandMacroInfo> macroInfos)
+        {
+            var compilerDirPath = Path.Combine(Path.GetDirectoryName(this.GetType().Assembly.Location), "roslyn");
+
+            foreach (var grp in macroInfos.GroupBy(x => x.ToggleButtonStateCodeType))
+            {
+                CodeDomProvider codeProvider = null;
+
+                switch (grp.Key)
+                {
+                    case ToggleButtonStateCode_e.CSharp:
+                        codeProvider = new CSharpCodeProvider(
+                            new ProviderOptions(Path.Combine(compilerDirPath, "csc.exe"), 0));
+                        break;
+                    case ToggleButtonStateCode_e.VBNET:
+                        codeProvider = new VBCodeProvider(
+                            new ProviderOptions(Path.Combine(compilerDirPath, "vbc.exe"), 0));
+                        break;
+                    default:
+                        throw new NotSupportedException("Not supported language");
+                }
+
+                var classToMacroMap = new Dictionary<string, CommandMacroInfo>();
+                var codes = new List<string>();
+
+                foreach (var macroInfo in grp) 
+                {
+                    var className = "CT_" + Guid.NewGuid().ToString().TrimStart('{').TrimEnd('}').Replace("-", "");
+
+                    var code = "";
+
+                    switch (macroInfo.ToggleButtonStateCodeType)
+                    {
+                        case ToggleButtonStateCode_e.CSharp:
+                            code = string.Format(Settings.Default.ToggleButtonResolverCSharp, className, macroInfo.ToggleButtonStateCode);
+                            break;
+
+                        case ToggleButtonStateCode_e.VBNET:
+                            code = string.Format(Settings.Default.ToggleButtonResolverVBNET, className, macroInfo.ToggleButtonStateCode);
+                            break;
+
+                        default:
+                            throw new Exception("Code type is not supported");
+                    }
+
+                    classToMacroMap.Add(className, macroInfo);
+                    codes.Add(code);
+                }
+                
+                var parameters = new CompilerParameters()
+                {
+                    GenerateExecutable = false,
+                    GenerateInMemory = true
+                };
+
+                parameters.ReferencedAssemblies.Add(typeof(IModule).Assembly.Location);
+                parameters.ReferencedAssemblies.Add(typeof(IXApplication).Assembly.Location);
+                                
+                var results = codeProvider.CompileAssemblyFromSource(parameters, codes.ToArray());
+
+                if (!results.Errors.HasErrors)
+                {
+                    var assm = results.CompiledAssembly;
+
+                    Assembly AssemblyResolve(object sender, ResolveEventArgs args)
+                    {
+                        var resolvedAssm = AppDomain.CurrentDomain.GetAssemblies()
+                            .FirstOrDefault(a => a.GetName().FullName == args.Name);
+
+                        return resolvedAssm;
+                    }
+
+                    AppDomain.CurrentDomain.AssemblyResolve += AssemblyResolve;
+
+                    foreach (var type in assm.GetTypes().Where(t => typeof(IToggleBuggonStateResolver).IsAssignableFrom(t))) 
+                    {
+                        if (classToMacroMap.TryGetValue(type.Name, out CommandMacroInfo macroInfo))
+                        {
+                            var stateResolver = (IToggleBuggonStateResolver)Activator.CreateInstance(type, m_App);
+                            m_StateResolvers.TryAdd(macroInfo, stateResolver);
+                        }
+                        else 
+                        {
+                            Debug.Assert(false, "Unregistered type");
+                        }
+                    }
+                    
+                    AppDomain.CurrentDomain.AssemblyResolve -= AssemblyResolve;
+                }
+                else
+                {
+                    throw new CustomResolverCodeCompileFailedException(results.Errors);
+                }
+            }
         }
 
         private void OnCommandStateResolve(XCad.UI.Commands.Structures.CommandSpec spec, XCad.UI.Commands.Structures.CommandState state)
         {
             var cmdSpec = (CommandItemInfoSpec)spec;
             state.Enabled = cmdSpec.Info.Scope.IsInScope(m_App);
+
+            if (state.Enabled)
+            {
+                if (cmdSpec.Info.Triggers.HasFlag(Triggers_e.ToggleButton))
+                {
+                    state.Checked = TryResolveState(cmdSpec.Info);
+                }
+            }
         }
 
         private void OnCommandClick(XCad.UI.Commands.Structures.CommandSpec spec)
         {
             var cmdSpec = (CommandItemInfoSpec)spec;
-            RunMacroCommand(cmdSpec.Info);
+            var macroInfo = cmdSpec.Info;
+
+            if (RunMacroCommand(macroInfo, out Exception err)) 
+            {
+                if (macroInfo.ResolveButtonStateCodeOnce || macroInfo.ToggleButtonStateCodeType == ToggleButtonStateCode_e.None)
+                {
+                    if (m_CachedToggleStates.TryGetValue(macroInfo, out bool isChecked))
+                    {
+                        isChecked = !isChecked;
+                        m_CachedToggleStates[macroInfo] = isChecked;
+                    }
+                    else
+                    {
+                        Debug.Assert(false, "State should have been resolved by SOLIDWORKS before this call");
+                    }
+                }
+            }
+            else
+            {
+                m_Msg.ShowError(err, $"Failed to run macro: '{cmdSpec.Title}'");
+            }
         }
         
         private void SaveSettingChanges(ToolbarSettings toolbarSets, CustomToolbarInfo toolbarConf,
@@ -214,6 +379,64 @@ namespace Xarial.CadPlus.CustomToolbar.Services
             }
         }
 
+        private bool TryResolveState(CommandMacroInfo macroInfo) 
+        {
+            bool isChecked = false;
+
+            try
+            {
+                if (macroInfo.ResolveButtonStateCodeOnce || macroInfo.ToggleButtonStateCodeType == ToggleButtonStateCode_e.None)
+                {
+                    if (!m_CachedToggleStates.TryGetValue(macroInfo, out isChecked))
+                    {
+                        GetCheckState(macroInfo);
+                        m_CachedToggleStates.Add(macroInfo, isChecked);
+                    }
+                }
+                else
+                {
+                    isChecked = GetCheckState(macroInfo);
+                }
+            }
+            catch 
+            {
+                isChecked = false;
+            }
+
+            return isChecked;
+        }
+        
+        private bool GetCheckState(CommandMacroInfo macroInfo)
+        {
+            if (macroInfo.ToggleButtonStateCodeType == ToggleButtonStateCode_e.None)
+            {
+                return false;
+            }
+            else
+            {
+                try
+                {
+                    IToggleBuggonStateResolver stateResolver = null;
+
+                    m_StateResolvers.TryGetValue(macroInfo, out stateResolver);
+
+                    if (stateResolver != null)
+                    {
+                        return stateResolver.Resolve();
+                    }
+                    else 
+                    {
+                        return false;
+                    }
+                }
+                catch(Exception ex)
+                {
+                    m_Logger.Log(ex);
+                    return false;
+                }
+            }
+        }
+        
         public void Dispose()
         {
         }

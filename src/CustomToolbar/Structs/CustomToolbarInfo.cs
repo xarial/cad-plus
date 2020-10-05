@@ -62,10 +62,26 @@ namespace Xarial.CadPlus.CustomToolbar.Structs
 
                     return t;
                 });
+
+            Add(new Version("3.0"), new Version("3.1"),
+                t =>
+                {
+                    foreach (var group in t["Groups"])
+                    {
+                        foreach (JObject cmd in group["Commands"])
+                        {
+                            cmd.Add(new JProperty("ToggleButtonStateCodeType", 0));
+                            cmd.Add(new JProperty("ToggleButtonStateCode", null));
+                            cmd.Add(new JProperty("ResolveButtonStateCodeOnce", true));
+                        }
+                    }
+
+                    return t;
+                });
         }
     }
 
-    [UserSettingVersion("3.0", typeof(CustomToolbarInfoVersionTransformer))]
+    [UserSettingVersion("3.1", typeof(CustomToolbarInfoVersionTransformer))]
     public class CustomToolbarInfo
     {
         public CommandGroupInfo[] Groups { get; set; }
