@@ -108,6 +108,7 @@
     <Compile Include="Base\CommandGroupInfoSpec.cs" />
     <Compile Include="Base\CommandItemInfoExtension.cs" />
     <Compile Include="Base\CommandItemInfoSpec.cs" />
+    <Compile Include="Base\IToggleButtonStateResolver.cs" />
     <Compile Include="Base\MacroButtonIcon.cs" />
     <Compile Include="Enums\MacroScope_e.cs" />
     <Compile Include="Enums\Location_e.cs" />

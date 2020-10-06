@@ -15,6 +15,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using Xarial.CadPlus.CustomToolbar.Base;
 using Xarial.CadPlus.CustomToolbar.Exceptions;
 using Xarial.CadPlus.CustomToolbar.Structs;
 using Xarial.CadPlus.ExtensionModule;
@@ -38,10 +39,10 @@ namespace Xarial.CadPlus.CustomToolbar.Services
                 m_App = app;
             }
 
-            public Dictionary<CommandMacroInfo, IToggleBuggonStateResolver> CreateResolvers(
+            public Dictionary<CommandMacroInfo, IToggleButtonStateResolver> CreateResolvers(
                 IEnumerable<CommandMacroInfo> macroInfos)
             {
-                var retVal = new Dictionary<CommandMacroInfo, IToggleBuggonStateResolver>();
+                var retVal = new Dictionary<CommandMacroInfo, IToggleButtonStateResolver>();
 
                 var opts = CreateCompilationOptions()
                     .WithOptimizationLevel(OptimizationLevel.Release);
@@ -50,7 +51,7 @@ namespace Xarial.CadPlus.CustomToolbar.Services
                 refs.AddRange(new[]
                 {
                     MetadataReference.CreateFromFile(typeof(AppDomain).Assembly.Location),
-                    MetadataReference.CreateFromFile(typeof(IModule).Assembly.Location),
+                    MetadataReference.CreateFromFile(typeof(IToggleButtonStateResolver).Assembly.Location),
                     MetadataReference.CreateFromFile(typeof(IXApplication).Assembly.Location)
                 });
 
@@ -89,11 +90,11 @@ namespace Xarial.CadPlus.CustomToolbar.Services
 
                         AppDomain.CurrentDomain.AssemblyResolve += AssemblyResolve;
 
-                        foreach (var type in assm.GetTypes().Where(t => typeof(IToggleBuggonStateResolver).IsAssignableFrom(t)))
+                        foreach (var type in assm.GetTypes().Where(t => typeof(IToggleButtonStateResolver).IsAssignableFrom(t)))
                         {
                             if (classToMacroMap.TryGetValue(type.Name, out CommandMacroInfo macroInfo))
                             {
-                                var stateResolver = (IToggleBuggonStateResolver)Activator.CreateInstance(type, m_App);
+                                var stateResolver = (IToggleButtonStateResolver)Activator.CreateInstance(type, m_App);
                                 retVal.Add(macroInfo, stateResolver);
                             }
                             else

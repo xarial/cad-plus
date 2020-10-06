@@ -43,7 +43,7 @@ namespace Xarial.CadPlus.CustomToolbar.Services
         private readonly IXLogger m_Logger;
 
         private readonly Dictionary<CommandMacroInfo, bool> m_CachedToggleStates;
-        private readonly ConcurrentDictionary<CommandMacroInfo, IToggleBuggonStateResolver> m_StateResolvers;
+        private readonly ConcurrentDictionary<CommandMacroInfo, IToggleButtonStateResolver> m_StateResolvers;
 
         public CustomToolbarInfo ToolbarInfo { get; }
 
@@ -62,7 +62,7 @@ namespace Xarial.CadPlus.CustomToolbar.Services
             m_Logger = logger;
 
             m_CachedToggleStates = new Dictionary<CommandMacroInfo, bool>();
-            m_StateResolvers = new ConcurrentDictionary<CommandMacroInfo, IToggleBuggonStateResolver>();
+            m_StateResolvers = new ConcurrentDictionary<CommandMacroInfo, IToggleButtonStateResolver>();
 
             try
             {
@@ -336,7 +336,7 @@ namespace Xarial.CadPlus.CustomToolbar.Services
             {
                 try
                 {
-                    IToggleBuggonStateResolver stateResolver = null;
+                    IToggleButtonStateResolver stateResolver = null;
 
                     m_StateResolvers.TryGetValue(macroInfo, out stateResolver);
 

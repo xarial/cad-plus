@@ -7,9 +7,9 @@
 
 using Xarial.XCad;
 
-namespace Xarial.CadPlus.ExtensionModule
+namespace Xarial.CadPlus.CustomToolbar.Base
 {
-    public interface IToggleBuggonStateResolver
+    public interface IToggleButtonStateResolver
     {
         IXApplication Application { get; }
         bool Resolve();

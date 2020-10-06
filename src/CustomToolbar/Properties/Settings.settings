@@ -12,12 +12,12 @@
       <Value Profile="(Default)">xtoolbar.json</Value>
     </Setting>
     <Setting Name="ToggleButtonResolverCSharp" Type="System.String" Scope="User">
-      <Value Profile="(Default)">using Xarial.CadPlus.ExtensionModule;
+      <Value Profile="(Default)">using Xarial.CadPlus.CustomToolbar.Base;
 using Xarial.XCad;
 
 namespace Xarial.CadPlus.CustomToolbar.Services.ToggleButton
 {{
-    public class {0}: IToggleBuggonStateResolver
+    public class {0}: IToggleButtonStateResolver
     {{
         public IXApplication Application {{ get; }}
 
@@ -34,21 +34,21 @@ namespace Xarial.CadPlus.CustomToolbar.Services.ToggleButton
 }}</Value>
     </Setting>
     <Setting Name="ToggleButtonResolverVBNET" Type="System.String" Scope="User">
-      <Value Profile="(Default)">Imports Xarial.CadPlus.ExtensionModule
+      <Value Profile="(Default)">Imports Xarial.CadPlus.CustomToolbar.Base
 Imports Xarial.XCad
 
 Namespace Xarial.CadPlus.CustomToolbar.Services.ToggleButton
 
     Public Class {0}
-        Implements IToggleBuggonStateResolver
+        Implements IToggleButtonStateResolver
 
-        Public ReadOnly Property Application As IXApplication Implements IToggleBuggonStateResolver.Application
+        Public ReadOnly Property Application As IXApplication Implements IToggleButtonStateResolver.Application
 
         Public Sub New(ByVal app As IXApplication)
             Application = app
         End Sub
 
-        Public Function Resolve() As Boolean Implements IToggleBuggonStateResolver.Resolve
+        Public Function Resolve() As Boolean Implements IToggleButtonStateResolver.Resolve
             {1}
         End Function
     End Class

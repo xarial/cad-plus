@@ -61,12 +61,12 @@ namespace Xarial.CadPlus.CustomToolbar.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute(@"using Xarial.CadPlus.ExtensionModule;
+        [global::System.Configuration.DefaultSettingValueAttribute(@"using Xarial.CadPlus.CustomToolbar.Base;
 using Xarial.XCad;
 
 namespace Xarial.CadPlus.CustomToolbar.Services.ToggleButton
 {{
-    public class {0}: IToggleBuggonStateResolver
+    public class {0}: IToggleButtonStateResolver
     {{
         public IXApplication Application {{ get; }}
 
@@ -92,21 +92,21 @@ namespace Xarial.CadPlus.CustomToolbar.Services.ToggleButton
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute(@"Imports Xarial.CadPlus.ExtensionModule
+        [global::System.Configuration.DefaultSettingValueAttribute(@"Imports Xarial.CadPlus.CustomToolbar.Base
 Imports Xarial.XCad
 
 Namespace Xarial.CadPlus.CustomToolbar.Services.ToggleButton
 
     Public Class {0}
-        Implements IToggleBuggonStateResolver
+        Implements IToggleButtonStateResolver
 
-        Public ReadOnly Property Application As IXApplication Implements IToggleBuggonStateResolver.Application
+        Public ReadOnly Property Application As IXApplication Implements IToggleButtonStateResolver.Application
 
         Public Sub New(ByVal app As IXApplication)
             Application = app
         End Sub
 
-        Public Function Resolve() As Boolean Implements IToggleBuggonStateResolver.Resolve
+        Public Function Resolve() As Boolean Implements IToggleButtonStateResolver.Resolve
             {1}
         End Function
     End Class

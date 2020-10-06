@@ -6,6 +6,7 @@
 //*********************************************************************
 
 using System.Collections.Generic;
+using Xarial.CadPlus.CustomToolbar.Base;
 using Xarial.CadPlus.CustomToolbar.Structs;
 using Xarial.CadPlus.ExtensionModule;
 
@@ -15,7 +16,7 @@ namespace Xarial.CadPlus.CustomToolbar.Services
     {
         public interface IStateResolveCompiler 
         {
-            Dictionary<CommandMacroInfo, IToggleBuggonStateResolver> CreateResolvers(IEnumerable<CommandMacroInfo> macroInfos);
+            Dictionary<CommandMacroInfo, IToggleButtonStateResolver> CreateResolvers(IEnumerable<CommandMacroInfo> macroInfos);
         }
     }
 }
