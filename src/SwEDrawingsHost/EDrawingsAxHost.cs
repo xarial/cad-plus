@@ -5,9 +5,9 @@
 //License: https://cadplus.xarial.com/license/
 //*********************************************************************
 
-using eDrawings.Interop.EModelViewControl;
 using System;
 using System.Windows.Forms;
+using Xarial.CadPlus.Xport.SwEDrawingsHost;
 
 namespace Xarial.CadPlus.Xport.EDrawingsHost
 {
@@ -15,13 +15,13 @@ namespace Xarial.CadPlus.Xport.EDrawingsHost
     {
         private bool m_IsLoaded;
 
-        public EModelViewControl Control { get; private set; }
+        public IEDrawingsControl Control { get; private set; }
 
-        public EDrawingsAxHost() : base("22945A69-1191-4DCF-9E6F-409BDE94D101")
+        public EDrawingsAxHost(EDrawingsVersion_e version = EDrawingsVersion_e.Default) 
+            : base(EDrawingsControl.GetOcxGuid(version))
         {
-            m_IsLoaded = false;
         }
-
+        
         protected override void OnCreateControl()
         {
             base.OnCreateControl();
@@ -29,15 +29,16 @@ namespace Xarial.CadPlus.Xport.EDrawingsHost
             if (!m_IsLoaded) //this function is called twice
             {
                 m_IsLoaded = true;
-                Control = GetOcx() as EModelViewControl;
+                var ocx = GetOcx();
 
-                if (Control == null)
+                if (ocx != null)
                 {
-                    throw new Exception("Failed to access eDrawings control");
+                    Control = new EDrawingsControl(ocx);
                 }
-
-                const int SIMPLE_UI = 0;
-                Control.FullUI = SIMPLE_UI;
+                else
+                {
+                    throw new Exception("Failed to create eDrawings control");
+                }
             }
         }
     }

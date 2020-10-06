@@ -20,7 +20,7 @@ namespace Xarial.CadPlus.Xport.Core
         private readonly TextWriter m_Logger;
         private readonly IProgress<double> m_ProgressHandler;
 
-        public Exporter(TextWriter logger, IProgress<double> progressHandler = null)
+        public Exporter(TextWriter logger, IProgress<double> progressHandler)
         {
             m_Logger = logger;
             m_ProgressHandler = progressHandler;
@@ -106,7 +106,7 @@ namespace Xarial.CadPlus.Xport.Core
         }
 
         private Task<bool> StartWaitProcessAsync(ProcessStartInfo prcStartInfo,
-            CancellationToken cancellationToken = default(CancellationToken))
+            CancellationToken cancellationToken = default)
         {
             var tcs = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
 

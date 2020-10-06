@@ -20,6 +20,7 @@
 		<Feature Id="ProductFeature" Title="Setup" Level="1">
       <ComponentGroupRef Id="FilesRegGroup" />
       <ComponentGroupRef Id="MainFilesRegGroup" />
+      <ComponentGroupRef Id="SwAddInComRegGroup" />
       <ComponentRef Id="ApplicationShortcut" />
     </Feature>
 
@@ -36,8 +37,10 @@
     
     <DirectoryRef Id="ApplicationProgramsFolder">
       <Component Id="ApplicationShortcut" Guid="{A92D2CF0-5C1F-43E4-AC7C-F8FCD1DF1844}">
-        <Shortcut Id="ApplicationStartMenuShortcut" Name="xPort" Description="Batch Export Utility"
+        <Shortcut Id="XPortApplicationStartMenuShortcut" Name="xPort" Description="Batch Export Utility"
             Target="[#xport.exe]" WorkingDirectory="APPLICATIONROOTDIRECTORY"/>
+        <Shortcut Id="XBatchApplicationStartMenuShortcut" Name="xBatch" Description="Batch Macro Runner Utility"
+            Target="[#xbatch.exe]" WorkingDirectory="APPLICATIONROOTDIRECTORY"/>
         <RemoveFolder Id="ApplicationProgramsFolder" On="uninstall"/>
         <RegistryValue Root="HKCU" Key="Software\Xarial\CAD+ Toolset" Name="installed" Type="integer" Value="1" KeyPath="yes"/>
       </Component>

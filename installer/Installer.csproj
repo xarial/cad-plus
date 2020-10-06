@@ -11,8 +11,9 @@
     <OutputType>Package</OutputType>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x64' ">
-	<PackageVersion>0.0.1</PackageVersion>
-	<PackageNameSuffix></PackageNameSuffix>
+    <PackageVersion>0.2.0</PackageVersion>
+    <PackageNameSuffix>
+    </PackageNameSuffix>
     <OutputPath>..\_build\</OutputPath>
     <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
     <DefineConstants>SourceOutDir=..\_build;PackageVersion=$(PackageVersion);PackageNameSuffix=$(PackageNameSuffix)</DefineConstants>
@@ -44,6 +45,9 @@
       <Name>WixUIExtension</Name>
     </WixExtension>
   </ItemGroup>
+  <ItemGroup>
+    <Compile Include="SwAddInReg.wxs" />
+  </ItemGroup>
   <Import Project="$(WixTargetsPath)" Condition=" '$(WixTargetsPath)' != '' " />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\WiX\v3.x\Wix.targets" Condition=" '$(WixTargetsPath)' == '' AND Exists('$(MSBuildExtensionsPath32)\Microsoft\WiX\v3.x\Wix.targets') " />
   <Target Name="EnsureWixToolsetInstalled" Condition=" '$(WixTargetsImported)' != 'true' ">
@@ -51,6 +55,7 @@
   </Target>
   <Target Name="BeforeBuild">
     <HeatDirectory Directory="..\_build" Transforms="DirectoryHeatTransform.xslt" PreprocessorVariable="var.SourceOutDir" OutputFile="Files.wxs" ComponentGroupName="FilesRegGroup" DirectoryRefId="INSTALLFOLDER" AutogenerateGuids="true" ToolPath="$(WixToolPath)" SuppressFragments="true" SuppressRegistry="true" SuppressCom="true" SuppressRootDirectory="true" />
+    <HeatFile File="..\_build\Xarial.CadPlus.AddIn.Sw.dll" PreprocessorVariable="var.SourceOutDir" OutputFile="SwAddInReg.wxs" ComponentGroupName="SwAddInComRegGroup" DirectoryRefId="INSTALLFOLDER" AutogenerateGuids="true" ToolPath="$(WixToolPath)" SuppressFragments="false" SuppressRegistry="false" SuppressCom="false" SuppressRootDirectory="true" />
   </Target>
   <PropertyGroup>
     <PreBuildEvent />
