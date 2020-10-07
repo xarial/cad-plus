@@ -45,7 +45,6 @@
   <ItemGroup>
     <Compile Include="CommandGroups.cs" />
     <Compile Include="IModule.cs" />
-    <Compile Include="IToggleBuggonStateResolver.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

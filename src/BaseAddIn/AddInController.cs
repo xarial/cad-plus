@@ -7,25 +7,39 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml;
+using System.Xml.Linq;
+using System.Xml.XPath;
 using Xarial.CadPlus.AddIn.Base.Properties;
 using Xarial.CadPlus.CustomToolbar;
 using Xarial.CadPlus.ExtensionModule;
 using Xarial.XCad.Extensions;
 using Xarial.XCad.UI.Commands;
 using Xarial.XToolkit.Wpf.Dialogs;
+using Xarial.XToolkit.Reflection;
 
 namespace Xarial.CadPlus.AddIn.Base
 {
     public class AddInController : IDisposable
     {
+        private class LocalAppConfigBindingRedirectReferenceResolver : AppConfigBindingRedirectReferenceResolver 
+        {
+            protected override Assembly[] GetRequestingAssemblies(Assembly requestingAssembly)
+                => new Assembly[] { requestingAssembly ?? typeof(AddInController).Assembly };
+        }
+
         private readonly IXExtension m_Ext;
         private readonly IModule[] m_Modules;
 
         public AddInController(IXExtension ext) 
         {
+            AppDomain.CurrentDomain.ResolveBindingRedirects(new LocalAppConfigBindingRedirectReferenceResolver());
+
             m_Ext = ext;
 
             var cmdGrp = ext.CommandManager.AddCommandGroup<CadPlusCommands_e>();

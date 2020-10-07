@@ -1,4 +1,12 @@
-﻿using System;
+﻿//*********************************************************************
+//CAD+ Toolset
+//Copyright(C) 2020 Xarial Pty Limited
+//Product URL: https://cadplus.xarial.com
+//License: https://cadplus.xarial.com/license/
+//*********************************************************************
+
+using Microsoft.CodeAnalysis;
+using System;
 using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,19 +17,8 @@ namespace Xarial.CadPlus.CustomToolbar.Exceptions
 {
     public class CustomResolverCodeCompileFailedException : Exception
     {
-        private static string GetErrors(CompilerErrorCollection errors) 
-        {
-            var result = new StringBuilder();
-            
-            foreach (CompilerError error in errors) 
-            {
-                result.AppendLine($"{error.ErrorNumber} - {error.ErrorText}");
-            }
-
-            return result.ToString();
-        }
-
-        public CustomResolverCodeCompileFailedException(CompilerErrorCollection errors) : base(GetErrors(errors))
+        public CustomResolverCodeCompileFailedException(IEnumerable<Diagnostic> errors) 
+            : base(string.Join(Environment.NewLine, errors))
         {
         }
     }
