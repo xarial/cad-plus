@@ -19,7 +19,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SwAddIn", "src\SwAddIn\SwAd
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CustomToolbar", "src\CustomToolbar\CustomToolbar.csproj", "{B645A77C-D088-45EE-95CA-AD45D63060CA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExtensionModule", "src\ExtensionModule\ExtensionModule.csproj", "{6BF97F84-C902-470F-874F-4AD839CB16B9}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Module", "src\Module\Module.csproj", "{6BF97F84-C902-470F-874F-4AD839CB16B9}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CustomToolbar.Tests", "tests\CustomToolbar.Tests\CustomToolbar.Tests.csproj", "{0312168C-2B71-4650-9DF6-992E762698E2}"
 EndProject

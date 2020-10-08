@@ -38,7 +38,7 @@ namespace Xarial.CadPlus.AddIn.Base
         private readonly IXExtension m_Ext;
         
         [ImportMany]
-        private IEnumerable<IModule> m_Modules;
+        private IEnumerable<IExtensionModule> m_Modules;
 
         public AddInController(IXExtension ext) 
         {

@@ -8,8 +8,8 @@
     <ProjectGuid>{6BF97F84-C902-470F-874F-4AD839CB16B9}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Xarial.CadPlus.ExtensionModule</RootNamespace>
-    <AssemblyName>Xarial.CadPlus.ExtensionModule</AssemblyName>
+    <RootNamespace>Xarial.CadPlus.Module</RootNamespace>
+    <AssemblyName>Xarial.CadPlus.Module</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
@@ -44,7 +44,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CommandGroups.cs" />
-    <Compile Include="IModule.cs" />
+    <Compile Include="IExtensionModule.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

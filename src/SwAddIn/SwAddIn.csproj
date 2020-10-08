@@ -90,14 +90,6 @@
       <Project>{49632346-24d7-4a28-99ec-75a69b43c81c}</Project>
       <Name>BaseAddIn</Name>
     </ProjectReference>
-    <ProjectReference Include="..\CustomToolbar\CustomToolbar.csproj">
-      <Project>{b645a77c-d088-45ee-95ca-ad45d63060ca}</Project>
-      <Name>CustomToolbar</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\ExtensionModule\ExtensionModule.csproj">
-      <Project>{6bf97f84-c902-470f-874f-4ad839cb16b9}</Project>
-      <Name>ExtensionModule</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\..\packages\Xarial.XCad.SolidWorks.0.6.4\build\Xarial.XCad.SolidWorks.targets" Condition="Exists('..\..\packages\Xarial.XCad.SolidWorks.0.6.4\build\Xarial.XCad.SolidWorks.targets')" />

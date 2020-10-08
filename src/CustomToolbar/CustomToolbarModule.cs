@@ -8,7 +8,6 @@
 using Autofac;
 using System;
 using System.ComponentModel;
-using Xarial.CadPlus.ExtensionModule;
 using Xarial.CadPlus.CustomToolbar.Properties;
 using Xarial.CadPlus.CustomToolbar.Services;
 using Xarial.CadPlus.CustomToolbar.UI.Forms;
@@ -20,11 +19,12 @@ using Xarial.XCad.UI.Commands.Attributes;
 using Xarial.XCad.UI.Commands.Enums;
 using Xarial.XToolkit.Services.UserSettings;
 using System.ComponentModel.Composition;
+using Xarial.CadPlus.ExtensionModule;
 
 namespace Xarial.CadPlus.CustomToolbar
 {
-    [Export(typeof(IModule))]
-    public class CustomToolbarModule : IModule
+    [Export(typeof(IExtensionModule))]
+    public class CustomToolbarModule : IExtensionModule
     {
         [CommandGroupInfo(CommandGroups.RootGroupId + 1)]
         [CommandGroupParent(CommandGroups.RootGroupId)]

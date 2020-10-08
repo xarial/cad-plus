@@ -14,7 +14,7 @@ using Xarial.XCad.Extensions;
 
 namespace Xarial.CadPlus.ExtensionModule
 {
-    public interface IModule : IDisposable
+    public interface IExtensionModule : IDisposable
     {
         void Load(IXExtension ext);
     }
