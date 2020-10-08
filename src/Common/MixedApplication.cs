@@ -51,7 +51,7 @@ namespace Xarial.CadPlus.Common
                 var hasError = false;
 
                 TArgs args = default;
-                parser.ParseArguments<TArgs>(e.Args)
+                parser.ParseArguments<TArgs>(CreateArguments, e.Args)
                     .WithParsed(a => args = a)
                     .WithNotParsed(err => hasError = true);
 
@@ -81,6 +81,8 @@ namespace Xarial.CadPlus.Common
                 base.OnStartup(e);
             }
         }
+
+        protected virtual TArgs CreateArguments() => (TArgs)Activator.CreateInstance(typeof(TArgs));
 
         private void OnDomainUnhandledException(object sender, UnhandledExceptionEventArgs e)
         {

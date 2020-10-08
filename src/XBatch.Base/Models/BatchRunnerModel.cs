@@ -18,7 +18,20 @@ using Xarial.XToolkit.Wpf.Utils;
 
 namespace Xarial.CadPlus.XBatch.Base.Models
 {
-    public class BatchRunnerModel
+    public interface IBatchRunnerModel 
+    {
+        event Action<double> ProgressChanged;
+        event Action<string> Log;
+
+        AppVersionInfo[] InstalledVersions { get; }
+        FileFilter[] InputFilesFilter { get; }
+        FileFilter[] MacroFilesFilter { get; }
+
+        Task<bool> BatchRun(BatchRunnerOptions opts);
+        void Cancel();
+    }
+
+    public class BatchRunnerModel : IBatchRunnerModel
     {
         public event Action<double> ProgressChanged;
         public event Action<string> Log;

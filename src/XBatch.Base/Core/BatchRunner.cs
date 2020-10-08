@@ -257,11 +257,15 @@ namespace Xarial.CadPlus.XBatch.Base.Core
 
                     if (doc == null)
                     {
-                        doc = app.Documents.Open(new DocumentOpenArgs()
+                        var openArgs = new DocumentOpenArgs()
                         {
                             Path = filePath,
-                            Silent = true
-                        });
+                            Silent = opts.OpenFileOptions.HasFlag(OpenFileOptions_e.Silent),
+                            ReadOnly = opts.OpenFileOptions.HasFlag(OpenFileOptions_e.ReadOnly),
+                            Rapid = opts.OpenFileOptions.HasFlag(OpenFileOptions_e.Rapid)
+                        };
+
+                        doc = app.Documents.Open(openArgs);
                     }
 
                     app.Documents.Active = doc;
