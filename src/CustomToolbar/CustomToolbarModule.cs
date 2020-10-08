@@ -19,9 +19,11 @@ using Xarial.XCad.UI.Commands;
 using Xarial.XCad.UI.Commands.Attributes;
 using Xarial.XCad.UI.Commands.Enums;
 using Xarial.XToolkit.Services.UserSettings;
+using System.ComponentModel.Composition;
 
 namespace Xarial.CadPlus.CustomToolbar
 {
+    [Export(typeof(IModule))]
     public class CustomToolbarModule : IModule
     {
         [CommandGroupInfo(CommandGroups.RootGroupId + 1)]
