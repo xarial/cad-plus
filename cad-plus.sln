@@ -35,7 +35,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XBatch.Base", "src\XBatch.B
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XBatch.Sw", "src\XBatch.Sw\XBatch.Sw.csproj", "{A7D83A5E-6376-4C3D-ADF0-3DC718635C44}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Xbatch.Tests", "tests\Xbatch.Tests\Xbatch.Tests.csproj", "{4232461D-4433-4986-B307-F70A9A67929D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Xbatch.Tests", "tests\Xbatch.Tests\Xbatch.Tests.csproj", "{4232461D-4433-4986-B307-F70A9A67929D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Init", "src\Init\Init.csproj", "{C5008247-53FB-410D-B8E4-1E44312CBEDC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -149,6 +151,14 @@ Global
 		{4232461D-4433-4986-B307-F70A9A67929D}.Release|Any CPU.Build.0 = Release|Any CPU
 		{4232461D-4433-4986-B307-F70A9A67929D}.Release|x64.ActiveCfg = Release|Any CPU
 		{4232461D-4433-4986-B307-F70A9A67929D}.Release|x64.Build.0 = Release|Any CPU
+		{C5008247-53FB-410D-B8E4-1E44312CBEDC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C5008247-53FB-410D-B8E4-1E44312CBEDC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C5008247-53FB-410D-B8E4-1E44312CBEDC}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{C5008247-53FB-410D-B8E4-1E44312CBEDC}.Debug|x64.Build.0 = Debug|Any CPU
+		{C5008247-53FB-410D-B8E4-1E44312CBEDC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C5008247-53FB-410D-B8E4-1E44312CBEDC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C5008247-53FB-410D-B8E4-1E44312CBEDC}.Release|x64.ActiveCfg = Release|Any CPU
+		{C5008247-53FB-410D-B8E4-1E44312CBEDC}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

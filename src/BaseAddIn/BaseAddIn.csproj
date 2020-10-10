@@ -87,6 +87,10 @@
     <None Include="Resources\logo.png" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Init\Init.csproj">
+      <Project>{c5008247-53fb-410d-b8e4-1e44312cbedc}</Project>
+      <Name>Init</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Module\Module.csproj">
       <Project>{6bf97f84-c902-470f-874f-4ad839cb16b9}</Project>
       <Name>Module</Name>

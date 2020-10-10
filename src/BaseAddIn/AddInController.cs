@@ -24,6 +24,7 @@ using Xarial.XToolkit.Reflection;
 using System.ComponentModel.Composition.Hosting;
 using System.ComponentModel.Composition;
 using System.ComponentModel.Composition.Primitives;
+using Xarial.CadPlus.Module.Init;
 
 namespace Xarial.CadPlus.AddIn.Base
 {
@@ -43,6 +44,8 @@ namespace Xarial.CadPlus.AddIn.Base
         public AddInController(IXExtension ext) 
         {
             AppDomain.CurrentDomain.ResolveBindingRedirects(new LocalAppConfigBindingRedirectReferenceResolver());
+
+            Initializer.Init();
 
             m_Ext = ext;
 

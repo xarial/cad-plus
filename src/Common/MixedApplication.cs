@@ -13,6 +13,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using Xarial.CadPlus.Module.Init;
 
 namespace Xarial.CadPlus.Common
 {
@@ -32,6 +33,8 @@ namespace Xarial.CadPlus.Common
         {
             this.DispatcherUnhandledException += OnDispatcherUnhandledException;
             AppDomain.CurrentDomain.UnhandledException += OnDomainUnhandledException;
+
+            Initializer.Init();
 
             OnAppStart();
 

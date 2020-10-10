@@ -86,5 +86,11 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Init\Init.csproj">
+      <Project>{c5008247-53fb-410d-b8e4-1e44312cbedc}</Project>
+      <Name>Init</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
