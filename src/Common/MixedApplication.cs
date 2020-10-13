@@ -13,6 +13,8 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Interop;
+using System.Windows.Navigation;
 using Xarial.CadPlus.Module.Init;
 
 namespace Xarial.CadPlus.Common
@@ -33,8 +35,6 @@ namespace Xarial.CadPlus.Common
         {
             this.DispatcherUnhandledException += OnDispatcherUnhandledException;
             AppDomain.CurrentDomain.UnhandledException += OnDomainUnhandledException;
-
-            Initializer.Init();
 
             OnAppStart();
 
@@ -64,6 +64,8 @@ namespace Xarial.CadPlus.Common
                 {
                     try
                     {
+                        Initializer.Init(IntPtr.Zero);
+
                         RunConsole(args)
                             .ConfigureAwait(false)
                             .GetAwaiter()
@@ -82,9 +84,16 @@ namespace Xarial.CadPlus.Common
             else
             {
                 base.OnStartup(e);
+                this.Activated += OnActivated;
             }
         }
 
+        private void OnActivated(object sender, EventArgs e)
+        {
+            this.Activated -= OnActivated;
+            Initializer.Init(new WindowInteropHelper(this.MainWindow).Handle);
+        }
+        
         protected virtual TArgs CreateArguments() => (TArgs)Activator.CreateInstance(typeof(TArgs));
 
         private void OnDomainUnhandledException(object sender, UnhandledExceptionEventArgs e)

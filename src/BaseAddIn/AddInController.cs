@@ -45,7 +45,7 @@ namespace Xarial.CadPlus.AddIn.Base
         {
             AppDomain.CurrentDomain.ResolveBindingRedirects(new LocalAppConfigBindingRedirectReferenceResolver());
 
-            Initializer.Init();
+            Initializer.Init(ext.Application.WindowHandle);
 
             m_Ext = ext;
 
