@@ -25,20 +25,67 @@ namespace Xarial.CadPlus.Common
         internal static extern bool AttachConsole(int processId);
     }
 
+    public class ConsoleHostModule : BaseHostModule
+    {
+        public override IntPtr ParentWindow => IntPtr.Zero;
+
+        public override event Action Loaded;
+
+        internal ConsoleHostModule() 
+        {
+            Loaded?.Invoke();
+        }
+    }
+
+    public class WpfAppHostModule : BaseHostModule 
+    {
+        private readonly Application m_App;
+
+        internal WpfAppHostModule(Application app) 
+        {
+            m_App = app;
+            m_App.Activated += OnAppActivated;
+        }
+
+        public override IntPtr ParentWindow => m_App.MainWindow != null
+            ? new WindowInteropHelper(m_App.MainWindow).Handle 
+            : IntPtr.Zero;
+
+        public override event Action Loaded;
+
+        private void OnAppActivated(object sender, EventArgs e)
+        {
+            Loaded?.Invoke();
+        }
+    }
+
     public abstract class MixedApplication<TArgs> : Application
     {
+        private BaseHostModule m_HostModule;
+
         protected virtual void OnAppStart()
         {
         }
 
         protected override void OnStartup(StartupEventArgs e)
         {
+            var isConsole = e.Args.Any();
+
             this.DispatcherUnhandledException += OnDispatcherUnhandledException;
             AppDomain.CurrentDomain.UnhandledException += OnDomainUnhandledException;
 
             OnAppStart();
 
-            if (e.Args.Any())
+            if (isConsole)
+            {
+                m_HostModule = new ConsoleHostModule();
+            }
+            else 
+            {
+                m_HostModule = new WpfAppHostModule(this);
+            }
+
+            if (isConsole)
             {
                 WindowsApi.AttachConsole(-1);
                 
@@ -64,8 +111,6 @@ namespace Xarial.CadPlus.Common
                 {
                     try
                     {
-                        Initializer.Init(IntPtr.Zero);
-
                         RunConsole(args)
                             .ConfigureAwait(false)
                             .GetAwaiter()
@@ -84,16 +129,9 @@ namespace Xarial.CadPlus.Common
             else
             {
                 base.OnStartup(e);
-                this.Activated += OnActivated;
             }
         }
-
-        private void OnActivated(object sender, EventArgs e)
-        {
-            this.Activated -= OnActivated;
-            Initializer.Init(new WindowInteropHelper(this.MainWindow).Handle);
-        }
-        
+                
         protected virtual TArgs CreateArguments() => (TArgs)Activator.CreateInstance(typeof(TArgs));
 
         private void OnDomainUnhandledException(object sender, UnhandledExceptionEventArgs e)

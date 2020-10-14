@@ -28,6 +28,27 @@ using Xarial.CadPlus.Module.Init;
 
 namespace Xarial.CadPlus.AddIn.Base
 {
+    public class AddInHostModule : BaseHostModule 
+    {
+        private readonly IXExtension m_Ext;
+
+        public override IntPtr ParentWindow => m_Ext.Application.WindowHandle;
+
+        public override event Action Loaded;
+
+        internal AddInHostModule(IXExtension ext) 
+        {
+            m_Ext = ext;
+
+            m_Ext.Application.Loaded += OnApplicationLoaded;
+        }
+
+        private void OnApplicationLoaded(XCad.IXApplication app)
+        {
+            Loaded?.Invoke();
+        }
+    }
+
     public class AddInController : IDisposable
     {
         private class LocalAppConfigBindingRedirectReferenceResolver : AppConfigBindingRedirectReferenceResolver 
@@ -37,7 +58,9 @@ namespace Xarial.CadPlus.AddIn.Base
         }
 
         private readonly IXExtension m_Ext;
-        
+
+        private readonly BaseHostModule m_HostModule;
+
         [ImportMany]
         private IEnumerable<IExtensionModule> m_Modules;
 
@@ -45,10 +68,10 @@ namespace Xarial.CadPlus.AddIn.Base
         {
             AppDomain.CurrentDomain.ResolveBindingRedirects(new LocalAppConfigBindingRedirectReferenceResolver());
 
-            Initializer.Init(ext.Application.WindowHandle);
+            m_HostModule = new AddInHostModule(ext);
 
             m_Ext = ext;
-
+            
             var cmdGrp = ext.CommandManager.AddCommandGroup<CadPlusCommands_e>();
             cmdGrp.CommandClick += OnCommandClick;
 
@@ -67,7 +90,7 @@ namespace Xarial.CadPlus.AddIn.Base
                 }
             }
         }
-
+        
         private ComposablePartCatalog CreateDirectoryCatalog(string path, string searchPattern)
         {
             var catalog = new AggregateCatalog();
