@@ -32,9 +32,21 @@ Please see the table below for the list of features and their availability in th
 
 ## Download
 
-**Community Edition** can be downloaded by filling the following [request form](https://form.jotform.com/201120474719045). Download URL will be e-mailed to the specified e-mail address.
+**Community Edition** can be downloaded by following the instructions on the [download page](/download/).
+
+When starting the application for the first time the following message will be displayed.
+
+![Unregistered version of CAD+ Toolset](unregistered-product.png)
+
+You can continue to use unregistered version, but we encourage you to register your copy to suppress the popup message. Please find more information on [register](/register/) page
 
 **Professional Edition** is not yet available for download.
+
+## Updates
+
+Tools will automatically check for the available updates on the start. If new update is available the following modeless popup will be displayed. Popup will automatically close in 20 seconds unless closed prior.
+
+![Update available popup](updates-available.png)
 
 ## Feedback
 

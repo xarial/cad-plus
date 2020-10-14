@@ -27,6 +27,14 @@ CAD+ Toolset community edition is a free and open source software designed to be
 
 We might occasionally send you e-mails regarding your experience with the tool, this includes but not limited to notifications about updates, request for feedback etc. We are greatly appreciate your time and feedback and will not spam you with unnecessary marketing materials and only send e-mails which will help to improve the quality of the product and thus your business process.
 
+### Can I install CAD+ Toolset for multiple machines?
+
+we currently do not support site licenses and registration needs to be performed on individual machines. Please contact us via [e-mail](mailto:info@xarial.com) for more information or alternative options.
+
+### Can I transfer my community edition license to different machine?
+
+License of CAD+ Toolset is attached to the unique hardware key and cannot be transferred to other machine. Please request new licence.
+
 ### How do I provide a feedback or request new functionality?
 
 We would like to hear from you regarding your experience with the product. Please submit your bug report or enhancement request directly on [GitHub Issues](https://github.com/xarial/cad-plus/issues) or contact us via [e-mail](mailto:info@xarial.com).
