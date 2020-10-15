@@ -58,6 +58,8 @@ namespace Xarial.CadPlus.CustomToolbar.UI.Views
             {
                 e.Effects = DragDropEffects.None;
             }
+
+            e.Handled = true;
         }
 
         private void OnDragEnter(object sender, DragEventArgs e)
@@ -71,6 +73,8 @@ namespace Xarial.CadPlus.CustomToolbar.UI.Views
             {
                 e.Effects = DragDropEffects.None;
             }
+
+            e.Handled = true;
         }
 
         private void OnDrop(object sender, DragEventArgs e)
@@ -78,6 +82,7 @@ namespace Xarial.CadPlus.CustomToolbar.UI.Views
             if (TryGetFileDropArgument(sender as TreeView, e, out MacroDropArgs args)) 
             {
                 FileDropCommand?.Execute(args);
+                (sender as FrameworkElement).Focus();
             }
         }
 
