@@ -87,27 +87,27 @@
                         <Button Style="{StaticResource ToolbarButton}" Focusable="False"
                                 ToolTip="{Binding Path=SelectedElement, Converter={StaticResource menuTitleConv}, ConverterParameter={x:Static conv:CommandContextMenu_e.MoveUp}}"
                                 Command="{Binding Path=MoveCommandUpCommand}" CommandParameter="{Binding Path=SelectedElement}">
-                            <Image Source="/Xarial.CadPlus.CustomToolbar;component/Resources/icon-move-left.png"/>
+                            <Image Source="/Xarial.CadPlus.CustomToolbar.Module;component/Resources/icon-move-left.png"/>
                         </Button>
                         <Button Style="{StaticResource ToolbarButton}" Focusable="False"
                                 ToolTip="{Binding Path=SelectedElement, Converter={StaticResource menuTitleConv}, ConverterParameter={x:Static conv:CommandContextMenu_e.MoveDown}}"
                                 Command="{Binding Path=MoveCommandDownCommand}" CommandParameter="{Binding Path=SelectedElement}">
-                            <Image Source="/Xarial.CadPlus.CustomToolbar;component/Resources/icon-move-right.png"/>
+                            <Image Source="/Xarial.CadPlus.CustomToolbar.Module;component/Resources/icon-move-right.png"/>
                         </Button>
                         <Button Style="{StaticResource ToolbarButton}" Focusable="False"
                                 ToolTip="{Binding Path=SelectedElement, Converter={StaticResource menuTitleConv}, ConverterParameter={x:Static conv:CommandContextMenu_e.InsertBefore}}"
                                 Command="{Binding Path=InsertCommandBeforeCommand}" CommandParameter="{Binding Path=SelectedElement}">
-                            <Image Source="/Xarial.CadPlus.CustomToolbar;component/Resources/icon-add-after.png"/>
+                            <Image Source="/Xarial.CadPlus.CustomToolbar.Module;component/Resources/icon-add-after.png"/>
                         </Button>
                         <Button Style="{StaticResource ToolbarButton}" Focusable="False"
                                 ToolTip="{Binding Path=SelectedElement, Converter={StaticResource menuTitleConv}, ConverterParameter={x:Static conv:CommandContextMenu_e.InsertAfter}}"
                                 Command="{Binding Path=InsertCommandAfterCommand}" CommandParameter="{Binding Path=SelectedElement}">
-                            <Image Source="/Xarial.CadPlus.CustomToolbar;component/Resources/icon-add-before.png"/>
+                            <Image Source="/Xarial.CadPlus.CustomToolbar.Module;component/Resources/icon-add-before.png"/>
                         </Button>
                         <Button Style="{StaticResource ToolbarButton}" Focusable="False"
                                 ToolTip="{Binding Path=SelectedElement, Converter={StaticResource menuTitleConv}, ConverterParameter={x:Static conv:CommandContextMenu_e.Remove}}"
                                 Command="{Binding Path=CommandRemoveCommand}" CommandParameter="{Binding Path=SelectedElement}">
-                            <Image Source="/Xarial.CadPlus.CustomToolbar;component/Resources/icon-remove.png"/>
+                            <Image Source="/Xarial.CadPlus.CustomToolbar.Module;component/Resources/icon-remove.png"/>
                         </Button>
                     </StackPanel>
                     <views:CommandManagerView DataContext="{Binding}" Grid.Row="1" Margin="2" />

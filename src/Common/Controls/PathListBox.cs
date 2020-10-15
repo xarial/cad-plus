@@ -111,11 +111,11 @@ namespace Xarial.CadPlus.Common.Controls
 
         private void AddFolders()
         {
-            var dlg = new BetterFolderBrowser();
-
-            dlg.Title = "Select folder to process";
-            
-            dlg.Multiselect = true;
+            var dlg = new BetterFolderBrowser()
+            {
+                Title = "Select folder to process",
+                Multiselect = true
+            };
 
             if (dlg.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
