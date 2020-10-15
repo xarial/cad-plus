@@ -26,11 +26,12 @@ namespace Xarial.CadPlus.CustomToolbar.Services
                 => VisualBasicCompilation.Create(dllName, code, refs, (VisualBasicCompilationOptions)opts);
 
             protected override CompilationOptions CreateCompilationOptions()
-                => new VisualBasicCompilationOptions(OutputKind.DynamicallyLinkedLibrary);
+                => new VisualBasicCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
+                    .WithOptionStrict(OptionStrict.Off);
 
             protected override SyntaxTree CreateSyntaxTree(SourceText src)
-                => Microsoft.CodeAnalysis.VisualBasic.SyntaxFactory.ParseSyntaxTree(src,
-                    VisualBasicParseOptions.Default.WithLanguageVersion(Microsoft.CodeAnalysis.VisualBasic.LanguageVersion.VisualBasic16), "");
+                => SyntaxFactory.ParseSyntaxTree(src,
+                    VisualBasicParseOptions.Default.WithLanguageVersion(LanguageVersion.VisualBasic16), "");
 
             protected override IEnumerable<MetadataReference> GetReferences()
             {

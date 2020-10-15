@@ -19,7 +19,8 @@ For example the below command will open all SOLIDWORKS part files from the *D:\D
 | -m  | --macros  |Yes   | List of macros to run: VBA macros (*.swp or *.swb) and VSTA macros (*.dll) are supported  |
 | -f  | --filter  | No  |  Filter to extract input files, if input parameter contains directories |
 | -e  |  --error | No  | If this option is used export will continue if any of the files or formats failed to process, otherwise the export will terminate  |
-| -t  |  --timeout | No  | Timeout in seconds for processing a single file (e.g. opening the file and running the macros)")]
-| -s  |  --startup | No  | Specifies the startup options (silent, background, safe) for the host application. Multiple option can be used
-| -v  |  --hostversion | No  | Version of SOLIDWORKS application. Use one of the following formats: 2020, Sw2020, SOLIDWORKS 2020. If this option is not specified than the oldest version installed on this system will be used.
+| -t  |  --timeout | No  | Timeout in seconds for processing a single file (e.g. opening the file and running the macros)")] |
+| -s  |  --startup | No  | Specifies the startup options (silent, background, safe) for the host application. Multiple option can be used |
+| -v  |  --hostversion | No  | Version of SOLIDWORKS application. Use one of the following formats: 2020, Sw2020, SOLIDWORKS 2020. If this option is not specified than the oldest version installed on this system will be used. |
+| -o  |  --open | No  | Specifies options (silent, readonly, rapid) for the file opening. Default: silent |
 

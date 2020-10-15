@@ -5,8 +5,6 @@ title: CAD+ Toolset (Beta) | Utilities for SOLIDWORKS automation
 description: SOLIDWORKS utilities for improving your productivity in SOLIDWORKS. Automate properties, geometry, export and much more
 image: /logo.svg
 ---
-[Request FREE Community Edition](https://form.jotform.com/201120474719045){ target="_blank" class="download-button" }
-
 ![CAD+ Toolset](/logo.svg){ width=200 }
 
 **CAD+ Toolset (Beta)** application complements functionality of SOLIDWORKS by enabling additional toolsets. Application allows to automate various areas of SOLIDWORKS application. This includes but not limited to custom properties automation, geometry features, custom toolbars, export and import capabilities etc.
@@ -36,7 +34,7 @@ Please see the table below for the list of features and their availability in th
 
 When starting the application for the first time the following message will be displayed.
 
-![Unregistered version of CAD+ Toolset](unregistered-product.png)
+![Unregistered version of CAD+ Toolset](unregistered-product.png){ width=500 }
 
 You can continue to use unregistered version, but we encourage you to register your copy to suppress the popup message. Please find more information on [register](/register/) page
 
@@ -46,7 +44,7 @@ You can continue to use unregistered version, but we encourage you to register y
 
 Tools will automatically check for the available updates on the start. If new update is available the following modeless popup will be displayed. Popup will automatically close in 20 seconds unless closed prior.
 
-![Update available popup](updates-available.png)
+![Update available popup](updates-available.png){ width=500 }
 
 ## Feedback
 

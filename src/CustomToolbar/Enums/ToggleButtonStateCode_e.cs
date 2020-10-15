@@ -18,8 +18,8 @@ namespace Xarial.CadPlus.CustomToolbar.Enums
     {
         None,
 
-        [Title("C#")]
-        CSharp,
+        //[Title("C#")]
+        //CSharp,
 
         [Title("VB.NET")]
         VBNET

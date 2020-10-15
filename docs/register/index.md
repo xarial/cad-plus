@@ -1,7 +1,8 @@
 ---
-layout: default
+layout: article
 title: CAD+ Toolset Registration
-sitemap: false
+description: Registration procedure and FAQ for the CAD+ Toolset add-in
+toc: false
 ---
 Thank you for using CAD+ Toolset. We hope the tool is helping you to streamline your business process. We would appreciate if you register your copy of the software as this would help us to further develop the tool and organize development resources.
 

@@ -1,7 +1,8 @@
 ---
-layout: default
+layout: article
 title: CAD+ Toolset Feedback
-sitemap: false
+description: Feedback form for CAD+ Toolset add-in
+toc: false
 ---
 Thank you for using CAD+ Toolset.
 

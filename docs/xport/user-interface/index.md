@@ -14,9 +14,9 @@ User Interface provides a visual way to configure the export process. There are 
 
 ![xPort settings tab](xport-settings-tab.png)
 
-3. Input files and folders scope. Use *Add File...* (4) and *Add Folder...* (5) buttons to add new files and folders. Press *del* button on keyboard to remove the selected files or folders from the list.
-3. Browsing the file to add to the exporting process.
-3. Browsing the folder to add to the exporting process
+3. Input files and folders scope. Use *Add Files...* (4) and *Add Folders...* (5) buttons to add new files and folders. Press *del* button on keyboard to remove the selected files or folders from the list. Alternatively drag-n-drop files and folders directly to the list.
+3. Browsing the files to add to the exporting process.
+3. Browsing the folders to add to the exporting process
 3. Filter for files when processing folder. You can use a * wildcard, e.g. \*.sld\* will filter all SOLIDWORKS files (.sldprt, .slddrw and .sldasm) and exclude all other files types.
 3. List of formats to output. Multiple formats can be selected
 

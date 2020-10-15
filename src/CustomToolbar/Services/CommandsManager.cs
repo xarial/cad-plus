@@ -155,9 +155,9 @@ namespace Xarial.CadPlus.CustomToolbar.Services
                 IStateResolveCompiler compiler = null;
                 switch (grp.Key)
                 {
-                    case ToggleButtonStateCode_e.CSharp:
-                        compiler = new CSharpStateResolveCompiler(Settings.Default.ToggleButtonResolverCSharp, m_App);
-                        break;
+                    //case ToggleButtonStateCode_e.CSharp:
+                    //    compiler = new CSharpStateResolveCompiler(Settings.Default.ToggleButtonResolverCSharp, m_App);
+                    //    break;
                     case ToggleButtonStateCode_e.VBNET:
                         compiler = new VbNetStateResolveCompiler(Settings.Default.ToggleButtonResolverVBNET, m_App);
                         break;
