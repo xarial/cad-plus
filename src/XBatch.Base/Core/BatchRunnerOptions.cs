@@ -18,7 +18,7 @@ namespace Xarial.CadPlus.XBatch.Base.Core
     [Flags]
     public enum StartupOptions_e 
     {
-        None = 0,
+        Default = 0,
 
         [Summary("Bypasses all settings")]
         Safe = 1,
@@ -30,6 +30,22 @@ namespace Xarial.CadPlus.XBatch.Base.Core
         Silent = 4
     }
 
+    [Flags]
+    public enum OpenFileOptions_e 
+    {
+        Default = 0,
+
+        [Summary("Suppresses all message boxes")]
+        Silent = 1,
+
+        [Summary("Opens all documents read-only")]
+        [Title("Read Only")]
+        ReadOnly = 2,
+
+        [Summary("Opens documents in the rapid mode. Some of the APIs might be unavailable")]
+        Rapid = 4
+    }
+
     public class BatchRunnerOptions
     {
         public string[] Input { get; set; }
@@ -39,5 +55,15 @@ namespace Xarial.CadPlus.XBatch.Base.Core
         public string[] Macros { get; set; }
         public AppVersionInfo Version { get; set; }
         public StartupOptions_e StartupOptions { get; set; }
+        public OpenFileOptions_e OpenFileOptions { get; set; }
+
+        public BatchRunnerOptions() 
+        {
+            Filter = "*.*";
+            Timeout = 600;
+            ContinueOnError = true;
+            StartupOptions = StartupOptions_e.Silent | StartupOptions_e.Safe;
+            OpenFileOptions = OpenFileOptions_e.Silent;
+        }
     }
 }

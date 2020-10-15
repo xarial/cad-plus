@@ -8,6 +8,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -20,6 +21,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using WK.Libraries.BetterFolderBrowserNS;
 using Xarial.XToolkit.Wpf.Utils;
 
 namespace Xarial.CadPlus.Common.Controls
@@ -83,33 +85,47 @@ namespace Xarial.CadPlus.Common.Controls
         public override void OnApplyTemplate()
         {
             m_ListBox = (ListBox)this.Template.FindName("PART_ListBox", this);
-            m_AddFileButton = (Button)this.Template.FindName("PART_AddFileButton", this);
-            m_AddFolderButton = (Button)this.Template.FindName("PART_AddFolderButton", this);
+            m_AddFileButton = (Button)this.Template.FindName("PART_AddFilesButton", this);
+            m_AddFolderButton = (Button)this.Template.FindName("PART_AddFoldersButton", this);
+
+            m_ListBox.AllowDrop = true;
+
+            m_ListBox.DragEnter += OnDragEnter;
+            m_ListBox.DragOver += OnDragOver;
+            m_ListBox.Drop += OnDrop;
 
             m_ListBox.KeyUp += OnListBoxKeyUp;
-            m_AddFileButton.Click += OnAddFileButtonClick;
-            m_AddFolderButton.Click += OnAddFolderButtonClick;
+            m_AddFileButton.Click += OnAddFilesButtonClick;
+            m_AddFolderButton.Click += OnAddFoldersButtonClick;
         }
 
-        private void OnAddFileButtonClick(object sender, RoutedEventArgs e)
+        private void OnAddFilesButtonClick(object sender, RoutedEventArgs e)
         {
-            AddFile();
+            AddFiles();
         }
 
-        private void OnAddFolderButtonClick(object sender, RoutedEventArgs e)
+        private void OnAddFoldersButtonClick(object sender, RoutedEventArgs e)
         {
-            AddFolder();
+            AddFolders();
         }
 
-        private void AddFolder()
+        private void AddFolders()
         {
-            if (FileSystemBrowser.BrowseFolder(out string path, "Select folder to process"))
+            var dlg = new BetterFolderBrowser()
             {
-                PathsSource?.Add(path);
+                Title = "Select folder to process",
+                Multiselect = true
+            };
+
+            if (dlg.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                var folders = dlg.SelectedFolders;
+
+                AddPathsToSource(folders);
             }
         }
 
-        private void AddFile()
+        private void AddFiles()
         {
             var filter = "";
 
@@ -118,9 +134,119 @@ namespace Xarial.CadPlus.Common.Controls
                 filter = FileSystemBrowser.BuildFilterString(Filters);
             }
 
-            if (FileSystemBrowser.BrowseFileOpen(out string path, "Select file to process", filter))
+            if (FileSystemBrowser.BrowseFilesOpen(out string[] paths, "Select file to process", filter))
             {
-                PathsSource?.Add(path);
+                AddPathsToSource(paths);
+            }
+        }
+
+        private void OnDragOver(object sender, DragEventArgs e)
+        {
+            if (CanDrop(e))
+            {
+                e.Effects = DragDropEffects.Copy;
+            }
+            else
+            {
+                e.Effects = DragDropEffects.None;
+            }
+
+            e.Handled = true;
+        }
+
+        private void OnDragEnter(object sender, DragEventArgs e)
+        {
+            if (CanDrop(e))
+            {
+                e.Effects = DragDropEffects.Copy;
+            }
+            else
+            {
+                e.Effects = DragDropEffects.None;
+            }
+
+            e.Handled = true;
+        }
+
+        private void OnDrop(object sender, DragEventArgs e)
+        {
+            if (TryGetPaths(e, out string[] paths))
+            {
+                AddPathsToSource(paths);
+
+                //NOTE: this is required so the command state can be reevaluated
+                (sender as FrameworkElement).Focus();
+            }
+        }
+
+        private bool CanDrop(DragEventArgs e)
+        {
+            if (TryGetPaths(e, out string[] paths))
+            {
+                return paths.All(p => 
+                {
+                    var isFile = File.Exists(p);
+                    var isFolder = Directory.Exists(p);
+
+                    if (isFile && ShowAddFileButton)
+                    {
+                        return true;
+                    }
+                    else if (isFolder && ShowAddFolderButton)
+                    {
+                        return true;
+                    }
+                    else 
+                    {
+                        return false;
+                    }
+                });
+            }
+
+            return false;
+        }
+
+        private void AddPathsToSource(params string[] paths) 
+        {
+            if (paths != null) 
+            {
+                foreach (var path in paths) 
+                {
+                    if (!ContainsPath(path))
+                    {
+                        PathsSource?.Add(path);
+                    }
+                }
+            }
+        }
+
+        private bool ContainsPath(string path) 
+        {
+            if (PathsSource != null)
+            {
+                foreach (string curPath in PathsSource)
+                {
+                    if (string.Equals(curPath, path, StringComparison.CurrentCultureIgnoreCase))
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        private bool TryGetPaths(DragEventArgs e, out string[] paths)
+        {
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            {
+                paths = e.Data.GetData(DataFormats.FileDrop) as string[];
+                return true;
+            }
+            else
+            {
+                paths = null;
+                return false;
             }
         }
 

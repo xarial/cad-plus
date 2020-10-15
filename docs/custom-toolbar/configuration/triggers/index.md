@@ -4,6 +4,7 @@ caption: Triggers
 description: Executing macro based on triggers using Custom Toolbar of CAD+ Toolset
 labels: [configure,trigger]
 order: 1
+image: macro-triggers.png
 ---
 It is possible to configure the trigger for the macro to be executed. Multiple triggers for the same macro are supported.
 
@@ -11,6 +12,7 @@ It is possible to configure the trigger for the macro to be executed. Multiple t
 
 * None - macro will not be executed. This is equal to disabling the macro
 * Button - macro button will be created in the toolbar or menu (as per the Location setting). Macro will be executed once command is clicked
+* Toggle Button - button with checked/unchecked state. Follow [Toggles](../toggles/) article for more information.
 * Application Start - macro will be executed when SOLIDWORKS application starts
 * New Document - macro will be executed when new document (part, assembly or drawing is selected)
 * Open Document - macro will be executed when existing document is opened

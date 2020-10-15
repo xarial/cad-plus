@@ -1,8 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
-  <Import Project="$(SolutionDir)common\common.props" />
   <PropertyGroup>
+    <ModuleName>xPort</ModuleName>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{10B86DA1-4256-4F3E-A21F-A39942354AB4}</ProjectGuid>
@@ -43,6 +43,9 @@
     <ApplicationIcon>xport.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="BetterFolderBrowser, Version=1.2.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\BetterFolderBrowser.1.2.0\lib\BetterFolderBrowser.dll</HintPath>
+    </Reference>
     <Reference Include="CommandLine, Version=2.8.0.0, Culture=neutral, PublicKeyToken=5a870481e358d379, processorArchitecture=MSIL">
       <HintPath>..\..\packages\CommandLineParser.2.8.0\lib\net461\CommandLine.dll</HintPath>
     </Reference>
@@ -63,11 +66,11 @@
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
-    <Reference Include="Xarial.XToolkit, Version=0.2.2.0, Culture=neutral, PublicKeyToken=60dcaf351d4060db, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Xarial.XToolkit.0.2.2\lib\net461\Xarial.XToolkit.dll</HintPath>
+    <Reference Include="Xarial.XToolkit, Version=0.2.4.0, Culture=neutral, PublicKeyToken=60dcaf351d4060db, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Xarial.XToolkit.0.2.4\lib\net461\Xarial.XToolkit.dll</HintPath>
     </Reference>
-    <Reference Include="Xarial.XToolkit.Wpf, Version=0.2.7.0, Culture=neutral, PublicKeyToken=60dcaf351d4060db, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Xarial.XToolkit.Wpf.0.2.7\lib\net461\Xarial.XToolkit.Wpf.dll</HintPath>
+    <Reference Include="Xarial.XToolkit.Wpf, Version=0.2.11.0, Culture=neutral, PublicKeyToken=60dcaf351d4060db, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Xarial.XToolkit.Wpf.0.2.11\lib\net461\Xarial.XToolkit.Wpf.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -142,5 +145,6 @@
       <Name>StandAloneExporter</Name>
     </ProjectReference>
   </ItemGroup>
+  <Import Project="$(SolutionDir)common\common.module.props" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

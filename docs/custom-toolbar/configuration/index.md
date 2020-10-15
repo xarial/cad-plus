@@ -29,12 +29,13 @@ Configure the parameters as shown below:
 1. Add new macro button in toolbar
 1. Title of the macro button. It displayed as a bold header in the tooltip when mouse hovers a button in SOLIDWORKS toolbar
 1. Description of the macro button. It displayed as a sub-header in the tooltip and in the SOLIDWORKS task bar in the bottom right corner when mouse hovers a button in SOLIDWORKS toolbar
-1. Icon of the macro button. Optimal size is between 16x16 and 120x120 in PNG format, however image will be automatically scaled and aligned which allows support for any size (including different width and height). Transparency is supported.
+1. Path to icon of the macro button. Optimal size is between 16x16 and 120x120 in PNG format, however image will be automatically scaled and aligned which allows support for any size (including different width and height). Transparency is supported.
 1. Full path to macro to run
 1. Macro entry point. This is the subroutine which should be run first when executing the macro. This is a parameterless subroutine (usually named main). Custom Toolbar will try to automatically find the best suitable subroutine
-1. Command location. Identifies where command should be added (menu, toolbar)
-1. Command scope. Identifies the scope (part, assembly, drawing, no documents) where macro can be run. Macro will be disabled in the not selected environments
 1. Triggers. Macro trigger options. Follow [triggers](triggers) article for more information
+1. Command scope. Identifies the scope (part, assembly, drawing, no documents) where macro can be run. Macro will be disabled in the not selected environments
+1. Command location. Identifies where command should be added (menu, toolbar). This option is only available for **Button** and **Toggle Button** triggers
+1. Toggle Button State Code group - options for handling the state of toggle button if **Toggle Button** trigger is specified. Follow [Toggles](toggles/) article for more information.
 1. Unload After Run. If option is checked macro will be automatically unloaded after run. This option is useful when macro is [shared](../multi-user/) across different users. In this case macro wil lbe released immediately enabling the possibility to replace the macro with new version. This option cannot be used if macro displays User Form as in this case it will be immediately unloaded and form will be closed. Untick this option if macro uses User Form or any other popup Window.
 
 ### Configuring Toolbar

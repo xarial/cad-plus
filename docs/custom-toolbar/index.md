@@ -2,7 +2,7 @@
 title: User Guide for Custom Toolbar SOLIDWORKS add-in
 caption: Custom Toolbar
 description: Documentation of Custom Toolbar SOLIDWORKS add-in
-order: 3
+order: 4
 ---
 ![Commands in the custom SOLIDWORKS toolbar](custom-sw-toolbar.png)
 

@@ -1,18 +1,21 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\..\packages\Microsoft.CodeAnalysis.Analyzers.3.0.0\build\Microsoft.CodeAnalysis.Analyzers.props" Condition="Exists('..\..\packages\Microsoft.CodeAnalysis.Analyzers.3.0.0\build\Microsoft.CodeAnalysis.Analyzers.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
-  <Import Project="$(SolutionDir)common\common.props" />
   <PropertyGroup>
+    <ModuleName>CustomToolbar</ModuleName>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{B645A77C-D088-45EE-95CA-AD45D63060CA}</ProjectGuid>
+    <AssemblyName>Xarial.CadPlus.$(ModuleName).Module</AssemblyName>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Xarial.CadPlus.CustomToolbar</RootNamespace>
-    <AssemblyName>Xarial.CadPlus.CustomToolbar</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -36,20 +39,49 @@
     <Reference Include="Microsoft.Bcl.AsyncInterfaces, Version=1.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Microsoft.Bcl.AsyncInterfaces.1.1.0\lib\net461\Microsoft.Bcl.AsyncInterfaces.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.CodeAnalysis, Version=3.7.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.CodeAnalysis.Common.3.7.0\lib\netstandard2.0\Microsoft.CodeAnalysis.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.CodeAnalysis.CSharp, Version=3.7.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.CodeAnalysis.CSharp.3.7.0\lib\netstandard2.0\Microsoft.CodeAnalysis.CSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.CodeAnalysis.VisualBasic, Version=3.7.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.CodeAnalysis.VisualBasic.3.7.0\lib\netstandard2.0\Microsoft.CodeAnalysis.VisualBasic.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.VisualBasic" />
     <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Newtonsoft.Json.12.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="System" />
+    <Reference Include="System.Buffers, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\System.Buffers.4.5.1\lib\net461\System.Buffers.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Collections.Immutable, Version=1.2.3.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\System.Collections.Immutable.1.5.0\lib\netstandard2.0\System.Collections.Immutable.dll</HintPath>
+    </Reference>
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
-    <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=4.0.4.1, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\System.Runtime.CompilerServices.Unsafe.4.5.2\lib\netstandard2.0\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
+    <Reference Include="System.Memory, Version=4.0.1.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\System.Memory.4.5.4\lib\net461\System.Memory.dll</HintPath>
     </Reference>
-    <Reference Include="System.Threading.Tasks.Extensions, Version=4.2.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\System.Threading.Tasks.Extensions.4.5.2\lib\netstandard2.0\System.Threading.Tasks.Extensions.dll</HintPath>
+    <Reference Include="System.Numerics" />
+    <Reference Include="System.Numerics.Vectors, Version=4.1.4.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\System.Numerics.Vectors.4.5.0\lib\net46\System.Numerics.Vectors.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Reflection.Metadata, Version=1.4.3.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\System.Reflection.Metadata.1.6.0\lib\netstandard2.0\System.Reflection.Metadata.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=4.0.6.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\System.Runtime.CompilerServices.Unsafe.4.7.0\lib\netstandard2.0\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Text.Encoding.CodePages, Version=4.1.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\System.Text.Encoding.CodePages.4.5.1\lib\net461\System.Text.Encoding.CodePages.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Threading.Tasks.Extensions, Version=4.2.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\System.Threading.Tasks.Extensions.4.5.3\lib\netstandard2.0\System.Threading.Tasks.Extensions.dll</HintPath>
     </Reference>
     <Reference Include="System.Xaml" />
     <Reference Include="System.Xml.Linq" />
@@ -59,24 +91,27 @@
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
     <Reference Include="WindowsBase" />
-    <Reference Include="Xarial.XCad, Version=0.6.3.0, Culture=neutral, PublicKeyToken=60dcaf351d4060db, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Xarial.XCad.0.6.3\lib\net461\Xarial.XCad.dll</HintPath>
+    <Reference Include="Xarial.XCad, Version=0.6.5.0, Culture=neutral, PublicKeyToken=60dcaf351d4060db, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Xarial.XCad.0.6.5\lib\net461\Xarial.XCad.dll</HintPath>
     </Reference>
-    <Reference Include="Xarial.XToolkit, Version=0.2.2.0, Culture=neutral, PublicKeyToken=60dcaf351d4060db, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Xarial.XToolkit.0.2.2\lib\net461\Xarial.XToolkit.dll</HintPath>
+    <Reference Include="Xarial.XToolkit, Version=0.2.4.0, Culture=neutral, PublicKeyToken=60dcaf351d4060db, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Xarial.XToolkit.0.2.4\lib\net461\Xarial.XToolkit.dll</HintPath>
     </Reference>
-    <Reference Include="Xarial.XToolkit.Wpf, Version=0.2.7.0, Culture=neutral, PublicKeyToken=60dcaf351d4060db, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Xarial.XToolkit.Wpf.0.2.7\lib\net461\Xarial.XToolkit.Wpf.dll</HintPath>
+    <Reference Include="Xarial.XToolkit.Wpf, Version=0.2.11.0, Culture=neutral, PublicKeyToken=60dcaf351d4060db, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Xarial.XToolkit.Wpf.0.2.11\lib\net461\Xarial.XToolkit.Wpf.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Base\CommandGroupInfoSpec.cs" />
     <Compile Include="Base\CommandItemInfoExtension.cs" />
     <Compile Include="Base\CommandItemInfoSpec.cs" />
+    <Compile Include="Base\IToggleButtonStateResolver.cs" />
     <Compile Include="Base\MacroButtonIcon.cs" />
     <Compile Include="Enums\MacroScope_e.cs" />
     <Compile Include="Enums\Location_e.cs" />
+    <Compile Include="Enums\ToggleButtonStateCode_e.cs" />
     <Compile Include="Enums\Triggers_e.cs" />
+    <Compile Include="Exceptions\CustomResolverCodeCompileFailedException.cs" />
     <Compile Include="Exceptions\UserException.cs" />
     <Compile Include="Helpers\MacroScopeHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -91,12 +126,16 @@
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
     <Compile Include="Services\CommandsManager.cs" />
+    <Compile Include="Services\CSharpStateResolveCompiler.cs" />
+    <Compile Include="Services\IStateResolveCompiler.cs" />
     <Compile Include="Services\MacroEntryPointsExtractor.cs" />
     <Compile Include="Services\MacroRunner.cs" />
     <Compile Include="Services\MessageService.cs" />
+    <Compile Include="Services\RoslynStateResolveCompiler.cs" />
     <Compile Include="Services\SettingsProvider.cs" />
     <Compile Include="Services\ToolbarConfigurationProvider.cs" />
     <Compile Include="Services\TriggersManager.cs" />
+    <Compile Include="Services\VbNetStateResolveCompiler.cs" />
     <Compile Include="Structs\CommandGroupInfo.cs" />
     <Compile Include="Structs\CommandItemInfo.cs" />
     <Compile Include="Structs\CommandMacroInfo.cs" />
@@ -108,6 +147,7 @@
     <Compile Include="UI\Base\CommandPropertiesDataTemplateSelector.cs" />
     <Compile Include="UI\Base\CommandsCollection.cs" />
     <Compile Include="UI\Converters\CommandContextMenuTitleConverter.cs" />
+    <Compile Include="UI\Converters\HasEnumFlagToVisibilityConverter.cs" />
     <Compile Include="UI\Converters\MacroPathToEntryPointsConverter.cs" />
     <Compile Include="UI\Converters\PathToIconConverter.cs" />
     <Compile Include="UI\Converters\SelectedCommandConverter.cs" />
@@ -185,13 +225,26 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ExtensionModule\ExtensionModule.csproj">
-      <Project>{6bf97f84-c902-470f-874f-4ad839cb16b9}</Project>
-      <Name>ExtensionModule</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Resources\group_icon_default.png" />
   </ItemGroup>
+  <ItemGroup>
+    <Analyzer Include="..\..\packages\Microsoft.CodeAnalysis.Analyzers.3.0.0\analyzers\dotnet\cs\Microsoft.CodeAnalysis.Analyzers.dll" />
+    <Analyzer Include="..\..\packages\Microsoft.CodeAnalysis.Analyzers.3.0.0\analyzers\dotnet\cs\Microsoft.CodeAnalysis.CSharp.Analyzers.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Module\Module.csproj">
+      <Project>{6bf97f84-c902-470f-874f-4ad839cb16b9}</Project>
+      <Name>Module</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(SolutionDir)common\common.module.props" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\..\packages\Microsoft.CodeAnalysis.Analyzers.3.0.0\build\Microsoft.CodeAnalysis.Analyzers.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Microsoft.CodeAnalysis.Analyzers.3.0.0\build\Microsoft.CodeAnalysis.Analyzers.props'))" />
+    <Error Condition="!Exists('..\..\packages\Microsoft.CodeAnalysis.Analyzers.3.0.0\build\Microsoft.CodeAnalysis.Analyzers.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Microsoft.CodeAnalysis.Analyzers.3.0.0\build\Microsoft.CodeAnalysis.Analyzers.targets'))" />
+  </Target>
+  <Import Project="..\..\packages\Microsoft.CodeAnalysis.Analyzers.3.0.0\build\Microsoft.CodeAnalysis.Analyzers.targets" Condition="Exists('..\..\packages\Microsoft.CodeAnalysis.Analyzers.3.0.0\build\Microsoft.CodeAnalysis.Analyzers.targets')" />
 </Project>

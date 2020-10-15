@@ -59,6 +59,7 @@
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
                     <CheckBox Grid.ColumnSpan="2" Margin="2" IsChecked="{Binding Path=ContinueOnError}">Continue on error</CheckBox>
 
@@ -72,7 +73,10 @@
                                       SelectedItem="{Binding Path=Version}" Grid.Row="2" Grid.Column="1" Margin="2"/>
 
                     <TextBlock Grid.Row="3" Grid.Column="0" Margin="2" Text="Startup Options:" />
-                    <ctrls:EnumComboBox Value="{Binding Path=StartupOptions}" Grid.Row="3" Grid.Column="1" Margin="2"/>
+                    <ctrls:FlagEnumComboBox Value="{Binding Path=StartupOptions}" Grid.Row="3" Grid.Column="1" Margin="2"/>
+
+                    <TextBlock Grid.Row="4" Grid.Column="0" Margin="2" Text="Open File Options:" />
+                    <ctrls:FlagEnumComboBox Value="{Binding Path=OpenFileOptions}" Grid.Row="4" Grid.Column="1" Margin="2"/>
                 </Grid>
             </TabItem>
             <TabItem Header="Results">

@@ -27,10 +27,10 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
+        private int m_CachedTimeout;
         private bool m_IsBatchInProgress;
         private int m_ActiveTabIndex;
         private double m_Progress;
-        private bool m_IsTimeoutEnabled;
 
         private ICommand m_RunBatchCommand;
         private ICommand m_CancelBatchCommand;
@@ -61,15 +61,66 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
 
         public ObservableCollection<string> Macros { get; }
 
-        public string Filter { get; set; }
+        public string Filter 
+        {
+            get => m_Opts.Filter;
+            set 
+            {
+                m_Opts.Filter = value;
+                this.NotifyChanged();
+            }
+        }
 
-        public bool ContinueOnError { get; set; }
+        public bool ContinueOnError 
+        {
+            get => m_Opts.ContinueOnError;
+            set 
+            {
+                m_Opts.ContinueOnError = value;
+                this.NotifyChanged();
+            }
+        }
 
-        public int Timeout { get; set; }
+        public int Timeout
+        {
+            get => m_Opts.Timeout;
+            set
+            {
+                m_CachedTimeout = value;
+                m_Opts.Timeout = value;
+                this.NotifyChanged();
+            }
+        }
 
-        public StartupOptions_e StartupOptions { get; set; }
+        public StartupOptions_e StartupOptions 
+        {
+            get => m_Opts.StartupOptions;
+            set 
+            {
+                m_Opts.StartupOptions = value;
+                this.NotifyChanged();
+            }
+        }
 
-        public AppVersionInfo Version { get; set; }
+        public OpenFileOptions_e OpenFileOptions
+        {
+            get => m_Opts.OpenFileOptions;
+            set
+            {
+                m_Opts.OpenFileOptions = value;
+                this.NotifyChanged();
+            }
+        }
+
+        public AppVersionInfo Version 
+        {
+            get => m_Opts.Version;
+            set 
+            {
+                m_Opts.Version = value;
+                this.NotifyChanged();
+            }
+        }
 
         public AppVersionInfo[] InstalledVersions { get; set; }
 
@@ -79,10 +130,18 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
 
         public bool IsTimeoutEnabled
         {
-            get => m_IsTimeoutEnabled;
+            get => m_Opts.Timeout != -1;
             set
-            {
-                m_IsTimeoutEnabled = value;
+            {                
+                if (!value)
+                {
+                    m_Opts.Timeout = -1;
+                }
+                else 
+                {
+                    m_Opts.Timeout = m_CachedTimeout;
+                }
+
                 this.NotifyChanged();
             }
         }
@@ -100,28 +159,42 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
             }
         }
 
-        private readonly BatchRunnerModel m_Model;
+        private readonly IBatchRunnerModel m_Model;
         private readonly IMessageService m_MsgSvc;
 
-        public BatchRunnerVM(BatchRunnerModel model, IMessageService msgSvc)
+        private readonly BatchRunnerOptions m_Opts;
+
+        public BatchRunnerVM(IBatchRunnerModel model, IMessageService msgSvc)
         {
             m_Model = model;
             m_MsgSvc = msgSvc;
 
             Log = new ObservableCollection<string>();
 
+            m_Opts = new BatchRunnerOptions();
+            m_CachedTimeout = m_Opts.Timeout;
+
             m_Model.ProgressChanged += OnProgressChanged;
             m_Model.Log += OnLog;
-            Input = new ObservableCollection<string>();
-            Macros = new ObservableCollection<string>();
-            Filter = "*.*";
-            IsTimeoutEnabled = true;
-            Timeout = 600;
-            ContinueOnError = true;
-            StartupOptions = StartupOptions_e.Silent | StartupOptions_e.Safe;
 
+            Input = new ObservableCollection<string>();
+            Input.CollectionChanged += OnInputCollectionChanged;
+            
+            Macros = new ObservableCollection<string>();
+            Macros.CollectionChanged += OnMacrosCollectionChanged;
+            
             InstalledVersions = m_Model.InstalledVersions;
             Version = InstalledVersions.FirstOrDefault();
+        }
+
+        private void OnInputCollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            m_Opts.Input = Input.ToArray();
+        }
+
+        private void OnMacrosCollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            m_Opts.Macros = Macros.ToArray();
         }
 
         private void OnProgressChanged(double prg)
@@ -143,18 +216,7 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
                 Progress = 0;
                 Log.Clear();
 
-                var opts = new BatchRunnerOptions()
-                {
-                    Input = Input?.ToArray(),
-                    Macros = Macros?.ToArray(),
-                    Filter = Filter,
-                    ContinueOnError = ContinueOnError,
-                    Timeout = IsTimeoutEnabled ? Timeout : -1,
-                    StartupOptions = StartupOptions,
-                    Version = Version
-                };
-
-                if (await m_Model.BatchRun(opts).ConfigureAwait(false))
+                if (await m_Model.BatchRun(m_Opts).ConfigureAwait(false))
                 {
                     m_MsgSvc.ShowInformation("Job completed successfully");
                 }

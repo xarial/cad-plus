@@ -58,5 +58,66 @@ namespace Xarial.CadPlus.CustomToolbar.Properties {
                 this["XToolbarSettingsFile"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute(@"using Xarial.CadPlus.CustomToolbar.Base;
+using Xarial.XCad;
+
+namespace Xarial.CadPlus.CustomToolbar.Services.ToggleButton
+{{
+    public class {0}: IToggleButtonStateResolver
+    {{
+        public IXApplication Application {{ get; }}
+
+        public {0}(IXApplication app)
+        {{
+            Application = app;
+        }}
+
+        public bool Resolve()
+        {{
+            {1}
+        }}
+    }}
+}}")]
+        public string ToggleButtonResolverCSharp {
+            get {
+                return ((string)(this["ToggleButtonResolverCSharp"]));
+            }
+            set {
+                this["ToggleButtonResolverCSharp"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute(@"Imports Xarial.CadPlus.CustomToolbar.Base
+Imports Xarial.XCad
+
+Namespace Xarial.CadPlus.CustomToolbar.Services.ToggleButton
+
+    Public Class {0}
+        Implements IToggleButtonStateResolver
+
+        Public ReadOnly Property Application As IXApplication Implements IToggleButtonStateResolver.Application
+
+        Public Sub New(ByVal app As IXApplication)
+            Application = app
+        End Sub
+
+        Public Function Resolve() As Boolean Implements IToggleButtonStateResolver.Resolve
+            {1}
+        End Function
+    End Class
+End Namespace")]
+        public string ToggleButtonResolverVBNET {
+            get {
+                return ((string)(this["ToggleButtonResolverVBNET"]));
+            }
+            set {
+                this["ToggleButtonResolverVBNET"] = value;
+            }
+        }
     }
 }

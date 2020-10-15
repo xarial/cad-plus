@@ -11,8 +11,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Interop;
+using System.Windows.Navigation;
+using System.Windows.Threading;
+using Xarial.CadPlus.Module.Init;
 
 namespace Xarial.CadPlus.Common
 {
@@ -22,8 +27,45 @@ namespace Xarial.CadPlus.Common
         internal static extern bool AttachConsole(int processId);
     }
 
+    public class ConsoleHostModule : BaseHostModule
+    {
+        public override IntPtr ParentWindow => IntPtr.Zero;
+
+        public override event Action Loaded;
+
+        internal ConsoleHostModule() 
+        {
+            Loaded?.Invoke();
+        }
+    }
+
+    public class WpfAppHostModule : BaseHostModule
+    {
+        private readonly Application m_App;
+
+        internal WpfAppHostModule(Application app)
+        {
+            m_App = app;
+            m_App.Activated += OnAppActivated;
+        }
+
+        public override IntPtr ParentWindow => m_App.MainWindow != null
+            ? new WindowInteropHelper(m_App.MainWindow).Handle
+            : IntPtr.Zero;
+
+        public override event Action Loaded;
+
+        private void OnAppActivated(object sender, EventArgs e)
+        {
+            m_App.Activated -= OnAppActivated;
+            Loaded?.Invoke();
+        }
+    }
+
     public abstract class MixedApplication<TArgs> : Application
     {
+        private BaseHostModule m_HostModule;
+
         protected virtual void OnAppStart()
         {
         }
@@ -38,7 +80,10 @@ namespace Xarial.CadPlus.Common
             if (e.Args.Any())
             {
                 WindowsApi.AttachConsole(-1);
-                
+
+                SynchronizationContext.SetSynchronizationContext(new SynchronizationContext());
+                m_HostModule = new ConsoleHostModule();
+
                 var parser = new Parser(p =>
                 {
                     p.CaseInsensitiveEnumValues = true;
@@ -51,7 +96,7 @@ namespace Xarial.CadPlus.Common
                 var hasError = false;
 
                 TArgs args = default;
-                parser.ParseArguments<TArgs>(e.Args)
+                parser.ParseArguments<TArgs>(CreateArguments, e.Args)
                     .WithParsed(a => args = a)
                     .WithNotParsed(err => hasError = true);
 
@@ -78,9 +123,12 @@ namespace Xarial.CadPlus.Common
             }
             else
             {
+                m_HostModule = new WpfAppHostModule(this);
                 base.OnStartup(e);
             }
         }
+                
+        protected virtual TArgs CreateArguments() => (TArgs)Activator.CreateInstance(typeof(TArgs));
 
         private void OnDomainUnhandledException(object sender, UnhandledExceptionEventArgs e)
         {

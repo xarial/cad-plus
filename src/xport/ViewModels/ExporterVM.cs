@@ -14,6 +14,7 @@ using System.Linq;
 using System.Threading;
 using System.Windows;
 using System.Windows.Input;
+using WK.Libraries.BetterFolderBrowserNS;
 using Xarial.CadPlus.Common.Services;
 using Xarial.CadPlus.Xport.Core;
 using Xarial.CadPlus.Xport.Models;
@@ -202,9 +203,15 @@ namespace Xarial.CadPlus.Xport.ViewModels
 
         private void BrowseOutputDirectory()
         {
-            if (FileSystemBrowser.BrowseFolder(out string path, "Select output directory"))
+            var dlg = new BetterFolderBrowser()
             {
-                OutputDirectory = path;
+                Title = "Select output directory",
+                Multiselect = false
+            };
+
+            if (dlg.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                OutputDirectory = dlg.SelectedFolder;
             }
         }
     }

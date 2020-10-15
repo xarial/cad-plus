@@ -34,7 +34,7 @@
 					  CommandParameter="{Binding}" />
         </ContextMenu>
         <DataTemplate x:Key="NewCommandTemplate">
-            <Button Command="{Binding Path=AddNewItemCommand}" Width="12" Height="12" Background="#FF388A34" Margin="2">
+            <Button Command="{Binding Path=AddNewItemCommand}" Width="12" Height="12" Background="#FF388A34" Margin="2" Cursor="Hand">
                 <Button.Style>
                     <Style TargetType="{x:Type Button}">
                         <Style.Setters>
@@ -96,7 +96,18 @@
                         </MultiBinding>
                     </Image.Source>
                 </Image>
-                <TextBlock Text="{Binding Path=Title}" Grid.Column="1" VerticalAlignment="Center"/>
+                <TextBlock Text="{Binding Path=Title}" Grid.Column="1" VerticalAlignment="Center">
+                    <TextBlock.Style>
+                        <Style TargetType="{x:Type TextBlock}">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Path=IsSelected, RelativeSource={RelativeSource AncestorType={x:Type TreeViewItem}}}" Value="True">
+                                    <Setter Property="TextDecorations" Value="Underline"/>
+                                    <Setter Property="FontWeight" Value="Bold"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
                 <Grid.ToolTip>
                     <Grid MaxWidth="300">
                         <Grid.RowDefinitions>
