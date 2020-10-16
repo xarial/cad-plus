@@ -2,7 +2,7 @@
 caption: xBatch
 title: xBatch | Stand-Alone SOLIDWORKS Batch Macro Runner Utility
 description: Stand-alone utility to batch run macros on SOLIDWORKS files and folders
-order: 2
+order: 3
 image: xbatch-windows-start.png
 ---
 xBatch is a stand-alone utility allowing to run specified macros for each specified SOLIDWORKS models in a batch mode.

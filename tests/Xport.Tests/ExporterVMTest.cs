@@ -32,7 +32,7 @@ namespace Xport.Tests
             vm.IsTimeoutEnabled = true;
             vm.Timeout = 30;
             vm.OutputDirectory = "D:\\outdir";
-
+            
             vm.ExportCommand.Execute(null);
 
             Assert.AreEqual("*.sld*", opts.Filter);

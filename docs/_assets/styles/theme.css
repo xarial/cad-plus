@@ -6,10 +6,8 @@
     line-height: 1.5;
 }
 
-.header-title {
-    color: rgb(110, 50, 110);
-    font-size: 22px;
-    font-weight: bold;
+.header {
+    background-color: transparent !important;
 }
 
 pre.code-snippet {
@@ -21,7 +19,7 @@ a.download-button {
     text-decoration : none;
     border: none;
     color: white;
-    padding: 12px 30px;
+    padding: 5px 30px;
     cursor: pointer;
     font-size: 20px;
   }

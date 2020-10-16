@@ -41,7 +41,7 @@
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
                         <TextBlock Text="Format:" Grid.Column="0" Margin="2" />
-                        <ctrls:EnumComboBox Value="{Binding Path=Format}" Margin="2" Grid.Column="2" />
+                        <ctrls:FlagEnumComboBox Value="{Binding Path=Format}" Margin="2" Grid.Column="2" />
                     </Grid>
                     <Grid Grid.Row="3">
                         <Grid.ColumnDefinitions>

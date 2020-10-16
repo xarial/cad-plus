@@ -20,15 +20,15 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <TextBlock Text="Title:" Grid.Column="0" Grid.Row="0" Margin="2" />
+        <TextBlock Text="Title:" VerticalAlignment="Center"  Grid.Column="0" Grid.Row="0" Margin="2" />
         <TextBox Text="{Binding Path=Title, UpdateSourceTrigger=PropertyChanged}"
                  Grid.Column="1" Grid.Row="0" Margin="2" />
 
-        <TextBlock Text="Description:" Grid.Column="0" Grid.Row="1" Margin="2" />
+        <TextBlock Text="Description:" VerticalAlignment="Center" Grid.Column="0" Grid.Row="1" Margin="2" />
         <TextBox Text="{Binding Path=Description, UpdateSourceTrigger=PropertyChanged}"
                  Grid.Column="1" Grid.Row="1" Margin="2" />
 
-        <TextBlock Grid.Column="0" Grid.Row="2" Text="Icon:" Margin="2" />
+        <TextBlock Grid.Column="0" Grid.Row="2" VerticalAlignment="Center" Text="Icon:" Margin="2" />
         
         <Grid Grid.Column="1" Grid.Row="2">
             <Grid.ColumnDefinitions>
