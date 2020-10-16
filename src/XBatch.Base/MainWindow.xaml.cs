@@ -31,22 +31,20 @@ namespace Xarial.CadPlus.XBatch.Base
         {
             InitializeComponent();
             
-            var vm = new JobsManagerVM();
-            vm.JobDocuments.Add(new JobDocumentVM("A"));
-            vm.JobDocuments.Add(new JobDocumentVM("B"));
+            var msgService = new MessageService("xBatch");
 
-            this.DataContext = vm;
+            try
+            {
+                var appProvider = (Application.Current as XBatchApp).GetApplicationProvider();
+                var batchRunnerModel = new Models.BatchRunnerModel(appProvider);
 
-            //var msgService = new MessageService("xBatch");
-            //try
-            //{
-            //    var appProvider = (Application.Current as XBatchApp).GetApplicationProvider();
-            //    this.DataContext = new BatchRunnerVM(new Models.BatchRunnerModel(appProvider), msgService);
-            //}
-            //catch (Exception ex)
-            //{
-            //    msgService.ShowError(ex.ParseUserError(out _));
-            //}
+                var vm = new JobsManagerVM(batchRunnerModel, msgService);
+                this.DataContext = vm;
+            }
+            catch (Exception ex)
+            {
+                msgService.ShowError(ex.ParseUserError(out _));
+            }
         }
     }
 }

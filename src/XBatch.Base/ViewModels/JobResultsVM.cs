@@ -5,6 +5,8 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Xarial.CadPlus.XBatch.Base.Core;
+using Xarial.CadPlus.XBatch.Base.Models;
 using Xarial.CadPlus.XBatch.MDI;
 using Xarial.XToolkit.Wpf.Extensions;
 
@@ -28,9 +30,23 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
 
         public ObservableCollection<JobResultVM> Items { get; }
 
-        public JobResultsVM() 
+        private readonly IBatchRunnerModel m_Model;
+        private readonly BatchJob m_Job;
+
+        public JobResultsVM(IBatchRunnerModel model, BatchJob job) 
         {
+            m_Model = model;
+            m_Job = job;
+
             Items = new ObservableCollection<JobResultVM>();
+        }
+
+        public void StartNewJob()
+        {
+            var newRes = new JobResultVM(DateTime.Now.ToString(), m_Model.CreateExecutor(m_Job));
+            Items.Add(newRes);
+            Selected = newRes;
+            newRes.RunBatchAsync();
         }
     }
 }

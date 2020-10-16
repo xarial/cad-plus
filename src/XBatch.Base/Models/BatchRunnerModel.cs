@@ -20,44 +20,38 @@ namespace Xarial.CadPlus.XBatch.Base.Models
 {
     public interface IBatchRunnerModel 
     {
-        event Action<double> ProgressChanged;
-        event Action<string> Log;
-
         AppVersionInfo[] InstalledVersions { get; }
         FileFilter[] InputFilesFilter { get; }
         FileFilter[] MacroFilesFilter { get; }
+        IBatchRunJobExecutor CreateExecutor(BatchJob job);
+    }
 
-        Task<bool> BatchRun(BatchJob opts);
+    public interface IBatchRunJobExecutor
+    {
+        event Action<double> ProgressChanged;
+        event Action<string> Log;
+
+        Task<bool> Execute();
         void Cancel();
     }
 
-    public class BatchRunnerModel : IBatchRunnerModel
+    public class BatchRunJobExecutor : IBatchRunJobExecutor
     {
         public event Action<double> ProgressChanged;
         public event Action<string> Log;
 
         private CancellationTokenSource m_CurrentCancellationToken;
 
+        private readonly BatchJob m_Job;
         private readonly IApplicationProvider m_AppProvider;
 
-        public BatchRunnerModel(IApplicationProvider appProvider) 
+        public BatchRunJobExecutor(BatchJob job, IApplicationProvider appProvider) 
         {
+            m_Job = job;
             m_AppProvider = appProvider;
-            InstalledVersions = m_AppProvider.GetInstalledVersions().ToArray();
-
-            if (!InstalledVersions.Any()) 
-            {
-                throw new UserMessageException("Failed to detect any installed version of the host application");
-            }
         }
 
-        public FileFilter[] InputFilesFilter => m_AppProvider.InputFilesFilter;
-
-        public FileFilter[] MacroFilesFilter => m_AppProvider.MacroFilesFilter;
-
-        public AppVersionInfo[] InstalledVersions { get; }
-
-        public async Task<bool> BatchRun(BatchJob opts)
+        public async Task<bool> Execute()
         {
             m_CurrentCancellationToken = new CancellationTokenSource();
 
@@ -73,7 +67,7 @@ namespace Xarial.CadPlus.XBatch.Base.Models
                 {
                     var cancellationToken = m_CurrentCancellationToken.Token;
 
-                    return await batchRunner.BatchRun(opts, cancellationToken).ConfigureAwait(false);
+                    return await batchRunner.BatchRun(m_Job, cancellationToken).ConfigureAwait(false);
                 }
             }
             finally
@@ -97,5 +91,29 @@ namespace Xarial.CadPlus.XBatch.Base.Models
         {
             ProgressChanged?.Invoke(prg);
         }
+    }
+
+    public class BatchRunnerModel : IBatchRunnerModel
+    {
+        private readonly IApplicationProvider m_AppProvider;
+
+        public BatchRunnerModel(IApplicationProvider appProvider) 
+        {
+            m_AppProvider = appProvider;
+            InstalledVersions = m_AppProvider.GetInstalledVersions().ToArray();
+
+            if (!InstalledVersions.Any()) 
+            {
+                throw new UserMessageException("Failed to detect any installed version of the host application");
+            }
+        }
+
+        public FileFilter[] InputFilesFilter => m_AppProvider.InputFilesFilter;
+
+        public FileFilter[] MacroFilesFilter => m_AppProvider.MacroFilesFilter;
+
+        public AppVersionInfo[] InstalledVersions { get; }
+
+        public IBatchRunJobExecutor CreateExecutor(BatchJob job) => new BatchRunJobExecutor(job, m_AppProvider);
     }
 }

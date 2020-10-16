@@ -20,7 +20,7 @@ namespace Xbatch.Tests
             BatchJob opts = null;
             mock.Setup(m => m.BatchRun(It.IsAny<BatchJob>())).Callback<BatchJob>(e => opts = e);
             mock.Setup(m => m.InstalledVersions).Returns(new AppVersionInfo[] { new SwAppVersionInfo(SwVersion_e.Sw2019), new SwAppVersionInfo(SwVersion_e.Sw2020) });
-            var vm = new BatchRunnerVM(mock.Object, new Mock<IMessageService>().Object);
+            var vm = new _BatchRunnerVM(mock.Object, new Mock<IMessageService>().Object);
 
             vm.Input.Add("D:\\folder1");
             vm.Input.Add("D:\\folder2");
@@ -51,7 +51,7 @@ namespace Xbatch.Tests
             BatchJob opts = null;
             mock.Setup(m => m.BatchRun(It.IsAny<BatchJob>())).Callback<BatchJob>(e => opts = e);
             mock.Setup(m => m.InstalledVersions).Returns(new AppVersionInfo[] { new SwAppVersionInfo(SwVersion_e.Sw2019), new SwAppVersionInfo(SwVersion_e.Sw2020) });
-            var vm = new BatchRunnerVM(mock.Object, new Mock<IMessageService>().Object);
+            var vm = new _BatchRunnerVM(mock.Object, new Mock<IMessageService>().Object);
 
             vm.Timeout = 300;
             vm.IsTimeoutEnabled = false;
@@ -69,7 +69,7 @@ namespace Xbatch.Tests
             BatchJob opts = null;
             mock.Setup(m => m.BatchRun(It.IsAny<BatchJob>())).Callback<BatchJob>(e => opts = e);
             mock.Setup(m => m.InstalledVersions).Returns(new AppVersionInfo[] { new SwAppVersionInfo(SwVersion_e.Sw2019), new SwAppVersionInfo(SwVersion_e.Sw2020) });
-            var vm = new BatchRunnerVM(mock.Object, new Mock<IMessageService>().Object);
+            var vm = new _BatchRunnerVM(mock.Object, new Mock<IMessageService>().Object);
 
             vm.IsTimeoutEnabled = false;
             

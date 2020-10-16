@@ -67,12 +67,12 @@ namespace Xarial.CadPlus.Common.Controls
 
         public static readonly DependencyProperty FiltersProperty =
             DependencyProperty.Register(
-            nameof(Filters), typeof(FileFilter[]),
+            nameof(Filters), typeof(IEnumerable),
             typeof(PathListBox));
 
-        public FileFilter[] Filters
+        public IEnumerable Filters
         {
-            get { return (FileFilter[])GetValue(FiltersProperty); }
+            get { return (IEnumerable)GetValue(FiltersProperty); }
             set { SetValue(FiltersProperty, value); }
         }
 
@@ -131,7 +131,8 @@ namespace Xarial.CadPlus.Common.Controls
 
             if (Filters != null)
             {
-                filter = FileSystemBrowser.BuildFilterString(Filters);
+                var filters = Filters?.Cast<FileFilter>()?.ToArray();
+                filter = FileSystemBrowser.BuildFilterString(filters);
             }
 
             if (FileSystemBrowser.BrowseFilesOpen(out string[] paths, "Select file to process", filter))

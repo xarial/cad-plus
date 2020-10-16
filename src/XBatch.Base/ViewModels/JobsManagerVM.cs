@@ -6,6 +6,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using Xarial.CadPlus.Common.Services;
+using Xarial.CadPlus.XBatch.Base.Core;
+using Xarial.CadPlus.XBatch.Base.Models;
 using Xarial.XToolkit.Wpf;
 using Xarial.XToolkit.Wpf.Extensions;
 
@@ -31,8 +34,14 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
 
         public ICommand NewDocumentCommand { get; }
 
-        public JobsManagerVM()
+        private readonly IBatchRunnerModel m_Model;
+        private readonly IMessageService m_MsgSvc;
+
+        public JobsManagerVM(IBatchRunnerModel model, IMessageService msgSvc)
         {
+            m_Model = model;
+            m_MsgSvc = msgSvc;
+            
             JobDocuments = new ObservableCollection<JobDocumentVM>();
 
             NewDocumentCommand = new RelayCommand(OnNewDocument);
@@ -41,7 +50,7 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
         private void OnNewDocument() 
         {
             //TODO: create unique name
-            JobDocuments.Add(new JobDocumentVM("New xBatch Job Document"));
+            JobDocuments.Add(new JobDocumentVM("New xBatch Job Document", new BatchJob(), m_Model));
         }
     }
 }

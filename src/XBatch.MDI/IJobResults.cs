@@ -8,6 +8,6 @@ namespace Xarial.CadPlus.XBatch.MDI
 {
     public interface IJobResults
     {
-        IJobResult Selected { get; }
+        IJobResult Selected { get; set; }
     }
 }
