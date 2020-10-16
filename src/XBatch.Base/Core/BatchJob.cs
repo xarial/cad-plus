@@ -10,9 +10,16 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Xarial.XToolkit.Services.UserSettings;
+using Xarial.XToolkit.Services.UserSettings.Attributes;
 
 namespace Xarial.CadPlus.XBatch.Base.Core
 {
+    public class BatchJobVersionTransformer : BaseUserSettingsVersionsTransformer
+    {
+    }
+
+    [UserSettingVersion("1.0.0", typeof(BatchJobVersionTransformer))]
     public class BatchJob
     {
         public string[] Input { get; set; }

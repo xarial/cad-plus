@@ -22,7 +22,7 @@ namespace Xarial.CadPlus.XBatch.Sw
         private static string GetVersionDisplayName(SwVersion_e vers) 
             => $"SOLIDWORKS {vers.ToString().Substring("Sw".Length)}";
 
-        public SwAppVersionInfo(SwVersion_e vers) : base(GetVersionDisplayName(vers))
+        public SwAppVersionInfo(SwVersion_e vers) : base(GetVersionDisplayName(vers), vers.ToString())
         {
             Version = vers;
         }

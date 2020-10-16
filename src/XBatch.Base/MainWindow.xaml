@@ -11,6 +11,7 @@
         Title="xBatch" Height="450" Width="800">
     <Window.Resources>
         <conv:LogOutputToTextConverter x:Key="logOutConv"/>
+        <conv:CommandEnabledConverter x:Key="cmdEnabledConv"/>
     </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
@@ -20,16 +21,18 @@
         <Menu>
             <MenuItem Header="_File">
                 <MenuItem Header="_New" Command="{Binding Path=NewDocumentCommand}"/>
-                <MenuItem Header="_Open"/>
-                <MenuItem Header="_Close"/>
+                <MenuItem Header="_Open" Command="{Binding Path=OpenDocumentCommand}"/>
+                <MenuItem Header="_Close" IsEnabled="{Binding Path=Command, RelativeSource={RelativeSource Mode=Self}, Converter={StaticResource cmdEnabledConv}}"/>
                 <Separator />
-                <MenuItem Header="_Save"/>
-                <MenuItem Header="Save As..." />
-                <MenuItem Header="Save All" />
+                <MenuItem Header="_Save" Command="{Binding Path=ActiveJob.SaveDocumentCommand}" IsEnabled="{Binding Path=Command, RelativeSource={RelativeSource Mode=Self}, Converter={StaticResource cmdEnabledConv}}"/>
+                <MenuItem Header="Save As..." Command="{Binding Path=ActiveJob.SaveAsDocumentCommand}" IsEnabled="{Binding Path=Command, RelativeSource={RelativeSource Mode=Self}, Converter={StaticResource cmdEnabledConv}}"/>
+                <MenuItem Header="Save All" Command="{Binding Path=SaveAllDocumentsCommand}"/>
             </MenuItem>
             <MenuItem Header="_Job">
-                <MenuItem Header="_Run" Command="{Binding Path=ActiveJob.RunBatchCommand}"/>
-                <MenuItem Header="_Cancel" Command="{Binding Path=ActiveJob.Results.Selected.CancelJobCommand}"/>
+                <MenuItem Header="_Run" Command="{Binding Path=ActiveJob.RunBatchCommand}" 
+                          IsEnabled="{Binding Path=Command, RelativeSource={RelativeSource Mode=Self}, Converter={StaticResource cmdEnabledConv}}"/>
+                <MenuItem Header="_Cancel" Command="{Binding Path=ActiveJob.Results.Selected.CancelJobCommand}"
+                          IsEnabled="{Binding Path=Command, RelativeSource={RelativeSource Mode=Self}, Converter={StaticResource cmdEnabledConv}}"/>
             </MenuItem>
         </Menu>
         <mdi:JobsManagerControl Grid.Row="1" 
@@ -37,7 +40,7 @@
                                 ActiveJobDocument="{Binding Path=ActiveJob}">
             <mdi:JobsManagerControl.JobDocumentTemplate>
                 <DataTemplate>
-                    <Grid>
+                    <Grid Margin="5">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="*"/>
@@ -50,7 +53,7 @@
                             </Grid.ColumnDefinitions>
                             <TextBlock Grid.Column="0" Margin="2" Text="Target Version:" />
                             <ComboBox ItemsSource="{Binding Path=InstalledVersions}" DisplayMemberPath="DisplayName"
-                                      SelectedItem="{Binding Path=Version}"  Grid.Column="1" Margin="2"/>
+                                      SelectedItem="{Binding Path=Version}" Grid.Column="1" Margin="2" Width="200" HorizontalAlignment="Left"/>
                         </Grid>
                         <GroupBox Header="Input Files And Folders" Grid.Row="1">
                             <Grid>
@@ -79,7 +82,7 @@
             </mdi:JobsManagerControl.JobDocumentTemplate>
             <mdi:JobsManagerControl.JobResultsTemplate>
                 <DataTemplate>
-                    <ListBox ItemsSource="{Binding Path=Items}" SelectedItem="{Binding Path=Selected}">
+                    <ListBox Margin="5" ItemsSource="{Binding Path=Items}" SelectedItem="{Binding Path=Selected}">
                         <ListBox.ItemTemplate>
                             <DataTemplate>
                                 <TextBlock Text="{Binding Path=Name}"/>
@@ -90,7 +93,7 @@
             </mdi:JobsManagerControl.JobResultsTemplate>
             <mdi:JobsManagerControl.JobSettingsTemplate>
                 <DataTemplate>
-                    <Grid Margin="2">
+                    <Grid Margin="5">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto" SharedSizeGroup="Label" />
                             <ColumnDefinition Width="*" />
@@ -121,7 +124,7 @@
             <mdi:JobsManagerControl.JobResultLogTemplate>
                 <DataTemplate>
                     <TextBox AcceptsReturn="True" AcceptsTab="True" Grid.ColumnSpan="2"
-                             IsReadOnly="True"
+                             IsReadOnly="True" Margin="5"
                              VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
                         <TextBox.Text>
                             <MultiBinding Converter="{StaticResource logOutConv}" Mode="OneWay">
@@ -134,7 +137,7 @@
             </mdi:JobsManagerControl.JobResultLogTemplate>
             <mdi:JobsManagerControl.JobResultSummary>
                 <DataTemplate>
-                    <Grid>
+                    <Grid Margin="5">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="*"/>
                             <RowDefinition Height="Auto"/>

@@ -51,6 +51,7 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Converters\DocumentTitleConverter.cs" />
     <Compile Include="IJobDocument.cs" />
     <Compile Include="IJobResultLog.cs" />
     <Compile Include="IJobResult.cs" />

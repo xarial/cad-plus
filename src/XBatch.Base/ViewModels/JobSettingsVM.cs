@@ -12,6 +12,8 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
 {
     public class JobSettingsVM : IJobSettings, INotifyPropertyChanged
     {
+        public event Action Modified;
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         public bool ContinueOnError
@@ -21,6 +23,7 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
             {
                 m_Job.ContinueOnError = value;
                 this.NotifyChanged();
+                Modified?.Invoke();
             }
         }
 
@@ -32,6 +35,7 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
                 m_CachedTimeout = value;
                 m_Job.Timeout = value;
                 this.NotifyChanged();
+                Modified?.Invoke();
             }
         }
 
@@ -50,6 +54,7 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
                 }
 
                 this.NotifyChanged();
+                Modified?.Invoke();
             }
         }
 
@@ -60,6 +65,7 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
             {
                 m_Job.StartupOptions = value;
                 this.NotifyChanged();
+                Modified?.Invoke();
             }
         }
 
@@ -70,6 +76,7 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
             {
                 m_Job.OpenFileOptions = value;
                 this.NotifyChanged();
+                Modified?.Invoke();
             }
         }
 

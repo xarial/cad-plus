@@ -20,6 +20,7 @@ namespace Xarial.CadPlus.XBatch.Base.Models
 {
     public interface IBatchRunnerModel 
     {
+        AppVersionInfo ParseVersion(string id);
         AppVersionInfo[] InstalledVersions { get; }
         FileFilter[] InputFilesFilter { get; }
         FileFilter[] MacroFilesFilter { get; }
@@ -115,5 +116,7 @@ namespace Xarial.CadPlus.XBatch.Base.Models
         public AppVersionInfo[] InstalledVersions { get; }
 
         public IBatchRunJobExecutor CreateExecutor(BatchJob job) => new BatchRunJobExecutor(job, m_AppProvider);
+
+        public AppVersionInfo ParseVersion(string id) => m_AppProvider.ParseVersion(id);
     }
 }

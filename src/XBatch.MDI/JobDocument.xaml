@@ -4,11 +4,25 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:dz="http://schemas.devzest.com/presentation/docking"
     xmlns:local="clr-namespace:Xarial.CadPlus.XBatch.MDI"
+    xmlns:conv="clr-namespace:Xarial.CadPlus.XBatch.MDI.Converters"
     DefaultDockPosition="Document"
     Style="{DynamicResource {x:Type dz:DockItem}}"
-    HideOnPerformClose="False" 
-    TabText="{Binding Path=Document.Name, RelativeSource={RelativeSource Mode=Self}}"
-    Title="{Binding Path=Document.Name, RelativeSource={RelativeSource Mode=Self}}">
+    HideOnPerformClose="False">
     <ContentPresenter ContentTemplate="{Binding Path=JobDocumentTemplate, RelativeSource={RelativeSource AncestorType={x:Type local:JobsManagerControl}}}"
                       Content="{Binding Path=Document, RelativeSource={RelativeSource AncestorType={x:Type local:JobDocument}}}"/>
+    <dz:DockItem.Resources>
+        <conv:DocumentTitleConverter x:Key="docTitleConv"/>
+    </dz:DockItem.Resources>
+    <dz:DockItem.Title>
+        <MultiBinding Converter="{StaticResource docTitleConv}">
+            <Binding Path="Document.Name" RelativeSource="{RelativeSource Mode=Self}"/>
+            <Binding Path="Document.IsDirty" RelativeSource="{RelativeSource Mode=Self}"/>
+        </MultiBinding>
+    </dz:DockItem.Title>
+    <dz:DockItem.TabText>
+        <MultiBinding Converter="{StaticResource docTitleConv}">
+            <Binding Path="Document.Name" RelativeSource="{RelativeSource Mode=Self}"/>
+            <Binding Path="Document.IsDirty" RelativeSource="{RelativeSource Mode=Self}"/>
+        </MultiBinding>
+    </dz:DockItem.TabText>
 </dz:DockItem>

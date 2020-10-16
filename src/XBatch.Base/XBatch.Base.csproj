@@ -73,6 +73,7 @@
   <ItemGroup>
     <Compile Include="AppVersionInfo.cs" />
     <Compile Include="Arguments.cs" />
+    <Compile Include="Converters\CommandEnabledConverter.cs" />
     <Compile Include="Converters\LogOutputToTextConverter.cs" />
     <Compile Include="Core\BatchRunner.cs" />
     <Compile Include="Core\BatchJob.cs" />
