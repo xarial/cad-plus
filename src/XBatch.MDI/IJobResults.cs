@@ -6,10 +6,8 @@ using System.Threading.Tasks;
 
 namespace Xarial.CadPlus.XBatch.MDI
 {
-    public interface IJobDocument
+    public interface IJobResults
     {
-        string Name { get; }
-        IJobSettings Settings { get; }
-        IJobResults Results { get; }
+        IJobResult Selected { get; }
     }
 }

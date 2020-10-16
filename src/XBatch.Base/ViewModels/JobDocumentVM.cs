@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
@@ -25,13 +26,19 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
             }
         }
 
-        public IJobSettings Settings => null;
-
-        public IEnumerable<IJobResult> Results => null;
-
+        IJobSettings IJobDocument.Settings => Settings;
+        IJobResults IJobDocument.Results => Results;
+        
+        public JobSettingsVM Settings { get; }
+        public JobResultsVM Results { get; }
+        
         public JobDocumentVM(string name) 
         {
             Name = name;
+            Settings = new JobSettingsVM($"Settings of {name}");
+            Results = new JobResultsVM();
+            Results.Items.Add(new JobResultVM(name + "1"));
+            Results.Items.Add(new JobResultVM(name + "2"));
         }
     }
 }

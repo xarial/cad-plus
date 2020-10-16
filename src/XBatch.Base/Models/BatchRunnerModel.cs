@@ -27,7 +27,7 @@ namespace Xarial.CadPlus.XBatch.Base.Models
         FileFilter[] InputFilesFilter { get; }
         FileFilter[] MacroFilesFilter { get; }
 
-        Task<bool> BatchRun(BatchRunnerOptions opts);
+        Task<bool> BatchRun(BatchJob opts);
         void Cancel();
     }
 
@@ -57,7 +57,7 @@ namespace Xarial.CadPlus.XBatch.Base.Models
 
         public AppVersionInfo[] InstalledVersions { get; }
 
-        public async Task<bool> BatchRun(BatchRunnerOptions opts)
+        public async Task<bool> BatchRun(BatchJob opts)
         {
             m_CurrentCancellationToken = new CancellationTokenSource();
 

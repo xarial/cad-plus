@@ -54,6 +54,7 @@
     <Compile Include="IJobDocument.cs" />
     <Compile Include="IJobResultLog.cs" />
     <Compile Include="IJobResult.cs" />
+    <Compile Include="IJobResults.cs" />
     <Compile Include="IJobSettings.cs" />
     <Compile Include="IJobResultSummary.cs" />
     <Compile Include="JobDocument.xaml.cs">

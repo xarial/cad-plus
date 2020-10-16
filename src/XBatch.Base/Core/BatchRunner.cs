@@ -37,7 +37,7 @@ namespace Xarial.CadPlus.XBatch.Base.Core
             m_AppProvider = appProvider;   
         }
 
-        public async Task<bool> BatchRun(BatchRunnerOptions opts, CancellationToken cancellationToken = default)
+        public async Task<bool> BatchRun(BatchJob opts, CancellationToken cancellationToken = default)
         {
             m_Logger.WriteLine($"Batch macro running started");
 
@@ -206,7 +206,7 @@ namespace Xarial.CadPlus.XBatch.Base.Core
         }
 
         private bool AttemptProcessFile(ref IXApplication app, ref Process appPrc, 
-            string filePath, BatchRunnerOptions opts, CancellationToken cancellationToken = default)
+            string filePath, BatchJob opts, CancellationToken cancellationToken = default)
         {
             int curAttempt = 1;
 

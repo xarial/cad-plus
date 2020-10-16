@@ -63,61 +63,61 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
 
         public string Filter 
         {
-            get => m_Opts.Filter;
+            get => m_Job.Filter;
             set 
             {
-                m_Opts.Filter = value;
+                m_Job.Filter = value;
                 this.NotifyChanged();
             }
         }
 
         public bool ContinueOnError 
         {
-            get => m_Opts.ContinueOnError;
+            get => m_Job.ContinueOnError;
             set 
             {
-                m_Opts.ContinueOnError = value;
+                m_Job.ContinueOnError = value;
                 this.NotifyChanged();
             }
         }
 
         public int Timeout
         {
-            get => m_Opts.Timeout;
+            get => m_Job.Timeout;
             set
             {
                 m_CachedTimeout = value;
-                m_Opts.Timeout = value;
+                m_Job.Timeout = value;
                 this.NotifyChanged();
             }
         }
 
         public StartupOptions_e StartupOptions 
         {
-            get => m_Opts.StartupOptions;
+            get => m_Job.StartupOptions;
             set 
             {
-                m_Opts.StartupOptions = value;
+                m_Job.StartupOptions = value;
                 this.NotifyChanged();
             }
         }
 
         public OpenFileOptions_e OpenFileOptions
         {
-            get => m_Opts.OpenFileOptions;
+            get => m_Job.OpenFileOptions;
             set
             {
-                m_Opts.OpenFileOptions = value;
+                m_Job.OpenFileOptions = value;
                 this.NotifyChanged();
             }
         }
 
         public AppVersionInfo Version 
         {
-            get => m_Opts.Version;
+            get => m_Job.Version;
             set 
             {
-                m_Opts.Version = value;
+                m_Job.Version = value;
                 this.NotifyChanged();
             }
         }
@@ -130,16 +130,16 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
 
         public bool IsTimeoutEnabled
         {
-            get => m_Opts.Timeout != -1;
+            get => m_Job.Timeout != -1;
             set
             {                
                 if (!value)
                 {
-                    m_Opts.Timeout = -1;
+                    m_Job.Timeout = -1;
                 }
                 else 
                 {
-                    m_Opts.Timeout = m_CachedTimeout;
+                    m_Job.Timeout = m_CachedTimeout;
                 }
 
                 this.NotifyChanged();
@@ -162,7 +162,7 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
         private readonly IBatchRunnerModel m_Model;
         private readonly IMessageService m_MsgSvc;
 
-        private readonly BatchRunnerOptions m_Opts;
+        private readonly BatchJob m_Job;
 
         public BatchRunnerVM(IBatchRunnerModel model, IMessageService msgSvc)
         {
@@ -171,8 +171,8 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
 
             Log = new ObservableCollection<string>();
 
-            m_Opts = new BatchRunnerOptions();
-            m_CachedTimeout = m_Opts.Timeout;
+            m_Job = new BatchJob();
+            m_CachedTimeout = m_Job.Timeout;
 
             m_Model.ProgressChanged += OnProgressChanged;
             m_Model.Log += OnLog;
@@ -189,12 +189,12 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
 
         private void OnInputCollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
-            m_Opts.Input = Input.ToArray();
+            m_Job.Input = Input.ToArray();
         }
 
         private void OnMacrosCollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
-            m_Opts.Macros = Macros.ToArray();
+            m_Job.Macros = Macros.ToArray();
         }
 
         private void OnProgressChanged(double prg)
@@ -216,7 +216,7 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
                 Progress = 0;
                 Log.Clear();
 
-                if (await m_Model.BatchRun(m_Opts).ConfigureAwait(false))
+                if (await m_Model.BatchRun(m_Job).ConfigureAwait(false))
                 {
                     m_MsgSvc.ShowInformation("Job completed successfully");
                 }

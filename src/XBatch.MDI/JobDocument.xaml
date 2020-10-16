@@ -9,5 +9,6 @@
     HideOnPerformClose="False" 
     TabText="{Binding Path=Document.Name, RelativeSource={RelativeSource Mode=Self}}"
     Title="{Binding Path=Document.Name, RelativeSource={RelativeSource Mode=Self}}">
-    <ContentPresenter ContentTemplate="{Binding Path=JobDocumentTemplate, RelativeSource={RelativeSource AncestorType={x:Type local:JobsManagerControl}}}" Content="{Binding Path=Document, RelativeSource={RelativeSource AncestorType={x:Type local:JobDocument}}}"/>
+    <ContentPresenter ContentTemplate="{Binding Path=JobDocumentTemplate, RelativeSource={RelativeSource AncestorType={x:Type local:JobsManagerControl}}}"
+                      Content="{Binding Path=Document, RelativeSource={RelativeSource AncestorType={x:Type local:JobDocument}}}"/>
 </dz:DockItem>

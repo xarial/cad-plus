@@ -17,13 +17,13 @@ namespace Xarial.CadPlus.XBatch.Base
 {
     public class Arguments
     {
-        internal BatchRunnerOptions Options { get; }
+        internal BatchJob Options { get; }
 
         private readonly IApplicationProvider m_AppProvider;
 
         public Arguments(IApplicationProvider appProvider) 
         {
-            Options = new BatchRunnerOptions();
+            Options = new BatchJob();
             m_AppProvider = appProvider;
         }
 

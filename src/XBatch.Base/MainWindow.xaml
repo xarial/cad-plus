@@ -8,14 +8,66 @@
         mc:Ignorable="d" WindowState="Maximized"
         Title="xBatch" Height="450" Width="800">
     <Grid>
-        <mdi:JobsManagerControl JobDocumentsSource="{Binding Path=JobDocuments, Mode=OneWay}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <Menu>
+            <MenuItem Header="_File">
+                <MenuItem Header="_New" Command="{Binding Path=NewDocumentCommand}"/>
+                <MenuItem Header="_Open"/>
+                <MenuItem Header="_Close"/>
+                <Separator />
+                <MenuItem Header="_Save"/>
+                <MenuItem Header="Save As..." />
+                <MenuItem Header="Save All" />
+            </MenuItem>
+            <MenuItem Header="_Job">
+                <MenuItem Header="_Run"/>
+            </MenuItem>
+        </Menu>
+        <mdi:JobsManagerControl Grid.Row="1" 
+                                JobDocumentsSource="{Binding Path=JobDocuments, Mode=OneWay}" 
+                                ActiveJobDocument="{Binding Path=ActiveJob}">
             <mdi:JobsManagerControl.JobDocumentTemplate>
                 <DataTemplate>
                     <Grid Background="Green">
                         <TextBlock Text="{Binding Path=Name}"/>
                     </Grid>
                 </DataTemplate>
-            </mdi:JobsManagerControl.JobDocumentTemplate>   
+            </mdi:JobsManagerControl.JobDocumentTemplate>
+            <mdi:JobsManagerControl.JobResultsTemplate>
+                <DataTemplate>
+                    <ListBox ItemsSource="{Binding Path=Items}" SelectedItem="{Binding Path=Selected}">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Path=Name}"/>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </DataTemplate>
+            </mdi:JobsManagerControl.JobResultsTemplate>
+            <mdi:JobsManagerControl.JobSettingsTemplate>
+                <DataTemplate>
+                    <Grid Background="Blue">
+                        <TextBlock Text="{Binding Path=Message}"/>
+                    </Grid>
+                </DataTemplate>
+            </mdi:JobsManagerControl.JobSettingsTemplate>
+            <mdi:JobsManagerControl.JobResultLogTemplate>
+                <DataTemplate>
+                    <Grid Background="Salmon">
+                        <TextBox Text="{Binding Path=Output}" IsReadOnly="True"/>
+                    </Grid>
+                </DataTemplate>
+            </mdi:JobsManagerControl.JobResultLogTemplate>
+            <mdi:JobsManagerControl.JobResultSummary>
+                <DataTemplate>
+                    <Grid Background="Orange">
+                        <TextBlock Text="{Binding Path=Message}"/>
+                    </Grid>
+                </DataTemplate>
+            </mdi:JobsManagerControl.JobResultSummary>
         </mdi:JobsManagerControl>
     </Grid>
 </Window>

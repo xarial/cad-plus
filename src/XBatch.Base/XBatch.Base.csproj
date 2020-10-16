@@ -74,7 +74,9 @@
     <Compile Include="AppVersionInfo.cs" />
     <Compile Include="Arguments.cs" />
     <Compile Include="Core\BatchRunner.cs" />
-    <Compile Include="Core\BatchRunnerOptions.cs" />
+    <Compile Include="Core\BatchJob.cs" />
+    <Compile Include="Core\OpenFileOptions_e.cs" />
+    <Compile Include="Core\StartupOptions_e.cs" />
     <Compile Include="Exceptions\UserException.cs" />
     <Compile Include="IApplicationProvider.cs" />
     <Compile Include="MainWindow.xaml.cs">
@@ -96,6 +98,11 @@
     </Compile>
     <Compile Include="ViewModels\BatchRunnerVM.cs" />
     <Compile Include="ViewModels\JobDocumentVM.cs" />
+    <Compile Include="ViewModels\JobResultLogVM.cs" />
+    <Compile Include="ViewModels\JobResultSummaryVM.cs" />
+    <Compile Include="ViewModels\JobResultsVM.cs" />
+    <Compile Include="ViewModels\JobResultVM.cs" />
+    <Compile Include="ViewModels\JobSettingsVM.cs" />
     <Compile Include="ViewModels\JobsManagerVM.cs" />
     <Compile Include="Views\BatchRunnerView.xaml.cs">
       <DependentUpon>BatchRunnerView.xaml</DependentUpon>

@@ -17,8 +17,8 @@ namespace Xbatch.Tests
         public void BatchRunnerOptionsTest()
         {
             var mock = new Mock<IBatchRunnerModel>();
-            BatchRunnerOptions opts = null;
-            mock.Setup(m => m.BatchRun(It.IsAny<BatchRunnerOptions>())).Callback<BatchRunnerOptions>(e => opts = e);
+            BatchJob opts = null;
+            mock.Setup(m => m.BatchRun(It.IsAny<BatchJob>())).Callback<BatchJob>(e => opts = e);
             mock.Setup(m => m.InstalledVersions).Returns(new AppVersionInfo[] { new SwAppVersionInfo(SwVersion_e.Sw2019), new SwAppVersionInfo(SwVersion_e.Sw2020) });
             var vm = new BatchRunnerVM(mock.Object, new Mock<IMessageService>().Object);
 
@@ -48,8 +48,8 @@ namespace Xbatch.Tests
         public void BatchRunnerOptionsTimeoutTest()
         {
             var mock = new Mock<IBatchRunnerModel>();
-            BatchRunnerOptions opts = null;
-            mock.Setup(m => m.BatchRun(It.IsAny<BatchRunnerOptions>())).Callback<BatchRunnerOptions>(e => opts = e);
+            BatchJob opts = null;
+            mock.Setup(m => m.BatchRun(It.IsAny<BatchJob>())).Callback<BatchJob>(e => opts = e);
             mock.Setup(m => m.InstalledVersions).Returns(new AppVersionInfo[] { new SwAppVersionInfo(SwVersion_e.Sw2019), new SwAppVersionInfo(SwVersion_e.Sw2020) });
             var vm = new BatchRunnerVM(mock.Object, new Mock<IMessageService>().Object);
 
@@ -66,8 +66,8 @@ namespace Xbatch.Tests
         public void BatchRunnerOptionsTimeoutDisableTest()
         {
             var mock = new Mock<IBatchRunnerModel>();
-            BatchRunnerOptions opts = null;
-            mock.Setup(m => m.BatchRun(It.IsAny<BatchRunnerOptions>())).Callback<BatchRunnerOptions>(e => opts = e);
+            BatchJob opts = null;
+            mock.Setup(m => m.BatchRun(It.IsAny<BatchJob>())).Callback<BatchJob>(e => opts = e);
             mock.Setup(m => m.InstalledVersions).Returns(new AppVersionInfo[] { new SwAppVersionInfo(SwVersion_e.Sw2019), new SwAppVersionInfo(SwVersion_e.Sw2020) });
             var vm = new BatchRunnerVM(mock.Object, new Mock<IMessageService>().Object);
 

@@ -9,16 +9,20 @@
              d:DesignHeight="450" d:DesignWidth="1000">
     <dz:DockControl x:Name="ctrlDock">
         <dz:DockItem TabText="Summary" Title="Summary" ShowAction="{dz:ShowAsDockPositionAction DockPosition=Bottom}">
-            <TextBox />
+            <ContentPresenter ContentTemplate="{Binding Path=JobResultSummary, RelativeSource={RelativeSource AncestorType={x:Type local:JobsManagerControl}}}"
+                      Content="{Binding Path=ActiveJobDocument.Results.Selected.Summary, RelativeSource={RelativeSource AncestorType={x:Type local:JobsManagerControl}}}"/>
         </dz:DockItem>
         <dz:DockItem TabText="Log" Title="Log" ShowAction="{dz:ShowAsDockPositionAction DockPosition=Bottom}">
-            <TextBox />
+            <ContentPresenter ContentTemplate="{Binding Path=JobResultLogTemplate, RelativeSource={RelativeSource AncestorType={x:Type local:JobsManagerControl}}}"
+                      Content="{Binding Path=ActiveJobDocument.Results.Selected.Log, RelativeSource={RelativeSource AncestorType={x:Type local:JobsManagerControl}}}"/>
         </dz:DockItem>
         <dz:DockItem TabText="Results" Title="Results" ShowAction="{dz:ShowAsDockPositionAction DockPosition=Left}">
-            <TextBox />
+            <ContentPresenter ContentTemplate="{Binding Path=JobResultsTemplate, RelativeSource={RelativeSource AncestorType={x:Type local:JobsManagerControl}}}"
+                      Content="{Binding Path=ActiveJobDocument.Results, RelativeSource={RelativeSource AncestorType={x:Type local:JobsManagerControl}}}"/>
         </dz:DockItem>
         <dz:DockItem TabText="Settings" Title="Settings" ShowAction="{dz:ShowAsDockPositionAction DockPosition=Right}">
-            <TextBox />
+            <ContentPresenter ContentTemplate="{Binding Path=JobSettingsTemplate, RelativeSource={RelativeSource AncestorType={x:Type local:JobsManagerControl}}}"
+                      Content="{Binding Path=ActiveJobDocument.Settings, RelativeSource={RelativeSource AncestorType={x:Type local:JobsManagerControl}}}"/>
         </dz:DockItem>
     </dz:DockControl>
 </UserControl>

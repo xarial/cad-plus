@@ -51,15 +51,15 @@ namespace Xarial.CadPlus.XBatch.MDI
 			set { SetValue(JobResultLogTemplateProperty, value); }
 		}
 
-		public static readonly DependencyProperty JobResultTemplateProperty =
+		public static readonly DependencyProperty JobResultsTemplateProperty =
 			DependencyProperty.Register(
-			nameof(JobResultTemplate), typeof(DataTemplate),
+			nameof(JobResultsTemplate), typeof(DataTemplate),
 			typeof(JobsManagerControl));
 
-		public DataTemplate JobResultTemplate
+		public DataTemplate JobResultsTemplate
 		{
-			get { return (DataTemplate)GetValue(JobResultTemplateProperty); }
-			set { SetValue(JobResultTemplateProperty, value); }
+			get { return (DataTemplate)GetValue(JobResultsTemplateProperty); }
+			set { SetValue(JobResultsTemplateProperty, value); }
 		}
 
 		public static readonly DependencyProperty JobSettingsTemplateProperty =
