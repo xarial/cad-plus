@@ -30,16 +30,23 @@ namespace Xarial.CadPlus.XBatch.Base
         public MainWindow()
         {
             InitializeComponent();
-            var msgService = new MessageService("xBatch");
-            try
-            {
-                var appProvider = (Application.Current as XBatchApp).GetApplicationProvider();
-                this.DataContext = new BatchRunnerVM(new Models.BatchRunnerModel(appProvider), msgService);
-            }
-            catch (Exception ex)
-            {
-                msgService.ShowError(ex.ParseUserError(out _));
-            }
+            
+            var vm = new JobsManagerVM();
+            vm.JobDocuments.Add(new JobDocumentVM("A"));
+            vm.JobDocuments.Add(new JobDocumentVM("B"));
+
+            this.DataContext = vm;
+
+            //var msgService = new MessageService("xBatch");
+            //try
+            //{
+            //    var appProvider = (Application.Current as XBatchApp).GetApplicationProvider();
+            //    this.DataContext = new BatchRunnerVM(new Models.BatchRunnerModel(appProvider), msgService);
+            //}
+            //catch (Exception ex)
+            //{
+            //    msgService.ShowError(ex.ParseUserError(out _));
+            //}
         }
     }
 }

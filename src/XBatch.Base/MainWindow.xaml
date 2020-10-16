@@ -4,9 +4,18 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:views="clr-namespace:Xarial.CadPlus.XBatch.Base.Views"
-        mc:Ignorable="d"
+        xmlns:mdi="clr-namespace:Xarial.CadPlus.XBatch.MDI;assembly=XBatch.MDI"
+        mc:Ignorable="d" WindowState="Maximized"
         Title="xBatch" Height="450" Width="800">
     <Grid>
-        <views:BatchRunnerView/>
+        <mdi:JobsManagerControl JobDocumentsSource="{Binding Path=JobDocuments, Mode=OneWay}">
+            <mdi:JobsManagerControl.JobDocumentTemplate>
+                <DataTemplate>
+                    <Grid Background="Green">
+                        <TextBlock Text="{Binding Path=Name}"/>
+                    </Grid>
+                </DataTemplate>
+            </mdi:JobsManagerControl.JobDocumentTemplate>   
+        </mdi:JobsManagerControl>
     </Grid>
 </Window>

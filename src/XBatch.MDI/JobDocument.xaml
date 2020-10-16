@@ -1,0 +1,13 @@
+﻿<dz:DockItem
+    x:Class="Xarial.CadPlus.XBatch.MDI.JobDocument"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:dz="http://schemas.devzest.com/presentation/docking"
+    xmlns:local="clr-namespace:Xarial.CadPlus.XBatch.MDI"
+    DefaultDockPosition="Document"
+    Style="{DynamicResource {x:Type dz:DockItem}}"
+    HideOnPerformClose="False" 
+    TabText="{Binding Path=Document.Name, RelativeSource={RelativeSource Mode=Self}}"
+    Title="{Binding Path=Document.Name, RelativeSource={RelativeSource Mode=Self}}">
+    <ContentPresenter ContentTemplate="{Binding Path=JobDocumentTemplate, RelativeSource={RelativeSource AncestorType={x:Type local:JobsManagerControl}}}" Content="{Binding Path=Document, RelativeSource={RelativeSource AncestorType={x:Type local:JobDocument}}}"/>
+</dz:DockItem>

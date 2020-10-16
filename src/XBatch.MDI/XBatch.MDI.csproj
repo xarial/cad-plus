@@ -2,49 +2,38 @@
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
-    <ModuleName>xBatch</ModuleName>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{C64AE433-7BB9-4EDA-A54F-D71F2BF1B015}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <RootNamespace>Xarial.CadPlus.XBatch.Base</RootNamespace>
-    <AssemblyName>XBatch.Base</AssemblyName>
+    <ProjectGuid>{C4E21B63-B877-4F42-B24C-9506C8E78FC0}</ProjectGuid>
+    <OutputType>library</OutputType>
+    <RootNamespace>Xarial.CadPlus.XBatch.MDI</RootNamespace>
+    <AssemblyName>XBatch.MDI</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <WarningLevel>4</WarningLevel>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
-  <PropertyGroup>
-    <StartupObject />
-  </PropertyGroup>
-  <PropertyGroup>
-    <ApplicationIcon>xbatch.ico</ApplicationIcon>
-  </PropertyGroup>
   <ItemGroup>
-    <Reference Include="CommandLine, Version=2.8.0.0, Culture=neutral, PublicKeyToken=5a870481e358d379, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\CommandLineParser.2.8.0\lib\net461\CommandLine.dll</HintPath>
-    </Reference>
-    <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Newtonsoft.Json.12.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="DevZest.WpfDocking, Version=2.5.0.0, Culture=neutral, PublicKeyToken=861fc077c3dc39c3, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\DevZest.WpfDocking.3.0.0\lib\net35-Client\DevZest.WpfDocking.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -60,27 +49,19 @@
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
-    <Reference Include="Xarial.XCad, Version=0.6.5.0, Culture=neutral, PublicKeyToken=60dcaf351d4060db, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Xarial.XCad.0.6.5\lib\net461\Xarial.XCad.dll</HintPath>
-    </Reference>
-    <Reference Include="Xarial.XToolkit, Version=0.2.4.0, Culture=neutral, PublicKeyToken=60dcaf351d4060db, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Xarial.XToolkit.0.2.4\lib\net461\Xarial.XToolkit.dll</HintPath>
-    </Reference>
-    <Reference Include="Xarial.XToolkit.Wpf, Version=0.2.11.0, Culture=neutral, PublicKeyToken=60dcaf351d4060db, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Xarial.XToolkit.Wpf.0.2.11\lib\net461\Xarial.XToolkit.Wpf.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AppVersionInfo.cs" />
-    <Compile Include="Arguments.cs" />
-    <Compile Include="Core\BatchRunner.cs" />
-    <Compile Include="Core\BatchRunnerOptions.cs" />
-    <Compile Include="Exceptions\UserException.cs" />
-    <Compile Include="IApplicationProvider.cs" />
-    <Compile Include="MainWindow.xaml.cs">
-      <DependentUpon>MainWindow.xaml</DependentUpon>
+    <Compile Include="IJobDocument.cs" />
+    <Compile Include="IJobResultLog.cs" />
+    <Compile Include="IJobResult.cs" />
+    <Compile Include="IJobSettings.cs" />
+    <Compile Include="IJobResultSummary.cs" />
+    <Compile Include="JobDocument.xaml.cs">
+      <DependentUpon>JobDocument.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Models\BatchRunnerModel.cs" />
+    <Compile Include="JobsManagerControl.xaml.cs">
+      <DependentUpon>JobsManagerControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -94,18 +75,10 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="ViewModels\BatchRunnerVM.cs" />
-    <Compile Include="ViewModels\JobDocumentVM.cs" />
-    <Compile Include="ViewModels\JobsManagerVM.cs" />
-    <Compile Include="Views\BatchRunnerView.xaml.cs">
-      <DependentUpon>BatchRunnerView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="XBatchApp.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <None Include="app.config" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -113,28 +86,14 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Common\Common.csproj">
-      <Project>{cb753a98-59d1-4058-b486-e1dfd86fb5bb}</Project>
-      <Name>Common</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\XBatch.MDI\XBatch.MDI.csproj">
-      <Project>{c4e21b63-b877-4f42-b24c-9506c8e78fc0}</Project>
-      <Name>XBatch.MDI</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Page Include="MainWindow.xaml">
-      <Generator>MSBuild:Compile</Generator>
+    <Page Include="JobDocument.xaml">
       <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\BatchRunnerView.xaml">
+    <Page Include="JobsManagerControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
-  <ItemGroup>
-    <Resource Include="xbatch.ico" />
-  </ItemGroup>
-  <Import Project="$(SolutionDir)common\common.module.props" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
