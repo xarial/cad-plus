@@ -25,7 +25,7 @@ using Xarial.XToolkit.Reporting;
 
 namespace Xarial.CadPlus.XBatch.Base
 {
-    public partial class MainWindow : Window
+    public partial class MainWindow
     {
         public MainWindow()
         {
@@ -38,7 +38,8 @@ namespace Xarial.CadPlus.XBatch.Base
                 var appProvider = (Application.Current as XBatchApp).GetApplicationProvider();
                 var batchRunnerModel = new Models.BatchRunnerModel(appProvider);
 
-                var vm = new JobsManagerVM(batchRunnerModel, msgService);
+                var vm = new BatchManagerVM(batchRunnerModel, msgService);
+                
                 this.DataContext = vm;
             }
             catch (Exception ex)

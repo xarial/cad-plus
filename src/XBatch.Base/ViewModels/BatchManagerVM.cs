@@ -17,51 +17,37 @@ using Xarial.XToolkit.Wpf.Utils;
 
 namespace Xarial.CadPlus.XBatch.Base.ViewModels
 {
-    public class JobsManagerVM : INotifyPropertyChanged
+    public class BatchManagerVM : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public IList<JobDocumentVM> JobDocuments { get; }
-
-        public JobDocumentVM ActiveJob 
+        public BatchDocumentVM Document
         {
-            get => m_ActiveJob;
+            get => m_Document;
             set 
             {
-                m_ActiveJob = value;
+                m_Document = value;
                 this.NotifyChanged();
             }
         }
 
-        private JobDocumentVM m_ActiveJob;
+        private BatchDocumentVM m_Document;
 
         public ICommand NewDocumentCommand { get; }
         public ICommand OpenDocumentCommand { get; }
-        public ICommand SaveAllDocumentsCommand { get; }
-
+        
         private readonly IBatchRunnerModel m_Model;
         private readonly IMessageService m_MsgSvc;
 
-        public JobsManagerVM(IBatchRunnerModel model, IMessageService msgSvc)
+        public BatchManagerVM(IBatchRunnerModel model, IMessageService msgSvc)
         {
             m_Model = model;
             m_MsgSvc = msgSvc;
             
-            JobDocuments = new ObservableCollection<JobDocumentVM>();
-
-            NewDocumentCommand = new RelayCommand(OnNewDocument);
+            NewDocumentCommand = new RelayCommand(NewDocument);
             OpenDocumentCommand = new RelayCommand(OpenDocument);
-            SaveAllDocumentsCommand = new RelayCommand(SaveAllDocuments, () => JobDocuments.Any(d => d.IsDirty));
         }
-
-        private void SaveAllDocuments()
-        {
-            foreach (var dirtyDoc in JobDocuments.Where(d => d.IsDirty)) 
-            {
-                dirtyDoc.SaveDocument();
-            }
-        }
-
+        
         private void OpenDocument()
         {
             try
@@ -69,13 +55,20 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
                 if (FileSystemBrowser.BrowseFileOpen(out string filePath, "Select file to open",
                     FileSystemBrowser.BuildFilterString(new FileFilter("xBatch File", "*.xbatch"), FileFilter.AllFiles))) 
                 {
-                    if (!JobDocuments.Any(d => string.Equals(d.FilePath, filePath, StringComparison.CurrentCultureIgnoreCase)))
+                    if (!string.Equals(Document?.FilePath, filePath, StringComparison.CurrentCultureIgnoreCase))
                     {
                         var svc = new UserSettingsService();
 
                         var batchJob = svc.ReadSettings<BatchJob>(filePath);
 
-                        JobDocuments.Add(new JobDocumentVM(new FileInfo(filePath), batchJob, m_Model, m_MsgSvc));
+                        if (Document == null)
+                        {
+                            Document = new BatchDocumentVM(new FileInfo(filePath), batchJob, m_Model, m_MsgSvc);
+                        }
+                        else 
+                        {
+                            //TODO: open in current session or in new session
+                        }
                     }
                     else 
                     {
@@ -89,19 +82,16 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
             }
         }
 
-        private void OnNewDocument() 
+        private void NewDocument() 
         {
-            int index = 0;
-
-            var name = "";
-
-            do
+            if (Document == null)
             {
-                name = $"xBatch Document {++index}";
+                Document = new BatchDocumentVM("xBatch Document", new BatchJob(), m_Model, m_MsgSvc);
             }
-            while (JobDocuments.Any(d => string.Equals(d.Name, name, StringComparison.CurrentCultureIgnoreCase)));
-
-            JobDocuments.Add(new JobDocumentVM(name, new BatchJob(), m_Model, m_MsgSvc));
+            else
+            {
+                //TODO: open in new session or in current session
+            }
         }
     }
 }

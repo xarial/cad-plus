@@ -7,18 +7,17 @@ using System.Text;
 using System.Threading.Tasks;
 using Xarial.CadPlus.XBatch.Base.Core;
 using Xarial.CadPlus.XBatch.Base.Models;
-using Xarial.CadPlus.XBatch.MDI;
 using Xarial.XToolkit.Wpf.Extensions;
 
 namespace Xarial.CadPlus.XBatch.Base.ViewModels
 {
-    public class JobResultsVM : IJobResults, INotifyPropertyChanged
+    public class JobResultsVM : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
-        private IJobResult m_Selected;
+        private JobResultVM m_Selected;
 
-        public IJobResult Selected 
+        public JobResultVM Selected 
         {
             get => m_Selected;
             set 

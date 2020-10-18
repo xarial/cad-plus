@@ -5,12 +5,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Xarial.CadPlus.XBatch.Base.Core;
-using Xarial.CadPlus.XBatch.MDI;
+using Xarial.CadPlus.XBatch.Base.Models;
 using Xarial.XToolkit.Wpf.Extensions;
 
 namespace Xarial.CadPlus.XBatch.Base.ViewModels
 {
-    public class JobSettingsVM : IJobSettings, INotifyPropertyChanged
+    public class BatchDocumentSettingsVM : INotifyPropertyChanged
     {
         public event Action Modified;
 
@@ -80,13 +80,45 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
             }
         }
 
+        public AppVersionInfo Version
+        {
+            get => m_Job.Version;
+            set
+            {
+                m_Job.Version = value;
+                this.NotifyChanged();
+                Modified?.Invoke();
+            }
+        }
+
+        public AppVersionInfo[] InstalledVersions { get; set; }
+
         private int m_CachedTimeout;
         private readonly BatchJob m_Job;
+        private readonly IBatchRunnerModel m_Model;
 
-        public JobSettingsVM(BatchJob job) 
+        public BatchDocumentSettingsVM(BatchJob job, IBatchRunnerModel model) 
         {
             m_Job = job;
             m_CachedTimeout = m_Job.Timeout;
+            m_Model = model;
+
+            InstalledVersions = m_Model.InstalledVersions;
+
+            if (m_Job.Version != null)
+            {
+                try
+                {
+                    Version = m_Model.ParseVersion(m_Job.Version?.Id);
+                }
+                catch
+                {
+                }
+            }
+            else
+            {
+                Version = InstalledVersions.FirstOrDefault();
+            }
         }
     }
 }

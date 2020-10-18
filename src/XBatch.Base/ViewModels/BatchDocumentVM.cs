@@ -10,7 +10,6 @@ using System.Windows.Input;
 using Xarial.CadPlus.Common.Services;
 using Xarial.CadPlus.XBatch.Base.Core;
 using Xarial.CadPlus.XBatch.Base.Models;
-using Xarial.CadPlus.XBatch.MDI;
 using Xarial.XToolkit.Services.UserSettings;
 using Xarial.XToolkit.Wpf;
 using Xarial.XToolkit.Wpf.Extensions;
@@ -18,7 +17,7 @@ using Xarial.XToolkit.Wpf.Utils;
 
 namespace Xarial.CadPlus.XBatch.Base.ViewModels
 {
-    public class JobDocumentVM : INotifyPropertyChanged, IJobDocument
+    public class BatchDocumentVM : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -33,11 +32,8 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
                 this.NotifyChanged();
             }
         }
-
-        IJobSettings IJobDocument.Settings => Settings;
-        IJobResults IJobDocument.Results => Results;
-        
-        public JobSettingsVM Settings { get; }
+                
+        public BatchDocumentSettingsVM Settings { get; }
         public JobResultsVM Results { get; }
 
         public ObservableCollection<string> Input { get; }
@@ -55,24 +51,11 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
             }
         }
 
-        public AppVersionInfo Version
-        {
-            get => m_Job.Version;
-            set
-            {
-                m_Job.Version = value;
-                this.NotifyChanged();
-                IsDirty = true;
-            }
-        }
-
-        public AppVersionInfo[] InstalledVersions { get; set; }
-
         public FileFilter[] InputFilesFilter => m_Model.InputFilesFilter;
 
         public FileFilter[] MacroFilesFilter => m_Model.MacroFilesFilter;
 
-        public ICommand RunBatchCommand { get; }
+        public ICommand RunJobCommand { get; }
 
         public ICommand SaveDocumentCommand { get; }
         public ICommand SaveAsDocumentCommand { get; }
@@ -96,14 +79,14 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
 
         public string FilePath => m_FilePath;
 
-        public JobDocumentVM(FileInfo file, BatchJob job, IBatchRunnerModel model, IMessageService msgSvc) 
+        public BatchDocumentVM(FileInfo file, BatchJob job, IBatchRunnerModel model, IMessageService msgSvc) 
             : this(Path.GetFileNameWithoutExtension(file.FullName), job, model, msgSvc)
         {
             m_FilePath = file.FullName;
             IsDirty = false;
         }
 
-        public JobDocumentVM(string name, BatchJob job, IBatchRunnerModel model, IMessageService msgSvc) 
+        public BatchDocumentVM(string name, BatchJob job, IBatchRunnerModel model, IMessageService msgSvc) 
         {
             m_Model = model;
             m_Job = job;
@@ -111,12 +94,12 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
 
             IsDirty = true;
 
-            RunBatchCommand = new RelayCommand(RunBatch, () => Input.Any() && Macros.Any() && Version != null);
+            RunJobCommand = new RelayCommand(RunJob, () => Input.Any() && Macros.Any() && Settings.Version != null);
             SaveDocumentCommand = new RelayCommand(SaveDocument, () => IsDirty);
             SaveAsDocumentCommand = new RelayCommand(SaveAsDocument);
 
             Name = name;
-            Settings = new JobSettingsVM(m_Job);
+            Settings = new BatchDocumentSettingsVM(m_Job, model);
             Settings.Modified += OnSettingsModified;
             Results = new JobResultsVM(m_Model, m_Job);
             Input = new ObservableCollection<string>(m_Job.Input ?? Enumerable.Empty<string>());
@@ -124,23 +107,6 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
 
             Macros = new ObservableCollection<string>(m_Job.Macros ?? Enumerable.Empty<string>());
             Macros.CollectionChanged += OnMacrosCollectionChanged;
-
-            InstalledVersions = m_Model.InstalledVersions;
-
-            if (m_Job.Version != null)
-            {
-                try
-                {
-                    Version = m_Model.ParseVersion(m_Job.Version?.Id);
-                }
-                catch
-                {
-                }
-            }
-            else 
-            {
-                InstalledVersions.FirstOrDefault();
-            }
         }
 
         private void OnSettingsModified()
@@ -192,7 +158,7 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
             IsDirty = true;
         }
 
-        private void RunBatch() 
+        private void RunJob() 
         {
             Results.StartNewJob();
         }

@@ -6,19 +6,15 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using Xarial.CadPlus.XBatch.Base.Models;
-using Xarial.CadPlus.XBatch.MDI;
 using Xarial.XToolkit.Wpf;
 using Xarial.XToolkit.Wpf.Extensions;
 
 namespace Xarial.CadPlus.XBatch.Base.ViewModels
 {
-    public class JobResultVM : IJobResult, INotifyPropertyChanged
+    public class JobResultVM : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
-
-        IJobResultLog IJobResult.Log => Log;
-        IJobResultSummary IJobResult.Summary => Summary;
-
+        
         public JobResultLogVM Log { get; }
         public JobResultSummaryVM Summary { get; }
 
