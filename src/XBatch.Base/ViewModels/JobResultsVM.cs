@@ -42,7 +42,7 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
 
         public void StartNewJob()
         {
-            var newRes = new JobResultVM(DateTime.Now.ToString(), m_Model.CreateExecutor(m_Job));
+            var newRes = new JobResultVM($"Job #{Items.Count + 1}", m_Model.CreateExecutor(m_Job));
             Items.Add(newRes);
             Selected = newRes;
             newRes.RunBatchAsync();

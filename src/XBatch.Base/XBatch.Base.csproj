@@ -96,14 +96,20 @@
   <ItemGroup>
     <Compile Include="AppVersionInfo.cs" />
     <Compile Include="Arguments.cs" />
+    <Compile Include="Controls\JobItemsDataGrid.xaml.cs">
+      <DependentUpon>JobItemsDataGrid.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Converters\DocumentTitleConverter.cs" />
     <Compile Include="Converters\CommandEnabledConverter.cs" />
+    <Compile Include="Converters\JobItemStatusToImageConverter.cs" />
+    <Compile Include="Converters\JobStatusToImageConverter.cs" />
     <Compile Include="Converters\LogOutputToTextConverter.cs" />
     <Compile Include="Converters\SelectedVersionConverter.cs" />
     <Compile Include="Core\BatchRunner.cs" />
     <Compile Include="Core\BatchJob.cs" />
     <Compile Include="Core\OpenFileOptions_e.cs" />
     <Compile Include="Core\StartupOptions_e.cs" />
+    <Compile Include="Exceptions\JobCancelledException.cs" />
     <Compile Include="Exceptions\UserException.cs" />
     <Compile Include="IApplicationProvider.cs" />
     <Compile Include="MainWindow.xaml.cs">
@@ -124,6 +130,8 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
     <Compile Include="ViewModels\BatchDocumentVM.cs" />
+    <Compile Include="ViewModels\JobItemFileVM.cs" />
+    <Compile Include="ViewModels\JobItemMacroVM.cs" />
     <Compile Include="ViewModels\JobResultLogVM.cs" />
     <Compile Include="ViewModels\JobResultSummaryVM.cs" />
     <Compile Include="ViewModels\JobResultsVM.cs" />
@@ -149,6 +157,10 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Page Include="Controls\JobItemsDataGrid.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -210,6 +222,24 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\xbatch.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\status-awaiting.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\status-cancelled.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\status-failed.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\status-in-progress.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\status-succeeded.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\status-warning.png" />
   </ItemGroup>
   <Import Project="$(SolutionDir)common\common.module.props" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

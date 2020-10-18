@@ -29,16 +29,18 @@ namespace Xarial.CadPlus.XBatch.Base.Models
 
     public interface IBatchRunJobExecutor
     {
+        event Action<IEnumerable<IJobItemFile>> JobSet;
         event Action<double> ProgressChanged;
         event Action<string> Log;
 
-        Task<bool> Execute();
+        Task<bool> ExecuteAsync();
         void Cancel();
     }
 
     public class BatchRunJobExecutor : IBatchRunJobExecutor
     {
         public event Action<double> ProgressChanged;
+        public event Action<IEnumerable<IJobItemFile>> JobSet;
         public event Action<string> Log;
 
         private CancellationTokenSource m_CurrentCancellationToken;
@@ -46,36 +48,58 @@ namespace Xarial.CadPlus.XBatch.Base.Models
         private readonly BatchJob m_Job;
         private readonly IApplicationProvider m_AppProvider;
 
+        private readonly LogWriter m_LogWriter;
+        private readonly ProgressHandler m_PrgHander;
+        
+        private bool m_IsExecuting;
+
         public BatchRunJobExecutor(BatchJob job, IApplicationProvider appProvider) 
         {
             m_Job = job;
             m_AppProvider = appProvider;
+
+            m_LogWriter = new LogWriter();
+            m_PrgHander = new ProgressHandler();
+
+            m_IsExecuting = false;
         }
 
-        public async Task<bool> Execute()
+        public async Task<bool> ExecuteAsync()
         {
-            m_CurrentCancellationToken = new CancellationTokenSource();
-
-            var logWriter = new LogWriter();
-            var prgHander = new ProgressHandler();
-
-            logWriter.Log += OnLog;
-            prgHander.ProgressChanged += OnProgressChanged;
-
-            try
+            if (!m_IsExecuting)
             {
-                using (var batchRunner = new BatchRunner(m_AppProvider, logWriter, prgHander))
-                {
-                    var cancellationToken = m_CurrentCancellationToken.Token;
+                m_IsExecuting = true;
 
-                    return await batchRunner.BatchRun(m_Job, cancellationToken).ConfigureAwait(false);
+                m_CurrentCancellationToken = new CancellationTokenSource();
+
+                m_LogWriter.Log += OnLog;
+                m_PrgHander.ProgressChanged += OnProgressChanged;
+                m_PrgHander.JobScopeSet += OnJobScopeSet;
+
+                try
+                {
+                    using (var batchRunner = new BatchRunner(m_AppProvider, m_LogWriter, m_PrgHander))
+                    {
+                        var cancellationToken = m_CurrentCancellationToken.Token;
+
+                        return await batchRunner.BatchRun(m_Job, cancellationToken).ConfigureAwait(false);
+                    }
+                }
+                finally
+                {
+                    m_LogWriter.Log -= OnLog;
+                    m_PrgHander.ProgressChanged -= OnProgressChanged;
                 }
             }
-            finally
+            else 
             {
-                logWriter.Log -= OnLog;
-                prgHander.ProgressChanged -= OnProgressChanged;
+                throw new Exception("Execution is already running");
             }
+        }
+
+        private void OnJobScopeSet(IEnumerable<IJobItemFile> files)
+        {
+            JobSet?.Invoke(files);
         }
 
         public void Cancel()

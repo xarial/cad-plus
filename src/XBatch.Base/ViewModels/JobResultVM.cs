@@ -5,12 +5,22 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using Xarial.CadPlus.XBatch.Base.Exceptions;
 using Xarial.CadPlus.XBatch.Base.Models;
 using Xarial.XToolkit.Wpf;
 using Xarial.XToolkit.Wpf.Extensions;
 
 namespace Xarial.CadPlus.XBatch.Base.ViewModels
 {
+    public enum JobState_e 
+    {
+        InProgress,
+        Failed,
+        Succeeded,
+        CompletedWithWarning,
+        Cancelled
+    }
+
     public class JobResultVM : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
@@ -38,6 +48,18 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
         
         private readonly IBatchRunJobExecutor m_Executor;
 
+        private JobState_e m_Status;
+
+        public JobState_e Status
+        {
+            get => m_Status;
+            set 
+            {
+                m_Status = value;
+                this.NotifyChanged();
+            }
+        }
+
         public JobResultVM(string name, IBatchRunJobExecutor executor)
         {
             m_Executor = executor;
@@ -56,21 +78,27 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
         {
             try
             {
+                Status = JobState_e.InProgress;
+
                 IsBatchInProgress = true;
-                
-                if (await m_Executor.Execute().ConfigureAwait(false))
+
+                if (await m_Executor.ExecuteAsync().ConfigureAwait(false))
                 {
-                    //m_MsgSvc.ShowInformation("Job completed successfully");
+                    Status = Summary.JobItemFiles.Any(i => i.Status != Common.Services.JobItemStatus_e.Succeeded)
+                        ? JobState_e.CompletedWithWarning : JobState_e.Succeeded;
                 }
                 else
                 {
-                    //m_MsgSvc.ShowError("Job failed");
+                    Status = JobState_e.Failed;
                 }
             }
-            catch (Exception ex)
+            catch (JobCancelledException) 
             {
-                //TODO: add log
-                //m_MsgSvc.ShowError(ex.ParseUserError(out _));
+                Status = JobState_e.Cancelled;
+            }
+            catch (Exception)
+            {
+                Status = JobState_e.Failed;
             }
             finally
             {
