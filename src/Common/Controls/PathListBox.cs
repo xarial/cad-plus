@@ -22,6 +22,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using WK.Libraries.BetterFolderBrowserNS;
+using Xarial.XToolkit.Wpf;
 using Xarial.XToolkit.Wpf.Utils;
 
 namespace Xarial.CadPlus.Common.Controls
@@ -37,6 +38,10 @@ namespace Xarial.CadPlus.Common.Controls
             DefaultStyleKeyProperty.OverrideMetadata(
                 typeof(PathListBox), new FrameworkPropertyMetadata(typeof(PathListBox)));
         }
+
+        public ICommand AddFoldersCommand { get; }
+        public ICommand AddFilesCommand { get; }
+        public ICommand DeleteSelectedCommand { get; }
 
         public static readonly DependencyProperty PathsSourceProperty =
             DependencyProperty.Register(
@@ -65,6 +70,34 @@ namespace Xarial.CadPlus.Common.Controls
             nameof(ShowAddFolderButton), typeof(bool),
             typeof(PathListBox), new PropertyMetadata(true));
 
+        public bool ShowAddFolderButton
+        {
+            get { return (bool)GetValue(ShowAddFolderButtonProperty); }
+            set { SetValue(ShowAddFolderButtonProperty, value); }
+        }
+
+        public static readonly DependencyProperty AllowDropFilesProperty =
+            DependencyProperty.Register(
+            nameof(AllowDropFiles), typeof(bool),
+            typeof(PathListBox), new PropertyMetadata(true));
+
+        public bool AllowDropFiles
+        {
+            get { return (bool)GetValue(AllowDropFilesProperty); }
+            set { SetValue(AllowDropFilesProperty, value); }
+        }
+
+        public static readonly DependencyProperty AllowDropFoldersProperty =
+            DependencyProperty.Register(
+            nameof(AllowDropFolders), typeof(bool),
+            typeof(PathListBox), new PropertyMetadata(true));
+
+        public bool AllowDropFolders
+        {
+            get { return (bool)GetValue(AllowDropFoldersProperty); }
+            set { SetValue(AllowDropFoldersProperty, value); }
+        }
+
         public static readonly DependencyProperty FiltersProperty =
             DependencyProperty.Register(
             nameof(Filters), typeof(IEnumerable),
@@ -76,10 +109,11 @@ namespace Xarial.CadPlus.Common.Controls
             set { SetValue(FiltersProperty, value); }
         }
 
-        public bool ShowAddFolderButton
+        public PathListBox() 
         {
-            get { return (bool)GetValue(ShowAddFolderButtonProperty); }
-            set { SetValue(ShowAddFolderButtonProperty, value); }
+            AddFilesCommand = new RelayCommand(AddFiles);
+            AddFoldersCommand = new RelayCommand(AddFolders);
+            DeleteSelectedCommand = new RelayCommand(DeleteSelected);
         }
 
         public override void OnApplyTemplate()
@@ -189,11 +223,11 @@ namespace Xarial.CadPlus.Common.Controls
                     var isFile = File.Exists(p);
                     var isFolder = Directory.Exists(p);
 
-                    if (isFile && ShowAddFileButton)
+                    if (isFile && AllowDropFiles)
                     {
                         return true;
                     }
-                    else if (isFolder && ShowAddFolderButton)
+                    else if (isFolder && AllowDropFolders)
                     {
                         return true;
                     }
@@ -253,15 +287,20 @@ namespace Xarial.CadPlus.Common.Controls
 
         private void OnListBoxKeyUp(object sender, KeyEventArgs e)
         {
-            if (e.Key == Key.Delete) 
+            if (e.Key == Key.Delete)
             {
-                var itemsToDelete = new object[m_ListBox.SelectedItems.Count];
-                m_ListBox.SelectedItems.CopyTo(itemsToDelete, 0);
+                DeleteSelected();
+            }
+        }
 
-                foreach (var selItem in itemsToDelete) 
-                {
-                    PathsSource.Remove(selItem);
-                }
+        private void DeleteSelected()
+        {
+            var itemsToDelete = new object[m_ListBox.SelectedItems.Count];
+            m_ListBox.SelectedItems.CopyTo(itemsToDelete, 0);
+
+            foreach (var selItem in itemsToDelete)
+            {
+                PathsSource.Remove(selItem);
             }
         }
     }

@@ -96,8 +96,10 @@
   <ItemGroup>
     <Compile Include="AppVersionInfo.cs" />
     <Compile Include="Arguments.cs" />
+    <Compile Include="Converters\DocumentTitleConverter.cs" />
     <Compile Include="Converters\CommandEnabledConverter.cs" />
     <Compile Include="Converters\LogOutputToTextConverter.cs" />
+    <Compile Include="Converters\SelectedVersionConverter.cs" />
     <Compile Include="Core\BatchRunner.cs" />
     <Compile Include="Core\BatchJob.cs" />
     <Compile Include="Core\OpenFileOptions_e.cs" />
@@ -196,6 +198,18 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\app-version.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\open.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\save.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\new.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\xbatch.png" />
   </ItemGroup>
   <Import Project="$(SolutionDir)common\common.module.props" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -35,7 +35,8 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
 
         public ICommand NewDocumentCommand { get; }
         public ICommand OpenDocumentCommand { get; }
-        
+        public ICommand CloseDocumentCommand { get; }
+
         private readonly IBatchRunnerModel m_Model;
         private readonly IMessageService m_MsgSvc;
 
@@ -46,6 +47,7 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
             
             NewDocumentCommand = new RelayCommand(NewDocument);
             OpenDocumentCommand = new RelayCommand(OpenDocument);
+            CloseDocumentCommand = new RelayCommand(CloseDocument, () => Document != null);
         }
         
         private void OpenDocument()
@@ -92,6 +94,12 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
             {
                 //TODO: open in new session or in current session
             }
+        }
+
+        private void CloseDocument() 
+        {
+            //TODO: check if is dirty and show warning
+            Document = null;
         }
     }
 }
