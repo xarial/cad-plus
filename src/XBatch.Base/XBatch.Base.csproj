@@ -43,11 +43,31 @@
     <Reference Include="CommandLine, Version=2.8.0.0, Culture=neutral, PublicKeyToken=5a870481e358d379, processorArchitecture=MSIL">
       <HintPath>..\..\packages\CommandLineParser.2.8.0\lib\net461\CommandLine.dll</HintPath>
     </Reference>
+    <Reference Include="ControlzEx, Version=4.0.0.0, Culture=neutral, PublicKeyToken=69f1c32f803d307e, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\ControlzEx.4.3.2\lib\net45\ControlzEx.dll</HintPath>
+    </Reference>
+    <Reference Include="DevZest.WpfDocking, Version=2.5.0.0, Culture=neutral, PublicKeyToken=861fc077c3dc39c3, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\DevZest.WpfDocking.3.0.0\lib\net35-Client\DevZest.WpfDocking.dll</HintPath>
+    </Reference>
+    <Reference Include="Fluent, Version=8.0.0.0, Culture=neutral, PublicKeyToken=3e436e32a8c5546f, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Fluent.Ribbon.8.0.0\lib\net452\Fluent.dll</HintPath>
+    </Reference>
+    <Reference Include="MahApps.Metro, Version=2.0.0.0, Culture=neutral, PublicKeyToken=51482d6f650b2b3f, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\MahApps.Metro.2.2.0\lib\net46\MahApps.Metro.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Xaml.Behaviors, Version=1.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.Xaml.Behaviors.Wpf.1.1.19\lib\net45\Microsoft.Xaml.Behaviors.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Newtonsoft.Json.12.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -57,9 +77,12 @@
     <Reference Include="System.Xaml">
       <RequiredTargetFramework>4.0</RequiredTargetFramework>
     </Reference>
+    <Reference Include="UIAutomationProvider" />
+    <Reference Include="UIAutomationTypes" />
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
+    <Reference Include="WindowsFormsIntegration" />
     <Reference Include="Xarial.XCad, Version=0.6.5.0, Culture=neutral, PublicKeyToken=60dcaf351d4060db, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Xarial.XCad.0.6.5\lib\net461\Xarial.XCad.dll</HintPath>
     </Reference>
@@ -73,8 +96,20 @@
   <ItemGroup>
     <Compile Include="AppVersionInfo.cs" />
     <Compile Include="Arguments.cs" />
+    <Compile Include="Controls\JobItemsDataGrid.xaml.cs">
+      <DependentUpon>JobItemsDataGrid.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Converters\DocumentTitleConverter.cs" />
+    <Compile Include="Converters\CommandEnabledConverter.cs" />
+    <Compile Include="Converters\JobItemStatusToImageConverter.cs" />
+    <Compile Include="Converters\JobStatusToImageConverter.cs" />
+    <Compile Include="Converters\LogOutputToTextConverter.cs" />
+    <Compile Include="Converters\SelectedVersionConverter.cs" />
     <Compile Include="Core\BatchRunner.cs" />
-    <Compile Include="Core\BatchRunnerOptions.cs" />
+    <Compile Include="Core\BatchJob.cs" />
+    <Compile Include="Core\OpenFileOptions_e.cs" />
+    <Compile Include="Core\StartupOptions_e.cs" />
+    <Compile Include="Exceptions\JobCancelledException.cs" />
     <Compile Include="Exceptions\UserException.cs" />
     <Compile Include="IApplicationProvider.cs" />
     <Compile Include="MainWindow.xaml.cs">
@@ -94,10 +129,15 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="ViewModels\BatchRunnerVM.cs" />
-    <Compile Include="Views\BatchRunnerView.xaml.cs">
-      <DependentUpon>BatchRunnerView.xaml</DependentUpon>
-    </Compile>
+    <Compile Include="ViewModels\BatchDocumentVM.cs" />
+    <Compile Include="ViewModels\JobItemFileVM.cs" />
+    <Compile Include="ViewModels\JobItemMacroVM.cs" />
+    <Compile Include="ViewModels\JobResultLogVM.cs" />
+    <Compile Include="ViewModels\JobResultSummaryVM.cs" />
+    <Compile Include="ViewModels\JobResultsVM.cs" />
+    <Compile Include="ViewModels\JobResultVM.cs" />
+    <Compile Include="ViewModels\BatchDocumentSettingsVM.cs" />
+    <Compile Include="ViewModels\BatchManagerVM.cs" />
     <Compile Include="XBatchApp.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -117,17 +157,89 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Page Include="Controls\JobItemsDataGrid.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Views\BatchRunnerView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
   </ItemGroup>
   <ItemGroup>
     <Resource Include="xbatch.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\add-macro.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\cancel-job.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\run-job.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\background-mode.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\no-popup-mode.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\rapid-mode.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\remove-file-folder.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\remove-macro.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\add-folder.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\add-file.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\read-only-mode.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\silent-mode.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\safe-mode.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\app-version.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\open.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\save.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\new.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\xbatch.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\status-awaiting.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\status-cancelled.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\status-failed.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\status-in-progress.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\status-succeeded.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\status-warning.png" />
   </ItemGroup>
   <Import Project="$(SolutionDir)common\common.module.props" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

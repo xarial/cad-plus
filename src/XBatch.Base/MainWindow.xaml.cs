@@ -25,16 +25,22 @@ using Xarial.XToolkit.Reporting;
 
 namespace Xarial.CadPlus.XBatch.Base
 {
-    public partial class MainWindow : Window
+    public partial class MainWindow
     {
         public MainWindow()
         {
             InitializeComponent();
+            
             var msgService = new MessageService("xBatch");
+
             try
             {
                 var appProvider = (Application.Current as XBatchApp).GetApplicationProvider();
-                this.DataContext = new BatchRunnerVM(new Models.BatchRunnerModel(appProvider), msgService);
+                var batchRunnerModel = new Models.BatchRunnerModel(appProvider);
+
+                var vm = new BatchManagerVM(batchRunnerModel, msgService);
+                
+                this.DataContext = vm;
             }
             catch (Exception ex)
             {

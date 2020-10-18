@@ -13,13 +13,18 @@ using System.Threading.Tasks;
 
 namespace Xarial.CadPlus.Common.Services
 {
-    public class ConsoleProgressWriter : IProgress<double>
+    public class ConsoleProgressWriter : IProgressHandler
     {
         public void Report(double value)
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine($"Progress: {(value * 100).ToString("F")}%");
             Console.ResetColor();
+        }
+
+        public void SetJobScope(IEnumerable<IJobItemFile> scope)
+        {
+            Console.WriteLine($"Processing {scope.Count()} file(s)");
         }
     }
 }

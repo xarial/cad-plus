@@ -12,6 +12,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Xarial.CadPlus.Common.Services;
 using Xarial.CadPlus.XBatch.Base.Exceptions;
 using Xarial.XCad;
 using Xarial.XCad.Documents;
@@ -22,31 +23,83 @@ using Xarial.XToolkit.Reporting;
 
 namespace Xarial.CadPlus.XBatch.Base.Core
 {
+    internal class JobItem : IJobItem
+    {
+        public event Action<IJobItem, JobItemStatus_e> StatusChanged;
+
+        public string DisplayName { get; protected set; }
+        
+        internal string FilePath { get; }
+
+        public JobItemStatus_e Status 
+        {
+            get => m_Status;
+            set 
+            {
+                m_Status = value;
+                StatusChanged?.Invoke(this, value);
+            }
+        }
+
+        private JobItemStatus_e m_Status;
+
+        internal JobItem(string filePath) 
+        {
+            FilePath = filePath;
+            m_Status = JobItemStatus_e.AwaitingProcessing;
+        }
+    }
+
+    internal class JobItemMacro : JobItem, IJobItemOperation
+    {
+        internal JobItemMacro(string filePath) : base(filePath)
+        {
+            DisplayName = Path.GetFileNameWithoutExtension(filePath);
+        }
+    }
+
+    internal class JobItemFile : JobItem, IJobItemFile
+    {
+        internal JobItemFile(string filePath, JobItemMacro[] macros) : base(filePath)
+        {
+            DisplayName = Path.GetFileName(filePath);
+            Macros = macros;
+        }
+
+        IEnumerable<IJobItemOperation> IJobItemFile.Operations => Macros;
+
+        public JobItemMacro[] Macros { get; }
+    }
+
     public class BatchRunner : IDisposable
     {
         private const int MAX_ATTEMPTS = 3;
 
         private readonly TextWriter m_Logger;
-        private readonly IProgress<double> m_ProgressHandler;
+        private readonly IProgressHandler m_ProgressHandler;
         private readonly IApplicationProvider m_AppProvider;
 
-        public BatchRunner(IApplicationProvider appProvider, TextWriter logger, IProgress<double> progressHandler)
+        public BatchRunner(IApplicationProvider appProvider, TextWriter logger, IProgressHandler progressHandler)
         {
             m_Logger = logger;
             m_ProgressHandler = progressHandler;
             m_AppProvider = appProvider;   
         }
 
-        public async Task<bool> BatchRun(BatchRunnerOptions opts, CancellationToken cancellationToken = default)
+        public async Task<bool> BatchRun(BatchJob opts, CancellationToken cancellationToken = default)
         {
+            m_ProgressHandler.Report(double.NaN);
+
             m_Logger.WriteLine($"Batch macro running started");
 
             var batchStartTime = DateTime.Now;
             
-            var allFiles = SelectAllFiles(opts.Input, opts.Filter).ToArray();
+            var allFiles = PrepareJobScope(opts.Input, opts.Filter, opts.Macros).ToArray();
 
             m_Logger.WriteLine($"Running batch processing for {allFiles.Length} file(s)");
-            
+
+            m_ProgressHandler.SetJobScope(allFiles);
+
             TimeSpan timeout = default;
 
             if (opts.Timeout > 0)
@@ -95,7 +148,7 @@ namespace Xarial.CadPlus.XBatch.Base.Core
             return jobResult;
         }
 
-        private IEnumerable<string> SelectAllFiles(IEnumerable<string> inputs, string filter) 
+        private IEnumerable<JobItemFile> PrepareJobScope(IEnumerable<string> inputs,  string filter, IEnumerable<string> macros) 
         {
             if (string.IsNullOrEmpty(filter)) 
             {
@@ -108,12 +161,12 @@ namespace Xarial.CadPlus.XBatch.Base.Core
                 {
                     foreach (var file in Directory.EnumerateFiles(input, filter, SearchOption.AllDirectories))
                     {
-                        yield return file;
+                        yield return new JobItemFile(file, macros.Select(m => new JobItemMacro(m)).ToArray());
                     }
                 }
                 else if (File.Exists(input))
                 {
-                    yield return input;
+                    yield return new JobItemFile(input, macros.Select(m => new JobItemMacro(m)).ToArray());
                 }
                 else
                 {
@@ -189,7 +242,7 @@ namespace Xarial.CadPlus.XBatch.Base.Core
                 {
                     if (cancellationToken.IsCancellationRequested)
                     {
-                        throw new UserMessageException("Cancelled by the user");
+                        throw new JobCancelledException();
                     }
                     
                     m_Logger.WriteLine($"Failed to start application from attempt {curAttempt}");
@@ -206,11 +259,13 @@ namespace Xarial.CadPlus.XBatch.Base.Core
         }
 
         private bool AttemptProcessFile(ref IXApplication app, ref Process appPrc, 
-            string filePath, BatchRunnerOptions opts, CancellationToken cancellationToken = default)
+            JobItemFile file, BatchJob opts, CancellationToken cancellationToken = default)
         {
+            file.Status = JobItemStatus_e.InProgress;
+
             int curAttempt = 1;
 
-            var macrosStack = new List<string>(opts.Macros);
+            var macrosStack = new List<JobItemMacro>(file.Macros);
 
             TimeSpan? timeout = null;
             
@@ -251,15 +306,15 @@ namespace Xarial.CadPlus.XBatch.Base.Core
                     }
 
                     var fileProcessStartTime = DateTime.Now;
-                    m_Logger.WriteLine($"Started processing file {filePath}");
+                    m_Logger.WriteLine($"Started processing file {file.FilePath}");
                     
-                    doc = app.Documents.FirstOrDefault(d => string.Equals(d.Path, filePath));
+                    doc = app.Documents.FirstOrDefault(d => string.Equals(d.Path, file.FilePath));
 
                     if (doc == null)
                     {
                         var openArgs = new DocumentOpenArgs()
                         {
-                            Path = filePath,
+                            Path = file.FilePath,
                             Silent = opts.OpenFileOptions.HasFlag(OpenFileOptions_e.Silent),
                             ReadOnly = opts.OpenFileOptions.HasFlag(OpenFileOptions_e.ReadOnly),
                             Rapid = opts.OpenFileOptions.HasFlag(OpenFileOptions_e.Rapid)
@@ -272,7 +327,8 @@ namespace Xarial.CadPlus.XBatch.Base.Core
 
                     AttempRunMacros(app, doc, macrosStack);
 
-                    m_Logger.WriteLine($"Processing file '{filePath}' completed. Execution time {DateTime.Now.Subtract(fileProcessStartTime).ToString(@"hh\:mm\:ss")}");
+                    file.Status = macrosStack.Any() ? JobItemStatus_e.Warning : JobItemStatus_e.Succeeded;
+                    m_Logger.WriteLine($"Processing file '{file.FilePath}' completed. Execution time {DateTime.Now.Subtract(fileProcessStartTime).ToString(@"hh\:mm\:ss")}");
 
                     return true;
                 }
@@ -282,7 +338,7 @@ namespace Xarial.CadPlus.XBatch.Base.Core
 
                     if (cancellationToken.IsCancellationRequested) 
                     {
-                        throw new UserMessageException("Cancelled by the user");
+                        throw new JobCancelledException();
                     }
 
                     if (timeoutCancellationToken.IsCancellationRequested)
@@ -294,7 +350,7 @@ namespace Xarial.CadPlus.XBatch.Base.Core
                     {
                         if (ex is OpenDocumentFailedException)
                         {
-                            errDesc = $"Failed to open document {filePath}: {(ex as OpenDocumentFailedException).Message}";
+                            errDesc = $"Failed to open document {file.FilePath}: {(ex as OpenDocumentFailedException).Message}";
                         }
                         else
                         {
@@ -312,25 +368,31 @@ namespace Xarial.CadPlus.XBatch.Base.Core
                 }
             }
 
-            m_Logger.WriteLine($"Processing file '{filePath}' failed");
+            file.Status = JobItemStatus_e.Failed;
+            m_Logger.WriteLine($"Processing file '{file.FilePath}' failed");
+
             return false;
         }
 
-        private void AttempRunMacros(IXApplication app, IXDocument doc, List<string> macrosStack)
+        private void AttempRunMacros(IXApplication app, IXDocument doc, List<JobItemMacro> macrosStack)
         {
             while (macrosStack.Any())
             {
-                var macroPath = macrosStack.First();
+                var macroItem = macrosStack.First();
 
                 try
                 {
-                    m_Logger.WriteLine($"Running '{macroPath}' macro");
+                    macroItem.Status = JobItemStatus_e.InProgress;
+                    m_Logger.WriteLine($"Running '{macroItem.FilePath}' macro");
 
-                    var macro = app.OpenMacro(macroPath);
+                    var macro = app.OpenMacro(macroItem.FilePath);
                     macro.Run();
+                    macroItem.Status = JobItemStatus_e.Succeeded;
                 }
                 catch (Exception ex)
                 {
+                    macroItem.Status = JobItemStatus_e.Failed;
+
                     string errorDesc;
 
                     if (ex is MacroRunFailedException)
@@ -342,7 +404,7 @@ namespace Xarial.CadPlus.XBatch.Base.Core
                         errorDesc = "Unknown error";
                     }
 
-                    m_Logger.WriteLine($"Failed to run macro '{macroPath}': {errorDesc}");
+                    m_Logger.WriteLine($"Failed to run macro '{macroItem}': {errorDesc}");
 
                     if (!IsDocAlive(doc))
                     {

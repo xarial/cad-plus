@@ -3,9 +3,11 @@
     <TargetFramework>net461</TargetFramework>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <IsPackable>false</IsPackable>
+    <XCadRegDll>false</XCadRegDll>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="DevZest.WpfDocking" Version="3.0.0" />
     <PackageReference Include="Moq" Version="4.14.1" />
     <PackageReference Include="nunit" Version="3.12.0" />
     <PackageReference Include="NUnit3TestAdapter" Version="3.15.1" />

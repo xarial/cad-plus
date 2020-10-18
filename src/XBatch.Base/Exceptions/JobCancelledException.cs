@@ -5,17 +5,18 @@
 //License: https://cadplus.xarial.com/license/
 //*********************************************************************
 
-using System.Globalization;
-using System.Windows.Controls;
-using Xarial.XToolkit.Wpf.Controls;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace Xarial.CadPlus.XBatch.Base.Views
+namespace Xarial.CadPlus.XBatch.Base.Exceptions
 {
-    public partial class BatchRunnerView : UserControl
+    public class JobCancelledException : UserMessageException
     {
-        public BatchRunnerView()
+        public JobCancelledException() : base("Cancelled by the user") 
         {
-            InitializeComponent();
         }
     }
 }
