@@ -96,6 +96,9 @@
   <ItemGroup>
     <Compile Include="AppVersionInfo.cs" />
     <Compile Include="Arguments.cs" />
+    <Compile Include="Controls\HomePage.xaml.cs">
+      <DependentUpon>HomePage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Controls\JobItemsDataGrid.xaml.cs">
       <DependentUpon>JobItemsDataGrid.xaml</DependentUpon>
     </Compile>
@@ -112,9 +115,11 @@
     <Compile Include="Exceptions\JobCancelledException.cs" />
     <Compile Include="Exceptions\UserException.cs" />
     <Compile Include="IApplicationProvider.cs" />
+    <Compile Include="Locations.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Models\BatchRunJobExecutor.cs" />
     <Compile Include="Models\BatchRunnerModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
@@ -129,6 +134,7 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <Compile Include="Services\RecentFilesManager.cs" />
     <Compile Include="ViewModels\BatchDocumentVM.cs" />
     <Compile Include="ViewModels\JobItemFileVM.cs" />
     <Compile Include="ViewModels\JobItemMacroVM.cs" />
@@ -157,6 +163,10 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Page Include="Controls\HomePage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Controls\JobItemsDataGrid.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -240,6 +250,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\status-warning.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\browse-file.png" />
   </ItemGroup>
   <Import Project="$(SolutionDir)common\common.module.props" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

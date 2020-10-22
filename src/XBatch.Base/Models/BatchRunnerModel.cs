@@ -7,124 +7,50 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using Xarial.CadPlus.Common.Services;
 using Xarial.CadPlus.XBatch.Base.Core;
 using Xarial.CadPlus.XBatch.Base.Exceptions;
+using Xarial.CadPlus.XBatch.Base.Services;
+using Xarial.XToolkit.Services.UserSettings;
 using Xarial.XToolkit.Wpf.Utils;
 
 namespace Xarial.CadPlus.XBatch.Base.Models
 {
     public interface IBatchRunnerModel 
     {
-        AppVersionInfo ParseVersion(string id);
+        ObservableCollection<string> RecentFiles { get; }
         AppVersionInfo[] InstalledVersions { get; }
+
         FileFilter[] InputFilesFilter { get; }
         FileFilter[] MacroFilesFilter { get; }
+
+        void SaveJobToFile(BatchJob job, string filePath);
+        BatchJob LoadJobFromFile(string filePath);
+        BatchJob CreateNewJobDocument();
+
+        AppVersionInfo ParseVersion(string id);
+
         IBatchRunJobExecutor CreateExecutor(BatchJob job);
-    }
-
-    public interface IBatchRunJobExecutor
-    {
-        event Action<IEnumerable<IJobItemFile>> JobSet;
-        event Action<double> ProgressChanged;
-        event Action<string> Log;
-
-        Task<bool> ExecuteAsync();
-        void Cancel();
-    }
-
-    public class BatchRunJobExecutor : IBatchRunJobExecutor
-    {
-        public event Action<double> ProgressChanged;
-        public event Action<IEnumerable<IJobItemFile>> JobSet;
-        public event Action<string> Log;
-
-        private CancellationTokenSource m_CurrentCancellationToken;
-
-        private readonly BatchJob m_Job;
-        private readonly IApplicationProvider m_AppProvider;
-
-        private readonly LogWriter m_LogWriter;
-        private readonly ProgressHandler m_PrgHander;
-        
-        private bool m_IsExecuting;
-
-        public BatchRunJobExecutor(BatchJob job, IApplicationProvider appProvider) 
-        {
-            m_Job = job;
-            m_AppProvider = appProvider;
-
-            m_LogWriter = new LogWriter();
-            m_PrgHander = new ProgressHandler();
-
-            m_IsExecuting = false;
-        }
-
-        public async Task<bool> ExecuteAsync()
-        {
-            if (!m_IsExecuting)
-            {
-                m_IsExecuting = true;
-
-                m_CurrentCancellationToken = new CancellationTokenSource();
-
-                m_LogWriter.Log += OnLog;
-                m_PrgHander.ProgressChanged += OnProgressChanged;
-                m_PrgHander.JobScopeSet += OnJobScopeSet;
-
-                try
-                {
-                    using (var batchRunner = new BatchRunner(m_AppProvider, m_LogWriter, m_PrgHander))
-                    {
-                        var cancellationToken = m_CurrentCancellationToken.Token;
-
-                        return await batchRunner.BatchRun(m_Job, cancellationToken).ConfigureAwait(false);
-                    }
-                }
-                finally
-                {
-                    m_LogWriter.Log -= OnLog;
-                    m_PrgHander.ProgressChanged -= OnProgressChanged;
-                }
-            }
-            else 
-            {
-                throw new Exception("Execution is already running");
-            }
-        }
-
-        private void OnJobScopeSet(IEnumerable<IJobItemFile> files)
-        {
-            JobSet?.Invoke(files);
-        }
-
-        public void Cancel()
-        {
-            m_CurrentCancellationToken.Cancel();
-        }
-
-        private void OnLog(string line)
-        {
-            Log?.Invoke(line);
-        }
-
-        private void OnProgressChanged(double prg)
-        {
-            ProgressChanged?.Invoke(prg);
-        }
     }
 
     public class BatchRunnerModel : IBatchRunnerModel
     {
         private readonly IApplicationProvider m_AppProvider;
 
-        public BatchRunnerModel(IApplicationProvider appProvider) 
+        private readonly IRecentFilesManager m_RecentFilesMgr;
+
+        public ObservableCollection<string> RecentFiles { get; }
+
+        public BatchRunnerModel(IApplicationProvider appProvider, IRecentFilesManager recentFilesMgr) 
         {
             m_AppProvider = appProvider;
+            m_RecentFilesMgr = recentFilesMgr;
+            RecentFiles = new ObservableCollection<string>(m_RecentFilesMgr.RecentFiles);
+
             InstalledVersions = m_AppProvider.GetInstalledVersions().ToArray();
 
             if (!InstalledVersions.Any()) 
@@ -141,6 +67,39 @@ namespace Xarial.CadPlus.XBatch.Base.Models
 
         public IBatchRunJobExecutor CreateExecutor(BatchJob job) => new BatchRunJobExecutor(job, m_AppProvider);
 
+        public BatchJob CreateNewJobDocument() => new BatchJob();
+
+        public BatchJob LoadJobFromFile(string filePath)
+        {
+            var svc = new UserSettingsService();
+
+            var batchJob = svc.ReadSettings<BatchJob>(filePath);
+
+            UpdateRecentFiles(filePath);
+
+            return batchJob;
+        }
+
         public AppVersionInfo ParseVersion(string id) => m_AppProvider.ParseVersion(id);
+
+        public void SaveJobToFile(BatchJob job, string filePath)
+        {
+            var svc = new UserSettingsService();
+
+            svc.StoreSettings(job, filePath);
+
+            UpdateRecentFiles(filePath);
+        }
+
+        private void UpdateRecentFiles(string filePath) 
+        {
+            m_RecentFilesMgr.PushFile(filePath);
+            RecentFiles.Clear();
+            
+            foreach (var recFile in m_RecentFilesMgr.RecentFiles)
+            {
+                RecentFiles.Add(recFile);
+            }
+        }
     }
 }

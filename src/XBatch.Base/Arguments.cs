@@ -15,6 +15,16 @@ using Xarial.CadPlus.XBatch.Base.Core;
 
 namespace Xarial.CadPlus.XBatch.Base
 {
+    [Verb("file")]
+    public class FileOptions
+    {
+        [Option('o', "open", Required = false)]
+        public string FilePath { get; set; }
+
+        [Option('n', "new", Required = false)]
+        public bool CreateNew { get; set; }
+    }
+
     public class Arguments
     {
         internal BatchJob Options { get; }
@@ -26,7 +36,7 @@ namespace Xarial.CadPlus.XBatch.Base
             Options = new BatchJob();
             m_AppProvider = appProvider;
         }
-
+        
         [Option('i', "input", Required = true, HelpText = "List of input directories or file paths to process")]
         public IEnumerable<string> Input 
         {

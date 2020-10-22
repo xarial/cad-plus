@@ -22,5 +22,17 @@ namespace Xarial.CadPlus.XBatch.Base.Properties {
                 return defaultInstance;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Xarial\\CADPlusToolset")]
+        public string AppRootDir {
+            get {
+                return ((string)(this["AppRootDir"]));
+            }
+            set {
+                this["AppRootDir"] = value;
+            }
+        }
     }
 }

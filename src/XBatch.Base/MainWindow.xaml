@@ -36,6 +36,9 @@
                     <xconv:ObjectIsNotNullUniversalConverter x:Key="objIsNotNullToVisConv" 
                                                              TrueValue="{x:Static win:Visibility.Visible}"
                                                              FalseValue="{x:Static win:Visibility.Collapsed}"/>
+                    <xconv:ObjectIsNotNullUniversalConverter x:Key="objIsNullToVisConv" 
+                                                             TrueValue="{x:Static win:Visibility.Collapsed}"
+                                                             FalseValue="{x:Static win:Visibility.Visible}"/>
                     <xconv:ObjectIsNotNullUniversalConverter x:Key="objIsNotNullConv"/>
                 </ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
@@ -66,7 +69,7 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        <fluent:Ribbon Grid.Row="0">
+        <fluent:Ribbon Grid.Row="0" Visibility="{Binding Path=Document, Converter={StaticResource objIsNotNullToVisConv}}">
             <fluent:Ribbon.Menu>
                 <fluent:Backstage>
                     <fluent:BackstageTabControl>
@@ -89,7 +92,7 @@
                     </fluent:BackstageTabControl>
                 </fluent:Backstage>
             </fluent:Ribbon.Menu>
-            <fluent:RibbonTabItem Header="Input" DataContext="{Binding Path=Document}" IsEnabled="{Binding Converter={StaticResource objIsNotNullConv}}">
+            <fluent:RibbonTabItem Header="Input" DataContext="{Binding Path=Document}">
                 <fluent:RibbonGroupBox Header="Files">
                     <fluent:Button Header="Add Files..." 
                                    Command="{Binding Path=AddFilesCommand, ElementName=lstInputs}"
@@ -115,7 +118,7 @@
                                    LargeIcon="/XBatch.Base;component/Resources/remove-macro.png" />
                 </fluent:RibbonGroupBox>
             </fluent:RibbonTabItem>
-            <fluent:RibbonTabItem Header="Settings" DataContext="{Binding Path=Document.Settings}" IsEnabled="{Binding Converter={StaticResource objIsNotNullConv}}">
+            <fluent:RibbonTabItem Header="Settings" DataContext="{Binding Path=Document.Settings}">
                 <fluent:RibbonGroupBox Header="Startup Options">
                     <fluent:DropDownButton LargeIcon="/XBatch.Base;component/Resources/app-version.png" Header="{Binding Path=Version.DisplayName}" 
                                            ItemsSource="{Binding Path=InstalledVersions}">
@@ -181,7 +184,7 @@
                     <metro:ToggleSwitch Grid.Column="0" VerticalAlignment="Center" OnContent="Continue on error" OffContent="Stop on error" IsOn="{Binding Path=ContinueOnError}"/>
                 </fluent:RibbonGroupBox>
             </fluent:RibbonTabItem>
-            <fluent:RibbonTabItem Header="Job" DataContext="{Binding Path=Document}" IsEnabled="{Binding Converter={StaticResource objIsNotNullConv}}">
+            <fluent:RibbonTabItem Header="Job" DataContext="{Binding Path=Document}" >
                 <fluent:RibbonGroupBox Header="Execution">
                     <fluent:Button Header="Run Job"
                                    Icon="/XBatch.Base;component/Resources/run-job.png"
@@ -286,5 +289,9 @@
                 </dz:DockItem>
             </dz:DockControl.DockItems>
         </dz:DockControl>
+        <ctrls:HomePage Grid.RowSpan="2" VerticalAlignment="Center" HorizontalAlignment="Center"
+                        Visibility="{Binding Path=Document, Converter={StaticResource objIsNullToVisConv}}">
+            
+        </ctrls:HomePage>
     </Grid>
 </metro:MetroWindow>

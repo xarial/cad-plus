@@ -142,9 +142,7 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
 
             try
             {
-                var svc = new UserSettingsService();
-
-                svc.StoreSettings(m_Job, m_FilePath);
+                m_Model.SaveJobToFile(m_Job, m_FilePath);
                 IsDirty = false;
             }
             catch

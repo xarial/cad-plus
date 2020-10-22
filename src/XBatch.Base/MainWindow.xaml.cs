@@ -20,6 +20,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Xarial.CadPlus.Common.Services;
+using Xarial.CadPlus.XBatch.Base.Services;
 using Xarial.CadPlus.XBatch.Base.ViewModels;
 using Xarial.XToolkit.Reporting;
 
@@ -36,7 +37,7 @@ namespace Xarial.CadPlus.XBatch.Base
             try
             {
                 var appProvider = (Application.Current as XBatchApp).GetApplicationProvider();
-                var batchRunnerModel = new Models.BatchRunnerModel(appProvider);
+                var batchRunnerModel = new Models.BatchRunnerModel(appProvider, new RecentFilesManager());
 
                 var vm = new BatchManagerVM(batchRunnerModel, msgService);
                 

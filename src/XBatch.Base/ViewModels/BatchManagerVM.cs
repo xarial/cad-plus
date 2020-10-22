@@ -53,33 +53,34 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
             m_MsgSvc = msgSvc;
             
             NewDocumentCommand = new RelayCommand(NewDocument);
-            OpenDocumentCommand = new RelayCommand(OpenDocument);
+            OpenDocumentCommand = new RelayCommand<string>(OpenDocument);
             CloseDocumentCommand = new RelayCommand(CloseDocument, () => Document != null);
         }
+
+        public ObservableCollection<string> RecentFiles => m_Model.RecentFiles;
         
-        private void OpenDocument()
+        private void OpenDocument(string filePath)
         {
             try
             {
-                if (FileSystemBrowser.BrowseFileOpen(out string filePath, "Select file to open",
-                    FileSystemBrowser.BuildFilterString(new FileFilter("xBatch File", "*.xbatch"), FileFilter.AllFiles))) 
+                if (!string.IsNullOrEmpty(filePath) ||
+                    FileSystemBrowser.BrowseFileOpen(out filePath, "Select file to open",
+                        FileSystemBrowser.BuildFilterString(new FileFilter("xBatch File", "*.xbatch"), FileFilter.AllFiles)))
                 {
                     if (!string.Equals(Document?.FilePath, filePath, StringComparison.CurrentCultureIgnoreCase))
                     {
-                        var svc = new UserSettingsService();
-
-                        var batchJob = svc.ReadSettings<BatchJob>(filePath);
+                        var batchJob = m_Model.LoadJobFromFile(filePath);
 
                         if (Document == null)
                         {
                             Document = new BatchDocumentVM(new FileInfo(filePath), batchJob, m_Model, m_MsgSvc);
                         }
-                        else 
+                        else
                         {
                             //TODO: open in current session or in new session
                         }
                     }
-                    else 
+                    else
                     {
                         m_MsgSvc.ShowError("Document already open");
                     }
@@ -95,7 +96,9 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
         {
             if (Document == null)
             {
-                Document = new BatchDocumentVM("xBatch Document", new BatchJob(), m_Model, m_MsgSvc);
+                var job = m_Model.CreateNewJobDocument();
+
+                Document = new BatchDocumentVM("xBatch Document", job, m_Model, m_MsgSvc);
             }
             else
             {
