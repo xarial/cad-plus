@@ -88,8 +88,6 @@ namespace Xarial.CadPlus.XBatch.Base.Core
 
         public async Task<bool> BatchRun(BatchJob opts, CancellationToken cancellationToken = default)
         {
-            m_ProgressHandler.Report(double.NaN);
-
             m_Logger.WriteLine($"Batch macro running started");
 
             var batchStartTime = DateTime.Now;
@@ -98,7 +96,7 @@ namespace Xarial.CadPlus.XBatch.Base.Core
 
             m_Logger.WriteLine($"Running batch processing for {allFiles.Length} file(s)");
 
-            m_ProgressHandler.SetJobScope(allFiles);
+            m_ProgressHandler.SetJobScope(allFiles, batchStartTime);
 
             TimeSpan timeout = default;
 
@@ -127,8 +125,9 @@ namespace Xarial.CadPlus.XBatch.Base.Core
                 {
                     for (int i = 0; i < allFiles.Length; i++)
                     {
-                        var res = AttemptProcessFile(ref app, ref appPrc, allFiles[i], opts, cancellationToken);
-                        m_ProgressHandler?.Report((i + 1) / (double)allFiles.Length);
+                        var curFile = allFiles[i];
+                        var res = AttemptProcessFile(ref app, ref appPrc, curFile, opts, cancellationToken);
+                        m_ProgressHandler?.ReportProgress(curFile, res);
                                                 
                         if (!res && !opts.ContinueOnError) 
                         {
@@ -143,7 +142,11 @@ namespace Xarial.CadPlus.XBatch.Base.Core
                 TryShutDownApplication(appPrc);
             }
 
-            m_Logger.WriteLine($"Batch running completed in {DateTime.Now.Subtract(batchStartTime).ToString(@"hh\:mm\:ss")}");
+            var duration = DateTime.Now.Subtract(batchStartTime);
+
+            m_ProgressHandler.ReportCompleted(duration);
+
+            m_Logger.WriteLine($"Batch running completed in {duration.ToString(@"hh\:mm\:ss")}");
 
             return jobResult;
         }

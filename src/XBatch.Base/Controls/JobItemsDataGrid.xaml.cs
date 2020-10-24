@@ -67,7 +67,8 @@ namespace Xarial.CadPlus.XBatch.Base.Controls
 				IsReadOnly = true,
 				Header = header,
 				CellTemplate = cellTemplate,
-				Width = DataGridLength.SizeToHeader
+				Width = DataGridLength.SizeToHeader,
+				SortMemberPath = binding.Path.Path
 			};
 
 			return statusCol;

@@ -106,6 +106,7 @@
     <Compile Include="Converters\CommandEnabledConverter.cs" />
     <Compile Include="Converters\JobItemStatusToImageConverter.cs" />
     <Compile Include="Converters\JobStatusToImageConverter.cs" />
+    <Compile Include="Converters\JobTitleConverter.cs" />
     <Compile Include="Converters\LogOutputToTextConverter.cs" />
     <Compile Include="Converters\SelectedVersionConverter.cs" />
     <Compile Include="Core\BatchRunner.cs" />
@@ -253,6 +254,9 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\browse-file.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\run-job-small.png" />
   </ItemGroup>
   <Import Project="$(SolutionDir)common\common.module.props" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

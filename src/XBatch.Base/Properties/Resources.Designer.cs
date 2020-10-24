@@ -203,6 +203,16 @@ namespace Xarial.CadPlus.XBatch.Base.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap run_job_small {
+            get {
+                object obj = ResourceManager.GetObject("run_job_small", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap safe_mode {
             get {
                 object obj = ResourceManager.GetObject("safe_mode", resourceCulture);

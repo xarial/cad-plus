@@ -38,24 +38,21 @@ namespace Xarial.CadPlus.Common.Services
         string DisplayName { get; }
     }
 
-    public interface IProgressHandler : IProgress<double>
+    public interface IProgressHandler
     {
-        void SetJobScope(IEnumerable<IJobItemFile> scope);
+        void ReportProgress(IJobItemFile file, bool result);
+        void SetJobScope(IJobItemFile[] scope, DateTime startTime);
+        void ReportCompleted(TimeSpan duration);
     }
 
     public class ProgressHandler : IProgressHandler
     {
-        public event Action<double> ProgressChanged;
-        public event Action<IEnumerable<IJobItemFile>> JobScopeSet;
+        public event Action<IJobItemFile, bool> ProgressChanged;
+        public event Action<IJobItemFile[], DateTime> JobScopeSet;
+        public event Action<TimeSpan> Completed;
 
-        public void Report(double value)
-        {
-            ProgressChanged?.Invoke(value);
-        }
-
-        public void SetJobScope(IEnumerable<IJobItemFile> scope)
-        {
-            JobScopeSet?.Invoke(scope);
-        }
+        public void ReportCompleted(TimeSpan duration) => Completed?.Invoke(duration);
+        public void ReportProgress(IJobItemFile file, bool result) => ProgressChanged?.Invoke(file, result);
+        public void SetJobScope(IJobItemFile[] scope, DateTime startTime) => JobScopeSet?.Invoke(scope, startTime);
     }
 }

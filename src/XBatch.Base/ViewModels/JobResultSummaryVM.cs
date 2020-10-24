@@ -21,6 +21,12 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
+        private JobItemFileVM[] m_JobItemFiles;
+        private int m_ProcessedFiles;
+        private int m_FailedFiles;
+        private DateTime? m_StartTime;
+        private TimeSpan? m_Duration;
+
         public double Progress
         {
             get => m_Progress;
@@ -44,8 +50,6 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
             }
         }
 
-        private JobItemFileVM[] m_JobItemFiles;
-
         public JobItemFileVM[] JobItemFiles 
         {
             get => m_JobItemFiles;
@@ -56,34 +60,89 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
             }
         }
 
+        public int ProcessedFiles
+        {
+            get => m_ProcessedFiles;
+            set 
+            {
+                m_ProcessedFiles = value;
+                this.NotifyChanged();
+            }
+        }
+
+        public int FailedFiles
+        {
+            get => m_FailedFiles;
+            set
+            {
+                m_FailedFiles = value;
+                this.NotifyChanged();
+            }
+        }
+
+        public DateTime? StartTime 
+        {
+            get => m_StartTime;
+            set 
+            {
+                m_StartTime = value;
+                this.NotifyChanged();
+            }
+        }
+
+        public TimeSpan? Duration
+        {
+            get => m_Duration;
+            set
+            {
+                m_Duration = value;
+                this.NotifyChanged();
+            }
+        }
+
         private readonly IBatchRunJobExecutor m_Executor;
         private double m_Progress;
         private bool m_IsInitializing;
 
         public JobResultSummaryVM(IBatchRunJobExecutor executor)
         {
+            IsInitializing = true;
+
             m_Executor = executor;
 
             m_Executor.JobSet += OnJobSet;
             m_Executor.ProgressChanged += OnProgressChanged;
+            m_Executor.JobCompleted += OnJobCompleted;
         }
 
-        private void OnJobSet(IEnumerable<IJobItemFile> files)
+        private void OnJobSet(IJobItemFile[] files, DateTime startTime)
         {
             JobItemFiles = files.Select(f => new JobItemFileVM(f)).ToArray();
+            StartTime = startTime;
         }
 
-        private void OnProgressChanged(double prg)
+        private void OnJobCompleted(TimeSpan duration)
         {
-            if (double.IsNaN(prg))
-            {
-                IsInitializing = true;
-            }
-            else
+            Duration = duration;
+        }
+
+        private void OnProgressChanged(IJobItemFile file, bool result)
+        {
+            if (IsInitializing)
             {
                 IsInitializing = false;
-                Progress = prg;
             }
+
+            if (result)
+            {
+                ProcessedFiles++;
+            }
+            else 
+            {
+                FailedFiles++;
+            }
+
+            Progress = (ProcessedFiles + FailedFiles) / (double)JobItemFiles.Length;
         }
     }
 }

@@ -9,6 +9,7 @@ namespace Xarial.CadPlus.XBatch.Base.Services
 {
     public interface IRecentFilesManager 
     {
+        void RemoveFile(string filePath);
         void PushFile(string filePath);
         IEnumerable<string> RecentFiles { get; }
     }
@@ -81,6 +82,20 @@ namespace Xarial.CadPlus.XBatch.Base.Services
             catch 
             {
             }
+        }
+
+        public void RemoveFile(string filePath)
+        {
+            var existingIndex = m_RecentFiles.FindIndex(1, x => string.Equals(x, filePath, StringComparison.CurrentCultureIgnoreCase));
+
+            if (existingIndex != -1)
+            {
+                m_RecentFiles.RemoveAt(existingIndex);
+            }
+
+            TruncateList();
+
+            TrySaveRecentFiles();
         }
     }
 }

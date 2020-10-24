@@ -71,13 +71,22 @@ namespace Xarial.CadPlus.XBatch.Base.Models
 
         public BatchJob LoadJobFromFile(string filePath)
         {
-            var svc = new UserSettingsService();
+            try
+            {
+                var svc = new UserSettingsService();
 
-            var batchJob = svc.ReadSettings<BatchJob>(filePath);
+                var batchJob = svc.ReadSettings<BatchJob>(filePath);
 
-            UpdateRecentFiles(filePath);
+                AppendRecentFiles(filePath);
 
-            return batchJob;
+                return batchJob;
+            }
+            catch 
+            {
+                m_RecentFilesMgr.RemoveFile(filePath);
+                UpdateRecentFiles();
+                throw;
+            }
         }
 
         public AppVersionInfo ParseVersion(string id) => m_AppProvider.ParseVersion(id);
@@ -88,14 +97,19 @@ namespace Xarial.CadPlus.XBatch.Base.Models
 
             svc.StoreSettings(job, filePath);
 
-            UpdateRecentFiles(filePath);
+            AppendRecentFiles(filePath);
         }
 
-        private void UpdateRecentFiles(string filePath) 
+        private void AppendRecentFiles(string filePath)
         {
             m_RecentFilesMgr.PushFile(filePath);
+            UpdateRecentFiles();
+        }
+
+        private void UpdateRecentFiles()
+        {
             RecentFiles.Clear();
-            
+
             foreach (var recFile in m_RecentFilesMgr.RecentFiles)
             {
                 RecentFiles.Add(recFile);

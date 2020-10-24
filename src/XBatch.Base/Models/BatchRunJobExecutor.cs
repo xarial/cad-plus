@@ -16,8 +16,9 @@ namespace Xarial.CadPlus.XBatch.Base.Models
 {
     public interface IBatchRunJobExecutor
     {
-        event Action<IEnumerable<IJobItemFile>> JobSet;
-        event Action<double> ProgressChanged;
+        event Action<IJobItemFile[], DateTime> JobSet;
+        event Action<TimeSpan> JobCompleted;
+        event Action<IJobItemFile, bool> ProgressChanged;
         event Action<string> Log;
 
         Task<bool> ExecuteAsync();
@@ -26,8 +27,10 @@ namespace Xarial.CadPlus.XBatch.Base.Models
 
     public class BatchRunJobExecutor : IBatchRunJobExecutor
     {
-        public event Action<double> ProgressChanged;
-        public event Action<IEnumerable<IJobItemFile>> JobSet;
+        public event Action<IJobItemFile, bool> ProgressChanged;
+        public event Action<IJobItemFile[], DateTime> JobSet;
+        public event Action<TimeSpan> JobCompleted;
+
         public event Action<string> Log;
 
         private CancellationTokenSource m_CurrentCancellationToken;
@@ -62,6 +65,7 @@ namespace Xarial.CadPlus.XBatch.Base.Models
                 m_LogWriter.Log += OnLog;
                 m_PrgHander.ProgressChanged += OnProgressChanged;
                 m_PrgHander.JobScopeSet += OnJobScopeSet;
+                m_PrgHander.Completed += OnJobCompleted;
 
                 try
                 {
@@ -84,10 +88,9 @@ namespace Xarial.CadPlus.XBatch.Base.Models
             }
         }
 
-        private void OnJobScopeSet(IEnumerable<IJobItemFile> files)
-        {
-            JobSet?.Invoke(files);
-        }
+        private void OnJobCompleted(TimeSpan duration) => JobCompleted?.Invoke(duration);
+
+        private void OnJobScopeSet(IJobItemFile[] files, DateTime startTime) => JobSet?.Invoke(files, startTime);
 
         public void Cancel()
         {
@@ -99,9 +102,9 @@ namespace Xarial.CadPlus.XBatch.Base.Models
             Log?.Invoke(line);
         }
 
-        private void OnProgressChanged(double prg)
+        private void OnProgressChanged(IJobItemFile file, bool result)
         {
-            ProgressChanged?.Invoke(prg);
+            ProgressChanged?.Invoke(file, result);
         }
     }
 }
