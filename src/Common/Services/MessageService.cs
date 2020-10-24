@@ -18,12 +18,28 @@ namespace Xarial.CadPlus.Common.Services
     {
         void ShowError(string error);
         void ShowInformation(string msg);
+        bool? ShowQuestion(string question);
     }
 
     public class MessageService : IMessageService
     {
         public void ShowError(string error) => ShowMessage(error, MessageBoxImage.Error);
         public void ShowInformation(string msg) => ShowMessage(msg, MessageBoxImage.Information);
+
+        public bool? ShowQuestion(string question)
+        {
+            switch (ShowMessage(question, MessageBoxImage.Information, MessageBoxButton.YesNoCancel)) 
+            {
+                case MessageBoxResult.Yes:
+                    return true;
+
+                case MessageBoxResult.No:
+                    return false;
+
+                default:
+                    return null;
+            }
+        }
 
         private readonly string m_Title;
 
@@ -32,9 +48,7 @@ namespace Xarial.CadPlus.Common.Services
             m_Title = title;
         }
 
-        public void ShowMessage(string msg, MessageBoxImage img, MessageBoxButton btn = MessageBoxButton.OK)
-        {
-            MessageBox.Show(msg, m_Title, btn, img);
-        }
+        public MessageBoxResult ShowMessage(string msg, MessageBoxImage img, MessageBoxButton btn = MessageBoxButton.OK)
+            => MessageBox.Show(msg, m_Title, btn, img);
     }
 }
