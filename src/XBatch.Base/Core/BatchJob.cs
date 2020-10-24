@@ -32,11 +32,13 @@ namespace Xarial.CadPlus.XBatch.Base.Core
         public AppVersionInfo Version { get; set; }
         public StartupOptions_e StartupOptions { get; set; }
         public OpenFileOptions_e OpenFileOptions { get; set; }
+        public int BatchSize { get; set; }
 
         public BatchJob() 
         {
             Filters = new string[] { "*.*" };
             Timeout = 600;
+            BatchSize = 25;
             ContinueOnError = true;
             StartupOptions = StartupOptions_e.Silent | StartupOptions_e.Safe;
             OpenFileOptions = OpenFileOptions_e.Silent;

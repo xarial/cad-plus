@@ -123,6 +123,14 @@
                                    Icon="/XBatch.Base;component/Resources/remove-file-folder.png"
                                    LargeIcon="/XBatch.Base;component/Resources/remove-file-folder.png" />
                 </fluent:RibbonGroupBox>
+                <fluent:RibbonGroupBox Header="Folder Filters">
+                    <DataGrid ItemsSource="{Binding Path=Filters}" AutoGenerateColumns="False" Width="100"
+                              HeadersVisibility="None" ColumnWidth="*" CanUserAddRows="True">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Binding="{Binding Path=Value, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="False"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </fluent:RibbonGroupBox>
                 <fluent:RibbonGroupBox Header="Macros">
                     <fluent:Button Header="Add Macros..." Size="Large"
                                    Command="{Binding Path=AddFilesCommand, ElementName=lstMacros}"
@@ -186,18 +194,33 @@
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
                         <metro:ToggleSwitch Grid.Column="0" VerticalAlignment="Center" 
                                             OnContent="Timeout On" 
                                             OffContent="Timeout Off"
-                                            IsOn="{Binding Path=IsTimeoutEnabled}"/>
+                                            IsOn="{Binding Path=IsTimeoutEnabled}">
+                        </metro:ToggleSwitch>
                         <fluent:Spinner Value="{Binding Path=Timeout}" Grid.Column="1"
                                         Minimum="0" Maximum="3600"
-                                        Format="0" Width="150"
+                                        Format="0" Width="75" Margin="-20 0 0 0"
                                         Header="" IsEnabled="{Binding Path=IsTimeoutEnabled}"/>
                     </Grid>
                     <metro:ToggleSwitch Grid.Column="0" VerticalAlignment="Center" OnContent="Continue on error" OffContent="Stop on error" IsOn="{Binding Path=ContinueOnError}"/>
+                    <Grid Margin="20 0 0 0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <metro:ToggleSwitch Grid.Column="0" VerticalAlignment="Center" 
+                                            OnContent="Limit Batch Size" 
+                                            OffContent="Unlimited Batch Size"
+                                            IsOn="{Binding Path=IsBatchSizeLimited}"/>
+                            <fluent:Spinner Value="{Binding Path=BatchSize}" Grid.Column="1"
+                                        Minimum="1"
+                                        Format="0" Width="75" Margin="-20 0 0 0"
+                                        Header="" Visibility="{Binding Path=IsBatchSizeLimited, Converter={StaticResource boolToVisConv}}"/>
+                        </Grid>
                 </fluent:RibbonGroupBox>
             </fluent:RibbonTabItem>
             <fluent:RibbonTabItem Header="Job" DataContext="{Binding Path=Document}" >
@@ -321,28 +344,9 @@
                 </dz:DockItem>
                 <dz:DockItem TabText="Files And Folders" Title="Files And Folders" ShowAction="{dz:ShowAsDockPositionAction DockPosition=Document, Source=3}">
                     <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="*"/>
-                            <RowDefinition Height="Auto"/>
-                        </Grid.RowDefinitions>
                         <cmnctrls:PathListBox x:Name="lstInputs" Filters="{Binding Path=InputFilesFilter}" 
                                               Grid.Row="0" PathsSource="{Binding Path=Input}"
                                               ShowAddFileButton="False" ShowAddFolderButton="False"/>
-                        <Grid Grid.Row="1">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="*" />
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Text="Filters:" Grid.Column="0" Margin="2" VerticalAlignment="Top" />
-                            <DataGrid ItemsSource="{Binding Path=Filters}" AutoGenerateColumns="False" BorderBrush="Black" BorderThickness="1"
-                                      AlternationCount="2" AlternatingRowBackground="LightGray" RowHeaderWidth="15"
-                                      Grid.Column="1" Margin="2" Width="200" Height="100" HorizontalAlignment="Left"
-                                      HeadersVisibility="Row" ColumnWidth="*" CanUserAddRows="True">
-                                <DataGrid.Columns>
-                                    <DataGridTextColumn Binding="{Binding Path=Value, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="False"/>
-                                </DataGrid.Columns>
-                            </DataGrid>
-                        </Grid>
                     </Grid>
                 </dz:DockItem>
                 <dz:DockItem TabText="Macros" Title="Macros" ShowAction="{dz:ShowAsSidePaneAction Side=Bottom, Size=*, IsSizeForTarget=True, Target=3, Source=4 }">

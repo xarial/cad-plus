@@ -48,6 +48,18 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
             }
         }
 
+        public int BatchSize
+        {
+            get => m_Job.BatchSize;
+            set
+            {
+                m_CachedBatchSize = value;
+                m_Job.BatchSize = value;
+                this.NotifyChanged();
+                Modified?.Invoke();
+            }
+        }
+
         public bool IsTimeoutEnabled
         {
             get => m_Job.Timeout != -1;
@@ -67,6 +79,25 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
             }
         }
 
+        public bool IsBatchSizeLimited
+        {
+            get => m_Job.BatchSize != -1;
+            set
+            {
+                if (!value)
+                {
+                    m_Job.BatchSize = -1;
+                }
+                else
+                {
+                    m_Job.BatchSize = m_CachedBatchSize;
+                }
+
+                this.NotifyChanged();
+                Modified?.Invoke();
+            }
+        }
+        
         public bool StartupOptionSafe 
         {
             get => m_Job.StartupOptions.HasFlag(StartupOptions_e.Safe);
@@ -191,6 +222,7 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
         public ICommand SelectVersionCommand { get; }
 
         private int m_CachedTimeout;
+        private int m_CachedBatchSize;
         private readonly BatchJob m_Job;
         private readonly IBatchRunnerModel m_Model;
 
