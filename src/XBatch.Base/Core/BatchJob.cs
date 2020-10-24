@@ -23,7 +23,7 @@ namespace Xarial.CadPlus.XBatch.Base.Core
     public class BatchJob
     {
         public string[] Input { get; set; }
-        public string Filter { get; set; }
+        public string[] Filters { get; set; }
         
         public bool ContinueOnError { get; set; }
         public int Timeout { get; set; }
@@ -35,7 +35,7 @@ namespace Xarial.CadPlus.XBatch.Base.Core
 
         public BatchJob() 
         {
-            Filter = "*.*";
+            Filters = new string[] { "*.*" };
             Timeout = 600;
             ContinueOnError = true;
             StartupOptions = StartupOptions_e.Silent | StartupOptions_e.Safe;

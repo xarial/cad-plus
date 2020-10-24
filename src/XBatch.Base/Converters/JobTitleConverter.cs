@@ -19,7 +19,12 @@ namespace Xarial.CadPlus.XBatch.Base.Converters
                 var failedFilesCount = (int)values[2];
                 var totalFilesCount = (int)values[3];
 
-                var prg = ((procFilesCount + failedFilesCount) / (double)totalFilesCount) * 100;
+                double prg = 0;
+
+                if (totalFilesCount != 0)
+                {
+                    prg = ((procFilesCount + failedFilesCount) / (double)totalFilesCount) * 100;
+                }
 
                 return $"{jobName} - {prg:F2}% - {procFilesCount + failedFilesCount}/{totalFilesCount} file(s)";
             }

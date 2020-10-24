@@ -50,10 +50,10 @@ namespace Xarial.CadPlus.XBatch.Base
             set => m_Options.Input = value?.ToArray();
         }
 
-        [Option('f', "filter", Required = false, HelpText = "Filter to extract input files, if input parameter contains directories. Default (all files): *.*")]
-        public string Filter 
+        [Option('f', "filters", Required = false, HelpText = "Filters to extract input files, if input parameter contains directories. Default (all files): *.*")]
+        public string[] Filters
         {
-            set => m_Options.Filter = value;
+            set => m_Options.Filters = value;
         }
 
         [Option('m', "macros", Required = true, HelpText = "List of macros to run")]

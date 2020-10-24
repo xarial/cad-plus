@@ -11,6 +11,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Xarial.CadPlus.Common.Services;
 using Xarial.CadPlus.XBatch.Base.Core;
+using Xarial.XToolkit.Reporting;
 
 namespace Xarial.CadPlus.XBatch.Base.Models
 {
@@ -75,6 +76,11 @@ namespace Xarial.CadPlus.XBatch.Base.Models
 
                         return await batchRunner.BatchRun(m_Job, cancellationToken).ConfigureAwait(false);
                     }
+                }
+                catch(Exception ex)
+                {
+                    m_LogWriter.WriteLine(ex.ParseUserError(out _));
+                    throw;
                 }
                 finally
                 {

@@ -41,6 +41,9 @@
                                                              TrueValue="{x:Static win:Visibility.Collapsed}"
                                                              FalseValue="{x:Static win:Visibility.Visible}"/>
                     <xconv:ObjectIsNotNullUniversalConverter x:Key="objIsNotNullConv"/>
+                    <xconv:BooleanUniversalConverter x:Key="boolToVisConv" 
+                                                     TrueValue="{x:Static win:Visibility.Visible}"
+                                                     FalseValue="{x:Static win:Visibility.Collapsed}"/>
                 </ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
@@ -311,6 +314,7 @@
                             </Grid>
                             <ctrls:JobItemsDataGrid ItemsSource="{Binding Path=JobItemFiles}" Grid.Row="1" Margin="5"/>
                             <metro:MetroProgressBar Grid.Row="2" IsIndeterminate="{Binding Path=IsInitializing}"
+                                                    Visibility="{Binding Path=DataContext.Results.Selected.IsBatchInProgress, RelativeSource={RelativeSource AncestorType={x:Type dz:DockItem}}, Converter={StaticResource boolToVisConv}}"
                                                     Value="{Binding Path=Progress}" Minimum="0" Maximum="1"/>
                         </Grid>
                     </Grid>
@@ -329,10 +333,15 @@
                                 <ColumnDefinition Width="Auto"/>
                                 <ColumnDefinition Width="*" />
                             </Grid.ColumnDefinitions>
-                            <TextBlock Text="Filter:" Grid.Column="0" Margin="2" VerticalAlignment="Center" />
-                            <TextBox Text="{Binding Path=Filter, UpdateSourceTrigger=PropertyChanged}" 
-                                     Grid.Column="1" Margin="2" Width="200" HorizontalAlignment="Left"
-                                     metro:TextBoxHelper.Watermark="Input filters for files in folders" />
+                            <TextBlock Text="Filters:" Grid.Column="0" Margin="2" VerticalAlignment="Top" />
+                            <DataGrid ItemsSource="{Binding Path=Filters}" AutoGenerateColumns="False" BorderBrush="Black" BorderThickness="1"
+                                      AlternationCount="2" AlternatingRowBackground="LightGray" RowHeaderWidth="15"
+                                      Grid.Column="1" Margin="2" Width="200" Height="100" HorizontalAlignment="Left"
+                                      HeadersVisibility="Row" ColumnWidth="*" CanUserAddRows="True">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Binding="{Binding Path=Value, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="False"/>
+                                </DataGrid.Columns>
+                            </DataGrid>
                         </Grid>
                     </Grid>
                 </dz:DockItem>

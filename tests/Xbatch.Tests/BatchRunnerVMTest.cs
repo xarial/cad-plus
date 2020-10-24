@@ -28,7 +28,7 @@ namespace Xbatch.Tests
 
             vm.Document.Input.Add("D:\\folder1");
             vm.Document.Input.Add("D:\\folder2");
-            vm.Document.Filter = "*.sld*";
+            vm.Document.Filters.Add("*.sld*");
             vm.Document.Macros.Add("C:\\macro1.swp");
             vm.Document.Macros.Add("C:\\macro2.swp");
             vm.Document.Settings.IsTimeoutEnabled = true;
@@ -42,7 +42,7 @@ namespace Xbatch.Tests
 
             vm.Document.RunJobCommand.Execute(null);
 
-            Assert.AreEqual("*.sld*", opts.Filter);
+            Assert.IsTrue(new string[] { "*.sld*" }.SequenceEqual(opts.Filters));
             Assert.IsTrue(new string[] { "C:\\macro1.swp", "C:\\macro2.swp" }.SequenceEqual(opts.Macros));
             Assert.IsTrue(new string[] { "D:\\folder1", "D:\\folder2" }.SequenceEqual(opts.Input));
             Assert.AreEqual(30, opts.Timeout);

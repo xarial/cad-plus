@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Xarial.CadPlus.Common.Services;
@@ -92,11 +93,16 @@ namespace Xarial.CadPlus.XBatch.Base.Core
 
             var batchStartTime = DateTime.Now;
             
-            var allFiles = PrepareJobScope(opts.Input, opts.Filter, opts.Macros).ToArray();
+            var allFiles = PrepareJobScope(opts.Input, opts.Filters, opts.Macros).ToArray();
 
             m_Logger.WriteLine($"Running batch processing for {allFiles.Length} file(s)");
 
             m_ProgressHandler.SetJobScope(allFiles, batchStartTime);
+
+            if (!allFiles.Any())
+            {
+                throw new UserMessageException("Empty job. No files matching specified filter");
+            }
 
             TimeSpan timeout = default;
 
@@ -151,20 +157,46 @@ namespace Xarial.CadPlus.XBatch.Base.Core
             return jobResult;
         }
 
-        private IEnumerable<JobItemFile> PrepareJobScope(IEnumerable<string> inputs,  string filter, IEnumerable<string> macros) 
+        private bool MatchesFilter(string file, string[] filters) 
         {
-            if (string.IsNullOrEmpty(filter)) 
+            if (filters?.Any() == false)
             {
-                filter = "*.*";
+                return true;
             }
+            else 
+            {
+                const string ANY_FILTER = "*";
 
+                return filters.Any(f => 
+                {
+                    var regex = (f.StartsWith(ANY_FILTER) ? "" : "^")
+                    + Regex.Escape(f).Replace($"\\{ANY_FILTER}", ".*").Replace("\\?", ".")
+                    + (f.EndsWith(ANY_FILTER) ? "" : "$");
+
+                    return Regex.IsMatch(file, regex, RegexOptions.IgnoreCase);
+                });
+            }
+        }
+
+        private IEnumerable<JobItemFile> PrepareJobScope(IEnumerable<string> inputs,  string[] filters, IEnumerable<string> macros) 
+        {
             foreach (var input in inputs)
             {
                 if (Directory.Exists(input))
                 {
-                    foreach (var file in Directory.EnumerateFiles(input, filter, SearchOption.AllDirectories))
+                    foreach (var file in Directory.EnumerateFiles(input, "*.*", SearchOption.AllDirectories))
                     {
-                        yield return new JobItemFile(file, macros.Select(m => new JobItemMacro(m)).ToArray());
+                        if (MatchesFilter(file, filters))
+                        {
+                            if (m_AppProvider.CanProcessFile(file))
+                            {
+                                yield return new JobItemFile(file, macros.Select(m => new JobItemMacro(m)).ToArray());
+                            }
+                            else 
+                            {
+                                m_Logger.WriteLine($"Skipping file '{file}'");
+                            }
+                        }
                     }
                 }
                 else if (File.Exists(input))

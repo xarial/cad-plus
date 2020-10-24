@@ -24,6 +24,41 @@ using Xarial.XToolkit.Wpf.Utils;
 
 namespace Xarial.CadPlus.XBatch.Base.ViewModels
 {
+    public class FilterVM : INotifyPropertyChanged
+    {
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        private string[] m_Src;
+        private int m_Index;
+        private string m_Value;
+
+        public string Value
+        {
+            get => m_Value;
+            set 
+            {
+                m_Value = value;
+                m_Src[m_Index] = value;
+                this.NotifyChanged();
+            }
+        }
+
+        public FilterVM() : this("*.*")
+        {
+        }
+
+        public FilterVM(string value) 
+        {
+            m_Value = value;
+        }
+
+        internal void SetBinding(string[] src, int index) 
+        {
+            m_Src = src;
+            m_Index = index;
+        }
+    }
+
     public class BatchDocumentVM : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
@@ -47,17 +82,8 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
 
         public ObservableCollection<string> Macros { get; }
 
-        public string Filter
-        {
-            get => m_Job.Filter;
-            set
-            {
-                m_Job.Filter = value;
-                this.NotifyChanged();
-                IsDirty = true;
-            }
-        }
-
+        public ObservableCollection<FilterVM> Filters { get; }
+        
         public FileFilter[] InputFilesFilter => m_Model.InputFilesFilter;
 
         public FileFilter[] MacroFilesFilter => m_Model.MacroFilesFilter;
@@ -109,6 +135,11 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
             Settings = new BatchDocumentSettingsVM(m_Job, model);
             Settings.Modified += OnSettingsModified;
             Results = new JobResultsVM(m_Model, m_Job);
+
+            Filters = new ObservableCollection<FilterVM>((m_Job.Filters ?? Enumerable.Empty<string>()).Select(f => new FilterVM(f)));
+            Filters.CollectionChanged += OnFiltersCollectionChanged;
+            BindFilters();
+
             Input = new ObservableCollection<string>(m_Job.Input ?? Enumerable.Empty<string>());
             Input.CollectionChanged += OnInputCollectionChanged;
 
@@ -161,6 +192,22 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
         {
             m_Job.Macros = Macros.ToArray();
             IsDirty = true;
+        }
+
+        private void OnFiltersCollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            BindFilters();
+            IsDirty = true;
+        }
+
+        private void BindFilters() 
+        {
+            m_Job.Filters = Filters.Select(f => f.Value).ToArray();
+
+            for (int i = 0; i < Filters.Count; i++) 
+            {
+                Filters[i].SetBinding(m_Job.Filters, i);
+            }
         }
 
         private void RunJob() 
