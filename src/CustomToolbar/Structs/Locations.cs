@@ -11,6 +11,7 @@ using Xarial.CadPlus.CustomToolbar.Properties;
 
 namespace Xarial.CadPlus.CustomToolbar.Structs
 {
+    //TODO: move to Module
     internal static class Locations
     {
         internal static string AppDirectoryPath

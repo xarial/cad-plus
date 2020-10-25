@@ -6,6 +6,7 @@
 //*********************************************************************
 
 using System;
+using System.ComponentModel;
 using Xarial.XCad.Base.Attributes;
 
 namespace Xarial.CadPlus.CustomToolbar.Enums
@@ -20,6 +21,9 @@ namespace Xarial.CadPlus.CustomToolbar.Enums
         [Summary("Invoked by clicking button in the toolbar")]
         [Title("Button")]
         Button = 1 << 0,
+
+        [Title("Toggle Button")]
+        ToggleButton = Button | Toggle,
 
         [Title("Application Start")]
         ApplicationStart = 1 << 1,
@@ -46,6 +50,9 @@ namespace Xarial.CadPlus.CustomToolbar.Enums
         ConfigurationChange = 1 << 8,
 
         [Title("Rebuild")]
-        Rebuild = 1 << 9
+        Rebuild = 1 << 9,
+
+        [Browsable(false)]
+        Toggle = 1 << 10
     }
 }

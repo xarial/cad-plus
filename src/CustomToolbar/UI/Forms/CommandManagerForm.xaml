@@ -8,13 +8,22 @@
         xmlns:base="clr-namespace:Xarial.CadPlus.CustomToolbar.UI.Base"
         xmlns:conv="clr-namespace:Xarial.CadPlus.CustomToolbar.UI.Converters"
         xmlns:xconv="clr-namespace:Xarial.XToolkit.Wpf.Converters;assembly=Xarial.XToolkit.Wpf"
+        xmlns:sys="clr-namespace:System;assembly=mscorlib"
+        xmlns:win="clr-namespace:System.Windows;assembly=PresentationCore"
         mc:Ignorable="d"
         d:DataContext="{x:Type vm:CommandManagerVM}"
-        Height="600" Width="600" WindowStartupLocation="CenterOwner" ShowInTaskbar="False"
-		Title="Custom Toolbar Configuration">
+        Height="600" Width="800" WindowStartupLocation="CenterOwner" ShowInTaskbar="False"
+		Title="Custom Toolbar Configuration" WindowStyle="ToolWindow">
     <Window.Resources>
         <conv:CommandContextMenuTitleConverter x:Key="menuTitleConv" />
         <xconv:ObjectIsNotNullUniversalConverter x:Key="objIsNotNulToBool"/>
+        <xconv:MatchValueUniversalConverter x:Key="groupsIsEmpty" 
+                                           TrueValue="{x:Static win:Visibility.Visible}"
+                                           FalseValue="{x:Static win:Visibility.Collapsed}">
+            <xconv:MatchValueUniversalConverter.TargetValue>
+                <sys:Int32>0</sys:Int32>
+            </xconv:MatchValueUniversalConverter.TargetValue>
+        </xconv:MatchValueUniversalConverter>
     </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
@@ -78,30 +87,36 @@
                         <Button Style="{StaticResource ToolbarButton}" Focusable="False"
                                 ToolTip="{Binding Path=SelectedElement, Converter={StaticResource menuTitleConv}, ConverterParameter={x:Static conv:CommandContextMenu_e.MoveUp}}"
                                 Command="{Binding Path=MoveCommandUpCommand}" CommandParameter="{Binding Path=SelectedElement}">
-                            <Image Source="/Xarial.CadPlus.CustomToolbar;component/Resources/icon-move-left.png"/>
+                            <Image Source="/Xarial.CadPlus.CustomToolbar.Module;component/Resources/icon-move-left.png"/>
                         </Button>
                         <Button Style="{StaticResource ToolbarButton}" Focusable="False"
                                 ToolTip="{Binding Path=SelectedElement, Converter={StaticResource menuTitleConv}, ConverterParameter={x:Static conv:CommandContextMenu_e.MoveDown}}"
                                 Command="{Binding Path=MoveCommandDownCommand}" CommandParameter="{Binding Path=SelectedElement}">
-                            <Image Source="/Xarial.CadPlus.CustomToolbar;component/Resources/icon-move-right.png"/>
+                            <Image Source="/Xarial.CadPlus.CustomToolbar.Module;component/Resources/icon-move-right.png"/>
                         </Button>
                         <Button Style="{StaticResource ToolbarButton}" Focusable="False"
                                 ToolTip="{Binding Path=SelectedElement, Converter={StaticResource menuTitleConv}, ConverterParameter={x:Static conv:CommandContextMenu_e.InsertBefore}}"
                                 Command="{Binding Path=InsertCommandBeforeCommand}" CommandParameter="{Binding Path=SelectedElement}">
-                            <Image Source="/Xarial.CadPlus.CustomToolbar;component/Resources/icon-add-after.png"/>
+                            <Image Source="/Xarial.CadPlus.CustomToolbar.Module;component/Resources/icon-add-after.png"/>
                         </Button>
                         <Button Style="{StaticResource ToolbarButton}" Focusable="False"
                                 ToolTip="{Binding Path=SelectedElement, Converter={StaticResource menuTitleConv}, ConverterParameter={x:Static conv:CommandContextMenu_e.InsertAfter}}"
                                 Command="{Binding Path=InsertCommandAfterCommand}" CommandParameter="{Binding Path=SelectedElement}">
-                            <Image Source="/Xarial.CadPlus.CustomToolbar;component/Resources/icon-add-before.png"/>
+                            <Image Source="/Xarial.CadPlus.CustomToolbar.Module;component/Resources/icon-add-before.png"/>
                         </Button>
                         <Button Style="{StaticResource ToolbarButton}" Focusable="False"
                                 ToolTip="{Binding Path=SelectedElement, Converter={StaticResource menuTitleConv}, ConverterParameter={x:Static conv:CommandContextMenu_e.Remove}}"
                                 Command="{Binding Path=CommandRemoveCommand}" CommandParameter="{Binding Path=SelectedElement}">
-                            <Image Source="/Xarial.CadPlus.CustomToolbar;component/Resources/icon-remove.png"/>
+                            <Image Source="/Xarial.CadPlus.CustomToolbar.Module;component/Resources/icon-remove.png"/>
                         </Button>
                     </StackPanel>
-                    <views:CommandManagerView DataContext="{Binding}" Grid.Row="1" />
+                    <views:CommandManagerView DataContext="{Binding}" Grid.Row="1" Margin="2" />
+                    <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Row="1" Margin="2"
+                               IsHitTestVisible="False"
+                               TextAlignment="Center"
+                               Text="Drag-n-drop macro or click + button to create new command"
+                               Visibility="{Binding Path=Groups.Commands.Count, Converter={StaticResource groupsIsEmpty}}"
+                               TextWrapping="Wrap" FontSize="15" />
                 </Grid>
                 <GridSplitter Grid.Column="1" Width="3"
                       HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="Gray" />
@@ -112,7 +127,7 @@
                             <RowDefinition Height="Auto"/>
                         </Grid.RowDefinitions>
                     </Grid>
-                    <ContentPresenter Content="{Binding Path=SelectedElement}" Grid.Row="0">
+                    <ContentPresenter Content="{Binding Path=SelectedElement}" Grid.Row="0" Margin="2">
                         <ContentPresenter.ContentTemplateSelector>
                             <base:CommandPropertiesDataTemplateSelector>
                                 <base:CommandPropertiesDataTemplateSelector.CommandMacroTemplate>
@@ -128,9 +143,9 @@
                                 <base:CommandPropertiesDataTemplateSelector.DefaultTemplate>
                                     <DataTemplate>
                                         <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center"
-                                       TextAlignment="Center"
-                                       Text="Select command or toolbar to change properties. Click + button to add new element"
-                                       TextWrapping="Wrap" FontSize="15" />
+                                           TextAlignment="Center"
+                                           Text="Select command or toolbar to change properties"
+                                           TextWrapping="Wrap" FontSize="15" />
                                     </DataTemplate>
                                 </base:CommandPropertiesDataTemplateSelector.DefaultTemplate>
                             </base:CommandPropertiesDataTemplateSelector>

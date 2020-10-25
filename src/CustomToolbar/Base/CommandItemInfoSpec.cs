@@ -25,11 +25,11 @@ namespace Xarial.CadPlus.CustomToolbar.Base
             Icon = info.GetCommandIcon();
             HasToolbar = info.Location.HasFlag(Location_e.Toolbar);
             HasMenu = info.Location.HasFlag(Location_e.Menu);
-            HasTabBox = info.Location.HasFlag(Location_e.TabBox);
-            if (HasTabBox) 
-            {
-                TabBoxStyle = XCad.UI.Commands.Enums.RibbonTabTextDisplay_e.TextBelow;
-            }
+            //HasTabBox = info.Location.HasFlag(Location_e.TabBox);
+            //if (HasTabBox) 
+            //{
+            //    TabBoxStyle = XCad.UI.Commands.Enums.RibbonTabTextDisplay_e.TextBelow;
+            //}
         }
     }
 }

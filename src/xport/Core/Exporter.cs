@@ -12,15 +12,62 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Xarial.CadPlus.Common.Services;
 
 namespace Xarial.CadPlus.Xport.Core
 {
+    internal class JobItem : IJobItem
+    {
+        public event Action<IJobItem, JobItemStatus_e> StatusChanged;
+
+        public string DisplayName { get; protected set; }
+
+        internal string FilePath { get; }
+
+        public JobItemStatus_e Status
+        {
+            get => m_Status;
+            set
+            {
+                m_Status = value;
+                StatusChanged?.Invoke(this, value);
+            }
+        }
+
+        private JobItemStatus_e m_Status;
+
+        internal JobItem(string filePath)
+        {
+            FilePath = filePath;
+            m_Status = JobItemStatus_e.AwaitingProcessing;
+        }
+    }
+
+    internal class JobItemFile : JobItem, IJobItemFile
+    {
+        public IEnumerable<IJobItemOperation> Operations => throw new NotImplementedException();
+
+        internal JobItemFile(string filePath, JobItemFormat[] formats) : base(filePath)
+        {
+            Formats = formats;
+        }
+
+        public JobItemFormat[] Formats { get; }
+    }
+
+    internal class JobItemFormat : JobItem, IJobItemOperation
+    {
+        internal JobItemFormat(string filePath) : base(filePath)
+        {
+        }
+    }
+
     public class Exporter : IDisposable
     {
         private readonly TextWriter m_Logger;
-        private readonly IProgress<double> m_ProgressHandler;
+        private readonly IProgressHandler m_ProgressHandler;
 
-        public Exporter(TextWriter logger, IProgress<double> progressHandler = null)
+        public Exporter(TextWriter logger, IProgressHandler progressHandler)
         {
             m_Logger = logger;
             m_ProgressHandler = progressHandler;
@@ -33,29 +80,26 @@ namespace Xarial.CadPlus.Xport.Core
             var curTime = DateTime.Now;
 
             var jobs = ParseOptions(opts);
-
-            var totalJobs = jobs.Sum(j => j.Value.Length);
-            int curJob = 0;
-
+            
             foreach (var job in jobs)
             {
-                var file = job.Key;
+                var file = job.FilePath;
 
-                var outFiles = job.Value;
+                var outFiles = job.Formats;
 
                 foreach (var outFile in outFiles)
                 {
                     try
                     {
-                        var desFile = outFile;
+                        var desFile = outFile.FilePath;
 
                         int index = 0;
 
                         while (File.Exists(desFile))
                         {
-                            var outDir = Path.GetDirectoryName(outFile);
-                            var fileName = Path.GetFileNameWithoutExtension(outFile);
-                            var ext = Path.GetExtension(outFile);
+                            var outDir = Path.GetDirectoryName(outFile.FilePath);
+                            var fileName = Path.GetFileNameWithoutExtension(outFile.FilePath);
+                            var ext = Path.GetExtension(outFile.FilePath);
 
                             fileName = $"{fileName} ({++index})";
 
@@ -97,16 +141,16 @@ namespace Xarial.CadPlus.Xport.Core
                             throw ex;
                         }
                     }
-
-                    m_ProgressHandler?.Report(++curJob / (double)totalJobs);
                 }
+
+                m_ProgressHandler?.ReportProgress(job, true);
             }
 
             m_Logger.WriteLine($"Exporting completed in {DateTime.Now.Subtract(curTime).ToString(@"hh\:mm\:ss")}");
         }
 
         private Task<bool> StartWaitProcessAsync(ProcessStartInfo prcStartInfo,
-            CancellationToken cancellationToken = default(CancellationToken))
+            CancellationToken cancellationToken = default)
         {
             var tcs = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
 
@@ -151,7 +195,7 @@ namespace Xarial.CadPlus.Xport.Core
             return tcs.Task;
         }
 
-        private Dictionary<string, string[]> ParseOptions(ExportOptions opts)
+        private JobItemFile[] ParseOptions(ExportOptions opts)
         {
             const string EDRW_FORMAT = ".e";
 
@@ -190,12 +234,12 @@ namespace Xarial.CadPlus.Xport.Core
                 }
             }
 
-            var jobs = new Dictionary<string, string[]>();
+            var jobs = new List<JobItemFile>();
 
             foreach (var file in files)
             {
-                var outFiles = new string[opts.Format.Length];
-                jobs.Add(file, outFiles);
+                var outFiles = new JobItemFormat[opts.Format.Length];
+                jobs.Add(new JobItemFile(file, outFiles));
 
                 for (int i = 0; i < opts.Format.Length; i++)
                 {
@@ -227,12 +271,12 @@ namespace Xarial.CadPlus.Xport.Core
                         }
                     }
 
-                    outFiles[i] = Path.Combine(!string.IsNullOrEmpty(outDir) ? outDir : Path.GetDirectoryName(file),
-                        Path.GetFileNameWithoutExtension(file) + ext);
+                    outFiles[i] = new JobItemFormat(Path.Combine(!string.IsNullOrEmpty(outDir) ? outDir : Path.GetDirectoryName(file),
+                        Path.GetFileNameWithoutExtension(file) + ext));
                 }
             }
 
-            return jobs;
+            return jobs.ToArray();
         }
 
         public void Dispose()

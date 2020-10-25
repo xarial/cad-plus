@@ -34,7 +34,7 @@
 					  CommandParameter="{Binding}" />
         </ContextMenu>
         <DataTemplate x:Key="NewCommandTemplate">
-            <Button Command="{Binding Path=AddNewItemCommand}" Width="12" Height="12" Background="#FF388A34" Margin="2">
+            <Button Command="{Binding Path=AddNewItemCommand}" Width="12" Height="12" Background="#FF388A34" Margin="2" Cursor="Hand">
                 <Button.Style>
                     <Style TargetType="{x:Type Button}">
                         <Style.Setters>
@@ -88,9 +88,26 @@
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
                 <Image Width="18" Height="18" Margin="2" 
-                       Source="{Binding Path=IconPath, Converter={StaticResource pathToIconConv}}"
-                       Grid.Column="0"/>
-                <TextBlock Text="{Binding Path=Title}" Grid.Column="1" VerticalAlignment="Center"/>
+                       Grid.Column="0">
+                    <Image.Source>
+                        <MultiBinding Converter="{StaticResource pathToIconConv}">
+                            <Binding Path="IconPath"/>
+                            <Binding/>
+                        </MultiBinding>
+                    </Image.Source>
+                </Image>
+                <TextBlock Text="{Binding Path=Title}" Grid.Column="1" VerticalAlignment="Center">
+                    <TextBlock.Style>
+                        <Style TargetType="{x:Type TextBlock}">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Path=IsSelected, RelativeSource={RelativeSource AncestorType={x:Type TreeViewItem}}}" Value="True">
+                                    <Setter Property="TextDecorations" Value="Underline"/>
+                                    <Setter Property="FontWeight" Value="Bold"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
                 <Grid.ToolTip>
                     <Grid MaxWidth="300">
                         <Grid.RowDefinitions>
@@ -112,7 +129,10 @@
     </UserControl.Resources>
     <Grid>
         <ctrls:TreeViewEx ItemsSource="{Binding Path=Groups}" 
-                          SelectedItem="{Binding Path=SelectedElement, Converter={StaticResource selCmdConv}}">
+                          SelectedItem="{Binding Path=SelectedElement, Converter={StaticResource selCmdConv}}" 
+                          AllowDrop="True" BorderThickness="0"
+                          DragOver="OnDragOver" DragEnter="OnDragEnter" Drop="OnDrop" 
+                          Background="White">
             <ctrls:TreeViewEx.ItemTemplateSelector>
                 <base:CommandDataTemplateSelector
 					        NewCommandTemplate="{StaticResource NewCommandTemplate}"

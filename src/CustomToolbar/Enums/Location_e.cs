@@ -24,15 +24,15 @@ namespace Xarial.CadPlus.CustomToolbar.Enums
 
         [Summary("Create command in menu")]
         [Title("Menu")]
-        Menu = 1 << 1,
+        Menu = 1 << 1
 
-        [Summary("Create command in command tab box")]
-        [Title("Tab Box")]
-        [Browsable(false), EditorBrowsable(EditorBrowsableState.Never)]
-        TabBoxHidden = 1 << 2,
+        //[Summary("Create command in command tab box")]
+        //[Title("Tab Box")]
+        //[Browsable(false), EditorBrowsable(EditorBrowsableState.Never)]
+        //TabBoxHidden = 1 << 2,
 
-        [Summary("Create command in command tab box")]
-        [Title("Tab Box")]
-        TabBox = Toolbar | TabBoxHidden
+        //[Summary("Create command in command tab box")]
+        //[Title("Tab Box")]
+        //TabBox = Toolbar | TabBoxHidden
     }
 }

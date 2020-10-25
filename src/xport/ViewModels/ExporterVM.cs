@@ -14,9 +14,10 @@ using System.Linq;
 using System.Threading;
 using System.Windows;
 using System.Windows.Input;
+using WK.Libraries.BetterFolderBrowserNS;
+using Xarial.CadPlus.Common.Services;
 using Xarial.CadPlus.Xport.Core;
 using Xarial.CadPlus.Xport.Models;
-using Xarial.CadPlus.Xport.Services;
 using Xarial.XToolkit.Reflection;
 using Xarial.XToolkit.Wpf;
 using Xarial.XToolkit.Wpf.Extensions;
@@ -28,7 +29,6 @@ namespace Xarial.CadPlus.Xport.ViewModels
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
-        private string m_Log;
         private bool m_IsExportInProgress;
         private int m_ActiveTabIndex;
         private string m_OutputDirectory;
@@ -39,22 +39,11 @@ namespace Xarial.CadPlus.Xport.ViewModels
         private ICommand m_ExportCommand;
         private ICommand m_CancelExportCommand;
         private ICommand m_BrowseOutputDirectoryCommand;
-        private ICommand m_AddFileCommand;
-        private ICommand m_AddFolderCommand;
-        private ICommand m_DeleteInputCommand;
-
+        
         public Format_e Format { get; set; }
 
-        public string Log
-        {
-            get => m_Log;
-            set
-            {
-                m_Log = value;
-                this.NotifyChanged();
-            }
-        }
-
+        public ObservableCollection<string> Log { get; }
+        
         public string OutputDirectory
         {
             get => m_OutputDirectory;
@@ -116,9 +105,6 @@ namespace Xarial.CadPlus.Xport.ViewModels
         public ICommand ExportCommand => m_ExportCommand ?? (m_ExportCommand = new RelayCommand(Export, () => !IsExportInProgress && Input.Any() && Format != 0));
         public ICommand CancelExportCommand => m_CancelExportCommand ?? (m_CancelExportCommand = new RelayCommand(CancelExport, () => IsExportInProgress));
         public ICommand BrowseOutputDirectoryCommand => m_BrowseOutputDirectoryCommand ?? (m_BrowseOutputDirectoryCommand = new RelayCommand(BrowseOutputDirectory));
-        public ICommand AddFileCommand => m_AddFileCommand ?? (m_AddFileCommand = new RelayCommand(AddFile));
-        public ICommand AddFolderCommand => m_AddFolderCommand ?? (m_AddFolderCommand = new RelayCommand(AddFolder));
-        public ICommand DeleteInputCommand => m_DeleteInputCommand ?? (m_DeleteInputCommand = new RelayCommand<IEnumerable>(DeleteInput));
 
         public int ActiveTabIndex
         {
@@ -138,6 +124,8 @@ namespace Xarial.CadPlus.Xport.ViewModels
             m_Model = model;
             m_MsgSvc = msgSvc;
 
+            Log = new ObservableCollection<string>();
+
             m_Model.ProgressChanged += OnProgressChanged;
             m_Model.Log += OnLog;
             Input = new ObservableCollection<string>();
@@ -154,7 +142,7 @@ namespace Xarial.CadPlus.Xport.ViewModels
 
         private void OnLog(string line)
         {
-            Log += !string.IsNullOrEmpty(Log) ? Environment.NewLine + line : line;
+            Log.Add(line);
         }
 
         private async void Export()
@@ -164,7 +152,7 @@ namespace Xarial.CadPlus.Xport.ViewModels
                 ActiveTabIndex = 1;
                 IsExportInProgress = true;
                 Progress = 0;
-                Log = "";
+                Log.Clear();
 
                 var opts = new ExportOptions()
                 {
@@ -215,37 +203,15 @@ namespace Xarial.CadPlus.Xport.ViewModels
 
         private void BrowseOutputDirectory()
         {
-            if (FileSystemBrowser.BrowseFolder(out string path, "Select output directory"))
+            var dlg = new BetterFolderBrowser()
             {
-                OutputDirectory = path;
-            }
-        }
+                Title = "Select output directory",
+                Multiselect = false
+            };
 
-        private void AddFolder()
-        {
-            if (FileSystemBrowser.BrowseFolder(out string path, "Select folder to process"))
+            if (dlg.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
-                Input.Add(path);
-            }
-        }
-
-        private void AddFile()
-        {
-            var filter = FileSystemBrowser.BuildFilterString(
-                new FileFilter("SOLIDWORKS Files", "*.sldprt", "*.sldasm", "*.slddrw"),
-                FileFilter.AllFiles);
-
-            if (FileSystemBrowser.BrowseFileOpen(out string path, "Select file to process", filter))
-            {
-                Input.Add(path);
-            }
-        }
-
-        private void DeleteInput(IEnumerable inputs)
-        {
-            foreach (var input in inputs.Cast<string>().ToArray())
-            {
-                Input.Remove(input);
+                OutputDirectory = dlg.SelectedFolder;
             }
         }
     }

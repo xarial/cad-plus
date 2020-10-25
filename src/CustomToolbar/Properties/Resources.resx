@@ -121,8 +121,8 @@
   <data name="configure_icon" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\configure-icon.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="custom_toolbars_toolbar" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\custom-toolbars-toolbar.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="group_icon_default" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\group_icon_default.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="icon_add_after" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\icon-add-after.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>

@@ -73,9 +73,9 @@ namespace Xarial.CadPlus.CustomToolbar.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap custom_toolbars_toolbar {
+        internal static System.Drawing.Bitmap group_icon_default {
             get {
-                object obj = ResourceManager.GetObject("custom_toolbars_toolbar", resourceCulture);
+                object obj = ResourceManager.GetObject("group_icon_default", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

@@ -29,17 +29,9 @@ namespace Xarial.CadPlus.CustomToolbar.UI.Base
 
         public event Action<IEnumerable<TCommandVM>> CommandsChanged;
 
-        private readonly ObservableCollection<TCommandVM> m_Commands;
-
         private readonly List<int> m_UsedIds;
 
-        public ObservableCollection<TCommandVM> Commands
-        {
-            get
-            {
-                return m_Commands;
-            }
-        }
+        public ObservableCollection<TCommandVM> Commands { get; }
 
         IList ICommandsCollection.Commands
         {
@@ -51,14 +43,14 @@ namespace Xarial.CadPlus.CustomToolbar.UI.Base
 
         public CommandsCollection(IEnumerable<TCommandVM> commands)
         {
-            m_Commands = new ObservableCollection<TCommandVM>(commands);
-            m_Commands.CollectionChanged += OnCommandsCollectionChanged;
+            Commands = new ObservableCollection<TCommandVM>(commands);
+            Commands.CollectionChanged += OnCommandsCollectionChanged;
 
-            m_UsedIds = m_Commands.Select(c => c.Command.Id).ToList();
+            m_UsedIds = Commands.Select(c => c.Command.Id).ToList();
 
             Add(new CollectionContainer()
             {
-                Collection = m_Commands
+                Collection = Commands
             });
 
             var newCmdPlc = new NewCommandPlaceholderVM();
@@ -69,23 +61,48 @@ namespace Xarial.CadPlus.CustomToolbar.UI.Base
 
         private void OnAddNewCommand()
         {
-            AddNewCommand(m_Commands.Count);
+            AddNewCommand(Commands.Count);
         }
 
         public ICommandVM AddNewCommand(int index)
         {
             var newCmd = new TCommandVM();
 
-            newCmd.Command.Id = GetNextId();
-            newCmd.Title = "New";
+            var id = GetNextId();
+            newCmd.Command.Id = id;
 
-            m_Commands.Insert(index, newCmd);
+            Commands.Insert(index, newCmd);
+            
+            AssignDefaultTitle(newCmd);
 
             NewCommandCreated?.Invoke(newCmd);
 
             return newCmd;
         }
-        
+
+        private void AssignDefaultTitle(ICommandVM newCmd)
+        {
+            int index = 0;
+            var title = "";
+
+            do
+            {
+                index++;
+
+                if (newCmd is CommandMacroVM)
+                {
+                    title = $"Macro {index}";
+                }
+                else if (newCmd is CommandGroupVM)
+                {
+                    title = $"Toolbar {index}";
+                }
+            } while (Commands.FirstOrDefault(
+                x => string.Equals(x.Title, title, StringComparison.CurrentCultureIgnoreCase)) != null);
+
+            newCmd.Title = title;
+        }
+
         private int GetNextId()
         {
             int id = 1;
@@ -103,7 +120,7 @@ namespace Xarial.CadPlus.CustomToolbar.UI.Base
         private void OnCommandsCollectionChanged(object sender,
             System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
-            CommandsChanged?.Invoke(m_Commands);
+            CommandsChanged?.Invoke(Commands);
         }
     }
 }

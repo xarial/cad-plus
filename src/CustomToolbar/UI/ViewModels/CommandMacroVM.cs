@@ -21,10 +21,7 @@ namespace Xarial.CadPlus.CustomToolbar.UI.ViewModels
 
         public string MacroPath
         {
-            get
-            {
-                return Command.MacroPath;
-            }
+            get => Command.MacroPath;
             set
             {
                 Command.MacroPath = value;
@@ -34,10 +31,7 @@ namespace Xarial.CadPlus.CustomToolbar.UI.ViewModels
 
         public MacroStartFunction EntryPoint
         {
-            get
-            {
-                return Command.EntryPoint;
-            }
+            get => Command.EntryPoint;
             set
             {
                 Command.EntryPoint = value;
@@ -57,7 +51,7 @@ namespace Xarial.CadPlus.CustomToolbar.UI.ViewModels
                             "Select macro file",
                             FileSystemBrowser.BuildFilterString(
                                 new FileFilter(
-                                    "SOLIDWORKS Macros", "*.swp", "*.swb", "*.dll"), 
+                                    "SOLIDWORKS Macros", "*.swp", "*.swb", "*.dll"), //TODO: make the extensions list a dependency
                                 FileFilter.AllFiles)))
                         {
                             MacroPath = macroFile;
@@ -71,10 +65,7 @@ namespace Xarial.CadPlus.CustomToolbar.UI.ViewModels
 
         public MacroScope_e Scope
         {
-            get
-            {
-                return Command.Scope;
-            }
+            get => Command.Scope;
             set
             {
                 Command.Scope = value;
@@ -84,10 +75,7 @@ namespace Xarial.CadPlus.CustomToolbar.UI.ViewModels
 
         public Triggers_e Triggers
         {
-            get
-            {
-                return Command.Triggers;
-            }
+            get => Command.Triggers;
             set
             {
                 Command.Triggers = value;
@@ -97,10 +85,7 @@ namespace Xarial.CadPlus.CustomToolbar.UI.ViewModels
 
         public bool UnloadAfterRun
         {
-            get
-            {
-                return Command.UnloadAfterRun;
-            }
+            get => Command.UnloadAfterRun;
             set
             {
                 Command.UnloadAfterRun = value;
@@ -110,13 +95,40 @@ namespace Xarial.CadPlus.CustomToolbar.UI.ViewModels
 
         public Location_e Location
         {
-            get
-            {
-                return Command.Location;
-            }
+            get => Command.Location;
             set
             {
                 Command.Location = value;
+                this.NotifyChanged();
+            }
+        }
+                
+        public ToggleButtonStateCode_e ToggleButtonStateCodeType
+        {
+            get => Command.ToggleButtonStateCodeType;
+            set 
+            {
+                Command.ToggleButtonStateCodeType = value;
+                this.NotifyChanged();
+            }
+        }
+        
+        public string ToggleButtonStateCode 
+        {
+            get => Command.ToggleButtonStateCode;
+            set
+            {
+                Command.ToggleButtonStateCode = value;
+                this.NotifyChanged();
+            }
+        }
+
+        public bool ResolveButtonStateCodeOnce
+        {
+            get => Command.ResolveButtonStateCodeOnce;
+            set
+            {
+                Command.ResolveButtonStateCodeOnce = value;
                 this.NotifyChanged();
             }
         }
