@@ -13,6 +13,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Controls;
 using System.Windows.Input;
 using Xarial.CadPlus.Common.Services;
 using Xarial.CadPlus.XBatch.Base.Core;
@@ -24,6 +25,41 @@ using Xarial.XToolkit.Wpf.Utils;
 
 namespace Xarial.CadPlus.XBatch.Base.ViewModels
 {
+    public class FilterVM : INotifyPropertyChanged
+    {
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        private string[] m_Src;
+        private int m_Index;
+        private string m_Value;
+
+        public string Value
+        {
+            get => m_Value;
+            set 
+            {
+                m_Value = value;
+                m_Src[m_Index] = value;
+                this.NotifyChanged();
+            }
+        }
+
+        public FilterVM() : this("*.*")
+        {
+        }
+
+        public FilterVM(string value) 
+        {
+            m_Value = value;
+        }
+
+        internal void SetBinding(string[] src, int index) 
+        {
+            m_Src = src;
+            m_Index = index;
+        }
+    }
+
     public class BatchDocumentVM : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
@@ -47,17 +83,8 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
 
         public ObservableCollection<string> Macros { get; }
 
-        public string Filter
-        {
-            get => m_Job.Filter;
-            set
-            {
-                m_Job.Filter = value;
-                this.NotifyChanged();
-                IsDirty = true;
-            }
-        }
-
+        public ObservableCollection<FilterVM> Filters { get; }
+        
         public FileFilter[] InputFilesFilter => m_Model.InputFilesFilter;
 
         public FileFilter[] MacroFilesFilter => m_Model.MacroFilesFilter;
@@ -66,6 +93,8 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
 
         public ICommand SaveDocumentCommand { get; }
         public ICommand SaveAsDocumentCommand { get; }
+
+        public ICommand FilterEditEndingCommand { get; }
 
         public bool IsDirty 
         {
@@ -104,16 +133,36 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
             RunJobCommand = new RelayCommand(RunJob, () => Input.Any() && Macros.Any() && Settings.Version != null);
             SaveDocumentCommand = new RelayCommand(SaveDocument, () => IsDirty);
             SaveAsDocumentCommand = new RelayCommand(SaveAsDocument);
+            FilterEditEndingCommand = new RelayCommand<DataGridCellEditEndingEventArgs>(FilterEditEnding);
 
             Name = name;
             Settings = new BatchDocumentSettingsVM(m_Job, model);
             Settings.Modified += OnSettingsModified;
             Results = new JobResultsVM(m_Model, m_Job);
+
+            Filters = new ObservableCollection<FilterVM>((m_Job.Filters ?? Enumerable.Empty<string>()).Select(f => new FilterVM(f)));
+            Filters.CollectionChanged += OnFiltersCollectionChanged;
+            BindFilters();
+
             Input = new ObservableCollection<string>(m_Job.Input ?? Enumerable.Empty<string>());
             Input.CollectionChanged += OnInputCollectionChanged;
 
             Macros = new ObservableCollection<string>(m_Job.Macros ?? Enumerable.Empty<string>());
             Macros.CollectionChanged += OnMacrosCollectionChanged;
+        }
+
+        private void FilterEditEnding(DataGridCellEditEndingEventArgs args)
+        {
+            var curFilter = args.EditingElement.DataContext as FilterVM;
+
+            for (int i = Filters.Count - 1; i >= 0; i--)
+            {
+                if (Filters[i] != curFilter &&
+                    string.Equals(Filters[i].Value, curFilter.Value, StringComparison.CurrentCultureIgnoreCase))
+                {
+                    Filters.RemoveAt(i);
+                }
+            }
         }
 
         private void OnSettingsModified()
@@ -142,9 +191,7 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
 
             try
             {
-                var svc = new UserSettingsService();
-
-                svc.StoreSettings(m_Job, m_FilePath);
+                m_Model.SaveJobToFile(m_Job, m_FilePath);
                 IsDirty = false;
             }
             catch
@@ -163,6 +210,22 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
         {
             m_Job.Macros = Macros.ToArray();
             IsDirty = true;
+        }
+
+        private void OnFiltersCollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            BindFilters();
+            IsDirty = true;
+        }
+
+        private void BindFilters() 
+        {
+            m_Job.Filters = Filters.Select(f => f.Value).ToArray();
+
+            for (int i = 0; i < Filters.Count; i++) 
+            {
+                Filters[i].SetBinding(m_Job.Filters, i);
+            }
         }
 
         private void RunJob() 

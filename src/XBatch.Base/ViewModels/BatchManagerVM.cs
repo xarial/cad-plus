@@ -5,10 +5,12 @@
 //License: https://cadplus.xarial.com/license/
 //*********************************************************************
 
+using CommandLine;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -53,33 +55,38 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
             m_MsgSvc = msgSvc;
             
             NewDocumentCommand = new RelayCommand(NewDocument);
-            OpenDocumentCommand = new RelayCommand(OpenDocument);
+            OpenDocumentCommand = new RelayCommand<string>(OpenDocument);
             CloseDocumentCommand = new RelayCommand(CloseDocument, () => Document != null);
         }
+
+        public ObservableCollection<string> RecentFiles => m_Model.RecentFiles;
         
-        private void OpenDocument()
+        internal void OpenDocument(string filePath)
         {
             try
             {
-                if (FileSystemBrowser.BrowseFileOpen(out string filePath, "Select file to open",
-                    FileSystemBrowser.BuildFilterString(new FileFilter("xBatch File", "*.xbatch"), FileFilter.AllFiles))) 
+                if (!string.IsNullOrEmpty(filePath) ||
+                    FileSystemBrowser.BrowseFileOpen(out filePath, "Select file to open",
+                        FileSystemBrowser.BuildFilterString(new FileFilter("xBatch File", "*.xbatch"), FileFilter.AllFiles)))
                 {
                     if (!string.Equals(Document?.FilePath, filePath, StringComparison.CurrentCultureIgnoreCase))
                     {
-                        var svc = new UserSettingsService();
-
-                        var batchJob = svc.ReadSettings<BatchJob>(filePath);
-
                         if (Document == null)
                         {
+                            var batchJob = m_Model.LoadJobFromFile(filePath);
                             Document = new BatchDocumentVM(new FileInfo(filePath), batchJob, m_Model, m_MsgSvc);
                         }
-                        else 
+                        else
                         {
-                            //TODO: open in current session or in new session
+                            var args = Parser.Default.FormatCommandLine<FileOptions>(new FileOptions() 
+                            {
+                                FilePath = filePath 
+                            });
+
+                            StartNewInstance(args);
                         }
                     }
-                    else 
+                    else
                     {
                         m_MsgSvc.ShowError("Document already open");
                     }
@@ -91,22 +98,55 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
             }
         }
 
-        private void NewDocument() 
+        internal void NewDocument() 
         {
             if (Document == null)
             {
-                Document = new BatchDocumentVM("xBatch Document", new BatchJob(), m_Model, m_MsgSvc);
+                var job = m_Model.CreateNewJobDocument();
+
+                Document = new BatchDocumentVM("xBatch Document", job, m_Model, m_MsgSvc);
             }
             else
             {
-                //TODO: open in new session or in current session
+                var args = Parser.Default.FormatCommandLine<FileOptions>(new FileOptions() { CreateNew = true });
+                StartNewInstance(args);
             }
         }
 
         private void CloseDocument() 
         {
-            //TODO: check if is dirty and show warning
-            Document = null;
+            if (Document.IsDirty)
+            {
+                var res = m_MsgSvc.ShowQuestion("Document has unsaved changes. Do you want to save this document?");
+
+                if (res.HasValue)
+                {
+                    if (res.Value) 
+                    {
+                        Document.SaveDocument();
+                    }
+
+                    Document = null;
+                }
+            }
+            else 
+            {
+                Document = null;
+            }
+        }
+
+        private void StartNewInstance(string args)
+        {
+            try
+            {
+                var appPath = Process.GetCurrentProcess().MainModule.FileName;
+                var prcStartInfo = new ProcessStartInfo(appPath, args);
+                Process.Start(prcStartInfo);
+            }
+            catch 
+            {
+                m_MsgSvc.ShowError("Failed to start new instance of the application");
+            }
         }
     }
 }

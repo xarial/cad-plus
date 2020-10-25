@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Xarial.CadPlus.Common.Services;
@@ -88,17 +89,20 @@ namespace Xarial.CadPlus.XBatch.Base.Core
 
         public async Task<bool> BatchRun(BatchJob opts, CancellationToken cancellationToken = default)
         {
-            m_ProgressHandler.Report(double.NaN);
-
             m_Logger.WriteLine($"Batch macro running started");
 
             var batchStartTime = DateTime.Now;
             
-            var allFiles = PrepareJobScope(opts.Input, opts.Filter, opts.Macros).ToArray();
+            var allFiles = PrepareJobScope(opts.Input, opts.Filters, opts.Macros).ToArray();
 
             m_Logger.WriteLine($"Running batch processing for {allFiles.Length} file(s)");
 
-            m_ProgressHandler.SetJobScope(allFiles);
+            m_ProgressHandler.SetJobScope(allFiles, batchStartTime);
+
+            if (!allFiles.Any())
+            {
+                throw new UserMessageException("Empty job. No files matching specified filter");
+            }
 
             TimeSpan timeout = default;
 
@@ -125,14 +129,35 @@ namespace Xarial.CadPlus.XBatch.Base.Core
             {
                 await Task.Run(() =>
                 {
+                    var curBatchSize = 0;
+
                     for (int i = 0; i < allFiles.Length; i++)
                     {
-                        var res = AttemptProcessFile(ref app, ref appPrc, allFiles[i], opts, cancellationToken);
-                        m_ProgressHandler?.Report((i + 1) / (double)allFiles.Length);
-                                                
+                        var curAppPrc = appPrc?.Id;
+
+                        var curFile = allFiles[i];
+                        var res = AttemptProcessFile(ref app, ref appPrc, curFile, opts, cancellationToken);
+                        m_ProgressHandler?.ReportProgress(curFile, res);
+
                         if (!res && !opts.ContinueOnError) 
                         {
                             throw new UserMessageException("Cancelling the job. Set 'Continue On Error' option to continue job if file failed");
+                        }
+
+                        if (appPrc?.Id != curAppPrc)
+                        {
+                            curBatchSize = 1;
+                        }
+                        else
+                        {
+                            curBatchSize++;
+                        }
+
+                        if (opts.BatchSize > 0 && curBatchSize >= opts.BatchSize) 
+                        {
+                            m_Logger.WriteLine("Closing application as batch size reached the limit");
+                            TryShutDownApplication(appPrc);
+                            curBatchSize = 0;
                         }
                     }
                 }).ConfigureAwait(false);
@@ -143,25 +168,55 @@ namespace Xarial.CadPlus.XBatch.Base.Core
                 TryShutDownApplication(appPrc);
             }
 
-            m_Logger.WriteLine($"Batch running completed in {DateTime.Now.Subtract(batchStartTime).ToString(@"hh\:mm\:ss")}");
+            var duration = DateTime.Now.Subtract(batchStartTime);
+
+            m_ProgressHandler.ReportCompleted(duration);
+
+            m_Logger.WriteLine($"Batch running completed in {duration.ToString(@"hh\:mm\:ss")}");
 
             return jobResult;
         }
 
-        private IEnumerable<JobItemFile> PrepareJobScope(IEnumerable<string> inputs,  string filter, IEnumerable<string> macros) 
+        private bool MatchesFilter(string file, string[] filters) 
         {
-            if (string.IsNullOrEmpty(filter)) 
+            if (filters?.Any() == false)
             {
-                filter = "*.*";
+                return true;
             }
+            else 
+            {
+                const string ANY_FILTER = "*";
 
+                return filters.Any(f => 
+                {
+                    var regex = (f.StartsWith(ANY_FILTER) ? "" : "^")
+                    + Regex.Escape(f).Replace($"\\{ANY_FILTER}", ".*").Replace("\\?", ".")
+                    + (f.EndsWith(ANY_FILTER) ? "" : "$");
+
+                    return Regex.IsMatch(file, regex, RegexOptions.IgnoreCase);
+                });
+            }
+        }
+
+        private IEnumerable<JobItemFile> PrepareJobScope(IEnumerable<string> inputs,  string[] filters, IEnumerable<string> macros) 
+        {
             foreach (var input in inputs)
             {
                 if (Directory.Exists(input))
                 {
-                    foreach (var file in Directory.EnumerateFiles(input, filter, SearchOption.AllDirectories))
+                    foreach (var file in Directory.EnumerateFiles(input, "*.*", SearchOption.AllDirectories))
                     {
-                        yield return new JobItemFile(file, macros.Select(m => new JobItemMacro(m)).ToArray());
+                        if (MatchesFilter(file, filters))
+                        {
+                            if (m_AppProvider.CanProcessFile(file))
+                            {
+                                yield return new JobItemFile(file, macros.Select(m => new JobItemMacro(m)).ToArray());
+                            }
+                            else 
+                            {
+                                m_Logger.WriteLine($"Skipping file '{file}'");
+                            }
+                        }
                     }
                 }
                 else if (File.Exists(input))
@@ -418,7 +473,7 @@ namespace Xarial.CadPlus.XBatch.Base.Core
 
         private bool IsAppAlive(IXApplication app, Process prc) 
         {
-            if (prc.HasExited || !prc.Responding)
+            if (prc == null || prc.HasExited || !prc.Responding)
             {
                 m_Logger.WriteLine("Application host is not responding or exited");
                 return false;

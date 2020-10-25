@@ -96,13 +96,18 @@
   <ItemGroup>
     <Compile Include="AppVersionInfo.cs" />
     <Compile Include="Arguments.cs" />
+    <Compile Include="Controls\HomePage.xaml.cs">
+      <DependentUpon>HomePage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Controls\JobItemsDataGrid.xaml.cs">
       <DependentUpon>JobItemsDataGrid.xaml</DependentUpon>
     </Compile>
     <Compile Include="Converters\DocumentTitleConverter.cs" />
     <Compile Include="Converters\CommandEnabledConverter.cs" />
+    <Compile Include="Converters\FilterTextConverter.cs" />
     <Compile Include="Converters\JobItemStatusToImageConverter.cs" />
     <Compile Include="Converters\JobStatusToImageConverter.cs" />
+    <Compile Include="Converters\JobTitleConverter.cs" />
     <Compile Include="Converters\LogOutputToTextConverter.cs" />
     <Compile Include="Converters\SelectedVersionConverter.cs" />
     <Compile Include="Core\BatchRunner.cs" />
@@ -111,10 +116,13 @@
     <Compile Include="Core\StartupOptions_e.cs" />
     <Compile Include="Exceptions\JobCancelledException.cs" />
     <Compile Include="Exceptions\UserException.cs" />
+    <Compile Include="Extensions\DataGridExtension.cs" />
     <Compile Include="IApplicationProvider.cs" />
+    <Compile Include="Locations.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Models\BatchRunJobExecutor.cs" />
     <Compile Include="Models\BatchRunnerModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
@@ -129,6 +137,7 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <Compile Include="Services\RecentFilesManager.cs" />
     <Compile Include="ViewModels\BatchDocumentVM.cs" />
     <Compile Include="ViewModels\JobItemFileVM.cs" />
     <Compile Include="ViewModels\JobItemMacroVM.cs" />
@@ -157,6 +166,10 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Page Include="Controls\HomePage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Controls\JobItemsDataGrid.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -164,6 +177,14 @@
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Themes\DockControl\DocumentTab.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Themes\DockControl\DocumentWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
   <ItemGroup>
@@ -240,6 +261,15 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\status-warning.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\browse-file.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\run-job-small.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\filter.png" />
   </ItemGroup>
   <Import Project="$(SolutionDir)common\common.module.props" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

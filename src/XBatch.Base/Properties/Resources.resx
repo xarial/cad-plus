@@ -133,8 +133,14 @@
   <data name="background_mode" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\background-mode.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="browse_file" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\browse-file.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="cancel_job" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\cancel-job.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="filter" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\filter.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="no_popup_mode" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\no-popup-mode.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -156,6 +162,9 @@
   </data>
   <data name="run_job" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\run-job.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="run_job_small" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\run-job-small.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="safe_mode" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\safe-mode.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>

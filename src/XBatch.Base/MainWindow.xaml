@@ -11,6 +11,7 @@
         xmlns:fluent="clr-namespace:Fluent;assembly=Fluent"
         xmlns:win="clr-namespace:System.Windows;assembly=PresentationCore"
         xmlns:vm="clr-namespace:Xarial.CadPlus.XBatch.Base.ViewModels"
+        xmlns:ext="clr-namespace:Xarial.CadPlus.XBatch.Base.Extensions"
         xmlns:metro="http://metro.mahapps.com/winfx/xaml/controls"
         Title="xBatch" Icon="Resources/xbatch.png"
         mc:Ignorable="d" WindowState="Maximized" TitleCharacterCasing="Normal" WindowTransitionsEnabled="False"
@@ -22,12 +23,16 @@
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Themes/Light.Blue.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/Fluent;Component/Themes/Generic.xaml" />
+                <ResourceDictionary Source="/XBatch.Base;component/Themes/DockControl/DocumentTab.xaml" />
+                <ResourceDictionary Source="/XBatch.Base;component/Themes/DockControl/DocumentWindow.xaml" />
                 <ResourceDictionary>
                     <conv:LogOutputToTextConverter x:Key="logOutConv"/>
                     <conv:CommandEnabledConverter x:Key="cmdEnabledConv"/>
                     <conv:SelectedVersionConverter x:Key="selVersConv"/>
                     <conv:DocumentTitleConverter x:Key="docTitleConv"/>
                     <conv:JobStatusToImageConverter x:Key="jobStatusToImgConv"/>
+                    <conv:JobTitleConverter x:Key="jobTitleConv"/>
+                    <conv:FilterTextConverter x:Key="filterTxtConv"/>
                     <xconv:MatchValueUniversalConverter x:Key="statusToVisConv" 
                                                         TargetValue="{x:Static vm:JobState_e.InProgress}"
                                                         TrueValue="{x:Static win:Visibility.Visible}"
@@ -36,7 +41,13 @@
                     <xconv:ObjectIsNotNullUniversalConverter x:Key="objIsNotNullToVisConv" 
                                                              TrueValue="{x:Static win:Visibility.Visible}"
                                                              FalseValue="{x:Static win:Visibility.Collapsed}"/>
+                    <xconv:ObjectIsNotNullUniversalConverter x:Key="objIsNullToVisConv" 
+                                                             TrueValue="{x:Static win:Visibility.Collapsed}"
+                                                             FalseValue="{x:Static win:Visibility.Visible}"/>
                     <xconv:ObjectIsNotNullUniversalConverter x:Key="objIsNotNullConv"/>
+                    <xconv:BooleanUniversalConverter x:Key="boolToVisConv" 
+                                                     TrueValue="{x:Static win:Visibility.Visible}"
+                                                     FalseValue="{x:Static win:Visibility.Collapsed}"/>
                 </ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
@@ -61,12 +72,24 @@
             </Grid>
         </DataTemplate>
     </metro:MetroWindow.TitleTemplate>
+    <metro:MetroWindow.RightWindowCommands>
+        <metro:WindowCommands>
+            <fluent:Button Header="Save" ToolTip="Save" Icon="/XBatch.Base;component/Resources/save.png" 
+                           Size="Small"
+                           Command="{Binding Path=Document.SaveDocumentCommand}" 
+                           IsEnabled="{Binding Path=Command, RelativeSource={RelativeSource Mode=Self}, Converter={StaticResource cmdEnabledConv}}"/>
+            <fluent:Button Header="Run Job" ToolTip="Run Job" Size="Small"
+                           Icon="/XBatch.Base;component/Resources/run-job-small.png"
+                           Command="{Binding Path=Document.RunJobCommand}" 
+                           IsEnabled="{Binding Path=Command, RelativeSource={RelativeSource Mode=Self}, Converter={StaticResource cmdEnabledConv}}"/>
+        </metro:WindowCommands>
+    </metro:MetroWindow.RightWindowCommands>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        <fluent:Ribbon Grid.Row="0">
+        <fluent:Ribbon Grid.Row="0" Visibility="{Binding Path=Document, Converter={StaticResource objIsNotNullToVisConv}}">
             <fluent:Ribbon.Menu>
                 <fluent:Backstage>
                     <fluent:BackstageTabControl>
@@ -89,7 +112,7 @@
                     </fluent:BackstageTabControl>
                 </fluent:Backstage>
             </fluent:Ribbon.Menu>
-            <fluent:RibbonTabItem Header="Input" DataContext="{Binding Path=Document}" IsEnabled="{Binding Converter={StaticResource objIsNotNullConv}}">
+            <fluent:RibbonTabItem Header="Input" DataContext="{Binding Path=Document}">
                 <fluent:RibbonGroupBox Header="Files">
                     <fluent:Button Header="Add Files..." 
                                    Command="{Binding Path=AddFilesCommand, ElementName=lstInputs}"
@@ -104,6 +127,51 @@
                                    Icon="/XBatch.Base;component/Resources/remove-file-folder.png"
                                    LargeIcon="/XBatch.Base;component/Resources/remove-file-folder.png" />
                 </fluent:RibbonGroupBox>
+                <fluent:RibbonGroupBox Header="Folder Filters">
+                    <DataGrid ItemsSource="{Binding Path=Filters}" AutoGenerateColumns="False" Width="100"
+                              HeadersVisibility="None" ColumnWidth="*" CanUserAddRows="True"
+                              GridLinesVisibility="Horizontal" 
+                              ext:DataGridExtension.CellEditEndingCommand="{Binding Path=FilterEditEndingCommand}">
+                        <DataGrid.Columns>
+                            <DataGridTemplateColumn IsReadOnly="True" Width="16">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Image Margin="2" Source="Resources/filter.png"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+
+                            <DataGridTemplateColumn>
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock>
+                                            <TextBlock.Text>
+                                                <MultiBinding Converter="{StaticResource filterTxtConv}">
+                                                    <Binding/>
+                                                    <Binding Path="Value"/>
+                                                </MultiBinding>
+                                            </TextBlock.Text>
+                                            <TextBlock.Style>
+                                                <Style TargetType="TextBlock">
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding DataContext, RelativeSource={RelativeSource AncestorType=DataGridRow}}" Value="{x:Static CollectionView.NewItemPlaceholder}">
+                                                            <Setter Property="Foreground" Value="Gray"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                                <DataGridTemplateColumn.CellEditingTemplate>
+                                    <DataTemplate>
+                                        <TextBox Text="{Binding Path=Value, UpdateSourceTrigger=PropertyChanged}"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellEditingTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </fluent:RibbonGroupBox>
                 <fluent:RibbonGroupBox Header="Macros">
                     <fluent:Button Header="Add Macros..." Size="Large"
                                    Command="{Binding Path=AddFilesCommand, ElementName=lstMacros}"
@@ -115,7 +183,7 @@
                                    LargeIcon="/XBatch.Base;component/Resources/remove-macro.png" />
                 </fluent:RibbonGroupBox>
             </fluent:RibbonTabItem>
-            <fluent:RibbonTabItem Header="Settings" DataContext="{Binding Path=Document.Settings}" IsEnabled="{Binding Converter={StaticResource objIsNotNullConv}}">
+            <fluent:RibbonTabItem Header="Settings" DataContext="{Binding Path=Document.Settings}">
                 <fluent:RibbonGroupBox Header="Startup Options">
                     <fluent:DropDownButton LargeIcon="/XBatch.Base;component/Resources/app-version.png" Header="{Binding Path=Version.DisplayName}" 
                                            ItemsSource="{Binding Path=InstalledVersions}">
@@ -167,21 +235,49 @@
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
                         <metro:ToggleSwitch Grid.Column="0" VerticalAlignment="Center" 
                                             OnContent="Timeout On" 
                                             OffContent="Timeout Off"
-                                            IsOn="{Binding Path=IsTimeoutEnabled}"/>
+                                            IsOn="{Binding Path=IsTimeoutEnabled}">
+                            <metro:ToggleSwitch.ToolTip>
+                                <fluent:ScreenTip Title="Timeout"
+                                          Text="Sets the maximum processing time in seconds for a single file. Use this option to eliminate hanging of the host application"
+                                          Width="190"
+                                          IsRibbonAligned="True" />
+                            </metro:ToggleSwitch.ToolTip>
+                        </metro:ToggleSwitch>
                         <fluent:Spinner Value="{Binding Path=Timeout}" Grid.Column="1"
                                         Minimum="0" Maximum="3600"
-                                        Format="0" Width="150"
+                                        Format="0" Width="75" Margin="-20 0 0 0"
                                         Header="" IsEnabled="{Binding Path=IsTimeoutEnabled}"/>
                     </Grid>
-                    <metro:ToggleSwitch Grid.Column="0" VerticalAlignment="Center" OnContent="Continue on error" OffContent="Stop on error" IsOn="{Binding Path=ContinueOnError}"/>
+                    <metro:ToggleSwitch Grid.Column="0" VerticalAlignment="Center" OnContent="Continue on error" OffContent="Stop on error" IsOn="{Binding Path=ContinueOnError}">
+                        <metro:ToggleSwitch.ToolTip>
+                            <fluent:ScreenTip Title="Continue On Error"
+                                          Text="Allows to continue execution if the error is encountered, such as failure to open the file or run the macro"
+                                          Width="190"
+                                          IsRibbonAligned="True" />
+                        </metro:ToggleSwitch.ToolTip>
+                    </metro:ToggleSwitch>
+                    <Grid Margin="20 0 0 0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <metro:ToggleSwitch Grid.Column="0" VerticalAlignment="Center" 
+                                            OnContent="Limit Batch Size" 
+                                            OffContent="Unlimited Batch Size"
+                                            IsOn="{Binding Path=IsBatchSizeLimited}"/>
+                            <fluent:Spinner Value="{Binding Path=BatchSize}" Grid.Column="1"
+                                        Minimum="1"
+                                        Format="0" Width="75" Margin="-20 0 0 0"
+                                        Header="" Visibility="{Binding Path=IsBatchSizeLimited, Converter={StaticResource boolToVisConv}}"/>
+                        </Grid>
                 </fluent:RibbonGroupBox>
             </fluent:RibbonTabItem>
-            <fluent:RibbonTabItem Header="Job" DataContext="{Binding Path=Document}" IsEnabled="{Binding Converter={StaticResource objIsNotNullConv}}">
+            <fluent:RibbonTabItem Header="Job" DataContext="{Binding Path=Document}" >
                 <fluent:RibbonGroupBox Header="Execution">
                     <fluent:Button Header="Run Job"
                                    Icon="/XBatch.Base;component/Resources/run-job.png"
@@ -215,7 +311,16 @@
                                         </Grid.ColumnDefinitions>
                                         <Image Width="16" Height="16" Margin="2" VerticalAlignment="Center" HorizontalAlignment="Center" 
                                                Source="{Binding Path=Status, Converter={StaticResource jobStatusToImgConv}}" Grid.Column="0"/>
-                                        <TextBlock Text="{Binding Path=Name}" Margin="2" Grid.Column="1"/>
+                                        <TextBlock Margin="2" Grid.Column="1">
+                                            <TextBlock.Text>
+                                                <MultiBinding Converter="{StaticResource jobTitleConv}">
+                                                    <Binding Path="Name"/>
+                                                    <Binding Path="Summary.ProcessedFiles"/>
+                                                    <Binding Path="Summary.FailedFiles"/>
+                                                    <Binding Path="Summary.JobItemFiles.Length"/>
+                                                </MultiBinding>
+                                            </TextBlock.Text>
+                                        </TextBlock>
                                         <metro:MetroProgressBar Grid.Row="1" Grid.ColumnSpan="2" 
                                                                 Visibility="{Binding Path=Status, Converter={StaticResource statusToVisConv}}"
                                                                 IsIndeterminate="{Binding Path=Summary.IsInitializing}"
@@ -231,18 +336,7 @@
                         </ListBox>
                     </Grid>
                 </dz:DockItem>
-                <dz:DockItem TabText="Summary" Title="Summary" ShowAction="{dz:ShowAsSidePaneAction Side=Bottom, Size=*, IsSizeForTarget=True, Target=0, Source=1}">
-                    <Grid Margin="5" DataContext="{Binding Path=Results.Selected.Summary}">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="*"/>
-                            <RowDefinition Height="Auto"/>
-                        </Grid.RowDefinitions>
-                        <ctrls:JobItemsDataGrid ItemsSource="{Binding Path=JobItemFiles}"/>
-                        <metro:MetroProgressBar Grid.Row="1" IsIndeterminate="{Binding Path=IsInitializing}"
-                                                Value="{Binding Path=Progress}" Minimum="0" Maximum="1"/>
-                    </Grid>
-                </dz:DockItem>
-                <dz:DockItem TabText="Log" Title="Log" ShowAction="{dz:ShowAsTabbedAction Target=1, Source=2}">
+                <dz:DockItem TabText="Log" Title="Log" ShowAction="{dz:ShowAsSidePaneAction Side=Bottom, Size=*, IsSizeForTarget=True, Target=0, Source=1}">
                     <Grid DataContext="{Binding Path=Results.Selected.Log}">
                         <TextBox AcceptsReturn="True" AcceptsTab="True"
                                  IsReadOnly="True" Margin="5"
@@ -256,25 +350,57 @@
                         </TextBox>
                     </Grid>
                 </dz:DockItem>
+                <dz:DockItem TabText="Summary" Title="Summary" ShowAction="{dz:ShowAsTabbedAction Target=1, Source=2}">
+                    <Grid Visibility="{Binding Path=Results.Selected, Converter={StaticResource objIsNotNullToVisConv}}">
+                        <Grid Margin="5" DataContext="{Binding Path=Results.Selected.Summary}">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <Grid Grid.Row="0" Margin="5">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="10"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+                            
+                                <TextBlock Text="Start Time:" Grid.Row="0" Grid.Column="0" Margin="2"/>
+                                <TextBlock Text="{Binding Path=StartTime}" Grid.Row="0" Grid.Column="2" Margin="2"/>
+
+                                <TextBlock Text="Duration:" Grid.Row="1" Grid.Column="0" Margin="2"/>
+                                <TextBlock Text="{Binding Path=Duration, StringFormat=hh\\:mm\\:ss}" Grid.Row="1" Grid.Column="2" Margin="2"/>
+
+                                <TextBlock Text="Total Files:" Grid.Row="2" Grid.Column="0" Margin="2"/>
+                                <TextBlock Text="{Binding Path=JobItemFiles.Length}" Grid.Row="2" Grid.Column="2" Margin="2"/>
+
+                                <TextBlock Text="Processed Files:" Grid.Row="3" Grid.Column="0" Margin="2"/>
+                                <TextBlock Text="{Binding Path=ProcessedFiles}" Grid.Row="3" Grid.Column="2" Margin="2"/>
+
+                                <TextBlock Text="Failed Files:" Grid.Row="4" Grid.Column="0" Margin="2"/>
+                                <TextBlock Text="{Binding Path=FailedFiles}" Grid.Row="4" Grid.Column="2" Margin="2"/>
+
+                            </Grid>
+                            <ctrls:JobItemsDataGrid ItemsSource="{Binding Path=JobItemFiles}" Grid.Row="1" Margin="5"/>
+                            <metro:MetroProgressBar Grid.Row="2" IsIndeterminate="{Binding Path=IsInitializing}"
+                                                    Visibility="{Binding Path=DataContext.Results.Selected.IsBatchInProgress, RelativeSource={RelativeSource AncestorType={x:Type dz:DockItem}}, Converter={StaticResource boolToVisConv}}"
+                                                    Value="{Binding Path=Progress}" Minimum="0" Maximum="1"/>
+                        </Grid>
+                    </Grid>
+                </dz:DockItem>
                 <dz:DockItem TabText="Files And Folders" Title="Files And Folders" ShowAction="{dz:ShowAsDockPositionAction DockPosition=Document, Source=3}">
                     <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="*"/>
-                            <RowDefinition Height="Auto"/>
-                        </Grid.RowDefinitions>
                         <cmnctrls:PathListBox x:Name="lstInputs" Filters="{Binding Path=InputFilesFilter}" 
                                               Grid.Row="0" PathsSource="{Binding Path=Input}"
                                               ShowAddFileButton="False" ShowAddFolderButton="False"/>
-                        <Grid Grid.Row="1">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="*" />
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Text="Filter:" Grid.Column="0" Margin="2" VerticalAlignment="Center" />
-                            <TextBox Text="{Binding Path=Filter, UpdateSourceTrigger=PropertyChanged}" 
-                                     Grid.Column="1" Margin="2" Width="200" HorizontalAlignment="Left"
-                                     metro:TextBoxHelper.Watermark="Input filters for files in folders" />
-                        </Grid>
                     </Grid>
                 </dz:DockItem>
                 <dz:DockItem TabText="Macros" Title="Macros" ShowAction="{dz:ShowAsSidePaneAction Side=Bottom, Size=*, IsSizeForTarget=True, Target=3, Source=4 }">
@@ -286,5 +412,7 @@
                 </dz:DockItem>
             </dz:DockControl.DockItems>
         </dz:DockControl>
+        <ctrls:HomePage Grid.RowSpan="2" VerticalAlignment="Center" HorizontalAlignment="Center"
+                        Visibility="{Binding Path=Document, Converter={StaticResource objIsNullToVisConv}}"/>
     </Grid>
 </metro:MetroWindow>
