@@ -11,6 +11,8 @@ namespace Xarial.CadPlus.CustomToolbar.UI.ValidationRules
 {
     public class FileExistsValidationRule : ValidationRule
     {
+        public bool AllowEmptyValues { get; set; } = false;
+
         public override ValidationResult Validate(object value, CultureInfo cultureInfo)
         {
             if (!string.IsNullOrEmpty(value as string))
@@ -26,7 +28,14 @@ namespace Xarial.CadPlus.CustomToolbar.UI.ValidationRules
             }
             else 
             {
-                return new ValidationResult(false, "Path is not specified");
+                if (AllowEmptyValues)
+                {
+                    return ValidationResult.ValidResult;
+                }
+                else
+                {
+                    return new ValidationResult(false, "Path is not specified");
+                }
             }
         }
     }

@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:vm="clr-namespace:Xarial.CadPlus.CustomToolbar.UI.ViewModels"
+             xmlns:val="clr-namespace:Xarial.CadPlus.CustomToolbar.UI.ValidationRules"
              xmlns:conv="clr-namespace:Xarial.CadPlus.CustomToolbar.UI.Converters"
              mc:Ignorable="d"
              d:DataContext="{x:Type vm:ICommandVM}"
@@ -35,7 +36,15 @@
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
-            <TextBox Grid.Column="0" Text="{Binding Path=IconPath, UpdateSourceTrigger=PropertyChanged}" Margin="2" />
+            <TextBox Grid.Column="0" Margin="2">
+                <TextBox.Text>
+                    <Binding Path="IconPath" UpdateSourceTrigger="PropertyChanged">
+                        <Binding.ValidationRules>
+                            <val:FileExistsValidationRule AllowEmptyValues="True" ValidatesOnTargetUpdated="True"/>
+                        </Binding.ValidationRules>
+                    </Binding>
+                </TextBox.Text>
+            </TextBox>
             <Button Grid.Column="1" Margin="2" Command="{Binding Path=BrowseIconCommand}">
                 <TextBlock Text="Browse..." Margin="5 0" />
             </Button>

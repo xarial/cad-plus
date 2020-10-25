@@ -25,30 +25,24 @@
             </xconv:MatchValueUniversalConverter.TargetValue>
         </xconv:MatchValueUniversalConverter>
         <Style x:Key="ErrorTemplate" TargetType="Control">
-            <Setter Property="Validation.ErrorTemplate">
-                <Setter.Value>
-                    <ControlTemplate>
-                        <DockPanel LastChildFill="True" Margin="3">
-                            <Border BorderBrush="Red" 
-                                    BorderThickness="2" CornerRadius="2,0,0,2">
-                                <Grid>
-                                    <AdornedElementPlaceholder Margin="-1"/>
-                                    <TextBlock Text="!"
-                                               Foreground="Red" Margin="2" 
-                                               FontWeight="Bold"
-                                               VerticalAlignment="Bottom" 
-                                               HorizontalAlignment="Right"/>
-                                </Grid>
-                            </Border>
-                        </DockPanel>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
             <Style.Triggers>
                 <Trigger Property="Validation.HasError" Value="True">
-                    <Setter Property="ToolTip" 
-                            Value="{Binding RelativeSource={x:Static RelativeSource.Self}, 
-                            Path=(Validation.Errors)[0].ErrorContent}" />
+                    <Setter Property="ToolTip" >
+                        <Setter.Value>
+                            <ToolTip>
+                                <ToolTip.Content>
+                                    <Grid DataContext="{Binding Path=PlacementTarget.(Validation.Errors)[0], RelativeSource={RelativeSource AncestorType={x:Type ToolTip}}}" MaxWidth="200">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="16"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Image Source="/Xarial.CadPlus.CustomToolbar.Module;component/Resources/error.png" VerticalAlignment="Top" Margin="2"/>
+                                        <TextBlock Grid.Column="1" Text="{Binding Path=ErrorContent}" TextWrapping="Wrap"/>
+                                    </Grid>
+                                </ToolTip.Content>
+                            </ToolTip>
+                        </Setter.Value>
+                    </Setter>
                 </Trigger>
             </Style.Triggers>
         </Style>
