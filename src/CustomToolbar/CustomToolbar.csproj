@@ -154,6 +154,8 @@
     <Compile Include="UI\Forms\CommandManagerForm.xaml.cs">
       <DependentUpon>CommandManagerForm.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI\ValidationRules\EntryPointsValidationRules.cs" />
+    <Compile Include="UI\ValidationRules\FileExistsValidationRule.cs" />
     <Compile Include="UI\ViewModels\CommandGroupVM.cs" />
     <Compile Include="UI\ViewModels\CommandMacroVM.cs" />
     <Compile Include="UI\ViewModels\CommandManagerVM.cs" />
@@ -237,6 +239,7 @@
       <Name>Module</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(SolutionDir)common\common.module.props" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

@@ -24,6 +24,37 @@
                 <sys:Int32>0</sys:Int32>
             </xconv:MatchValueUniversalConverter.TargetValue>
         </xconv:MatchValueUniversalConverter>
+        <Style x:Key="ErrorTemplate" TargetType="Control">
+            <Setter Property="Validation.ErrorTemplate">
+                <Setter.Value>
+                    <ControlTemplate>
+                        <DockPanel LastChildFill="True" Margin="3">
+                            <Border BorderBrush="Red" 
+                                    BorderThickness="2" CornerRadius="2,0,0,2">
+                                <Grid>
+                                    <AdornedElementPlaceholder Margin="-1"/>
+                                    <TextBlock Text="!"
+                                               Foreground="Red" Margin="2" 
+                                               FontWeight="Bold"
+                                               VerticalAlignment="Bottom" 
+                                               HorizontalAlignment="Right"/>
+                                </Grid>
+                            </Border>
+                        </DockPanel>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="Validation.HasError" Value="True">
+                    <Setter Property="ToolTip" 
+                            Value="{Binding RelativeSource={x:Static RelativeSource.Self}, 
+                            Path=(Validation.Errors)[0].ErrorContent}" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <Style TargetType="TextBox" BasedOn="{StaticResource ErrorTemplate}" />
+        <Style TargetType="CheckBox" BasedOn="{StaticResource ErrorTemplate}" />
+        <Style TargetType="ComboBox" BasedOn="{StaticResource ErrorTemplate}" />
     </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
