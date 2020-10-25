@@ -11,6 +11,7 @@
         xmlns:fluent="clr-namespace:Fluent;assembly=Fluent"
         xmlns:win="clr-namespace:System.Windows;assembly=PresentationCore"
         xmlns:vm="clr-namespace:Xarial.CadPlus.XBatch.Base.ViewModels"
+        xmlns:ext="clr-namespace:Xarial.CadPlus.XBatch.Base.Extensions"
         xmlns:metro="http://metro.mahapps.com/winfx/xaml/controls"
         Title="xBatch" Icon="Resources/xbatch.png"
         mc:Ignorable="d" WindowState="Maximized" TitleCharacterCasing="Normal" WindowTransitionsEnabled="False"
@@ -22,6 +23,8 @@
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Themes/Light.Blue.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/Fluent;Component/Themes/Generic.xaml" />
+                <ResourceDictionary Source="/XBatch.Base;component/Themes/DockControl/DocumentTab.xaml" />
+                <ResourceDictionary Source="/XBatch.Base;component/Themes/DockControl/DocumentWindow.xaml" />
                 <ResourceDictionary>
                     <conv:LogOutputToTextConverter x:Key="logOutConv"/>
                     <conv:CommandEnabledConverter x:Key="cmdEnabledConv"/>
@@ -29,6 +32,7 @@
                     <conv:DocumentTitleConverter x:Key="docTitleConv"/>
                     <conv:JobStatusToImageConverter x:Key="jobStatusToImgConv"/>
                     <conv:JobTitleConverter x:Key="jobTitleConv"/>
+                    <conv:FilterTextConverter x:Key="filterTxtConv"/>
                     <xconv:MatchValueUniversalConverter x:Key="statusToVisConv" 
                                                         TargetValue="{x:Static vm:JobState_e.InProgress}"
                                                         TrueValue="{x:Static win:Visibility.Visible}"
@@ -125,9 +129,46 @@
                 </fluent:RibbonGroupBox>
                 <fluent:RibbonGroupBox Header="Folder Filters">
                     <DataGrid ItemsSource="{Binding Path=Filters}" AutoGenerateColumns="False" Width="100"
-                              HeadersVisibility="None" ColumnWidth="*" CanUserAddRows="True">
+                              HeadersVisibility="None" ColumnWidth="*" CanUserAddRows="True"
+                              GridLinesVisibility="Horizontal" 
+                              ext:DataGridExtension.CellEditEndingCommand="{Binding Path=FilterEditEndingCommand}">
                         <DataGrid.Columns>
-                            <DataGridTextColumn Binding="{Binding Path=Value, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="False"/>
+                            <DataGridTemplateColumn IsReadOnly="True" Width="16">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Image Margin="2" Source="Resources/filter.png"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+
+                            <DataGridTemplateColumn>
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock>
+                                            <TextBlock.Text>
+                                                <MultiBinding Converter="{StaticResource filterTxtConv}">
+                                                    <Binding/>
+                                                    <Binding Path="Value"/>
+                                                </MultiBinding>
+                                            </TextBlock.Text>
+                                            <TextBlock.Style>
+                                                <Style TargetType="TextBlock">
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding DataContext, RelativeSource={RelativeSource AncestorType=DataGridRow}}" Value="{x:Static CollectionView.NewItemPlaceholder}">
+                                                            <Setter Property="Foreground" Value="Gray"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                                <DataGridTemplateColumn.CellEditingTemplate>
+                                    <DataTemplate>
+                                        <TextBox Text="{Binding Path=Value, UpdateSourceTrigger=PropertyChanged}"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellEditingTemplate>
+                            </DataGridTemplateColumn>
                         </DataGrid.Columns>
                     </DataGrid>
                 </fluent:RibbonGroupBox>
@@ -200,13 +241,26 @@
                                             OnContent="Timeout On" 
                                             OffContent="Timeout Off"
                                             IsOn="{Binding Path=IsTimeoutEnabled}">
+                            <metro:ToggleSwitch.ToolTip>
+                                <fluent:ScreenTip Title="Timeout"
+                                          Text="Sets the maximum processing time in seconds for a single file. Use this option to eliminate hanging of the host application"
+                                          Width="190"
+                                          IsRibbonAligned="True" />
+                            </metro:ToggleSwitch.ToolTip>
                         </metro:ToggleSwitch>
                         <fluent:Spinner Value="{Binding Path=Timeout}" Grid.Column="1"
                                         Minimum="0" Maximum="3600"
                                         Format="0" Width="75" Margin="-20 0 0 0"
                                         Header="" IsEnabled="{Binding Path=IsTimeoutEnabled}"/>
                     </Grid>
-                    <metro:ToggleSwitch Grid.Column="0" VerticalAlignment="Center" OnContent="Continue on error" OffContent="Stop on error" IsOn="{Binding Path=ContinueOnError}"/>
+                    <metro:ToggleSwitch Grid.Column="0" VerticalAlignment="Center" OnContent="Continue on error" OffContent="Stop on error" IsOn="{Binding Path=ContinueOnError}">
+                        <metro:ToggleSwitch.ToolTip>
+                            <fluent:ScreenTip Title="Continue on error"
+                                          Text="Allows to continue execution if the error is encountered, such as failure to open the file or run the macro"
+                                          Width="190"
+                                          IsRibbonAligned="True" />
+                        </metro:ToggleSwitch.ToolTip>
+                    </metro:ToggleSwitch>
                     <Grid Margin="20 0 0 0">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto"/>
@@ -359,8 +413,6 @@
             </dz:DockControl.DockItems>
         </dz:DockControl>
         <ctrls:HomePage Grid.RowSpan="2" VerticalAlignment="Center" HorizontalAlignment="Center"
-                        Visibility="{Binding Path=Document, Converter={StaticResource objIsNullToVisConv}}">
-            
-        </ctrls:HomePage>
+                        Visibility="{Binding Path=Document, Converter={StaticResource objIsNullToVisConv}}"/>
     </Grid>
 </metro:MetroWindow>

@@ -62,7 +62,7 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
 
         public bool IsTimeoutEnabled
         {
-            get => m_Job.Timeout != -1;
+            get => m_Job.Timeout > 0;
             set
             {
                 if (!value)
@@ -81,7 +81,7 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
 
         public bool IsBatchSizeLimited
         {
-            get => m_Job.BatchSize != -1;
+            get => m_Job.BatchSize > 0;
             set
             {
                 if (!value)
@@ -230,6 +230,8 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
         {
             m_Job = job;
             m_CachedTimeout = m_Job.Timeout;
+            m_CachedBatchSize = m_Job.BatchSize;
+
             m_Model = model;
 
             InstalledVersions = m_Model.InstalledVersions;

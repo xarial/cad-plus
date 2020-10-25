@@ -13,6 +13,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Controls;
 using System.Windows.Input;
 using Xarial.CadPlus.Common.Services;
 using Xarial.CadPlus.XBatch.Base.Core;
@@ -93,6 +94,8 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
         public ICommand SaveDocumentCommand { get; }
         public ICommand SaveAsDocumentCommand { get; }
 
+        public ICommand FilterEditEndingCommand { get; }
+
         public bool IsDirty 
         {
             get => m_IsDirty;
@@ -130,6 +133,7 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
             RunJobCommand = new RelayCommand(RunJob, () => Input.Any() && Macros.Any() && Settings.Version != null);
             SaveDocumentCommand = new RelayCommand(SaveDocument, () => IsDirty);
             SaveAsDocumentCommand = new RelayCommand(SaveAsDocument);
+            FilterEditEndingCommand = new RelayCommand<DataGridCellEditEndingEventArgs>(FilterEditEnding);
 
             Name = name;
             Settings = new BatchDocumentSettingsVM(m_Job, model);
@@ -145,6 +149,20 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
 
             Macros = new ObservableCollection<string>(m_Job.Macros ?? Enumerable.Empty<string>());
             Macros.CollectionChanged += OnMacrosCollectionChanged;
+        }
+
+        private void FilterEditEnding(DataGridCellEditEndingEventArgs args)
+        {
+            var curFilter = args.EditingElement.DataContext as FilterVM;
+
+            for (int i = Filters.Count - 1; i >= 0; i--)
+            {
+                if (Filters[i] != curFilter &&
+                    string.Equals(Filters[i].Value, curFilter.Value, StringComparison.CurrentCultureIgnoreCase))
+                {
+                    Filters.RemoveAt(i);
+                }
+            }
         }
 
         private void OnSettingsModified()

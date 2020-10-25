@@ -1,0 +1,44 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:dz="http://schemas.devzest.com/presentation/docking">
+
+    <Style TargetType="dz:DocumentTab">
+        <Style.Resources>
+            <Style TargetType="{x:Type Border}">
+                <Setter Property="CornerRadius" Value="2,2,0,0" />
+            </Style>
+            <DataTemplate x:Key="OverlayContentTemplate">
+                <Border Style="{StaticResource {x:Type Border}}">
+                    <dz:PreviewOverlay />
+                </Border>
+            </DataTemplate>
+            <dz:Overlay Content=" " x:Key="Overlay" ContentTemplate="{StaticResource OverlayContentTemplate}" />
+        </Style.Resources>
+        <Setter Property="Margin" Value="0.5,2,0.5,0" />
+        <Setter Property="Background" Value="{DynamicResource LightBrush}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="dz:DocumentTab" >
+                    <Border Background="{TemplateBinding Background}">
+                        <StackPanel Orientation="Horizontal" Margin="5,3">
+                            <TextBlock Text="{Binding TabText}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" />
+                        </StackPanel>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="{DynamicResource HoverBrush}" />
+            </Trigger>
+            <DataTrigger Binding="{Binding Path=IsSelected}" Value="True">
+                <Setter Property="Background" Value="{DynamicResource ShadeBrush}" />
+                <Setter Property="Panel.ZIndex" Value="1" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding Path=(dz:DockManager.Preview)}" Value="Tab">
+                <Setter Property="dz:DockManager.Overlay" Value="{StaticResource Overlay}" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+</ResourceDictionary>

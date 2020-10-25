@@ -104,6 +104,7 @@
     </Compile>
     <Compile Include="Converters\DocumentTitleConverter.cs" />
     <Compile Include="Converters\CommandEnabledConverter.cs" />
+    <Compile Include="Converters\FilterTextConverter.cs" />
     <Compile Include="Converters\JobItemStatusToImageConverter.cs" />
     <Compile Include="Converters\JobStatusToImageConverter.cs" />
     <Compile Include="Converters\JobTitleConverter.cs" />
@@ -115,6 +116,7 @@
     <Compile Include="Core\StartupOptions_e.cs" />
     <Compile Include="Exceptions\JobCancelledException.cs" />
     <Compile Include="Exceptions\UserException.cs" />
+    <Compile Include="Extensions\DataGridExtension.cs" />
     <Compile Include="IApplicationProvider.cs" />
     <Compile Include="Locations.cs" />
     <Compile Include="MainWindow.xaml.cs">
@@ -175,6 +177,14 @@
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Themes\DockControl\DocumentTab.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Themes\DockControl\DocumentWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
   <ItemGroup>
@@ -257,6 +267,9 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\run-job-small.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\filter.png" />
   </ItemGroup>
   <Import Project="$(SolutionDir)common\common.module.props" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
