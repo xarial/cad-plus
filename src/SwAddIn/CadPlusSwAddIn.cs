@@ -8,10 +8,7 @@
 using System;
 using System.Linq;
 using System.Runtime.InteropServices;
-using Xarial.CadPlus.ExtensionModule;
-using Xarial.CadPlus.CustomToolbar;
 using Xarial.XCad.SolidWorks;
-using Xarial.XCad.UI.Commands;
 using Xarial.XCad.Base.Attributes;
 using System.ComponentModel;
 using Xarial.XToolkit.Wpf.Dialogs;

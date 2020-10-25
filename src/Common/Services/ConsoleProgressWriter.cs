@@ -13,13 +13,29 @@ using System.Threading.Tasks;
 
 namespace Xarial.CadPlus.Common.Services
 {
-    public class ConsoleProgressWriter : IProgress<double>
+    public class ConsoleProgressWriter : IProgressHandler
     {
-        public void Report(double value)
+        private int m_TotalFiles;
+        private int m_ProcessedFiles;
+
+        public void ReportProgress(IJobItemFile file, bool result)
         {
+            m_ProcessedFiles++;
+            var prg = m_ProcessedFiles / (double)m_TotalFiles;
+
             Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine($"Progress: {(value * 100).ToString("F")}%");
+            Console.WriteLine($"Progress: {(prg * 100).ToString("F")}%");
             Console.ResetColor();
+        }
+
+        public void SetJobScope(IJobItemFile[] scope, DateTime startTime)
+        {
+            m_TotalFiles = scope.Length;
+            Console.WriteLine($"Processing {scope.Length} file(s)");
+        }
+        
+        public void ReportCompleted(TimeSpan duration)
+        {
         }
     }
 }

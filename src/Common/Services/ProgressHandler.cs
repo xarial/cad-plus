@@ -13,13 +13,46 @@ using System.Threading.Tasks;
 
 namespace Xarial.CadPlus.Common.Services
 {
-    public class ProgressHandler : IProgress<double>
+    public enum JobItemStatus_e
     {
-        public event Action<double> ProgressChanged;
+        AwaitingProcessing,
+        InProgress,
+        Failed,
+        Succeeded,
+        Warning
+    }
 
-        public void Report(double value)
-        {
-            ProgressChanged?.Invoke(value);
-        }
+    public interface IJobItemFile : IJobItem
+    {
+        IEnumerable<IJobItemOperation> Operations { get; }
+    }
+
+    public interface IJobItemOperation : IJobItem
+    {
+    }
+
+    public interface IJobItem
+    {
+        event Action<IJobItem, JobItemStatus_e> StatusChanged;
+        JobItemStatus_e Status { get; }
+        string DisplayName { get; }
+    }
+
+    public interface IProgressHandler
+    {
+        void ReportProgress(IJobItemFile file, bool result);
+        void SetJobScope(IJobItemFile[] scope, DateTime startTime);
+        void ReportCompleted(TimeSpan duration);
+    }
+
+    public class ProgressHandler : IProgressHandler
+    {
+        public event Action<IJobItemFile, bool> ProgressChanged;
+        public event Action<IJobItemFile[], DateTime> JobScopeSet;
+        public event Action<TimeSpan> Completed;
+
+        public void ReportCompleted(TimeSpan duration) => Completed?.Invoke(duration);
+        public void ReportProgress(IJobItemFile file, bool result) => ProgressChanged?.Invoke(file, result);
+        public void SetJobScope(IJobItemFile[] scope, DateTime startTime) => JobScopeSet?.Invoke(scope, startTime);
     }
 }

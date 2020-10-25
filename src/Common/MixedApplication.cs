@@ -8,11 +8,17 @@
 using CommandLine;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Interop;
+using System.Windows.Navigation;
+using System.Windows.Threading;
+using Xarial.CadPlus.Module.Init;
 
 namespace Xarial.CadPlus.Common
 {
@@ -22,10 +28,71 @@ namespace Xarial.CadPlus.Common
         internal static extern bool AttachConsole(int processId);
     }
 
-    public abstract class MixedApplication<TArgs> : Application
+    public class ConsoleHostModule : BaseHostModule
     {
+        public override IntPtr ParentWindow => IntPtr.Zero;
+
+        public override event Action Loaded;
+
+        internal ConsoleHostModule() 
+        {
+            Loaded?.Invoke();
+        }
+    }
+
+    public class WpfAppHostModule : BaseHostModule
+    {
+        private readonly Application m_App;
+
+        internal WpfAppHostModule(Application app)
+        {
+            m_App = app;
+            m_App.Activated += OnAppActivated;
+        }
+
+        public override IntPtr ParentWindow => m_App.MainWindow != null
+            ? new WindowInteropHelper(m_App.MainWindow).Handle
+            : IntPtr.Zero;
+
+        public override event Action Loaded;
+
+        private void OnAppActivated(object sender, EventArgs e)
+        {
+            m_App.Activated -= OnAppActivated;
+            Loaded?.Invoke();
+        }
+    }
+
+    public abstract class MixedApplication<TCliArgs> : Application
+    {
+        private bool m_IsStartWindowCalled;
+
+        private BaseHostModule m_HostModule;
+
         protected virtual void OnAppStart()
         {
+        }
+
+        protected virtual void TryExtractCliArguments(Parser parser, string[] input, 
+            out TCliArgs args, out bool hasArguments, out bool hasError)
+        {
+            args = default;
+            hasError = false;
+            hasArguments = false;
+
+            if (input.Any())
+            {
+                TCliArgs argsLocal = default;
+                bool hasErrorLocal = false;
+
+                parser.ParseArguments<TCliArgs>(input)
+                    .WithParsed(a => argsLocal = a)
+                    .WithNotParsed(err => hasErrorLocal = true);
+
+                args = argsLocal;
+                hasError = hasErrorLocal;
+                hasArguments = true;
+            }
         }
 
         protected override void OnStartup(StartupEventArgs e)
@@ -35,26 +102,33 @@ namespace Xarial.CadPlus.Common
 
             OnAppStart();
 
-            if (e.Args.Any())
+            var parserOutput = new StringBuilder();
+
+            TCliArgs args;
+            bool hasArgs;
+            bool hasError;
+
+            using (var outputWriter = new StringWriter(parserOutput))
             {
-                WindowsApi.AttachConsole(-1);
-                
                 var parser = new Parser(p =>
                 {
                     p.CaseInsensitiveEnumValues = true;
                     p.AutoHelp = true;
                     p.EnableDashDash = true;
-                    p.HelpWriter = Console.Out;
+                    p.HelpWriter = outputWriter;
                     p.IgnoreUnknownArguments = false;
                 });
 
-                var hasError = false;
+                TryExtractCliArguments(parser, e.Args, out args, out hasArgs, out hasError);
+            }
 
-                TArgs args = default;
-                parser.ParseArguments<TArgs>(e.Args)
-                    .WithParsed(a => args = a)
-                    .WithNotParsed(err => hasError = true);
+            if (hasArgs)
+            {
+                WindowsApi.AttachConsole(-1);
 
+                SynchronizationContext.SetSynchronizationContext(new SynchronizationContext());
+                m_HostModule = new ConsoleHostModule();
+                
                 var res = false;
 
                 if (!hasError)
@@ -73,24 +147,47 @@ namespace Xarial.CadPlus.Common
                         PrintError(ex.Message);
                     }
                 }
+                else 
+                {
+                    Console.Write(parserOutput.ToString());
+                }
 
                 Environment.Exit(res ? 0 : 1);
             }
             else
             {
+                m_HostModule = new WpfAppHostModule(this);
                 base.OnStartup(e);
             }
         }
 
+        protected override void OnActivated(EventArgs e)
+        {
+            base.OnActivated(e);
+
+            if (!m_IsStartWindowCalled)
+            {
+                m_IsStartWindowCalled = true;
+                OnWindowStarted();
+            }
+        }
+
+        protected virtual void OnWindowStarted() 
+        {
+        }
+
         private void OnDomainUnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
+            //TODO: log
         }
 
-        private void OnDispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
+        private void OnDispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
         {
+            //TODO: log
+            e.Handled = true;
         }
 
-        protected abstract Task RunConsole(TArgs args);
+        protected abstract Task RunConsole(TCliArgs args);
 
         private void PrintError(string msg)
         {

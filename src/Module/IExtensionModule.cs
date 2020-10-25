@@ -5,17 +5,17 @@
 //License: https://cadplus.xarial.com/license/
 //*********************************************************************
 
-using System.Globalization;
-using System.Windows.Controls;
-using Xarial.XToolkit.Wpf.Controls;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Xarial.XCad.Extensions;
 
-namespace Xarial.CadPlus.XBatch.Base.Views
+namespace Xarial.CadPlus.ExtensionModule
 {
-    public partial class BatchRunnerView : UserControl
+    public interface IExtensionModule : IDisposable
     {
-        public BatchRunnerView()
-        {
-            InitializeComponent();
-        }
+        void Load(IXExtension ext);
     }
 }

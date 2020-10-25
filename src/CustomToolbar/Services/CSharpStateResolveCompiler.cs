@@ -28,8 +28,8 @@ namespace Xarial.CadPlus.CustomToolbar.Services
                 => new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary);
 
             protected override SyntaxTree CreateSyntaxTree(SourceText src)
-                => Microsoft.CodeAnalysis.CSharp.SyntaxFactory.ParseSyntaxTree(src,
-                    CSharpParseOptions.Default.WithLanguageVersion(Microsoft.CodeAnalysis.CSharp.LanguageVersion.CSharp6), "");
+                => SyntaxFactory.ParseSyntaxTree(src,
+                    CSharpParseOptions.Default.WithLanguageVersion(LanguageVersion.CSharp7_3), "");
 
             protected override IEnumerable<MetadataReference> GetReferences()
             {

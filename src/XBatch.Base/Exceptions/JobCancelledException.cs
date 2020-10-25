@@ -10,12 +10,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Xarial.XCad.Extensions;
 
-namespace Xarial.CadPlus.ExtensionModule
+namespace Xarial.CadPlus.XBatch.Base.Exceptions
 {
-    public interface IModule : IDisposable
+    public class JobCancelledException : UserMessageException
     {
-        void Load(IXExtension ext);
+        public JobCancelledException() : base("Cancelled by the user") 
+        {
+        }
     }
 }

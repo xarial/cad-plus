@@ -7,29 +7,50 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using Xarial.CadPlus.Common.Services;
 using Xarial.CadPlus.XBatch.Base.Core;
 using Xarial.CadPlus.XBatch.Base.Exceptions;
+using Xarial.CadPlus.XBatch.Base.Services;
+using Xarial.XToolkit.Services.UserSettings;
 using Xarial.XToolkit.Wpf.Utils;
 
 namespace Xarial.CadPlus.XBatch.Base.Models
 {
-    public class BatchRunnerModel
+    public interface IBatchRunnerModel 
     {
-        public event Action<double> ProgressChanged;
-        public event Action<string> Log;
+        ObservableCollection<string> RecentFiles { get; }
+        AppVersionInfo[] InstalledVersions { get; }
 
-        private CancellationTokenSource m_CurrentCancellationToken;
+        FileFilter[] InputFilesFilter { get; }
+        FileFilter[] MacroFilesFilter { get; }
 
+        void SaveJobToFile(BatchJob job, string filePath);
+        BatchJob LoadJobFromFile(string filePath);
+        BatchJob CreateNewJobDocument();
+
+        AppVersionInfo ParseVersion(string id);
+
+        IBatchRunJobExecutor CreateExecutor(BatchJob job);
+    }
+
+    public class BatchRunnerModel : IBatchRunnerModel
+    {
         private readonly IApplicationProvider m_AppProvider;
 
-        public BatchRunnerModel(IApplicationProvider appProvider) 
+        private readonly IRecentFilesManager m_RecentFilesMgr;
+
+        public ObservableCollection<string> RecentFiles { get; }
+
+        public BatchRunnerModel(IApplicationProvider appProvider, IRecentFilesManager recentFilesMgr) 
         {
             m_AppProvider = appProvider;
+            m_RecentFilesMgr = recentFilesMgr;
+            RecentFiles = new ObservableCollection<string>(m_RecentFilesMgr.RecentFiles);
+
             InstalledVersions = m_AppProvider.GetInstalledVersions().ToArray();
 
             if (!InstalledVersions.Any()) 
@@ -44,45 +65,55 @@ namespace Xarial.CadPlus.XBatch.Base.Models
 
         public AppVersionInfo[] InstalledVersions { get; }
 
-        public async Task<bool> BatchRun(BatchRunnerOptions opts)
+        public IBatchRunJobExecutor CreateExecutor(BatchJob job) => new BatchRunJobExecutor(job, m_AppProvider);
+
+        public BatchJob CreateNewJobDocument() => new BatchJob();
+
+        public BatchJob LoadJobFromFile(string filePath)
         {
-            m_CurrentCancellationToken = new CancellationTokenSource();
-
-            var logWriter = new LogWriter();
-            var prgHander = new ProgressHandler();
-
-            logWriter.Log += OnLog;
-            prgHander.ProgressChanged += OnProgressChanged;
-
             try
             {
-                using (var batchRunner = new BatchRunner(m_AppProvider, logWriter, prgHander))
-                {
-                    var cancellationToken = m_CurrentCancellationToken.Token;
+                var svc = new UserSettingsService();
 
-                    return await batchRunner.BatchRun(opts, cancellationToken).ConfigureAwait(false);
-                }
+                var batchJob = svc.ReadSettings<BatchJob>(filePath);
+
+                AppendRecentFiles(filePath);
+
+                return batchJob;
             }
-            finally
+            catch 
             {
-                logWriter.Log -= OnLog;
-                prgHander.ProgressChanged -= OnProgressChanged;
+                m_RecentFilesMgr.RemoveFile(filePath);
+                UpdateRecentFiles();
+                throw;
             }
         }
 
-        public void Cancel()
+        public AppVersionInfo ParseVersion(string id) => m_AppProvider.ParseVersion(id);
+
+        public void SaveJobToFile(BatchJob job, string filePath)
         {
-            m_CurrentCancellationToken.Cancel();
+            var svc = new UserSettingsService();
+
+            svc.StoreSettings(job, filePath);
+
+            AppendRecentFiles(filePath);
         }
 
-        private void OnLog(string line)
+        private void AppendRecentFiles(string filePath)
         {
-            Log?.Invoke(line);
+            m_RecentFilesMgr.PushFile(filePath);
+            UpdateRecentFiles();
         }
 
-        private void OnProgressChanged(double prg)
+        private void UpdateRecentFiles()
         {
-            ProgressChanged?.Invoke(prg);
+            RecentFiles.Clear();
+
+            foreach (var recFile in m_RecentFilesMgr.RecentFiles)
+            {
+                RecentFiles.Add(recFile);
+            }
         }
     }
 }

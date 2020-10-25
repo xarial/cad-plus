@@ -16,15 +16,39 @@ using System.Xml;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using Xarial.CadPlus.AddIn.Base.Properties;
-using Xarial.CadPlus.CustomToolbar;
 using Xarial.CadPlus.ExtensionModule;
 using Xarial.XCad.Extensions;
 using Xarial.XCad.UI.Commands;
 using Xarial.XToolkit.Wpf.Dialogs;
 using Xarial.XToolkit.Reflection;
+using System.ComponentModel.Composition.Hosting;
+using System.ComponentModel.Composition;
+using System.ComponentModel.Composition.Primitives;
+using Xarial.CadPlus.Module.Init;
 
 namespace Xarial.CadPlus.AddIn.Base
 {
+    public class AddInHostModule : BaseHostModule 
+    {
+        private readonly IXExtension m_Ext;
+
+        public override IntPtr ParentWindow => m_Ext.Application.WindowHandle;
+
+        public override event Action Loaded;
+
+        internal AddInHostModule(IXExtension ext) 
+        {
+            m_Ext = ext;
+
+            m_Ext.Application.Loaded += OnApplicationLoaded;
+        }
+
+        private void OnApplicationLoaded(XCad.IXApplication app)
+        {
+            Loaded?.Invoke();
+        }
+    }
+
     public class AddInController : IDisposable
     {
         private class LocalAppConfigBindingRedirectReferenceResolver : AppConfigBindingRedirectReferenceResolver 
@@ -34,23 +58,30 @@ namespace Xarial.CadPlus.AddIn.Base
         }
 
         private readonly IXExtension m_Ext;
-        private readonly IModule[] m_Modules;
+
+        private readonly BaseHostModule m_HostModule;
+
+        [ImportMany]
+        private IEnumerable<IExtensionModule> m_Modules;
 
         public AddInController(IXExtension ext) 
         {
             AppDomain.CurrentDomain.ResolveBindingRedirects(new LocalAppConfigBindingRedirectReferenceResolver());
 
-            m_Ext = ext;
+            m_HostModule = new AddInHostModule(ext);
 
+            m_Ext = ext;
+            
             var cmdGrp = ext.CommandManager.AddCommandGroup<CadPlusCommands_e>();
             cmdGrp.CommandClick += OnCommandClick;
 
-            //TODO: use MEF to load modules
-            m_Modules = new IModule[]
-            {
-                new CustomToolbarModule()
-            };
+            var modulesDir = Path.Combine(Path.GetDirectoryName(this.GetType().Assembly.Location), "Modules");
 
+            var catalog = CreateDirectoryCatalog(modulesDir, "*.Module.dll");
+
+            var container = new CompositionContainer(catalog);
+            container.SatisfyImportsOnce(this);
+            
             if (m_Modules?.Any() == true)
             {
                 foreach (var module in m_Modules)
@@ -58,6 +89,20 @@ namespace Xarial.CadPlus.AddIn.Base
                     module.Load(ext);
                 }
             }
+        }
+        
+        private ComposablePartCatalog CreateDirectoryCatalog(string path, string searchPattern)
+        {
+            var catalog = new AggregateCatalog();
+
+            catalog.Catalogs.Add(new DirectoryCatalog(path, searchPattern));
+
+            foreach (var subDir in Directory.GetDirectories(path, "*.*", SearchOption.AllDirectories)) 
+            {
+                catalog.Catalogs.Add(new DirectoryCatalog(subDir, searchPattern));
+            }
+
+            return catalog;
         }
 
         private void OnCommandClick(CadPlusCommands_e spec)

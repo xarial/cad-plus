@@ -15,11 +15,14 @@ namespace Xarial.CadPlus.XBatch.Base
 {
     public class AppVersionInfo
     {
+        public string Id { get; set; }
+
         public string DisplayName { get; }
 
-        public AppVersionInfo(string dispName) 
+        public AppVersionInfo(string dispName, string id) 
         {
             DisplayName = dispName;
+            Id = id;
         }
     }
 }

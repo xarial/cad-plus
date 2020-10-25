@@ -50,11 +50,12 @@ namespace Xarial.CadPlus.CustomToolbar.Services
                 var refs = new List<MetadataReference>(GetReferences());
                 refs.AddRange(new[]
                 {
+                    MetadataReference.CreateFromFile(typeof(Debug).Assembly.Location),
                     MetadataReference.CreateFromFile(typeof(AppDomain).Assembly.Location),
                     MetadataReference.CreateFromFile(typeof(IToggleButtonStateResolver).Assembly.Location),
                     MetadataReference.CreateFromFile(typeof(IXApplication).Assembly.Location)
                 });
-
+                
                 var syntaxTrees = new List<SyntaxTree>();
                 var classToMacroMap = new Dictionary<string, CommandMacroInfo>();
 

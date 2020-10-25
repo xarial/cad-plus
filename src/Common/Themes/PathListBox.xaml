@@ -24,15 +24,15 @@
                             <RowDefinition Height="Auto" />
                         </Grid.RowDefinitions>
                         <ListBox x:Name="PART_ListBox" Margin="2" Grid.ColumnSpan="3" ItemsSource="{TemplateBinding PathsSource}" SelectionMode="Extended"/>
-                        <Button x:Name="PART_AddFileButton" Grid.Row="1" Grid.Column="1" 
+                        <Button x:Name="PART_AddFilesButton" Grid.Row="1" Grid.Column="1" 
                                 Visibility="{TemplateBinding ShowAddFileButton, Converter={StaticResource boolToVisConv}}"
                                 VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2">
-                            <TextBlock Text="Add File..." Margin="2" />
+                            <TextBlock Text="Add Files..." Margin="2" />
                         </Button>
-                        <Button x:Name="PART_AddFolderButton" Grid.Row="1" Grid.Column="2" 
+                        <Button x:Name="PART_AddFoldersButton" Grid.Row="1" Grid.Column="2" 
                                 Visibility="{TemplateBinding ShowAddFolderButton, Converter={StaticResource boolToVisConv}}"
                                 VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2">
-                            <TextBlock Text="Add Folder..." Margin="2" />
+                            <TextBlock Text="Add Folders..." Margin="2" />
                         </Button>
                     </Grid>
                 </ControlTemplate>

@@ -15,7 +15,7 @@ User Interface provides a visual way to configure the batch process. There are 3
 
 ![Input tab](input-tab.png)
 
-1. Input files and folders scope. Use *Add File...* (2) and *Add Folder...* (3) buttons to add new files and folders. Press *del* button on keyboard to remove the selected files or folders from the list.
+1. Input files and folders scope. Use *Add Files...* (2) and *Add Folders...* (3) buttons to add new files and folders. Press *del* button on keyboard to remove the selected files or folders from the list. Alternatively drag-n-drop files and folders directly to the list.
 1. Browsing the file to add to the exporting process.
 1. Browsing the folder to add to the exporting process
 1. Filter for files when processing folder. You can use a * wildcard, e.g. \*.sld\* will filter all SOLIDWORKS files (.sldprt, .slddrw and .sldasm) and exclude all other files types.
@@ -34,6 +34,12 @@ User Interface provides a visual way to configure the batch process. There are 3
     * Safe - runs SOLIDWORKS in safe mode bypassing options
     * Silent - runs SOLIDWORKS and with disabled popup messages and splash screen
     * Background - runs SOLIDWORKS in background. This option only available for SOLIDWORKS Professional or higher
+1. SOLIDWORKS files open options
+    * Silent - suppresses all popup dialogs, such as missing references when opening file
+    * Read Only - open files in read-only mode ensuring it cannot be overwritten
+    * Rapid - open files in a rapid mode:
+        * For drawings - opens in detailing mode. Some of the APIs might not be available in this mode
+        * For parts and assemblies - currently not supported and will be ignored
 
 ## Results
 
