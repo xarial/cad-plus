@@ -178,10 +178,13 @@ namespace Xarial.CadPlus.Common
 
         private void OnDomainUnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
+            //TODO: log
         }
 
-        private void OnDispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
+        private void OnDispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
         {
+            //TODO: log
+            e.Handled = true;
         }
 
         protected abstract Task RunConsole(TCliArgs args);

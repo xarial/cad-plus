@@ -129,15 +129,35 @@ namespace Xarial.CadPlus.XBatch.Base.Core
             {
                 await Task.Run(() =>
                 {
+                    var curBatchSize = 0;
+
                     for (int i = 0; i < allFiles.Length; i++)
                     {
+                        var curAppPrc = appPrc?.Id;
+
                         var curFile = allFiles[i];
                         var res = AttemptProcessFile(ref app, ref appPrc, curFile, opts, cancellationToken);
                         m_ProgressHandler?.ReportProgress(curFile, res);
-                                                
+
                         if (!res && !opts.ContinueOnError) 
                         {
                             throw new UserMessageException("Cancelling the job. Set 'Continue On Error' option to continue job if file failed");
+                        }
+
+                        if (appPrc?.Id != curAppPrc)
+                        {
+                            curBatchSize = 1;
+                        }
+                        else
+                        {
+                            curBatchSize++;
+                        }
+
+                        if (opts.BatchSize > 0 && curBatchSize >= opts.BatchSize) 
+                        {
+                            m_Logger.WriteLine("Closing application as batch size reached the limit");
+                            TryShutDownApplication(appPrc);
+                            curBatchSize = 0;
                         }
                     }
                 }).ConfigureAwait(false);
@@ -453,7 +473,7 @@ namespace Xarial.CadPlus.XBatch.Base.Core
 
         private bool IsAppAlive(IXApplication app, Process prc) 
         {
-            if (prc.HasExited || !prc.Responding)
+            if (prc == null || prc.HasExited || !prc.Responding)
             {
                 m_Logger.WriteLine("Application host is not responding or exited");
                 return false;

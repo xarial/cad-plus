@@ -17,21 +17,38 @@ namespace Xarial.CadPlus.XBatch.Base.Converters
 {
     public class LogOutputToTextConverter : IMultiValueConverter
     {
+        private object m_Lock;
+
+        public LogOutputToTextConverter() 
+        {
+            m_Lock = new object();
+        }
+
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {
-            var lines = values.First() as IEnumerable<string>;
-
-            var logText = new StringBuilder();
-
-            if (lines != null)
+            try
             {
-                foreach (var line in lines)
+                lock (m_Lock)
                 {
-                    logText.AppendLine(line?.ToString());
+                    var lines = values.First() as IEnumerable<string>;
+
+                    var logText = new StringBuilder();
+
+                    if (lines != null)
+                    {
+                        foreach (var line in lines)
+                        {
+                            logText.AppendLine(line?.ToString());
+                        }
+                    }
+
+                    return logText.ToString();
                 }
             }
-
-            return logText.ToString();
+            catch 
+            {
+                return Binding.DoNothing;
+            }
         }
 
         public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)

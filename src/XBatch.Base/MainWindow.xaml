@@ -255,7 +255,7 @@
                     </Grid>
                     <metro:ToggleSwitch Grid.Column="0" VerticalAlignment="Center" OnContent="Continue on error" OffContent="Stop on error" IsOn="{Binding Path=ContinueOnError}">
                         <metro:ToggleSwitch.ToolTip>
-                            <fluent:ScreenTip Title="Continue on error"
+                            <fluent:ScreenTip Title="Continue On Error"
                                           Text="Allows to continue execution if the error is encountered, such as failure to open the file or run the macro"
                                           Width="190"
                                           IsRibbonAligned="True" />
