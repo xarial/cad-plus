@@ -17,9 +17,9 @@ namespace Xarial.CadPlus.XBatch.Base.Models
 {
     public interface IBatchRunJobExecutor
     {
-        event Action<IJobItemFile[], DateTime> JobSet;
+        event Action<IJobItem[], DateTime> JobSet;
         event Action<TimeSpan> JobCompleted;
-        event Action<IJobItemFile, bool> ProgressChanged;
+        event Action<IJobItem, bool> ProgressChanged;
         event Action<string> Log;
 
         Task<bool> ExecuteAsync();
@@ -28,8 +28,8 @@ namespace Xarial.CadPlus.XBatch.Base.Models
 
     public class BatchRunJobExecutor : IBatchRunJobExecutor
     {
-        public event Action<IJobItemFile, bool> ProgressChanged;
-        public event Action<IJobItemFile[], DateTime> JobSet;
+        public event Action<IJobItem, bool> ProgressChanged;
+        public event Action<IJobItem[], DateTime> JobSet;
         public event Action<TimeSpan> JobCompleted;
 
         public event Action<string> Log;
@@ -96,7 +96,7 @@ namespace Xarial.CadPlus.XBatch.Base.Models
 
         private void OnJobCompleted(TimeSpan duration) => JobCompleted?.Invoke(duration);
 
-        private void OnJobScopeSet(IJobItemFile[] files, DateTime startTime) => JobSet?.Invoke(files, startTime);
+        private void OnJobScopeSet(IJobItem[] files, DateTime startTime) => JobSet?.Invoke(files, startTime);
 
         public void Cancel()
         {
@@ -108,7 +108,7 @@ namespace Xarial.CadPlus.XBatch.Base.Models
             Log?.Invoke(line);
         }
 
-        private void OnProgressChanged(IJobItemFile file, bool result)
+        private void OnProgressChanged(IJobItem file, bool result)
         {
             ProgressChanged?.Invoke(file, result);
         }

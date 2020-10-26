@@ -60,8 +60,9 @@ namespace Xarial.CadPlus.Xport.Models
             }
         }
 
-        private void OnJobScopeSet(IJobItemFile[] files, DateTime startTime)
+        private void OnJobScopeSet(IJobItem[] files, DateTime startTime)
         {
+            m_ProcessedFiles = 0;
             m_TotalFiles = files.Length;
         }
 
@@ -75,7 +76,7 @@ namespace Xarial.CadPlus.Xport.Models
             Log?.Invoke(line);
         }
 
-        private void OnProgressChanged(IJobItemFile file, bool res)
+        private void OnProgressChanged(IJobItem file, bool res)
         {
             m_ProcessedFiles++;
 
