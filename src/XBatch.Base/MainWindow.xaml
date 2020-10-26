@@ -407,7 +407,7 @@
                                     </Grid>
                                 </Grid>
                             </TabItem>
-                            <TabItem Header="Results">
+                            <TabItem Header="Status">
                                 <Grid Visibility="{Binding Converter={StaticResource objIsNotNullToVisConv}}"
                                   DataContext="{Binding Path=Summary}">
                                     <ctrls:JobItemsDataGrid ItemsSource="{Binding Path=JobItemFiles}" Grid.Row="1" Margin="5"/>

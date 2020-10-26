@@ -81,7 +81,9 @@ namespace Xarial.CadPlus.Xport.Core
 
             var jobs = ParseOptions(opts);
 
-            m_ProgressHandler.SetJobScope(jobs, startTime);
+            var formats = jobs.SelectMany(j => j.Formats).ToArray();
+
+            m_ProgressHandler.SetJobScope(formats, startTime);
 
             foreach (var job in jobs)
             {
@@ -143,9 +145,9 @@ namespace Xarial.CadPlus.Xport.Core
                             throw ex;
                         }
                     }
-                }
 
-                m_ProgressHandler?.ReportProgress(job, true);
+                    m_ProgressHandler?.ReportProgress(outFile, true);
+                }
             }
 
             var duration = DateTime.Now.Subtract(startTime);
