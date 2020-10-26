@@ -46,9 +46,6 @@
     <Reference Include="ControlzEx, Version=4.0.0.0, Culture=neutral, PublicKeyToken=69f1c32f803d307e, processorArchitecture=MSIL">
       <HintPath>..\..\packages\ControlzEx.4.3.2\lib\net45\ControlzEx.dll</HintPath>
     </Reference>
-    <Reference Include="DevZest.WpfDocking, Version=2.5.0.0, Culture=neutral, PublicKeyToken=861fc077c3dc39c3, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\DevZest.WpfDocking.3.0.0\lib\net35-Client\DevZest.WpfDocking.dll</HintPath>
-    </Reference>
     <Reference Include="Fluent, Version=8.0.0.0, Culture=neutral, PublicKeyToken=3e436e32a8c5546f, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Fluent.Ribbon.8.0.0\lib\net452\Fluent.dll</HintPath>
     </Reference>
@@ -108,7 +105,6 @@
     <Compile Include="Converters\JobItemStatusToImageConverter.cs" />
     <Compile Include="Converters\JobStatusToImageConverter.cs" />
     <Compile Include="Converters\JobTitleConverter.cs" />
-    <Compile Include="Converters\LogOutputToTextConverter.cs" />
     <Compile Include="Converters\SelectedVersionConverter.cs" />
     <Compile Include="Core\BatchRunner.cs" />
     <Compile Include="Core\BatchJob.cs" />
@@ -177,14 +173,6 @@
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Themes\DockControl\DocumentTab.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Themes\DockControl\DocumentWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
   <ItemGroup>

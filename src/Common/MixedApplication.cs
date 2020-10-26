@@ -22,10 +22,57 @@ using Xarial.CadPlus.Module.Init;
 
 namespace Xarial.CadPlus.Common
 {
-    internal static class WindowsApi 
+    internal static class ConsoleHandler
     {
-        [DllImport("Kernel32.dll")]
-        internal static extern bool AttachConsole(int processId);
+        [DllImport("kernel32.dll", SetLastError = true)]
+        private static extern bool AttachConsole(int dwProcessId);
+        
+        [DllImport("kernel32.dll", SetLastError = true)]
+        private static extern IntPtr GetStdHandle(int nStdHandle);
+        
+        [DllImport("kernel32.dll", SetLastError = true)]
+        private static extern bool SetStdHandle(int nStdHandle, IntPtr handle);
+        
+        [DllImport("kernel32.dll", SetLastError = true)]
+        private static extern int GetFileType(IntPtr handle);
+
+        private const int FILE_TYPE_DISK = 0x0001;
+        private const int FILE_TYPE_PIPE = 0x0003;
+
+        private const int STD_OUTPUT_HANDLE = -11;
+        private const int STD_ERROR_HANDLE = -12;
+        
+        internal static void Attach()
+        {
+            //need to call before AttachConsoel so the output can be redirected
+            var outHandle = GetStdHandle(STD_OUTPUT_HANDLE);
+
+            if (IsOutputRedirected(outHandle))
+            {
+                var outWriter = Console.Out;
+            }
+
+            bool errorRedirected = IsOutputRedirected(GetStdHandle(STD_ERROR_HANDLE));
+
+            if (errorRedirected) 
+            {
+                var errWriter = Console.Error;
+            }
+
+            AttachConsole(-1);
+
+            if (!errorRedirected)
+            {
+                SetStdHandle(STD_ERROR_HANDLE, outHandle);
+            }
+        }
+
+        private static bool IsOutputRedirected(IntPtr handle)
+        {
+            var fileType = GetFileType(handle);
+
+            return fileType == FILE_TYPE_DISK || fileType == FILE_TYPE_PIPE;
+        }
     }
 
     public class ConsoleHostModule : BaseHostModule
@@ -124,7 +171,8 @@ namespace Xarial.CadPlus.Common
 
             if (hasArgs)
             {
-                WindowsApi.AttachConsole(-1);
+                //WindowsApi.AttachConsole(-1);
+                ConsoleHandler.Attach();
 
                 SynchronizationContext.SetSynchronizationContext(new SynchronizationContext());
                 m_HostModule = new ConsoleHostModule();

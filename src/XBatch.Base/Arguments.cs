@@ -15,22 +15,48 @@ using Xarial.CadPlus.XBatch.Base.Core;
 
 namespace Xarial.CadPlus.XBatch.Base
 {
-    [Verb("file")]
+    [Verb("file", HelpText = "Managing xBatch files")]
     public class FileOptions
     {
-        [Option('o', "open", Required = false)]
+        [Option('o', "open", Required = false, HelpText = "Starts application and opens specified file")]
         public string FilePath { get; set; }
 
-        [Option('n', "new", Required = false)]
+        [Option('n', "new", Required = false, HelpText = "Starts application and creates new file")]
         public bool CreateNew { get; set; }
     }
 
-    [Verb("background", isDefault: true)]
-    public class Arguments
+    public interface IArguments 
+    {
+        BatchJob GetOptions(IApplicationProvider appProvider);
+    }
+
+    [Verb("job", HelpText = "Accessing job files")]
+    public class JobOptions : IArguments
     {
         private BatchJob m_Options;
 
-        internal BatchJob GetOptions(IApplicationProvider appProvider) 
+        [Option('r', "run", Required = true, HelpText = "Runs the job from the specified file")]
+        public string JobFilePath 
+        {
+            set 
+            {
+                m_Options = BatchJob.FromFile(value);
+            }
+        }
+
+        public BatchJob GetOptions(IApplicationProvider appProvider) 
+        {
+            m_Options.Version = appProvider.ParseVersion(m_Options.Version?.Id);
+            return m_Options;
+        }
+    }
+
+    [Verb("run", isDefault: true, HelpText = "Runs jobs by specifying parameters")]
+    public class RunOptions : IArguments
+    {
+        private BatchJob m_Options;
+
+        public BatchJob GetOptions(IApplicationProvider appProvider) 
         {
             m_DeferredSetters.ForEach(s => s.Invoke(appProvider));
             return m_Options;
@@ -38,7 +64,7 @@ namespace Xarial.CadPlus.XBatch.Base
 
         private List<Action<IApplicationProvider>> m_DeferredSetters;
 
-        public Arguments() 
+        public RunOptions() 
         {
             m_DeferredSetters = new List<Action<IApplicationProvider>>();
             m_Options = new BatchJob();
