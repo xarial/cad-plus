@@ -65,6 +65,10 @@ namespace Xbatch.Tests
             var vm = new BatchManagerVM(modelMock, msgSvcMock);
             vm.Document = new BatchDocumentVM("", new BatchJob(), modelMock, msgSvcMock);
 
+            vm.Document.Input.Add("abc");
+            vm.Document.Macros.Add("xyz");
+            vm.Document.Settings.Version = new SwAppVersionInfo(SwVersion_e.Sw2019);
+
             vm.Document.Settings.Timeout = 300;
             vm.Document.Settings.IsTimeoutEnabled = false;
             vm.Document.Settings.IsTimeoutEnabled = true;
@@ -86,7 +90,9 @@ namespace Xbatch.Tests
             var msgSvcMock = new Mock<IMessageService>().Object;
             var vm = new BatchManagerVM(modelMock, msgSvcMock);
             vm.Document = new BatchDocumentVM("", new BatchJob(), modelMock, msgSvcMock);
-
+            vm.Document.Input.Add("abc");
+            vm.Document.Macros.Add("xyz");
+            vm.Document.Settings.Version = new SwAppVersionInfo(SwVersion_e.Sw2019);
             vm.Document.Settings.IsTimeoutEnabled = false;
 
             vm.Document.RunJobCommand.Execute(null);
