@@ -26,7 +26,6 @@
                 <ResourceDictionary Source="/XBatch.Base;component/Themes/DockControl/DocumentTab.xaml" />
                 <ResourceDictionary Source="/XBatch.Base;component/Themes/DockControl/DocumentWindow.xaml" />
                 <ResourceDictionary>
-                    <conv:LogOutputToTextConverter x:Key="logOutConv"/>
                     <conv:CommandEnabledConverter x:Key="cmdEnabledConv"/>
                     <conv:SelectedVersionConverter x:Key="selVersConv"/>
                     <conv:DocumentTitleConverter x:Key="docTitleConv"/>
@@ -133,34 +132,29 @@
                               GridLinesVisibility="Horizontal" 
                               ext:DataGridExtension.CellEditEndingCommand="{Binding Path=FilterEditEndingCommand}">
                         <DataGrid.Columns>
-                            <DataGridTemplateColumn IsReadOnly="True" Width="16">
-                                <DataGridTemplateColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <Image Margin="2" Source="Resources/filter.png"/>
-                                    </DataTemplate>
-                                </DataGridTemplateColumn.CellTemplate>
-                            </DataGridTemplateColumn>
-
                             <DataGridTemplateColumn>
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
-                                        <TextBlock>
-                                            <TextBlock.Text>
-                                                <MultiBinding Converter="{StaticResource filterTxtConv}">
-                                                    <Binding/>
-                                                    <Binding Path="Value"/>
-                                                </MultiBinding>
-                                            </TextBlock.Text>
-                                            <TextBlock.Style>
-                                                <Style TargetType="TextBlock">
-                                                    <Style.Triggers>
-                                                        <DataTrigger Binding="{Binding DataContext, RelativeSource={RelativeSource AncestorType=DataGridRow}}" Value="{x:Static CollectionView.NewItemPlaceholder}">
-                                                            <Setter Property="Foreground" Value="Gray"/>
-                                                        </DataTrigger>
-                                                    </Style.Triggers>
-                                                </Style>
-                                            </TextBlock.Style>
-                                        </TextBlock>
+                                        <StackPanel Orientation="Horizontal">
+                                            <Image Width="16" Margin="2" Source="Resources/filter.png"/>
+                                            <TextBlock>
+                                                <TextBlock.Text>
+                                                    <MultiBinding Converter="{StaticResource filterTxtConv}">
+                                                        <Binding/>
+                                                        <Binding Path="Value"/>
+                                                    </MultiBinding>
+                                                </TextBlock.Text>
+                                                <TextBlock.Style>
+                                                    <Style TargetType="TextBlock">
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding DataContext, RelativeSource={RelativeSource AncestorType=DataGridRow}}" Value="{x:Static CollectionView.NewItemPlaceholder}">
+                                                                <Setter Property="Foreground" Value="Gray"/>
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </TextBlock.Style>
+                                            </TextBlock>
+                                        </StackPanel>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                                 <DataGridTemplateColumn.CellEditingTemplate>
@@ -338,16 +332,8 @@
                 </dz:DockItem>
                 <dz:DockItem TabText="Log" Title="Log" ShowAction="{dz:ShowAsSidePaneAction Side=Bottom, Size=*, IsSizeForTarget=True, Target=0, Source=1}">
                     <Grid DataContext="{Binding Path=Results.Selected.Log}">
-                        <TextBox AcceptsReturn="True" AcceptsTab="True"
-                                 IsReadOnly="True" Margin="5"
-                                 VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
-                            <TextBox.Text>
-                                <MultiBinding Converter="{StaticResource logOutConv}" Mode="OneWay">
-                                    <Binding Path="Output"/>
-                                    <Binding Path="Output.Count"/>
-                                </MultiBinding>
-                            </TextBox.Text>
-                        </TextBox>
+                        <ListBox VirtualizingStackPanel.IsVirtualizing="True"
+                                 Margin="2" Grid.ColumnSpan="2" ItemsSource="{Binding Path=Output}" />
                     </Grid>
                 </dz:DockItem>
                 <dz:DockItem TabText="Summary" Title="Summary" ShowAction="{dz:ShowAsTabbedAction Target=1, Source=2}">

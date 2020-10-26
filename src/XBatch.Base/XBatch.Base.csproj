@@ -108,7 +108,6 @@
     <Compile Include="Converters\JobItemStatusToImageConverter.cs" />
     <Compile Include="Converters\JobStatusToImageConverter.cs" />
     <Compile Include="Converters\JobTitleConverter.cs" />
-    <Compile Include="Converters\LogOutputToTextConverter.cs" />
     <Compile Include="Converters\SelectedVersionConverter.cs" />
     <Compile Include="Core\BatchRunner.cs" />
     <Compile Include="Core\BatchJob.cs" />

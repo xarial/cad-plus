@@ -22,6 +22,15 @@ namespace Xarial.CadPlus.XBatch.Base.Core
     [UserSettingVersion("1.0.0", typeof(BatchJobVersionTransformer))]
     public class BatchJob
     {
+        internal static BatchJob FromFile(string filePath) 
+        {
+            var svc = new UserSettingsService();
+
+            var batchJob = svc.ReadSettings<BatchJob>(filePath);
+
+            return batchJob;
+        }
+
         public string[] Input { get; set; }
         public string[] Filters { get; set; }
         

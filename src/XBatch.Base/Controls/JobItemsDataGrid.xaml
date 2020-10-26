@@ -7,5 +7,9 @@
              xmlns:conv="clr-namespace:Xarial.CadPlus.XBatch.Base.Converters"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <DataGrid IsReadOnly="True" x:Name="dgrdJobItems" ColumnWidth="*" AutoGenerateColumns="False"/>
+    <DataGrid IsReadOnly="True" x:Name="dgrdJobItems" 
+              ColumnWidth="*" AutoGenerateColumns="False"
+              VirtualizingPanel.VirtualizationMode="Standard"
+              VirtualizingPanel.IsVirtualizing="True"
+              ScrollViewer.CanContentScroll="True"/>
 </UserControl>

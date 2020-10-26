@@ -17,6 +17,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using Xarial.CadPlus.Common.Services;
 using Xarial.CadPlus.XBatch.Base.Core;
+using Xarial.CadPlus.XBatch.Base.Exceptions;
 using Xarial.CadPlus.XBatch.Base.Models;
 using Xarial.XToolkit.Services.UserSettings;
 using Xarial.XToolkit.Wpf;
@@ -122,7 +123,7 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
             IsDirty = false;
         }
 
-        public BatchDocumentVM(string name, BatchJob job, IBatchRunnerModel model, IMessageService msgSvc) 
+        public BatchDocumentVM(string name, BatchJob job, IBatchRunnerModel model, IMessageService msgSvc)
         {
             m_Model = model;
             m_Job = job;
@@ -130,7 +131,7 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
 
             IsDirty = true;
 
-            RunJobCommand = new RelayCommand(RunJob, () => Input.Any() && Macros.Any() && Settings.Version != null);
+            RunJobCommand = new RelayCommand(RunJob, () => CanRunJob);
             SaveDocumentCommand = new RelayCommand(SaveDocument, () => IsDirty);
             SaveAsDocumentCommand = new RelayCommand(SaveAsDocument);
             FilterEditEndingCommand = new RelayCommand<DataGridCellEditEndingEventArgs>(FilterEditEnding);
@@ -150,6 +151,8 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
             Macros = new ObservableCollection<string>(m_Job.Macros ?? Enumerable.Empty<string>());
             Macros.CollectionChanged += OnMacrosCollectionChanged;
         }
+
+        private bool CanRunJob => Input.Any() && Macros.Any() && Settings.Version != null;
 
         private void FilterEditEnding(DataGridCellEditEndingEventArgs args)
         {
@@ -228,8 +231,13 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
             }
         }
 
-        private void RunJob() 
+        internal void RunJob() 
         {
+            if (!CanRunJob) 
+            {
+                throw new UserMessageException("Cannot run this job as preconditions are not met");
+            }
+
             Results.StartNewJob();
         }
     }
