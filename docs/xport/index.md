@@ -4,7 +4,7 @@ title: xPort | Stand-Alone Batch Exporter Utility
 description: Stand-alone utility to publish SOLIDWORKS files to html, pdf, images etc. via eDrawings applications
 order: 2
 ---
-{% youtube id: KPBQ8RnvNpQ %}
+![xPort application](xport-app.png)
 
 xPort module is a stand-alone (.exe) application which is utilizing SOLIDWORKS eDrawings to publish the files to a list of formats.
 
@@ -26,6 +26,10 @@ The following output formats are supported:
 * PNG Image Files (*.png)
 * GIF Image Files (*.gif)
 * PDF Files (*.pdf). This option is currently EXPERIMENTAL. This option is not stable. Refer issues [#12 - PDF output is not consistent](https://github.com/xarial/cad-plus/issues/12) and [#15 - PDF export is corrupt\zero size](https://github.com/xarial/cad-plus/issues/15)
+
+## Video Demonstration
+
+{% youtube id: KPBQ8RnvNpQ %}
 
 ## Notes
 
