@@ -35,7 +35,7 @@ namespace Xarial.CadPlus.XBatch.Base
     {
         private BatchJob m_Options;
 
-        [Option('r', "run", Required = true, HelpText = "Runs the job from the specified file")]
+        [Option('r', "run", Required = true, HelpText = "Full path to *.xbatch file to run")]
         public string JobFilePath 
         {
             set 
@@ -94,7 +94,7 @@ namespace Xarial.CadPlus.XBatch.Base
             set => m_Options.ContinueOnError = value;
         }
 
-        [Option('t', "timeout", Required = false, HelpText = "Timeout in seconds for processing a single item (e.g. running macro on a single file). Defauult: 600 seconds")]
+        [Option('t', "timeout", Required = false, HelpText = "Timeout in seconds for processing a single item (e.g. running macro on a single file). Default: 600 seconds")]
         public int Timeout
         {
             set => m_Options.Timeout = value;
@@ -128,6 +128,12 @@ namespace Xarial.CadPlus.XBatch.Base
                     m_Options.OpenFileOptions = value.Aggregate((OpenFileOptions_e)0, (o, c) => o | c);
                 }
             }
+        }
+
+        [Option('b', "batch", Required = false, HelpText = "maximum number of files to process in the single session of CAD application before restarting. Default: 25")]
+        public int BatchSize
+        {
+            set => m_Options.BatchSize = value;
         }
     }
 }
