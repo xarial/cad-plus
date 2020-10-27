@@ -32,6 +32,9 @@ namespace Xarial.CadPlus.Xport.Models
 
         private CancellationTokenSource m_CurrentCancellationToken;
 
+        private int m_ProcessedFiles;
+        private int m_TotalFiles;
+
         public async Task Export(ExportOptions opts) 
         {
             m_CurrentCancellationToken = new CancellationTokenSource();
@@ -40,6 +43,7 @@ namespace Xarial.CadPlus.Xport.Models
             var prgHander = new ProgressHandler();
 
             logWriter.Log += OnLog;
+            prgHander.JobScopeSet += OnJobScopeSet;
             prgHander.ProgressChanged += OnProgressChanged;
 
             try
@@ -56,6 +60,12 @@ namespace Xarial.CadPlus.Xport.Models
             }
         }
 
+        private void OnJobScopeSet(IJobItem[] files, DateTime startTime)
+        {
+            m_ProcessedFiles = 0;
+            m_TotalFiles = files.Length;
+        }
+
         public void Cancel()
         {
             m_CurrentCancellationToken.Cancel();
@@ -66,9 +76,11 @@ namespace Xarial.CadPlus.Xport.Models
             Log?.Invoke(line);
         }
 
-        private void OnProgressChanged(double prg)
+        private void OnProgressChanged(IJobItem file, bool res)
         {
-            ProgressChanged?.Invoke(prg);
+            m_ProcessedFiles++;
+
+            ProgressChanged?.Invoke(m_ProcessedFiles / (double)m_TotalFiles);
         }
     }
 }

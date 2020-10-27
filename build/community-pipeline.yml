@@ -3,6 +3,7 @@ trigger:
     include:
     - master
     - dev
+    - staging
 
 name: '$(Date:yyyyMMdd).$(Rev:r)[$(BuildID)]'
 

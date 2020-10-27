@@ -17,25 +17,33 @@ namespace Xbatch.Tests
         public void BatchRunnerOptionsTest()
         {
             var mock = new Mock<IBatchRunnerModel>();
-            BatchRunnerOptions opts = null;
-            mock.Setup(m => m.BatchRun(It.IsAny<BatchRunnerOptions>())).Callback<BatchRunnerOptions>(e => opts = e);
+            BatchJob opts = null;
+            mock.Setup(m => m.CreateExecutor(It.IsAny<BatchJob>())).Callback<BatchJob>(e => opts = e).Returns(new Mock<IBatchRunJobExecutor>().Object);
             mock.Setup(m => m.InstalledVersions).Returns(new AppVersionInfo[] { new SwAppVersionInfo(SwVersion_e.Sw2019), new SwAppVersionInfo(SwVersion_e.Sw2020) });
-            var vm = new BatchRunnerVM(mock.Object, new Mock<IMessageService>().Object);
 
-            vm.Input.Add("D:\\folder1");
-            vm.Input.Add("D:\\folder2");
-            vm.Filter = "*.sld*";
-            vm.Macros.Add("C:\\macro1.swp");
-            vm.Macros.Add("C:\\macro2.swp");
-            vm.IsTimeoutEnabled = true;
-            vm.Timeout = 30;
-            vm.OpenFileOptions = OpenFileOptions_e.Silent | OpenFileOptions_e.ReadOnly;
-            vm.StartupOptions = StartupOptions_e.Background;
-            vm.Version = new SwAppVersionInfo(SwVersion_e.Sw2020);
+            var modelMock = mock.Object;
+            var msgSvcMock = new Mock<IMessageService>().Object;
+            var vm = new BatchManagerVM(modelMock, msgSvcMock);
+            vm.Document = new BatchDocumentVM("", new BatchJob(), modelMock, msgSvcMock);
 
-            vm.RunBatchCommand.Execute(null);
+            vm.Document.Input.Add("D:\\folder1");
+            vm.Document.Input.Add("D:\\folder2");
+            vm.Document.Filters.Clear();
+            vm.Document.Filters.Add(new FilterVM("*.sld*"));
+            vm.Document.Macros.Add("C:\\macro1.swp");
+            vm.Document.Macros.Add("C:\\macro2.swp");
+            vm.Document.Settings.IsTimeoutEnabled = true;
+            vm.Document.Settings.Timeout = 30;
+            vm.Document.Settings.OpenFileOptionSilent = true;
+            vm.Document.Settings.OpenFileOptionReadOnly = true;
+            vm.Document.Settings.StartupOptionBackground = true;
+            vm.Document.Settings.StartupOptionSilent = false;
+            vm.Document.Settings.StartupOptionSafe = false;
+            vm.Document.Settings.Version = new SwAppVersionInfo(SwVersion_e.Sw2020);
 
-            Assert.AreEqual("*.sld*", opts.Filter);
+            vm.Document.RunJobCommand.Execute(null);
+
+            Assert.IsTrue(new string[] { "*.sld*" }.SequenceEqual(opts.Filters));
             Assert.IsTrue(new string[] { "C:\\macro1.swp", "C:\\macro2.swp" }.SequenceEqual(opts.Macros));
             Assert.IsTrue(new string[] { "D:\\folder1", "D:\\folder2" }.SequenceEqual(opts.Input));
             Assert.AreEqual(30, opts.Timeout);
@@ -48,16 +56,24 @@ namespace Xbatch.Tests
         public void BatchRunnerOptionsTimeoutTest()
         {
             var mock = new Mock<IBatchRunnerModel>();
-            BatchRunnerOptions opts = null;
-            mock.Setup(m => m.BatchRun(It.IsAny<BatchRunnerOptions>())).Callback<BatchRunnerOptions>(e => opts = e);
+            BatchJob opts = null;
+            mock.Setup(m => m.CreateExecutor(It.IsAny<BatchJob>())).Callback<BatchJob>(e => opts = e).Returns(new Mock<IBatchRunJobExecutor>().Object);
             mock.Setup(m => m.InstalledVersions).Returns(new AppVersionInfo[] { new SwAppVersionInfo(SwVersion_e.Sw2019), new SwAppVersionInfo(SwVersion_e.Sw2020) });
-            var vm = new BatchRunnerVM(mock.Object, new Mock<IMessageService>().Object);
 
-            vm.Timeout = 300;
-            vm.IsTimeoutEnabled = false;
-            vm.IsTimeoutEnabled = true;
+            var modelMock = mock.Object;
+            var msgSvcMock = new Mock<IMessageService>().Object;
+            var vm = new BatchManagerVM(modelMock, msgSvcMock);
+            vm.Document = new BatchDocumentVM("", new BatchJob(), modelMock, msgSvcMock);
 
-            vm.RunBatchCommand.Execute(null);
+            vm.Document.Input.Add("abc");
+            vm.Document.Macros.Add("xyz");
+            vm.Document.Settings.Version = new SwAppVersionInfo(SwVersion_e.Sw2019);
+
+            vm.Document.Settings.Timeout = 300;
+            vm.Document.Settings.IsTimeoutEnabled = false;
+            vm.Document.Settings.IsTimeoutEnabled = true;
+
+            vm.Document.RunJobCommand.Execute(null);
 
             Assert.AreEqual(300, opts.Timeout);
         }
@@ -66,14 +82,20 @@ namespace Xbatch.Tests
         public void BatchRunnerOptionsTimeoutDisableTest()
         {
             var mock = new Mock<IBatchRunnerModel>();
-            BatchRunnerOptions opts = null;
-            mock.Setup(m => m.BatchRun(It.IsAny<BatchRunnerOptions>())).Callback<BatchRunnerOptions>(e => opts = e);
+            BatchJob opts = null;
+            mock.Setup(m => m.CreateExecutor(It.IsAny<BatchJob>())).Callback<BatchJob>(e => opts = e).Returns(new Mock<IBatchRunJobExecutor>().Object);
             mock.Setup(m => m.InstalledVersions).Returns(new AppVersionInfo[] { new SwAppVersionInfo(SwVersion_e.Sw2019), new SwAppVersionInfo(SwVersion_e.Sw2020) });
-            var vm = new BatchRunnerVM(mock.Object, new Mock<IMessageService>().Object);
 
-            vm.IsTimeoutEnabled = false;
-            
-            vm.RunBatchCommand.Execute(null);
+            var modelMock = mock.Object;
+            var msgSvcMock = new Mock<IMessageService>().Object;
+            var vm = new BatchManagerVM(modelMock, msgSvcMock);
+            vm.Document = new BatchDocumentVM("", new BatchJob(), modelMock, msgSvcMock);
+            vm.Document.Input.Add("abc");
+            vm.Document.Macros.Add("xyz");
+            vm.Document.Settings.Version = new SwAppVersionInfo(SwVersion_e.Sw2019);
+            vm.Document.Settings.IsTimeoutEnabled = false;
+
+            vm.Document.RunJobCommand.Execute(null);
 
             Assert.AreEqual(-1, opts.Timeout);
         }

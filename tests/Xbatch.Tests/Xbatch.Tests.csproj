@@ -3,6 +3,7 @@
     <TargetFramework>net461</TargetFramework>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <IsPackable>false</IsPackable>
+    <XCadRegDll>false</XCadRegDll>
   </PropertyGroup>
 
   <ItemGroup>

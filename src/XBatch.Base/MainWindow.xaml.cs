@@ -20,21 +20,28 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Xarial.CadPlus.Common.Services;
+using Xarial.CadPlus.XBatch.Base.Services;
 using Xarial.CadPlus.XBatch.Base.ViewModels;
 using Xarial.XToolkit.Reporting;
 
 namespace Xarial.CadPlus.XBatch.Base
 {
-    public partial class MainWindow : Window
+    public partial class MainWindow
     {
         public MainWindow()
         {
             InitializeComponent();
+            
             var msgService = new MessageService("xBatch");
+
             try
             {
                 var appProvider = (Application.Current as XBatchApp).GetApplicationProvider();
-                this.DataContext = new BatchRunnerVM(new Models.BatchRunnerModel(appProvider), msgService);
+                var batchRunnerModel = new Models.BatchRunnerModel(appProvider, new RecentFilesManager());
+
+                var vm = new BatchManagerVM(batchRunnerModel, msgService);
+                
+                this.DataContext = vm;
             }
             catch (Exception ex)
             {

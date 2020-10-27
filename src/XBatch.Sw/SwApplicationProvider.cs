@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -108,6 +109,15 @@ namespace Xarial.CadPlus.XBatch.Sw
             app.Sw.CommandInProgress = true;
 
             return app;
+        }
+
+        public bool CanProcessFile(string filePath)
+        {
+            const string TEMP_SW_FILE_NAME = "~$";
+
+            var fileName = Path.GetFileName(filePath);
+
+            return !fileName.StartsWith(TEMP_SW_FILE_NAME);
         }
     }
 }

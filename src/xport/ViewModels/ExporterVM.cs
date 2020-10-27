@@ -13,6 +13,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Threading;
 using System.Windows;
+using System.Windows.Data;
 using System.Windows.Input;
 using WK.Libraries.BetterFolderBrowserNS;
 using Xarial.CadPlus.Common.Services;
@@ -119,12 +120,16 @@ namespace Xarial.CadPlus.Xport.ViewModels
         private readonly IExporterModel m_Model;
         private readonly IMessageService m_MsgSvc;
 
+        private readonly object m_Lock;
+
         public ExporterVM(IExporterModel model, IMessageService msgSvc)
         {
             m_Model = model;
             m_MsgSvc = msgSvc;
 
+            m_Lock = new object();
             Log = new ObservableCollection<string>();
+            BindingOperations.EnableCollectionSynchronization(Log, m_Lock);
 
             m_Model.ProgressChanged += OnProgressChanged;
             m_Model.Log += OnLog;

@@ -5,62 +5,49 @@
 //License: https://cadplus.xarial.com/license/
 //*********************************************************************
 
-using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Xarial.XCad.Base.Attributes;
+using Xarial.XToolkit.Services.UserSettings;
+using Xarial.XToolkit.Services.UserSettings.Attributes;
 
 namespace Xarial.CadPlus.XBatch.Base.Core
 {
-    [Flags]
-    public enum StartupOptions_e 
+    public class BatchJobVersionTransformer : BaseUserSettingsVersionsTransformer
     {
-        Default = 0,
-
-        [Summary("Bypasses all settings")]
-        Safe = 1,
-
-        [Summary("Runs host application in background")]
-        Background = 2,
-
-        [Summary("Suppresses all popup windows")]
-        Silent = 4
     }
 
-    [Flags]
-    public enum OpenFileOptions_e 
+    [UserSettingVersion("1.0.0", typeof(BatchJobVersionTransformer))]
+    public class BatchJob
     {
-        Default = 0,
+        internal static BatchJob FromFile(string filePath) 
+        {
+            var svc = new UserSettingsService();
 
-        [Summary("Suppresses all message boxes")]
-        Silent = 1,
+            var batchJob = svc.ReadSettings<BatchJob>(filePath);
 
-        [Summary("Opens all documents read-only")]
-        [Title("Read Only")]
-        ReadOnly = 2,
+            return batchJob;
+        }
 
-        [Summary("Opens documents in the rapid mode. Some of the APIs might be unavailable")]
-        Rapid = 4
-    }
-
-    public class BatchRunnerOptions
-    {
         public string[] Input { get; set; }
-        public string Filter { get; set; }
+        public string[] Filters { get; set; }
+        
         public bool ContinueOnError { get; set; }
         public int Timeout { get; set; }
         public string[] Macros { get; set; }
+
         public AppVersionInfo Version { get; set; }
         public StartupOptions_e StartupOptions { get; set; }
         public OpenFileOptions_e OpenFileOptions { get; set; }
+        public int BatchSize { get; set; }
 
-        public BatchRunnerOptions() 
+        public BatchJob() 
         {
-            Filter = "*.*";
+            Filters = new string[] { "*.*" };
             Timeout = 600;
+            BatchSize = 25;
             ContinueOnError = true;
             StartupOptions = StartupOptions_e.Silent | StartupOptions_e.Safe;
             OpenFileOptions = OpenFileOptions_e.Silent;

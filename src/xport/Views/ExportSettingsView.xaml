@@ -16,7 +16,7 @@
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <TabControl Margin="2" SelectedIndex="{Binding Path=ActiveTabIndex}">
+        <TabControl Margin="2" SelectedIndex="{Binding Path=ActiveTabIndex}" Style="{x:Null}">
             <TabItem Header="Settings">
                 <Grid Grid.IsSharedSizeScope="True" IsEnabled="{Binding Path=IsExportInProgress, Converter={StaticResource revBoolConv}}">
                     <Grid.RowDefinitions>

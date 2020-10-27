@@ -6,6 +6,7 @@
 //*********************************************************************
 
 using System.ComponentModel;
+using System.IO;
 using System.Windows.Input;
 using Xarial.CadPlus.CustomToolbar.Enums;
 using Xarial.CadPlus.CustomToolbar.Structs;
@@ -28,7 +29,7 @@ namespace Xarial.CadPlus.CustomToolbar.UI.ViewModels
                 this.NotifyChanged();
             }
         }
-
+        
         public MacroStartFunction EntryPoint
         {
             get => Command.EntryPoint;

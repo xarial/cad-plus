@@ -154,6 +154,8 @@
     <Compile Include="UI\Forms\CommandManagerForm.xaml.cs">
       <DependentUpon>CommandManagerForm.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI\ValidationRules\EntryPointsValidationRules.cs" />
+    <Compile Include="UI\ValidationRules\FileExistsValidationRule.cs" />
     <Compile Include="UI\ViewModels\CommandGroupVM.cs" />
     <Compile Include="UI\ViewModels\CommandMacroVM.cs" />
     <Compile Include="UI\ViewModels\CommandManagerVM.cs" />
@@ -236,6 +238,9 @@
       <Project>{6bf97f84-c902-470f-874f-4ad839cb16b9}</Project>
       <Name>Module</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\error.png" />
   </ItemGroup>
   <Import Project="$(SolutionDir)common\common.module.props" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
