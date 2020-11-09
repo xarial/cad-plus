@@ -13,6 +13,9 @@ using Xarial.XCad.Base.Attributes;
 using System.ComponentModel;
 using Xarial.XToolkit.Wpf.Dialogs;
 using Xarial.CadPlus.AddIn.Base;
+using Xarial.XCad;
+using Xarial.XCad.Base;
+using Xarial.CadPlus.Common.Services;
 
 namespace Xarial.CadPlus.AddIn.Sw
 {
@@ -31,6 +34,11 @@ namespace Xarial.CadPlus.AddIn.Sw
         public override void OnDisconnect()
         {
             m_Controller.Dispose();
+        }
+
+        public override void ConfigureServices(IXServiceCollection collection)
+        {
+            collection.AddOrReplace<IXLogger, AppLogger>();
         }
     }
 }

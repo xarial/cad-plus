@@ -5,23 +5,11 @@
 //License: https://cadplus.xarial.com/license/
 //*********************************************************************
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 
 namespace Xarial.CadPlus.Common.Services
 {
-    public interface IMessageService
-    {
-        void ShowError(string error);
-        void ShowInformation(string msg);
-        bool? ShowQuestion(string question);
-    }
-
-    public class MessageService : IMessageService
+    public class GenericMessageService : IMessageService
     {
         public void ShowError(string error) => ShowMessage(error, MessageBoxImage.Error);
         public void ShowInformation(string msg) => ShowMessage(msg, MessageBoxImage.Information);
@@ -43,7 +31,7 @@ namespace Xarial.CadPlus.Common.Services
 
         private readonly string m_Title;
 
-        public MessageService(string title) 
+        public GenericMessageService(string title) 
         {
             m_Title = title;
         }

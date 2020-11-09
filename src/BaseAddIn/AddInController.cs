@@ -40,11 +40,6 @@ namespace Xarial.CadPlus.AddIn.Base
         {
             m_Ext = ext;
 
-            m_Ext.Application.Loaded += OnApplicationLoaded;
-        }
-
-        private void OnApplicationLoaded(XCad.IXApplication app)
-        {
             Loaded?.Invoke();
         }
     }

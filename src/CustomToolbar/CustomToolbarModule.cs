@@ -20,6 +20,8 @@ using Xarial.XCad.UI.Commands.Enums;
 using Xarial.XToolkit.Services.UserSettings;
 using System.ComponentModel.Composition;
 using Xarial.CadPlus.ExtensionModule;
+using Xarial.XCad.Base;
+using Xarial.CadPlus.Common.Services;
 
 namespace Xarial.CadPlus.CustomToolbar
 {
@@ -65,6 +67,9 @@ namespace Xarial.CadPlus.CustomToolbar
             builder.RegisterInstance(m_Ext.Application);
             builder.RegisterInstance(m_Ext.Logger);
 
+            builder.RegisterType<AppLogger>()
+                .As<IXLogger>();
+
             builder.RegisterType<MacroEntryPointsExtractor>()
                 .As<IMacroEntryPointsExtractor>();
 
@@ -77,7 +82,7 @@ namespace Xarial.CadPlus.CustomToolbar
             builder.RegisterType<SettingsProvider>()
                 .As<ISettingsProvider>();
 
-            builder.RegisterType<MessageService>()
+            builder.RegisterType<CadAppMessageService>()
                 .As<IMessageService>();
 
             builder.RegisterType<CommandManagerVM>()
