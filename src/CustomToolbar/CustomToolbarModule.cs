@@ -30,8 +30,8 @@ namespace Xarial.CadPlus.CustomToolbar
     {
         [CommandGroupInfo(CommandGroups.RootGroupId + 1)]
         [CommandGroupParent(CommandGroups.RootGroupId)]
-        [Title("Custom Toolbar")]
-        [Description("Custom toolbar configuration")]
+        [Title("Toolbar+")]
+        [Description("Toolbar+ configuration")]
         [Icon(typeof(Resources), nameof(Resources.configure_icon))]
         public enum Commands_e
         {
@@ -102,7 +102,7 @@ namespace Xarial.CadPlus.CustomToolbar
         protected virtual void LoadCommands()
         {
             m_Ext.CommandManager.AddCommandGroup<Commands_e>().CommandClick += OnCommandClick;
-
+            
             m_CmdsMgr = Resolve<ICommandsManager>();
             m_TriggersMgr = Resolve<ITriggersManager>();
             m_Msg = Resolve<IMessageService>();
