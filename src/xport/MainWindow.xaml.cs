@@ -20,7 +20,7 @@ namespace Xarial.CadPlus.Xport
             InitializeComponent();
             this.DataContext = new ExporterVM(
                 new ExporterModel(),
-                new MessageService("xPort"));
+                new GenericMessageService("xPort"));
         }
     }
 }

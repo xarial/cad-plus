@@ -367,15 +367,14 @@ namespace Xarial.CadPlus.XBatch.Base.Core
 
                     if (doc == null)
                     {
-                        var openArgs = new DocumentOpenArgs()
-                        {
-                            Path = file.FilePath,
-                            Silent = opts.OpenFileOptions.HasFlag(OpenFileOptions_e.Silent),
-                            ReadOnly = opts.OpenFileOptions.HasFlag(OpenFileOptions_e.ReadOnly),
-                            Rapid = opts.OpenFileOptions.HasFlag(OpenFileOptions_e.Rapid)
-                        };
+                        doc = app.Documents.PreCreate<IXDocument>();
 
-                        doc = app.Documents.Open(openArgs);
+                        doc.Path = file.FilePath;
+                        doc.Silent = opts.OpenFileOptions.HasFlag(OpenFileOptions_e.Silent);
+                        doc.ReadOnly = opts.OpenFileOptions.HasFlag(OpenFileOptions_e.ReadOnly);
+                        doc.Rapid = opts.OpenFileOptions.HasFlag(OpenFileOptions_e.Rapid);
+
+                        doc.Commit(cancellationToken);
                     }
 
                     app.Documents.Active = doc;

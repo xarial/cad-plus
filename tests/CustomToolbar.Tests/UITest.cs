@@ -9,6 +9,7 @@ using Autofac;
 using Moq;
 using NUnit.Framework;
 using System;
+using Xarial.CadPlus.Common.Services;
 using Xarial.CadPlus.CustomToolbar;
 using Xarial.CadPlus.CustomToolbar.Services;
 using Xarial.CadPlus.CustomToolbar.Structs;
