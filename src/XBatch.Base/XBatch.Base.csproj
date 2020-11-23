@@ -80,8 +80,8 @@
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="WindowsFormsIntegration" />
-    <Reference Include="Xarial.XCad, Version=0.6.8.0, Culture=neutral, PublicKeyToken=60dcaf351d4060db, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Xarial.XCad.0.6.8\lib\net461\Xarial.XCad.dll</HintPath>
+    <Reference Include="Xarial.XCad, Version=0.6.9.0, Culture=neutral, PublicKeyToken=60dcaf351d4060db, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Xarial.XCad.0.6.9-20201123.3\lib\net461\Xarial.XCad.dll</HintPath>
     </Reference>
     <Reference Include="Xarial.XToolkit, Version=0.2.4.0, Culture=neutral, PublicKeyToken=60dcaf351d4060db, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Xarial.XToolkit.0.2.4\lib\net461\Xarial.XToolkit.dll</HintPath>

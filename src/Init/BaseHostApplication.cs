@@ -1,13 +1,14 @@
 ﻿using System;
+using Xarial.CadPlus.Plus;
 
 namespace Xarial.CadPlus.Module.Init
 {
-    public abstract class BaseHostModule : IHostModule
+    public abstract class BaseHostApplication : IHostApplication
     {
         public abstract IntPtr ParentWindow { get; }
-        public abstract event Action Loaded;
+        public virtual event Action Loaded;
 
-        public BaseHostModule()
+        public BaseHostApplication()
         {
             //TODO: implement common initiation logic across multiple apps and add-ins, e.g. initate logger
         }

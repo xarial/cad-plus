@@ -17,6 +17,7 @@ using Xarial.CadPlus.Common.Services;
 using Xarial.CadPlus.XBatch.Base.Exceptions;
 using Xarial.XCad;
 using Xarial.XCad.Documents;
+using Xarial.XCad.Documents.Enums;
 using Xarial.XCad.Documents.Exceptions;
 using Xarial.XCad.Documents.Structures;
 using Xarial.XCad.Exceptions;
@@ -370,9 +371,23 @@ namespace Xarial.CadPlus.XBatch.Base.Core
                         doc = app.Documents.PreCreate<IXDocument>();
 
                         doc.Path = file.FilePath;
-                        doc.Silent = opts.OpenFileOptions.HasFlag(OpenFileOptions_e.Silent);
-                        doc.ReadOnly = opts.OpenFileOptions.HasFlag(OpenFileOptions_e.ReadOnly);
-                        doc.Rapid = opts.OpenFileOptions.HasFlag(OpenFileOptions_e.Rapid);
+
+                        var state = DocumentState_e.Default;
+
+                        if (opts.OpenFileOptions.HasFlag(OpenFileOptions_e.Silent)) 
+                        {
+                            state |= DocumentState_e.Silent;
+                        }
+
+                        if (opts.OpenFileOptions.HasFlag(OpenFileOptions_e.ReadOnly)) 
+                        {
+                            state |= DocumentState_e.ReadOnly;
+                        }
+
+                        if (opts.OpenFileOptions.HasFlag(OpenFileOptions_e.Rapid)) 
+                        {
+                            state |= DocumentState_e.Rapid;
+                        }
 
                         doc.Commit(cancellationToken);
                     }

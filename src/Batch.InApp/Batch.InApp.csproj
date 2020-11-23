@@ -39,8 +39,8 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
-    <Reference Include="Xarial.XCad, Version=0.6.8.0, Culture=neutral, PublicKeyToken=60dcaf351d4060db, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Xarial.XCad.0.6.8\lib\net461\Xarial.XCad.dll</HintPath>
+    <Reference Include="Xarial.XCad, Version=0.6.9.0, Culture=neutral, PublicKeyToken=60dcaf351d4060db, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Xarial.XCad.0.6.9-20201123.3\lib\net461\Xarial.XCad.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -48,9 +48,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Module\Module.csproj">
-      <Project>{6bf97f84-c902-470f-874f-4ad839cb16b9}</Project>
-      <Name>Module</Name>
+    <ProjectReference Include="..\Plus\Plus.csproj">
+      <Project>{9fd175a3-2038-4c2a-b988-8c1a4a26150a}</Project>
+      <Name>Plus</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
