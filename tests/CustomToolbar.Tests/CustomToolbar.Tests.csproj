@@ -18,6 +18,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\CustomToolbar\CustomToolbar.csproj" />
+    <ProjectReference Include="..\..\src\Plus\Plus.csproj" />
   </ItemGroup>
 
   <ItemGroup>
