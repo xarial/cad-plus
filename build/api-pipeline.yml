@@ -38,11 +38,18 @@ stages:
           command: restore
           projects: 'api/Plus/Plus.csproj'
 
+      - task: DownloadSecureFile@1
+        name: Certificate
+        displayName: 'Download code signing certificate'
+        inputs:
+          secureFile: xarial.snk
+
       - task: VSBuild@1
         displayName: 'Build preview version'
         inputs:
           solution: '$(ProjectPath)'
           configuration: '$(BuildConfiguration)'
+          msbuildArgs: 'SignAssembly=true;AssemblyOriginatorKeyFile=$(Certificate.secureFilePath);DelaySign=false;VersionSuffix=$(Build.BuildNumber)'
 
       - task: DotNetCoreCLI@2
         inputs:
@@ -56,6 +63,7 @@ stages:
           inputs:
             solution: '$(ProjectPath)'
             configuration: '$(BuildConfiguration)'
+            msbuildArgs: 'SignAssembly=true;AssemblyOriginatorKeyFile=$(Certificate.secureFilePath);DelaySign=false'
             clean: true
 
       - ${{ if and(eq(variables['Build.SourceBranch'], 'refs/heads/master'), ne(variables['Build.Reason'], 'PullRequest')) }}:
