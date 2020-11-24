@@ -7,8 +7,6 @@ trigger:
     include:
     - api/*
 
-name: '$(Date:yyyyMMdd).$(Rev:r)[$(BuildID)]'
-
 stages:
 
 - stage: 'Build'
