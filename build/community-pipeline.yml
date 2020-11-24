@@ -4,6 +4,9 @@ trigger:
     - master
     - dev
     - staging
+  paths:
+    include:
+    - src/*
 
 name: '$(Date:yyyyMMdd).$(Rev:r)[$(BuildID)]'
 
@@ -23,7 +26,7 @@ stages:
     
     steps:
 
-    - task: NuGetToolInstaller@0
+    - task: NuGetToolInstaller@1
       displayName: 'Use NuGet'
 
     - task: NuGetCommand@2
