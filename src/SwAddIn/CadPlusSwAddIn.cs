@@ -24,21 +24,15 @@ namespace Xarial.CadPlus.AddIn.Sw
     [Description("The toolset of utilities to complement SOLIDWORKS functionality")]
     public class CadPlusSwAddIn : SwAddInEx
     {
-        private AddInController m_Controller;
+        private readonly AddInController m_Controller;
 
-        public override void OnConnect()
+        public CadPlusSwAddIn() 
         {
             m_Controller = new AddInController(this);
         }
 
-        public override void OnDisconnect()
-        {
-            m_Controller.Dispose();
-        }
-
-        public override void ConfigureServices(IXServiceCollection collection)
-        {
-            collection.AddOrReplace<IXLogger, AppLogger>();
-        }
+        public override void OnConnect() => m_Controller.Connect();
+        public override void OnDisconnect() => m_Controller.Disconnect();
+        public override void ConfigureServices(IXServiceCollection collection) => m_Controller.ConfigureServices(collection);
     }
 }

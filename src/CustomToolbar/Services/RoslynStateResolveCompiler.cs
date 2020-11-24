@@ -18,7 +18,6 @@ using System.Text;
 using Xarial.CadPlus.CustomToolbar.Base;
 using Xarial.CadPlus.CustomToolbar.Exceptions;
 using Xarial.CadPlus.CustomToolbar.Structs;
-using Xarial.CadPlus.ExtensionModule;
 using Xarial.XCad;
 using Xarial.XCad.Base;
 

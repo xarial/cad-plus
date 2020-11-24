@@ -8,7 +8,6 @@
 using System.Collections.Generic;
 using Xarial.CadPlus.CustomToolbar.Base;
 using Xarial.CadPlus.CustomToolbar.Structs;
-using Xarial.CadPlus.ExtensionModule;
 
 namespace Xarial.CadPlus.CustomToolbar.Services
 {

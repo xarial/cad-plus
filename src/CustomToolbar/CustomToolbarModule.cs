@@ -19,19 +19,19 @@ using Xarial.XCad.UI.Commands.Attributes;
 using Xarial.XCad.UI.Commands.Enums;
 using Xarial.XToolkit.Services.UserSettings;
 using System.ComponentModel.Composition;
-using Xarial.CadPlus.ExtensionModule;
 using Xarial.XCad.Base;
 using Xarial.CadPlus.Common.Services;
+using Xarial.CadPlus.Plus;
 
 namespace Xarial.CadPlus.CustomToolbar
 {
     [Export(typeof(IExtensionModule))]
     public class CustomToolbarModule : IExtensionModule
     {
-        [CommandGroupInfo(CommandGroups.RootGroupId + 1)]
-        [CommandGroupParent(CommandGroups.RootGroupId)]
-        [Title("Custom Toolbar")]
-        [Description("Custom toolbar configuration")]
+        //[CommandGroupInfo(CommandGroups.RootGroupId + 1)]
+        //[CommandGroupParent(CommandGroups.RootGroupId)]
+        [Title("Toolbar+")]
+        [Description("Toolbar+ configuration")]
         [Icon(typeof(Resources), nameof(Resources.configure_icon))]
         public enum Commands_e
         {
@@ -47,14 +47,19 @@ namespace Xarial.CadPlus.CustomToolbar
         public static TService Resolve<TService>() 
             => m_Container.Resolve<TService>();
 
-        private IXExtension m_Ext;
+        private IHostExtensionApplication m_Host;
         private ICommandsManager m_CmdsMgr;
         private ITriggersManager m_TriggersMgr;
         private IMessageService m_Msg;
 
-        public void Load(IXExtension ext)
+        public void Init(IHostExtensionApplication host)
         {
-            m_Ext = ext;
+            m_Host = host;
+            m_Host.Connect += OnConnect;
+        }
+
+        private void OnConnect()
+        {
             CreateContainer();
             LoadCommands();
         }
@@ -63,9 +68,9 @@ namespace Xarial.CadPlus.CustomToolbar
         {
             var builder = new ContainerBuilder();
 
-            builder.RegisterInstance(m_Ext);
-            builder.RegisterInstance(m_Ext.Application);
-            builder.RegisterInstance(m_Ext.Logger);
+            builder.RegisterInstance(m_Host.Extension);
+            builder.RegisterInstance(m_Host.Extension.Application);
+            builder.RegisterInstance(m_Host.Extension.Logger);
 
             builder.RegisterType<AppLogger>()
                 .As<IXLogger>();
@@ -101,8 +106,8 @@ namespace Xarial.CadPlus.CustomToolbar
 
         protected virtual void LoadCommands()
         {
-            m_Ext.CommandManager.AddCommandGroup<Commands_e>().CommandClick += OnCommandClick;
-
+            m_Host.RegisterCommands<Commands_e>(OnCommandClick);
+            
             m_CmdsMgr = Resolve<ICommandsManager>();
             m_TriggersMgr = Resolve<ITriggersManager>();
             m_Msg = Resolve<IMessageService>();
@@ -116,7 +121,7 @@ namespace Xarial.CadPlus.CustomToolbar
 
                     var vm = Resolve<CommandManagerVM>();
 
-                    var popup = m_Ext.CreatePopupWindow<CommandManagerForm>();
+                    var popup = m_Host.Extension.CreatePopupWindow<CommandManagerForm>();
                     popup.Control.DataContext = vm;
                     popup.Control.WindowStartupLocation = System.Windows.WindowStartupLocation.CenterOwner;
 

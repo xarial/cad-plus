@@ -106,7 +106,7 @@ namespace Xarial.CadPlus.CustomToolbar.Services
 
         private void OnDocumentClosing(IXDocument doc)
         {
-            if (doc.Visible)
+            if (!doc.State.HasFlag(DocumentState_e.Hidden))
             {
                 InvokeTrigger(Triggers_e.DocumentClose);
             }
