@@ -19,7 +19,6 @@ using Xarial.CadPlus.CustomToolbar.Enums;
 using Xarial.CadPlus.CustomToolbar.Helpers;
 using Xarial.CadPlus.CustomToolbar.Properties;
 using Xarial.CadPlus.CustomToolbar.Structs;
-using Xarial.CadPlus.ExtensionModule;
 using Xarial.XCad;
 using Xarial.XCad.Base;
 using Xarial.XCad.Exceptions;

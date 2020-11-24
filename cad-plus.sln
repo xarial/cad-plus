@@ -19,8 +19,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SwAddIn", "src\SwAddIn\SwAd
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CustomToolbar", "src\CustomToolbar\CustomToolbar.csproj", "{B645A77C-D088-45EE-95CA-AD45D63060CA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Module", "src\Module\Module.csproj", "{6BF97F84-C902-470F-874F-4AD839CB16B9}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CustomToolbar.Tests", "tests\CustomToolbar.Tests\CustomToolbar.Tests.csproj", "{0312168C-2B71-4650-9DF6-992E762698E2}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common", "src\Common\Common.csproj", "{CB753A98-59D1-4058-B486-E1DFD86FB5BB}"
@@ -97,14 +95,6 @@ Global
 		{B645A77C-D088-45EE-95CA-AD45D63060CA}.Release|Any CPU.Build.0 = Release|Any CPU
 		{B645A77C-D088-45EE-95CA-AD45D63060CA}.Release|x64.ActiveCfg = Release|Any CPU
 		{B645A77C-D088-45EE-95CA-AD45D63060CA}.Release|x64.Build.0 = Release|Any CPU
-		{6BF97F84-C902-470F-874F-4AD839CB16B9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{6BF97F84-C902-470F-874F-4AD839CB16B9}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{6BF97F84-C902-470F-874F-4AD839CB16B9}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{6BF97F84-C902-470F-874F-4AD839CB16B9}.Debug|x64.Build.0 = Debug|Any CPU
-		{6BF97F84-C902-470F-874F-4AD839CB16B9}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{6BF97F84-C902-470F-874F-4AD839CB16B9}.Release|Any CPU.Build.0 = Release|Any CPU
-		{6BF97F84-C902-470F-874F-4AD839CB16B9}.Release|x64.ActiveCfg = Release|Any CPU
-		{6BF97F84-C902-470F-874F-4AD839CB16B9}.Release|x64.Build.0 = Release|Any CPU
 		{0312168C-2B71-4650-9DF6-992E762698E2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{0312168C-2B71-4650-9DF6-992E762698E2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0312168C-2B71-4650-9DF6-992E762698E2}.Debug|x64.ActiveCfg = Debug|Any CPU

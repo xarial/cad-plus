@@ -16,7 +16,6 @@ using System.Xml;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using Xarial.CadPlus.AddIn.Base.Properties;
-using Xarial.CadPlus.ExtensionModule;
 using Xarial.XCad.Extensions;
 using Xarial.XCad.UI.Commands;
 using Xarial.XToolkit.Wpf.Dialogs;
@@ -24,26 +23,13 @@ using Xarial.XToolkit.Reflection;
 using System.ComponentModel.Composition.Hosting;
 using System.ComponentModel.Composition;
 using System.ComponentModel.Composition.Primitives;
-using Xarial.CadPlus.Module.Init;
+using Xarial.CadPlus.Plus;
+using Xarial.XCad;
+using Xarial.XCad.Base;
+using Xarial.CadPlus.Common.Services;
 
 namespace Xarial.CadPlus.AddIn.Base
 {
-    public class AddInHostModule : BaseHostModule 
-    {
-        private readonly IXExtension m_Ext;
-
-        public override IntPtr ParentWindow => m_Ext.Application.WindowHandle;
-
-        public override event Action Loaded;
-
-        internal AddInHostModule(IXExtension ext) 
-        {
-            m_Ext = ext;
-
-            Loaded?.Invoke();
-        }
-    }
-
     public class AddInController : IDisposable
     {
         private class LocalAppConfigBindingRedirectReferenceResolver : AppConfigBindingRedirectReferenceResolver 
@@ -52,23 +38,19 @@ namespace Xarial.CadPlus.AddIn.Base
                 => new Assembly[] { requestingAssembly ?? typeof(AddInController).Assembly };
         }
 
-        private readonly IXExtension m_Ext;
+        static AddInController() 
+        {
+            AppDomain.CurrentDomain.ResolveBindingRedirects(new LocalAppConfigBindingRedirectReferenceResolver());
+        }
 
-        private readonly BaseHostModule m_HostModule;
+        private readonly AddInHostApplication m_AddInApp;
 
         [ImportMany]
         private IEnumerable<IExtensionModule> m_Modules;
 
         public AddInController(IXExtension ext) 
         {
-            AppDomain.CurrentDomain.ResolveBindingRedirects(new LocalAppConfigBindingRedirectReferenceResolver());
-
-            m_HostModule = new AddInHostModule(ext);
-
-            m_Ext = ext;
-            
-            var cmdGrp = ext.CommandManager.AddCommandGroup<CadPlusCommands_e>();
-            cmdGrp.CommandClick += OnCommandClick;
+            m_AddInApp = new AddInHostApplication(ext);
 
             var modulesDir = Path.Combine(Path.GetDirectoryName(this.GetType().Assembly.Location), "Modules");
 
@@ -81,11 +63,31 @@ namespace Xarial.CadPlus.AddIn.Base
             {
                 foreach (var module in m_Modules)
                 {
-                    module.Load(ext);
+                    module.Init(m_AddInApp);
                 }
             }
         }
-        
+
+        public void Connect() 
+        {
+            var cmdGrp = m_AddInApp.Extension.CommandManager.AddCommandGroup<CadPlusCommands_e>();
+            cmdGrp.CommandClick += OnCommandClick;
+
+            m_AddInApp.InvokeConnect();
+        }
+
+        public void ConfigureServices(IXServiceCollection svcColl) 
+        {
+            svcColl.AddOrReplace<IXLogger, AppLogger>();
+            m_AddInApp.InvokeConfigureServices(svcColl);
+        }
+
+        public void Disconnect() 
+        {
+            m_AddInApp.InvokeDisconnect();
+            Dispose();
+        }
+                
         private ComposablePartCatalog CreateDirectoryCatalog(string path, string searchPattern)
         {
             var catalog = new AggregateCatalog();
@@ -116,7 +118,7 @@ namespace Xarial.CadPlus.AddIn.Base
 
                 case CadPlusCommands_e.About:
                     AboutDialog.Show(this.GetType().Assembly, Resources.logo,
-                        m_Ext.Application.WindowHandle);
+                        m_AddInApp.Extension.Application.WindowHandle);
                     break;
             }
         }

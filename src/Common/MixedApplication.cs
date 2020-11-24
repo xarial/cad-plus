@@ -75,23 +75,23 @@ namespace Xarial.CadPlus.Common
         }
     }
 
-    public class ConsoleHostModule : BaseHostModule
+    public class ConsoleHostApplication : BaseHostApplication
     {
         public override IntPtr ParentWindow => IntPtr.Zero;
 
         public override event Action Loaded;
 
-        internal ConsoleHostModule() 
+        internal ConsoleHostApplication() 
         {
             Loaded?.Invoke();
         }
     }
 
-    public class WpfAppHostModule : BaseHostModule
+    public class WpfHostApplication : BaseHostApplication
     {
         private readonly Application m_App;
 
-        internal WpfAppHostModule(Application app)
+        internal WpfHostApplication(Application app)
         {
             m_App = app;
             m_App.Activated += OnAppActivated;
@@ -114,7 +114,7 @@ namespace Xarial.CadPlus.Common
     {
         private bool m_IsStartWindowCalled;
 
-        private BaseHostModule m_HostModule;
+        private BaseHostApplication m_HostApplication;
 
         protected virtual void OnAppStart()
         {
@@ -175,7 +175,7 @@ namespace Xarial.CadPlus.Common
                 ConsoleHandler.Attach();
 
                 SynchronizationContext.SetSynchronizationContext(new SynchronizationContext());
-                m_HostModule = new ConsoleHostModule();
+                m_HostApplication = new ConsoleHostApplication();
                 
                 var res = false;
 
@@ -204,7 +204,7 @@ namespace Xarial.CadPlus.Common
             }
             else
             {
-                m_HostModule = new WpfAppHostModule(this);
+                m_HostApplication = new WpfHostApplication(this);
                 base.OnStartup(e);
             }
         }

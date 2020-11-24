@@ -15,6 +15,7 @@ using Xarial.CadPlus.CustomToolbar.Services;
 using Xarial.CadPlus.CustomToolbar.Structs;
 using Xarial.CadPlus.CustomToolbar.UI.Forms;
 using Xarial.CadPlus.CustomToolbar.UI.ViewModels;
+using Xarial.CadPlus.Plus;
 using Xarial.XCad;
 using Xarial.XCad.Base;
 using Xarial.XCad.Extensions;
@@ -67,9 +68,9 @@ namespace CustomToolbar.Tests
         {
             var module = new CustomToolbarModuleMock();
 
-            var extMock = new Mock<IXExtension>();
+            var extMock = new Mock<IHostExtensionApplication>();
             
-            module.Load(extMock.Object);
+            module.Init(extMock.Object);
         }
 
 #if _RUN_UI_TESTS_

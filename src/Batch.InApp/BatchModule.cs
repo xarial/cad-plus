@@ -5,20 +5,20 @@ using System.ComponentModel.Composition;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Xarial.CadPlus.ExtensionModule;
 using Xarial.XCad.Base.Attributes;
 using Xarial.XCad.Extensions;
 using Xarial.XCad.UI.Commands.Attributes;
 using Xarial.XCad.UI.Commands.Enums;
 using Xarial.XCad.UI.Commands;
+using Xarial.CadPlus.Plus;
 
 namespace Xarial.CadPlus.Batch.InApp
 {
     [Export(typeof(IExtensionModule))]
     public class BatchModule : IExtensionModule
     {
-        [CommandGroupInfo(CommandGroups.RootGroupId + 2)]
-        [CommandGroupParent(CommandGroups.RootGroupId)]
+        //[CommandGroupInfo(CommandGroups.RootGroupId + 2)]
+        //[CommandGroupParent(CommandGroups.RootGroupId)]
         [Title("Batch+")]
         [Description("Commands to batch run macros")]
         //[Icon(typeof(Resources), nameof(Resources.configure_icon))]
@@ -31,12 +31,17 @@ namespace Xarial.CadPlus.Batch.InApp
             Run
         }
 
-        private IXExtension m_Ext;
+        private IHostExtensionApplication m_Host;
 
-        public void Load(IXExtension ext)
+        public void Init(IHostExtensionApplication host)
         {
-            m_Ext = ext;
-            m_Ext.CommandManager.AddCommandGroup<Commands_e>().CommandClick += OnCommandClick;
+            m_Host = host;
+            m_Host.Connect += OnConnect;
+        }
+
+        private void OnConnect()
+        {
+            m_Host.RegisterCommands<Commands_e>(OnCommandClick);
         }
 
         private void OnCommandClick(Commands_e spec)
