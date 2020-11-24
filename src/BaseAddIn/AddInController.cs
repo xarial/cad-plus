@@ -38,6 +38,11 @@ namespace Xarial.CadPlus.AddIn.Base
                 => new Assembly[] { requestingAssembly ?? typeof(AddInController).Assembly };
         }
 
+        static AddInController() 
+        {
+            AppDomain.CurrentDomain.ResolveBindingRedirects(new LocalAppConfigBindingRedirectReferenceResolver());
+        }
+
         private readonly AddInHostApplication m_AddInApp;
 
         [ImportMany]
@@ -45,8 +50,6 @@ namespace Xarial.CadPlus.AddIn.Base
 
         public AddInController(IXExtension ext) 
         {
-            AppDomain.CurrentDomain.ResolveBindingRedirects(new LocalAppConfigBindingRedirectReferenceResolver());
-
             m_AddInApp = new AddInHostApplication(ext);
 
             var modulesDir = Path.Combine(Path.GetDirectoryName(this.GetType().Assembly.Location), "Modules");
