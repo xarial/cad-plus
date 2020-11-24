@@ -53,7 +53,7 @@ stages:
         inputs:
           command: custom
           custom: pack
-          arguments: $(ProjectPath) --version-suffix $(Build.BuildId) --output $(Build.ArtifactStagingDirectory)/packages/preview --no-build /p:Configuration=$(BuildConfiguration)
+          arguments: $(ProjectPath) --version-suffix $(Build.BuildNumber) --output $(Build.ArtifactStagingDirectory)/packages/preview --no-build /p:Configuration=$(BuildConfiguration)
 
       - ${{ if and(eq(variables['Build.SourceBranch'], 'refs/heads/master'), ne(variables['Build.Reason'], 'PullRequest')) }}:
         - task: VSBuild@1
@@ -78,7 +78,7 @@ stages:
 - stage: 'PublishPreviewNuGetPackage'
   displayName: 'Publish Preview NuGet Package to xarial nuget feed'
   dependsOn: 'Build'
-  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/dev'), ne(variables['Build.Reason'], 'PullRequest'))
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/plus'), ne(variables['Build.Reason'], 'PullRequest'))
   jobs:
   - deployment:
     pool:
