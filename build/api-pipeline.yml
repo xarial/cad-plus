@@ -55,7 +55,7 @@ stages:
           custom: pack
           arguments: $(ProjectPath) --version-suffix $(Build.BuildNumber) --output $(Build.ArtifactStagingDirectory)/packages/preview --no-build /p:Configuration=$(BuildConfiguration)
 
-      - ${{ if and(eq(variables['Build.SourceBranch'], 'refs/heads/master'), ne(variables['Build.Reason'], 'PullRequest')) }}:
+      - ${{ if and(eq(variables['Build.SourceBranch'], 'refs/heads/plus'), ne(variables['Build.Reason'], 'PullRequest')) }}:
         - task: VSBuild@1
           displayName: 'Build production version'
           inputs:
@@ -64,7 +64,7 @@ stages:
             msbuildArgs: '/p:SignAssembly=true;AssemblyOriginatorKeyFile=$(Certificate.secureFilePath);DelaySign=false'
             clean: true
 
-      - ${{ if and(eq(variables['Build.SourceBranch'], 'refs/heads/master'), ne(variables['Build.Reason'], 'PullRequest')) }}:
+      - ${{ if and(eq(variables['Build.SourceBranch'], 'refs/heads/plus'), ne(variables['Build.Reason'], 'PullRequest')) }}:
         - task: DotNetCoreCLI@2
           inputs:
             command: custom
@@ -78,7 +78,7 @@ stages:
 - stage: 'PublishPreviewNuGetPackage'
   displayName: 'Publish Preview NuGet Package to xarial nuget feed'
   dependsOn: 'Build'
-  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/plus'), ne(variables['Build.Reason'], 'PullRequest'))
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/dev'), ne(variables['Build.Reason'], 'PullRequest'))
   jobs:
   - deployment:
     pool:
@@ -108,7 +108,7 @@ stages:
     value:
   displayName: 'Publish Production NuGet Package to nuget.org'
   dependsOn: 'Build'
-  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'), ne(variables['Build.Reason'], 'PullRequest'))
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/plus'), ne(variables['Build.Reason'], 'PullRequest'))
   jobs:
   - deployment:
     pool:
