@@ -11,14 +11,11 @@ using System.Runtime.InteropServices;
 namespace Xarial.CadPlus.MacroRunner
 {
     [ComVisible(true)]
-    [Guid("35C9ABF1-4C21-4810-B8C1-CB15394A13D1")]
+    [Guid("B2C8F829-9E75-4587-A1A2-CD3C02BA2CB9")]
     [InterfaceType(ComInterfaceType.InterfaceIsIDispatch)]
-    public interface IMacroRunner
+    public interface IMacroParameter
     {
         [DispId(1)]
-        IMacroResult Run(object appDisp, string macroPath, string moduleName, string subName, int opts, IMacroParameter param, bool cacheReg = false);
-
-        [DispId(2)]
-        IMacroParameter PopParameter(object appDisp);
+        IMacroResult Result { get; set; }
     }
 }

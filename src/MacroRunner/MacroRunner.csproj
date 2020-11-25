@@ -54,7 +54,12 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="IArgumentsParameter.cs" />
+    <Compile Include="IMacroParameter.cs" />
+    <Compile Include="IMacroParameterManager.cs" />
+    <Compile Include="IMacroResult.cs" />
     <Compile Include="IMacroRunner.cs" />
+    <Compile Include="IStatusResult.cs" />
     <Compile Include="MacroRunnerBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RotRegister.cs" />

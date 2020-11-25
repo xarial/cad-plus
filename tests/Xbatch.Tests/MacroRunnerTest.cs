@@ -17,11 +17,11 @@ namespace Xbatch.Tests
         {
             var app = SwApplicationFactory.Create();
 
-            //app = SwApplicationFactory.FromProcess(Process.GetProcessById(26320));
+            //var app = SwApplicationFactory.FromProcess(Process.GetProcessesByName("SLDWORKS").First());
             
             var runner = (IMacroRunner)Activator.CreateInstance(Type.GetTypeFromProgID("CadPlus.MacroRunner.Sw"));
 
-            var res = (IStatusResult)runner.Run(app.Sw, "D:\\Temp\\ParamsMacro.swp", "ParamsMacro1", "main", 0, new ArgumentsParameter(new string[] { "A", "B" }), true);
+            var res = (IStatusResult)runner.Run(app.Sw, "D:\\Temp\\ParamsMacro.swp", "ParamsMacro1", "main", 0, new ArgumentsParameter("A", 1, true), true);
         }
     }
 }

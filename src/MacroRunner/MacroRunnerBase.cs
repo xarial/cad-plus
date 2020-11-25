@@ -20,6 +20,7 @@ namespace Xarial.CadPlus.MacroRunner
 {
     [ComVisible(true)]
     [Guid("9312AC25-2DCD-40C5-9F31-021865E09E87")]
+    [ClassInterface(ClassInterfaceType.None)]
     public abstract class MacroRunnerBase : IMacroRunner
     {
         private const string MACRO_RUNNER_MONIKER_NAME = "_Xarial_CadPlus_MacroRunner_";
