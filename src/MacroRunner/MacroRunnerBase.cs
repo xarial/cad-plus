@@ -38,9 +38,9 @@ namespace Xarial.CadPlus.MacroRunner
             GetMacroParametersManager(false, out _, out IMacroParameterManager macroParamsMgr);
 
             var sessionId = GetCurrentMacroSessionId(app);
-            macroParamsMgr.PopParameter(sessionId);
+            var param = macroParamsMgr.PopParameter(sessionId);
 
-            return null;
+            return param;
         }
 
         public IMacroResult Run(object appDisp, string macroPath, string moduleName, 
@@ -73,6 +73,7 @@ namespace Xarial.CadPlus.MacroRunner
 
             try
             {
+                macroParamsMgr.PushParameter(CreateMacroSessionId(app, macro), param);
                 macro.Run(new MacroEntryPoint(moduleName, subName), (MacroRunOptions_e)opts);
             }
             finally 
@@ -87,6 +88,7 @@ namespace Xarial.CadPlus.MacroRunner
         }
 
         protected abstract IXApplication CastApplication(object app);
+        protected abstract string CreateMacroSessionId(IXApplication app, IXMacro macro);
         protected abstract string GetCurrentMacroSessionId(IXApplication app);
 
         private void GetMacroParametersManager(bool createIfNotExist, out RotRegister newRegister, out IMacroParameterManager macroParamsMgr) 

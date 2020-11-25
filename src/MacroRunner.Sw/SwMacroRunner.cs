@@ -18,7 +18,7 @@ using Xarial.XCad.SolidWorks;
 namespace Xarial.CadPlus.MacroRunner.Sw
 {
     [ComVisible(true)]
-    [ProgId("CadPlus.SwMacroRunner")]
+    [ProgId("CadPlus.MacroRunner.Sw")]
     [Guid("D52774EB-4280-4205-A0CB-E0984665F06A")]
     public class SwMacroRunner : MacroRunnerBase
     {
@@ -34,10 +34,13 @@ namespace Xarial.CadPlus.MacroRunner.Sw
             }
         }
 
+        protected override string CreateMacroSessionId(IXApplication app, IXMacro macro)
+            => CreateSessionId(app, macro.Path);
+
         protected override string GetCurrentMacroSessionId(IXApplication app)
-        {
-            var sw = (app as ISwApplication).Sw;
-            return $"{sw.GetProcessID()}_{sw.GetCurrentMacroPathName().ToLower()}";
-        }
+            => CreateSessionId(app, (app as ISwApplication).Sw.GetCurrentMacroPathName());
+
+        private string CreateSessionId(IXApplication app, string macroPath)
+            => $"{app.Process.Id}_{macroPath.ToLower()}";
     }
 }

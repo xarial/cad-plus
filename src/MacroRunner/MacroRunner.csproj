@@ -65,9 +65,9 @@
   <Import Project="$(SolutionDir)common\common.module.props" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="UnRegComObjects" BeforeTargets="BeforeClean">
-    <Exec Command="%windir%\Microsoft.NET\Framework64\v4.0.30319\RegAsm.exe &quot;$(TargetPath)&quot; /u" IgnoreExitCode="true" Condition="Exists('$(TargetPath)')" />
+    <Exec Command="%windir%\Microsoft.NET\Framework64\v4.0.30319\RegAsm.exe &quot;$(TargetPath)&quot; /tlb /u" IgnoreExitCode="true" Condition="Exists('$(TargetPath)')" />
   </Target>
   <Target Name="RegComObjects" AfterTargets="Build">
-    <Exec Command="%windir%\Microsoft.NET\Framework64\v4.0.30319\RegAsm.exe &quot;$(TargetPath)&quot; /codebase" Condition="Exists('$(TargetPath)')" />
+    <Exec Command="%windir%\Microsoft.NET\Framework64\v4.0.30319\RegAsm.exe &quot;$(TargetPath)&quot; /codebase /tlb" Condition="Exists('$(TargetPath)')" />
   </Target>
 </Project>

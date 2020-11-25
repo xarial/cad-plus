@@ -16,6 +16,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Common\Common.csproj" />
+    <ProjectReference Include="..\..\src\MacroRunner\MacroRunner.csproj" />
     <ProjectReference Include="..\..\src\XBatch.Base\XBatch.Base.csproj" />
     <ProjectReference Include="..\..\src\XBatch.Sw\XBatch.Sw.csproj" />
   </ItemGroup>
