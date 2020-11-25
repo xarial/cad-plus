@@ -11,6 +11,9 @@ using Xarial.XCad.UI.Commands.Attributes;
 using Xarial.XCad.UI.Commands.Enums;
 using Xarial.XCad.UI.Commands;
 using Xarial.CadPlus.Plus;
+using Xarial.XCad.UI.PropertyPage;
+using Xarial.XCad.UI.PropertyPage.Enums;
+using Xarial.XCad.Documents;
 
 namespace Xarial.CadPlus.Batch.InApp
 {
@@ -33,6 +36,9 @@ namespace Xarial.CadPlus.Batch.InApp
 
         private IHostExtensionApplication m_Host;
 
+        private IXPropertyPage<AssemblyBatchData> m_Page;
+        private AssemblyBatchData m_Data;
+
         public void Init(IHostExtensionApplication host)
         {
             m_Host = host;
@@ -42,6 +48,32 @@ namespace Xarial.CadPlus.Batch.InApp
         private void OnConnect()
         {
             m_Host.RegisterCommands<Commands_e>(OnCommandClick);
+            m_Page = m_Host.CreatePage<AssemblyBatchData>();
+            m_Data = new AssemblyBatchData();
+            m_Page.Closed += OnPageClosed;
+        }
+
+        private void OnPageClosed(PageCloseReasons_e reason)
+        {
+            if (reason == PageCloseReasons_e.Okay) 
+            {
+                IEnumerable<IXComponent> comps = null;
+
+                if (m_Data.ProcessAllFiles)
+                {
+                    comps = (m_Host.Extension.Application.Documents.Active as IXAssembly).Components.Flatten();
+                }
+                else 
+                {
+                    comps = m_Data.Components;
+                }
+
+                comps = comps.Distinct();
+
+                var exec = new AssemblyBatchRunJobExecutor(comps.ToArray());
+
+                exec.ExecuteAsync();
+            }
         }
 
         private void OnCommandClick(Commands_e spec)
@@ -49,6 +81,8 @@ namespace Xarial.CadPlus.Batch.InApp
             switch (spec) 
             {
                 case Commands_e.Run:
+                    m_Data.Components = m_Host.Extension.Application.Documents.Active.Selections.OfType<IXComponent>().ToList();
+                    m_Page.Show(m_Data);
                     break;
             }
         }

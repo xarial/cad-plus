@@ -14,10 +14,13 @@ using Xarial.XCad.UI.Commands;
 using Xarial.XCad.UI.Commands.Structures;
 using System.Linq;
 using System.Collections.Generic;
+using Xarial.XCad.UI.PropertyPage;
 
 namespace Xarial.CadPlus.AddIn.Base
 {
-    public class AddInHostApplication : BaseHostApplication, IHostExtensionApplication
+    public delegate IXPropertyPage<TData> CreatePageDelegate<TData>();
+
+    internal class AddInHostApplication : BaseHostApplication, IHostExtensionApplication
     {
         internal const int ROOT_GROUP_ID = 1000;
 
@@ -25,20 +28,23 @@ namespace Xarial.CadPlus.AddIn.Base
 
         public IXExtension Extension { get; }
 
+        public override event ConfigureServicesDelegate ConfigureServices;
         public override event Action Loaded;
         
         public event Action Connect;
         public event Action Disconnect;
-        public event ConfigureServicesDelegate ConfigureServices;
-
+        
         private CommandGroupSpec m_ParentGrpSpec;
 
         private int m_NextId;
 
         private readonly Dictionary<CommandSpec, Tuple<Delegate, Enum>> m_Handlers;
 
-        internal AddInHostApplication(IXExtension ext) 
+        private readonly ICustomHandler m_CustomHandlers;
+
+        internal AddInHostApplication(IXExtension ext, ICustomHandler specHandlers) 
         {
+            m_CustomHandlers = specHandlers;
             Extension = ext;
             m_NextId = ROOT_GROUP_ID + 1;
 
@@ -94,6 +100,18 @@ namespace Xarial.CadPlus.AddIn.Base
             else 
             {
                 System.Diagnostics.Debug.Assert(false, "Handler is not registered");
+            }
+        }
+
+        public IXPropertyPage<TData> CreatePage<TData>() 
+        {
+            if (m_CustomHandlers != null)
+            {
+                return m_CustomHandlers.CreatePage<TData>();
+            }
+            else
+            {
+                return Extension.CreatePage<TData>();
             }
         }
     }
