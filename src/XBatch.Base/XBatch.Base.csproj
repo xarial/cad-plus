@@ -111,6 +111,9 @@
     <Compile Include="Converters\SelectedVersionConverter.cs" />
     <Compile Include="Core\BatchRunner.cs" />
     <Compile Include="Core\BatchJob.cs" />
+    <Compile Include="Core\JobItem.cs" />
+    <Compile Include="Core\JobItemFile.cs" />
+    <Compile Include="Core\JobItemMacro.cs" />
     <Compile Include="Core\OpenFileOptions_e.cs" />
     <Compile Include="Core\StartupOptions_e.cs" />
     <Compile Include="Exceptions\JobCancelledException.cs" />

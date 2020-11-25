@@ -1,15 +1,16 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
-  <Import Project="$(SolutionDir)common\common.props" />
   <PropertyGroup>
+    <ModuleName>MacroRunner</ModuleName>
+    <XCadRegDll>false</XCadRegDll>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{F35A8149-7E4E-4C2F-BDF3-80DD6DA6BD1B}</ProjectGuid>
+    <ProjectGuid>{DA8337D6-678B-41A4-815B-2AAB9D80714D}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Xarial.CadPlus.AddIn.Sw</RootNamespace>
-    <AssemblyName>Xarial.CadPlus.AddIn.Sw</AssemblyName>
+    <RootNamespace>Xarial.CadPlus.MacroRunner.Sw</RootNamespace>
+    <AssemblyName>Xarial.CadPlus.MacroRunner.Sw.Module</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
@@ -32,9 +33,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Newtonsoft.Json.12.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
-    </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="SolidWorks.Interop.sldworks, Version=28.1.0.74, Culture=neutral, PublicKeyToken=7c4797c3e4eeac03, processorArchitecture=MSIL">
@@ -51,7 +49,6 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -70,33 +67,28 @@
     <Reference Include="Xarial.XCad.Toolkit, Version=0.6.9.0, Culture=neutral, PublicKeyToken=60dcaf351d4060db, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Xarial.XCad.Toolkit.0.6.9-20201123.3\lib\net461\Xarial.XCad.Toolkit.dll</HintPath>
     </Reference>
-    <Reference Include="Xarial.XToolkit, Version=0.2.4.0, Culture=neutral, PublicKeyToken=60dcaf351d4060db, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Xarial.XToolkit.0.2.4\lib\net461\Xarial.XToolkit.dll</HintPath>
-    </Reference>
-    <Reference Include="Xarial.XToolkit.Wpf, Version=0.2.11.0, Culture=neutral, PublicKeyToken=60dcaf351d4060db, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Xarial.XToolkit.Wpf.0.2.11\lib\net461\Xarial.XToolkit.Wpf.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CadPlusSwAddIn.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SwGeneralPropertyManagerPageHandler.cs" />
+    <Compile Include="SwMacroRunner.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\BaseAddIn\BaseAddIn.csproj">
-      <Project>{49632346-24d7-4a28-99ec-75a69b43c81c}</Project>
-      <Name>BaseAddIn</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Common\Common.csproj">
-      <Project>{cb753a98-59d1-4058-b486-e1dfd86fb5bb}</Project>
-      <Name>Common</Name>
+    <ProjectReference Include="..\MacroRunner\MacroRunner.csproj">
+      <Project>{f17d7e6b-8786-467a-a014-77311b399efc}</Project>
+      <Name>MacroRunner</Name>
     </ProjectReference>
   </ItemGroup>
+  <Import Project="$(SolutionDir)common\common.module.props" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Target Name="UnRegComObjects" BeforeTargets="BeforeClean">
+    <Exec Command="%windir%\Microsoft.NET\Framework64\v4.0.30319\RegAsm.exe &quot;$(TargetPath)&quot; /tlb /u" IgnoreExitCode="true" Condition="Exists('$(TargetPath)')" />
+  </Target>
+  <Target Name="RegComObjects" AfterTargets="Build">
+    <Exec Command="%windir%\Microsoft.NET\Framework64\v4.0.30319\RegAsm.exe &quot;$(TargetPath)&quot; /codebase /tlb" Condition="Exists('$(TargetPath)')" />
+  </Target>
   <Import Project="..\..\packages\Xarial.XCad.SolidWorks.0.6.9-20201123.3\build\Xarial.XCad.SolidWorks.targets" Condition="Exists('..\..\packages\Xarial.XCad.SolidWorks.0.6.9-20201123.3\build\Xarial.XCad.SolidWorks.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>

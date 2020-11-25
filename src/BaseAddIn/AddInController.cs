@@ -48,9 +48,9 @@ namespace Xarial.CadPlus.AddIn.Base
         [ImportMany]
         private IEnumerable<IExtensionModule> m_Modules;
 
-        public AddInController(IXExtension ext) 
+        public AddInController(IXExtension ext, ICustomHandler customHandlers = null) 
         {
-            m_AddInApp = new AddInHostApplication(ext);
+            m_AddInApp = new AddInHostApplication(ext, customHandlers);
 
             var modulesDir = Path.Combine(Path.GetDirectoryName(this.GetType().Assembly.Location), "Modules");
 

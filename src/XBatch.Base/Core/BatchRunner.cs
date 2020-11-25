@@ -25,54 +25,6 @@ using Xarial.XToolkit.Reporting;
 
 namespace Xarial.CadPlus.XBatch.Base.Core
 {
-    internal class JobItem : IJobItem
-    {
-        public event Action<IJobItem, JobItemStatus_e> StatusChanged;
-
-        public string DisplayName { get; protected set; }
-        
-        internal string FilePath { get; }
-
-        public JobItemStatus_e Status 
-        {
-            get => m_Status;
-            set 
-            {
-                m_Status = value;
-                StatusChanged?.Invoke(this, value);
-            }
-        }
-
-        private JobItemStatus_e m_Status;
-
-        internal JobItem(string filePath) 
-        {
-            FilePath = filePath;
-            m_Status = JobItemStatus_e.AwaitingProcessing;
-        }
-    }
-
-    internal class JobItemMacro : JobItem, IJobItemOperation
-    {
-        internal JobItemMacro(string filePath) : base(filePath)
-        {
-            DisplayName = Path.GetFileNameWithoutExtension(filePath);
-        }
-    }
-
-    internal class JobItemFile : JobItem, IJobItemFile
-    {
-        internal JobItemFile(string filePath, JobItemMacro[] macros) : base(filePath)
-        {
-            DisplayName = Path.GetFileName(filePath);
-            Macros = macros;
-        }
-
-        IEnumerable<IJobItemOperation> IJobItemFile.Operations => Macros;
-
-        public JobItemMacro[] Macros { get; }
-    }
-
     public class BatchRunner : IDisposable
     {
         private const int MAX_ATTEMPTS = 3;
