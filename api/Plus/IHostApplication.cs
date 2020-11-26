@@ -6,17 +6,41 @@
 //*********************************************************************
 
 using System;
+using System.Collections.Generic;
 using Xarial.XCad;
 
 namespace Xarial.CadPlus.Plus
 {
-    public delegate void ConfigureServicesDelegate(IXServiceCollection svcColl);
-
-    public interface IHostApplication
+    /// <summary>
+    /// Represents stan-alone application
+    /// </summary>
+    public interface IHostApplication : IDisposable
     {
-        event Action Loaded;
-        event ConfigureServicesDelegate ConfigureServices;
+        /// <summary>
+        /// Accesses the registered modules
+        /// </summary>
+        IEnumerable<IModule> Modules { get; }
 
+        /// <summary>
+        /// Notifies when the application loaded its data and modules can start invoking APIs
+        /// </summary>
+        event Action Connect;
+
+        /// <summary>
+        /// Notifies when application closes for modules to release resources
+        /// </summary>
+        event Action Disconnect;
+
+        /// <summary>
+        /// Invoked when application loaded its UI
+        /// </summary>
+        /// <remarks>Use this to display any popup windows, such as license or registration/login dialogs</remarks>
+        void OnStarted();
+        void OnConfigureServices(IXServiceCollection svcColl);
+
+        /// <summary>
+        /// Parent window of this application
+        /// </summary>
         IntPtr ParentWindow { get; }
     }
 }
