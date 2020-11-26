@@ -9,8 +9,7 @@ using System;
 
 namespace Xarial.CadPlus.Plus
 {
-    public interface IExtensionModule : IDisposable
+    public interface IExtensionModule : IModule
     {
-        void Init(IHostExtensionApplication host);
     }
 }
