@@ -17,10 +17,8 @@ namespace Xarial.CadPlus.MacroRunner
     [InterfaceType(ComInterfaceType.InterfaceIsIDispatch)]
     public interface IMacroParameterManager
     {
-        [DispId(1)]
         IMacroParameter PopParameter(string sessionId);
 
-        [DispId(2)]
         void PushParameter(string sessionId, IMacroParameter param);
     }
 

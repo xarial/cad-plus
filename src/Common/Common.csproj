@@ -68,6 +68,7 @@
     <Compile Include="Attributes\EnumDisplayNameAttribute.cs" />
     <Compile Include="Controls\PathListBox.cs" />
     <Compile Include="Controls\TaskDashboard.cs" />
+    <Compile Include="Exceptions\MacroRunnerResultError.cs" />
     <Compile Include="Exceptions\UserException.cs" />
     <Compile Include="MixedApplication.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -77,6 +78,7 @@
     <Compile Include="Services\GenericMessageService.cs" />
     <Compile Include="Services\LogWirter.cs" />
     <Compile Include="Services\IMessageService.cs" />
+    <Compile Include="Services\MacroRunnerBaseService.cs" />
     <Compile Include="Services\ProgressHandler.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -101,6 +103,10 @@
     <ProjectReference Include="..\Init\Init.csproj">
       <Project>{c5008247-53fb-410d-b8e4-1e44312cbedc}</Project>
       <Name>Init</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\MacroRunner\MacroRunner.csproj">
+      <Project>{f17d7e6b-8786-467a-a014-77311b399efc}</Project>
+      <Name>MacroRunner</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
