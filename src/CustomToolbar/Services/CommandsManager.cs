@@ -79,7 +79,7 @@ namespace Xarial.CadPlus.CustomToolbar.Services
         {
             try
             {
-                m_MacroRunner.RunMacro(cmd.MacroPath, cmd.EntryPoint, cmd.UnloadAfterRun);
+                m_MacroRunner.RunMacro(cmd.MacroPath, cmd.EntryPoint, cmd.UnloadAfterRun, "");
                 err = null;
                 return true;
             }

@@ -20,22 +20,10 @@ using Xarial.XCad.UI.PropertyPage;
 using System.Reflection;
 using Xarial.XToolkit.Reflection;
 using Xarial.CadPlus.Plus;
+using Xarial.CadPlus.Common.Sw.Services;
 
 namespace Xarial.CadPlus.AddIn.Sw
 {
-    public class SwCustomHandler : ICustomHandler
-    {
-        private readonly SwAddInEx m_AddIn;
-
-        internal SwCustomHandler(SwAddInEx addIn) 
-        {
-            m_AddIn = addIn;
-        }
-
-        public IXPropertyPage<TData> CreatePage<TData>()
-            => m_AddIn.CreatePage<TData, SwGeneralPropertyManagerPageHandler>();
-    }
-
     [ComVisible(true), Guid("AC45BDF0-66CB-4B08-8127-06C1F0C9452F")]
     [Title("CAD+ Toolset")]
     [Description("The toolset of utilities to complement SOLIDWORKS functionality")]
@@ -59,15 +47,33 @@ namespace Xarial.CadPlus.AddIn.Sw
                 }
             }   
         }
-        
-        private readonly IHostExtensionApplication m_Host;
+
+        static CadPlusSwAddIn() 
+        {
+            AppDomain.CurrentDomain.ResolveBindingRedirects(new LocalAppConfigBindingRedirectReferenceResolver());
+        }
+
+        private readonly AddInHostApplication m_Host;
 
         public CadPlusSwAddIn()
         {
-            AppDomain.CurrentDomain.ResolveBindingRedirects(new LocalAppConfigBindingRedirectReferenceResolver());
-            m_Host = CreateHost();
+            m_Host = new AddInHostApplication(this);
+            m_Host.ConfigureServices += OnConfigureModuleServices;
         }
 
-        private IHostExtensionApplication CreateHost() => new AddInHostApplication(this, new SwCustomHandler(this));
+        private void OnConfigureModuleServices(IXServiceCollection svc)
+        {
+            svc.AddOrReplace<IPropertyPageCreator>(
+                () => new SwPropertyPageCreator<SwGeneralPropertyManagerPageHandler>(this));
+
+            svc.AddOrReplace<IMacroRunnerExService>(() => new SwMacroRunnerExService(Application));
+
+            svc.AddOrReplace<IMacroFileFilterProvider, SwMacroFileFilterProvider>();
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            base.Dispose(disposing);
+        }
     }
 }

@@ -31,7 +31,9 @@ namespace Xarial.CadPlus.AddIn.Base
     public delegate IXPropertyPage<TData> CreatePageDelegate<TData>();
 
     public class AddInHostApplication : BaseHostApplication, IHostExtensionApplication
-    {   
+    {
+        public event Action<IXServiceCollection> ConfigureServices;
+
         [ImportMany]
         private IEnumerable<IExtensionModule> m_Modules;
 
@@ -51,14 +53,15 @@ namespace Xarial.CadPlus.AddIn.Base
         private int m_NextId;
 
         private readonly Dictionary<CommandSpec, Tuple<Delegate, Enum>> m_Handlers;
-
-        private readonly ICustomHandler m_CustomHandlers;
-
+        
+        public override IServiceProvider Services => m_SvcProvider;
+        
         private IServiceProvider m_SvcProvider;
 
-        public AddInHostApplication(IXExtension ext, ICustomHandler specHandlers) 
+        private IPropertyPageCreator m_PageCreator;
+
+        public AddInHostApplication(IXExtension ext) 
         {
-            m_CustomHandlers = specHandlers;
             Extension = ext;
             m_NextId = ROOT_GROUP_ID + 1;
 
@@ -121,8 +124,12 @@ namespace Xarial.CadPlus.AddIn.Base
 
         private void OnConfigureServices(IXServiceConsumer sender, IXServiceCollection svcColl)
         {
+            ConfigureServices?.Invoke(svcColl);
+
             OnConfigureServices(svcColl);
             m_SvcProvider = svcColl.CreateProvider();//TODO: might need to get the provider created in the extension instead of creating new one
+
+            m_PageCreator = (IPropertyPageCreator)m_SvcProvider.GetService(typeof(IPropertyPageCreator));
         }
 
         public override void OnConfigureServices(IXServiceCollection svcColl)
@@ -159,17 +166,8 @@ namespace Xarial.CadPlus.AddIn.Base
             }
         }
 
-        public IXPropertyPage<TData> CreatePage<TData>() 
-        {
-            if (m_CustomHandlers != null)
-            {
-                return m_CustomHandlers.CreatePage<TData>();
-            }
-            else
-            {
-                return Extension.CreatePage<TData>();
-            }
-        }
+        public IXPropertyPage<TData> CreatePage<TData>()
+            => m_PageCreator.CreatePage<TData>();
 
         private void OnCommandClick(CadPlusCommands_e spec)
         {

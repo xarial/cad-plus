@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 
@@ -20,6 +21,8 @@ namespace Xarial.CadPlus.MacroRunner
         IMacroParameter PopParameter(string sessionId);
 
         void PushParameter(string sessionId, IMacroParameter param);
+
+        void TryRemoveParameter(string sessionId, IMacroParameter param);
     }
 
     [ComVisible(true)]
@@ -28,47 +31,74 @@ namespace Xarial.CadPlus.MacroRunner
     [ProgId("CadPlus.MacroRunner.MacroParameterManager")]
     public class MacroParameterManager : IMacroParameterManager
     {
-        private readonly ConcurrentDictionary<string, ConcurrentStack<IMacroParameter>> m_Parameters;
+        private readonly Dictionary<string, List<IMacroParameter>> m_Parameters;
+
+        private readonly object m_Lock;
 
         public MacroParameterManager()
         {
-            m_Parameters = new ConcurrentDictionary<string, ConcurrentStack<IMacroParameter>>();
+            m_Parameters = new Dictionary<string, List<IMacroParameter>>();
+            m_Lock = new object();
         }
 
         public IMacroParameter PopParameter(string sessionId)
         {
-            if (m_Parameters.TryGetValue(sessionId, out ConcurrentStack<IMacroParameter> paramsStack))
+            lock (m_Lock)
             {
-                if (!paramsStack.TryPop(out IMacroParameter param))
+                if (m_Parameters.TryGetValue(sessionId, out List<IMacroParameter> paramsStack))
                 {
-                    throw new Exception("Failed to pop the parameter");
-                }
+                    if (paramsStack.Count > 0)
+                    {
+                        var param = paramsStack.First();
 
-                if (!paramsStack.Any())
+                        paramsStack.Remove(param);
+
+                        if (!paramsStack.Any())
+                        {
+                            m_Parameters.Remove(sessionId);
+                        }
+
+                        return param;
+                    }
+                    else
+                    {
+                        throw new Exception("No parameters remain for this session");
+                    }
+                }
+                else
                 {
-                    m_Parameters.TryRemove(sessionId, out _);
+                    throw new Exception("Parameter for this macro cannot be found");
                 }
-
-                return param;
-            }
-            else
-            {
-                throw new Exception("Parameter for this macro cannot be found");
             }
         }
 
         public void PushParameter(string sessionId, IMacroParameter param)
         {
-            if (!m_Parameters.TryGetValue(sessionId, out ConcurrentStack<IMacroParameter> paramsStack))
+            lock (m_Lock)
             {
-                paramsStack = new ConcurrentStack<IMacroParameter>();
+                if (!m_Parameters.TryGetValue(sessionId, out List<IMacroParameter> paramsStack))
+                {
+                    paramsStack = new List<IMacroParameter>();
+                    m_Parameters.Add(sessionId, paramsStack);
+                }
+
+                paramsStack.Add(param);
             }
+        }
 
-            paramsStack.Push(param);
-
-            if (!m_Parameters.TryAdd(sessionId, paramsStack))
+        public void TryRemoveParameter(string sessionId, IMacroParameter param) 
+        {
+            lock (m_Lock)
             {
-                throw new Exception("Failed to push the parameter");
+                if (m_Parameters.TryGetValue(sessionId, out List<IMacroParameter> paramsStack))
+                {
+                    paramsStack.Remove(param);
+
+                    if (!paramsStack.Any())
+                    {
+                        m_Parameters.Remove(sessionId);
+                    }
+                }
             }
         }
     }

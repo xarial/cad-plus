@@ -10,13 +10,13 @@ using Xarial.XCad.Structures;
 
 namespace Xarial.CadPlus.Common.Services
 {
-    public interface IMacroRunnerBaseService
+    public interface IMacroRunnerExService
     {
         void RunMacro(string macroPath, MacroEntryPoint entryPoint,
             MacroRunOptions_e opts, string args, IXDocument doc);
     }
 
-    public abstract class MacroRunnerBaseService : IMacroRunnerBaseService
+    public abstract class MacroRunnerExService : IMacroRunnerExService, IDisposable
     {
         [DllImport("shell32.dll", SetLastError = true)]
         private static extern IntPtr CommandLineToArgvW(
@@ -25,7 +25,7 @@ namespace Xarial.CadPlus.Common.Services
         private readonly IXApplication m_App;
         private readonly IMacroRunner m_Runner;
 
-        public MacroRunnerBaseService(IXApplication app)
+        public MacroRunnerExService(IXApplication app)
         {
             m_App = app;
             m_Runner = TryCreateMacroRunner();
@@ -117,6 +117,11 @@ namespace Xarial.CadPlus.Common.Services
             {
                 throw new Exception("Failed to parse arguments, pointer is null");
             }
+        }
+
+        public void Dispose()
+        {
+            m_Runner.Dispose();
         }
     }
 }

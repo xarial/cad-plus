@@ -47,6 +47,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MacroRunner", "src\MacroRun
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MacroRunner.Sw", "src\MacroRunner.Sw\MacroRunner.Sw.csproj", "{DA8337D6-678B-41A4-815B-2AAB9D80714D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common.Sw", "src\Common.Sw\Common.Sw.csproj", "{E1D89E3C-EBE7-41AF-B5A9-2048929702E2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -183,6 +185,14 @@ Global
 		{DA8337D6-678B-41A4-815B-2AAB9D80714D}.Release|Any CPU.Build.0 = Release|Any CPU
 		{DA8337D6-678B-41A4-815B-2AAB9D80714D}.Release|x64.ActiveCfg = Release|Any CPU
 		{DA8337D6-678B-41A4-815B-2AAB9D80714D}.Release|x64.Build.0 = Release|Any CPU
+		{E1D89E3C-EBE7-41AF-B5A9-2048929702E2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E1D89E3C-EBE7-41AF-B5A9-2048929702E2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E1D89E3C-EBE7-41AF-B5A9-2048929702E2}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{E1D89E3C-EBE7-41AF-B5A9-2048929702E2}.Debug|x64.Build.0 = Debug|Any CPU
+		{E1D89E3C-EBE7-41AF-B5A9-2048929702E2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E1D89E3C-EBE7-41AF-B5A9-2048929702E2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E1D89E3C-EBE7-41AF-B5A9-2048929702E2}.Release|x64.ActiveCfg = Release|Any CPU
+		{E1D89E3C-EBE7-41AF-B5A9-2048929702E2}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

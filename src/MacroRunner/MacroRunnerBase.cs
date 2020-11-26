@@ -74,8 +74,10 @@ namespace Xarial.CadPlus.MacroRunner
 
             try
             {
-                macroParamsMgr.PushParameter(CreateMacroSessionId(app, macro), param);
+                var sessionId = CreateMacroSessionId(app, macro);
+                macroParamsMgr.PushParameter(sessionId, param);
                 macro.Run(new MacroEntryPoint(moduleName, subName), (MacroRunOptions_e)opts);
+                macroParamsMgr.TryRemoveParameter(sessionId, param);
             }
             finally 
             {

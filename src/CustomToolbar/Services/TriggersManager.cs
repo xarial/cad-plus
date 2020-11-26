@@ -205,7 +205,7 @@ namespace Xarial.CadPlus.CustomToolbar.Services
                     {
                         try
                         {
-                            m_MacroRunner.RunMacro(cmd.MacroPath, cmd.EntryPoint, false);
+                            m_MacroRunner.RunMacro(cmd.MacroPath, cmd.EntryPoint, false, "");
                         }
                         catch(Exception ex)
                         {
