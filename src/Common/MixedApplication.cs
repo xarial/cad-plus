@@ -19,6 +19,7 @@ using System.Windows.Interop;
 using System.Windows.Navigation;
 using System.Windows.Threading;
 using Xarial.CadPlus.Module.Init;
+using Xarial.CadPlus.Plus;
 
 namespace Xarial.CadPlus.Common
 {
@@ -79,16 +80,24 @@ namespace Xarial.CadPlus.Common
     {
         public override IntPtr ParentWindow => IntPtr.Zero;
 
-        public override event Action Loaded;
+        public override event Action Connect;
+        public override event Action Disconnect;
+
+        public override IEnumerable<IModule> Modules => throw new NotImplementedException();
 
         internal ConsoleHostApplication() 
         {
-            Loaded?.Invoke();
+            base.OnStarted();
         }
     }
 
     public class WpfHostApplication : BaseHostApplication
     {
+        public override IEnumerable<Plus.IModule> Modules => throw new NotImplementedException();
+
+        public override event Action Connect;
+        public override event Action Disconnect;
+
         private readonly Application m_App;
 
         internal WpfHostApplication(Application app)
@@ -101,12 +110,10 @@ namespace Xarial.CadPlus.Common
             ? new WindowInteropHelper(m_App.MainWindow).Handle
             : IntPtr.Zero;
 
-        public override event Action Loaded;
-
         private void OnAppActivated(object sender, EventArgs e)
         {
             m_App.Activated -= OnAppActivated;
-            Loaded?.Invoke();
+            base.OnStarted();
         }
     }
 

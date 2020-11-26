@@ -13,8 +13,8 @@
     <PackageReference Include="nunit" Version="3.12.0" />
     <PackageReference Include="NUnit3TestAdapter" Version="3.15.1" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.2.0" />
-    <PackageReference Include="Xarial.CadPlusPlus" Version="0.1.0-20201124.9" />
-    <PackageReference Include="Xarial.XCad" Version="0.6.9-20201123.3" />
+    <PackageReference Include="Xarial.CadPlusPlus" Version="0.1.0-20201126.1" />
+    <PackageReference Include="Xarial.XCad" Version="0.6.9-20201126.1" />
   </ItemGroup>
 
   <ItemGroup>

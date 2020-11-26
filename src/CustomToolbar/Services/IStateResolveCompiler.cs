@@ -11,11 +11,8 @@ using Xarial.CadPlus.CustomToolbar.Structs;
 
 namespace Xarial.CadPlus.CustomToolbar.Services
 {
-    public partial class CommandsManager
+    public interface IStateResolveCompiler
     {
-        public interface IStateResolveCompiler 
-        {
-            Dictionary<CommandMacroInfo, IToggleButtonStateResolver> CreateResolvers(IEnumerable<CommandMacroInfo> macroInfos);
-        }
+        Dictionary<CommandMacroInfo, IToggleButtonStateResolver> CreateResolvers(IEnumerable<CommandMacroInfo> macroInfos);
     }
 }

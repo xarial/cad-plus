@@ -39,9 +39,14 @@ namespace Xarial.CadPlus.Batch.InApp
         private IXPropertyPage<AssemblyBatchData> m_Page;
         private AssemblyBatchData m_Data;
 
-        public void Init(IHostExtensionApplication host)
+        public void Init(IHostApplication host)
         {
-            m_Host = host;
+            if (!(host is IHostExtensionApplication))
+            {
+                throw new InvalidCastException("Only extension host is supported for this module");
+            }
+
+            m_Host = (IHostExtensionApplication)host;
             m_Host.Connect += OnConnect;
         }
 

@@ -15,24 +15,36 @@ using Xarial.XCad.UI.Commands.Structures;
 using System.Linq;
 using System.Collections.Generic;
 using Xarial.XCad.UI.PropertyPage;
+using Xarial.XToolkit.Reflection;
+using System.Reflection;
+using System.ComponentModel.Composition;
+using System.IO;
+using System.ComponentModel.Composition.Primitives;
+using System.ComponentModel.Composition.Hosting;
+using Xarial.XToolkit.Wpf.Dialogs;
+using Xarial.CadPlus.AddIn.Base.Properties;
+using Xarial.XCad.Base;
+using Xarial.CadPlus.Common.Services;
 
 namespace Xarial.CadPlus.AddIn.Base
 {
     public delegate IXPropertyPage<TData> CreatePageDelegate<TData>();
 
-    internal class AddInHostApplication : BaseHostApplication, IHostExtensionApplication
-    {
+    public class AddInHostApplication : BaseHostApplication, IHostExtensionApplication
+    {   
+        [ImportMany]
+        private IEnumerable<IExtensionModule> m_Modules;
+
         internal const int ROOT_GROUP_ID = 1000;
 
         public override IntPtr ParentWindow => Extension.Application.WindowHandle;
 
         public IXExtension Extension { get; }
 
-        public override event ConfigureServicesDelegate ConfigureServices;
-        public override event Action Loaded;
-        
-        public event Action Connect;
-        public event Action Disconnect;
+        public override IEnumerable<IModule> Modules => m_Modules;
+
+        public override event Action Connect;
+        public override event Action Disconnect;
         
         private CommandGroupSpec m_ParentGrpSpec;
 
@@ -42,7 +54,7 @@ namespace Xarial.CadPlus.AddIn.Base
 
         private readonly ICustomHandler m_CustomHandlers;
 
-        internal AddInHostApplication(IXExtension ext, ICustomHandler specHandlers) 
+        public AddInHostApplication(IXExtension ext, ICustomHandler specHandlers) 
         {
             m_CustomHandlers = specHandlers;
             Extension = ext;
@@ -51,30 +63,69 @@ namespace Xarial.CadPlus.AddIn.Base
             m_Handlers = new Dictionary<CommandSpec, Tuple<Delegate, Enum>>();
 
             Extension.StartupCompleted += OnStartupCompleted;
+            Extension.Connect += OnConnect;
+            Extension.Disconnect += OnDisconnect;
+            if (Extension is IXServiceConsumer) 
+            {
+                (Extension as IXServiceConsumer).ConfigureServices += OnConfigureServices;
+            }
+
+            var modulesDir = Path.Combine(Path.GetDirectoryName(this.GetType().Assembly.Location), "Modules");
+
+            var catalog = CreateDirectoryCatalog(modulesDir, "*.Module.dll");
+
+            var container = new CompositionContainer(catalog);
+            container.SatisfyImportsOnce(this);
+
+            if (m_Modules?.Any() == true)
+            {
+                foreach (var module in m_Modules)
+                {
+                    module.Init(this);
+                }
+            }
+        }
+
+        private void OnDisconnect(IXExtension ext) => Dispose();
+
+        private ComposablePartCatalog CreateDirectoryCatalog(string path, string searchPattern)
+        {
+            var catalog = new AggregateCatalog();
+
+            catalog.Catalogs.Add(new DirectoryCatalog(path, searchPattern));
+
+            foreach (var subDir in Directory.GetDirectories(path, "*.*", SearchOption.AllDirectories))
+            {
+                catalog.Catalogs.Add(new DirectoryCatalog(subDir, searchPattern));
+            }
+
+            return catalog;
         }
 
         private void OnStartupCompleted(IXExtension ext)
         {
-            Loaded?.Invoke();
+            OnStarted();
         }
 
-        internal void InvokeConnect() 
+        private void OnConnect(IXExtension ext) 
         {
-            m_ParentGrpSpec = Extension.CommandManager.CommandGroups.First(g => g.Spec.Id == ROOT_GROUP_ID).Spec;
+            var cmdGrp = Extension.CommandManager.AddCommandGroup<CadPlusCommands_e>();
+            cmdGrp.CommandClick += OnCommandClick;
+
+            m_ParentGrpSpec = cmdGrp.Spec;
 
             Connect?.Invoke();
         }
 
-        internal void InvokeDisconnect()
-        {
-            Disconnect?.Invoke();
-        }
+        private void OnConfigureServices(IXServiceConsumer sender, IXServiceCollection svcColl)
+            => OnConfigureServices(svcColl);
 
-        internal void InvokeConfigureServices(IXServiceCollection svcColl)
+        public override void OnConfigureServices(IXServiceCollection svcColl)
         {
-            ConfigureServices?.Invoke(svcColl);
+            svcColl.AddOrReplace<IXLogger, AppLogger>();
+            base.OnConfigureServices(svcColl);
         }
-
+        
         public void RegisterCommands<TCmd>(CommandHandler<TCmd> handler)
             where TCmd : Enum
         {
@@ -112,6 +163,40 @@ namespace Xarial.CadPlus.AddIn.Base
             else
             {
                 return Extension.CreatePage<TData>();
+            }
+        }
+
+        private void OnCommandClick(CadPlusCommands_e spec)
+        {
+            switch (spec)
+            {
+                case CadPlusCommands_e.Help:
+                    try
+                    {
+                        System.Diagnostics.Process.Start(Resources.HelpLink);
+                    }
+                    catch
+                    {
+                    }
+                    break;
+
+                case CadPlusCommands_e.About:
+                    AboutDialog.Show(this.GetType().Assembly, Resources.logo,
+                        Extension.Application.WindowHandle);
+                    break;
+            }
+        }
+
+        public override void Dispose()
+        {
+            Disconnect?.Invoke();
+
+            if (m_Modules?.Any() == true)
+            {
+                foreach (var module in m_Modules)
+                {
+                    module.Dispose();
+                }
             }
         }
     }

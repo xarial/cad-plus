@@ -52,9 +52,14 @@ namespace Xarial.CadPlus.CustomToolbar
         private ITriggersManager m_TriggersMgr;
         private IMessageService m_Msg;
 
-        public void Init(IHostExtensionApplication host)
+        public void Init(IHostApplication host)
         {
-            m_Host = host;
+            if (!(host is IHostExtensionApplication))
+            {
+                throw new InvalidCastException("This module is only availabel for extensions");
+            }
+
+            m_Host = (IHostExtensionApplication)host;
             m_Host.Connect += OnConnect;
         }
 

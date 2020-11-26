@@ -100,9 +100,8 @@ namespace Xarial.CadPlus.MacroRunner
             {
                 if (createIfNotExist)
                 {
-                    newRegister = new RotRegister();
                     macroParamsMgr = new MacroParameterManager();
-                    newRegister.RegisterObject(macroParamsMgr, MACRO_RUNNER_MONIKER_NAME);
+                    newRegister = new RotRegister(macroParamsMgr, MACRO_RUNNER_MONIKER_NAME);
                 }
                 else
                 {
