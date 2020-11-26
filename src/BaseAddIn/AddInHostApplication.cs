@@ -54,6 +54,8 @@ namespace Xarial.CadPlus.AddIn.Base
 
         private readonly ICustomHandler m_CustomHandlers;
 
+        private IServiceProvider m_SvcProvider;
+
         public AddInHostApplication(IXExtension ext, ICustomHandler specHandlers) 
         {
             m_CustomHandlers = specHandlers;
@@ -118,7 +120,10 @@ namespace Xarial.CadPlus.AddIn.Base
         }
 
         private void OnConfigureServices(IXServiceConsumer sender, IXServiceCollection svcColl)
-            => OnConfigureServices(svcColl);
+        {
+            OnConfigureServices(svcColl);
+            m_SvcProvider = svcColl.CreateProvider();//TODO: might need to get the provider created in the extension instead of creating new one
+        }
 
         public override void OnConfigureServices(IXServiceCollection svcColl)
         {

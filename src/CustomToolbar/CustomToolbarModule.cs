@@ -28,8 +28,6 @@ namespace Xarial.CadPlus.CustomToolbar
     [Export(typeof(IExtensionModule))]
     public class CustomToolbarModule : IExtensionModule
     {
-        //[CommandGroupInfo(CommandGroups.RootGroupId + 1)]
-        //[CommandGroupParent(CommandGroups.RootGroupId)]
         [Title("Toolbar+")]
         [Description("Toolbar+ configuration")]
         [Icon(typeof(Resources), nameof(Resources.configure_icon))]

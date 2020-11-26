@@ -20,8 +20,6 @@ namespace Xarial.CadPlus.Batch.InApp
     [Export(typeof(IExtensionModule))]
     public class BatchModule : IExtensionModule
     {
-        //[CommandGroupInfo(CommandGroups.RootGroupId + 2)]
-        //[CommandGroupParent(CommandGroups.RootGroupId)]
         [Title("Batch+")]
         [Description("Commands to batch run macros")]
         //[Icon(typeof(Resources), nameof(Resources.configure_icon))]
