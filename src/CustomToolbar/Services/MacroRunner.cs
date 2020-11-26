@@ -36,15 +36,8 @@ namespace Xarial.CadPlus.CustomToolbar.Services
         {
             var opts = unloadAfterRun ? MacroRunOptions_e.UnloadAfterRun : MacroRunOptions_e.Default;
 
-            try
-            {
-                m_Runner.RunMacro(macroPath, new XCad.Structures.MacroEntryPoint(entryPoint.ModuleName, entryPoint.SubName),
+            m_Runner.RunMacro(macroPath, new XCad.Structures.MacroEntryPoint(entryPoint.ModuleName, entryPoint.SubName),
                     opts, args, null);
-            }
-            catch (MacroUserInterruptException userInterruptEx) //do not consider this as an error
-            {
-                m_Logger.Log(userInterruptEx);
-            }
         }
     }
 }

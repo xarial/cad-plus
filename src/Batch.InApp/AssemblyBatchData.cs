@@ -44,7 +44,7 @@ namespace Xarial.CadPlus.Batch.InApp
         [Description("Open each document in its own window (activate)")]
         [Title("Activate Documents")]
         [ControlOptions(align: ControlLeftAlign_e.Indent)]
-        public bool OpenDocuments { get; set; } = true;
+        public bool ActivateDocuments { get; set; } = true;
 
         [CustomControl(typeof(MacrosList))]
         [ControlOptions(height: 100)]

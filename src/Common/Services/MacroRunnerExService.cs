@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Runtime.InteropServices;
 using Xarial.CadPlus.Common.Exceptions;
 using Xarial.CadPlus.MacroRunner;
@@ -6,6 +7,7 @@ using Xarial.XCad;
 using Xarial.XCad.Base;
 using Xarial.XCad.Documents;
 using Xarial.XCad.Enums;
+using Xarial.XCad.Exceptions;
 using Xarial.XCad.Structures;
 
 namespace Xarial.CadPlus.Common.Services
@@ -43,41 +45,54 @@ namespace Xarial.CadPlus.Common.Services
             }
         }
 
-        public void RunMacro(string macroPath, MacroEntryPoint entryPoint, 
+        public void RunMacro(string macroPath, MacroEntryPoint entryPoint,
             MacroRunOptions_e opts, string args, IXDocument doc)
         {
-            if (!string.IsNullOrEmpty(args) || doc != null)
+            try
             {
-                if (m_Runner != null)
+                if (entryPoint == null)
                 {
-                    var param = new MacroParameter();
-                    if (doc != null)
-                    {
-                        param.Set("Model", GetDocumentDispatch(doc));
-                    }
-                    if (!string.IsNullOrEmpty(args))
-                    {
-                        param.Set("Args", ParseCommandLine(args));
-                    }
+                    var macro = m_App.OpenMacro(macroPath);
+                    entryPoint = macro.EntryPoints.First();
+                }
 
-                    var res = m_Runner.Run(GetAppDispatch(m_App),
-                        macroPath, entryPoint.ModuleName, 
-                        entryPoint.ProcedureName, (int)opts, param, true);
-
-                    if (!res.Result) 
+                if (!string.IsNullOrEmpty(args) || doc != null)
+                {
+                    if (m_Runner != null)
                     {
-                        throw new MacroRunnerResultError(res.Message);
+                        var param = new MacroParameter();
+
+                        if (doc != null)
+                        {
+                            param.Set("Model", GetDocumentDispatch(doc));
+                        }
+                        if (!string.IsNullOrEmpty(args))
+                        {
+                            param.Set("Args", ParseCommandLine(args));
+                        }
+
+                        var res = m_Runner.Run(GetAppDispatch(m_App),
+                            macroPath, entryPoint.ModuleName,
+                            entryPoint.ProcedureName, (int)opts, param, true);
+
+                        if (!res.Result)
+                        {
+                            throw new MacroRunnerResultError(res.Message);
+                        }
+                    }
+                    else
+                    {
+                        throw new UserException("Macro runner is not installed. Cannot run the macro with arguments");
                     }
                 }
-                else 
+                else
                 {
-                    throw new UserException("Macro runner is not installed. Cannot run the macro with arguments");
+                    var macro = m_App.OpenMacro(macroPath);
+                    macro.Run(entryPoint, opts);
                 }
             }
-            else
+            catch (MacroUserInterruptException) //do not consider this as an error
             {
-                var macro = m_App.OpenMacro(macroPath);
-                macro.Run(entryPoint, opts);
             }
         }
 

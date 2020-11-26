@@ -14,6 +14,7 @@ using Xarial.CadPlus.Plus;
 using Xarial.XCad.UI.PropertyPage;
 using Xarial.XCad.UI.PropertyPage.Enums;
 using Xarial.XCad.Documents;
+using Xarial.CadPlus.Common.Services;
 
 namespace Xarial.CadPlus.Batch.InApp
 {
@@ -37,6 +38,8 @@ namespace Xarial.CadPlus.Batch.InApp
         private IXPropertyPage<AssemblyBatchData> m_Page;
         private AssemblyBatchData m_Data;
 
+        private IMacroRunnerExService m_MacroRunnerSvc;
+
         public void Init(IHostApplication host)
         {
             if (!(host is IHostExtensionApplication))
@@ -46,6 +49,8 @@ namespace Xarial.CadPlus.Batch.InApp
 
             m_Host = (IHostExtensionApplication)host;
             m_Host.Connect += OnConnect;
+
+            m_MacroRunnerSvc = (IMacroRunnerExService)m_Host.Services.GetService(typeof(IMacroRunnerExService));
         }
 
         private void OnConnect()
@@ -71,9 +76,10 @@ namespace Xarial.CadPlus.Batch.InApp
                     comps = m_Data.Components;
                 }
 
-                comps = comps.Distinct();
-
-                var exec = new AssemblyBatchRunJobExecutor(comps.ToArray());
+                comps = comps.Distinct(new ComponentScopeEqualityComparer());
+                
+                var exec = new AssemblyBatchRunJobExecutor(m_Host.Extension.Application, m_MacroRunnerSvc,
+                    comps.ToArray(), m_Data.Macros, m_Data.ActivateDocuments);
 
                 exec.ExecuteAsync();
             }
