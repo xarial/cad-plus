@@ -49,17 +49,23 @@ namespace Xarial.CadPlus.Batch.InApp
 
             try
             {
-                var paths = m_Comps.Select(c => "").ToArray();
-
-                var jobItems = m_Comps.Select(c => new JobItemFile("", m_Macros.Select(m => new JobItemMacro(m)).ToArray())).ToArray();
-
-                JobSet?.Invoke(jobItems, startTime);
-
-                for (int i = 0; i < jobItems.Length; i++)
+                using (var prg = m_App.CreateProgress())
                 {
-                    var jobItem = jobItems[i];
-                    var res = TryProcessFile(jobItem);
-                    ProgressChanged?.Invoke(jobItem, res);
+                    var jobItems = m_Comps.Select(c => new JobItemFile(c.Path, m_Macros.Select(m => new JobItemMacro(m)).ToArray())).ToArray();
+
+                    JobSet?.Invoke(jobItems, startTime);
+
+                    for (int i = 0; i < jobItems.Length; i++)
+                    {
+                        var jobItem = jobItems[i];
+                        
+                        prg.SetStatus($"Processing {jobItem.FilePath}");
+
+                        var res = TryProcessFile(jobItem);
+                        
+                        ProgressChanged?.Invoke(jobItem, res);
+                        prg.Report((double)i / (double)jobItems.Length);
+                    }
                 }
 
                 return Task.FromResult(true);
@@ -76,9 +82,11 @@ namespace Xarial.CadPlus.Batch.InApp
 
         private bool TryProcessFile(JobItemFile file) 
         {
+            IXDocument doc = null;
+
             try
             {
-                var doc = m_App.Documents.FirstOrDefault(
+                doc = m_App.Documents.FirstOrDefault(
                     d => string.Equals(d.Path, file.FilePath,
                     StringComparison.CurrentCultureIgnoreCase));
 
@@ -120,6 +128,19 @@ namespace Xarial.CadPlus.Batch.InApp
             catch
             {
                 file.Status = JobItemStatus_e.Failed;
+            }
+            finally 
+            {
+                try
+                {
+                    if (doc != null)
+                    {
+                        doc.Close();
+                    }
+                }
+                catch 
+                {
+                }
             }
 
             return file.Status == JobItemStatus_e.Succeeded || file.Status == JobItemStatus_e.Warning;

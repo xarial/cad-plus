@@ -41,14 +41,14 @@ namespace Xarial.CadPlus.Batch.InApp
         [ControlTag(nameof(ProcessAllFiles))]
         public bool ProcessAllFiles { get; set; } = true;
 
-        [Description("Open each document in its own window (activate)")]
-        [Title("Activate Documents")]
-        [ControlOptions(align: ControlLeftAlign_e.Indent)]
-        public bool ActivateDocuments { get; set; } = true;
-
         [CustomControl(typeof(MacrosList))]
         [ControlOptions(height: 100)]
         [Icon(typeof(Resources), nameof(Resources.macros_icon))]
         public ObservableCollection<string> Macros { get; set; } = new ObservableCollection<string>();
+
+        [Description("Open each document in its own window (activate)")]
+        [Title("Activate Documents")]
+        [ControlOptions(align: ControlLeftAlign_e.Indent)]
+        public bool ActivateDocuments { get; set; } = true;
     }
 }

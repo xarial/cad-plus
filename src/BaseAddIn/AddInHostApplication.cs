@@ -62,32 +62,40 @@ namespace Xarial.CadPlus.AddIn.Base
 
         public AddInHostApplication(IXExtension ext) 
         {
-            Extension = ext;
-            m_NextId = ROOT_GROUP_ID + 1;
-
-            m_Handlers = new Dictionary<CommandSpec, Tuple<Delegate, Enum>>();
-
-            Extension.StartupCompleted += OnStartupCompleted;
-            Extension.Connect += OnConnect;
-            Extension.Disconnect += OnDisconnect;
-            if (Extension is IXServiceConsumer) 
+            try
             {
-                (Extension as IXServiceConsumer).ConfigureServices += OnConfigureServices;
-            }
+                Extension = ext;
+                m_NextId = ROOT_GROUP_ID + 1;
 
-            var modulesDir = Path.Combine(Path.GetDirectoryName(this.GetType().Assembly.Location), "Modules");
+                m_Handlers = new Dictionary<CommandSpec, Tuple<Delegate, Enum>>();
 
-            var catalog = CreateDirectoryCatalog(modulesDir, "*.Module.dll");
-
-            var container = new CompositionContainer(catalog);
-            container.SatisfyImportsOnce(this);
-
-            if (m_Modules?.Any() == true)
-            {
-                foreach (var module in m_Modules)
+                Extension.StartupCompleted += OnStartupCompleted;
+                Extension.Connect += OnConnect;
+                Extension.Disconnect += OnDisconnect;
+                if (Extension is IXServiceConsumer)
                 {
-                    module.Init(this);
+                    (Extension as IXServiceConsumer).ConfigureServices += OnConfigureServices;
                 }
+
+                var modulesDir = Path.Combine(Path.GetDirectoryName(this.GetType().Assembly.Location), "Modules");
+
+                var catalog = CreateDirectoryCatalog(modulesDir, "*.Module.dll");
+
+                var container = new CompositionContainer(catalog);
+                container.SatisfyImportsOnce(this);
+
+                if (m_Modules?.Any() == true)
+                {
+                    foreach (var module in m_Modules)
+                    {
+                        module.Init(this);
+                    }
+                }
+            }
+            catch 
+            {
+                new GenericMessageService("CAD+").ShowError("Failed to init add-in");
+                throw;
             }
         }
 
@@ -114,12 +122,20 @@ namespace Xarial.CadPlus.AddIn.Base
 
         private void OnConnect(IXExtension ext) 
         {
-            var cmdGrp = Extension.CommandManager.AddCommandGroup<CadPlusCommands_e>();
-            cmdGrp.CommandClick += OnCommandClick;
+            try
+            {
+                var cmdGrp = Extension.CommandManager.AddCommandGroup<CadPlusCommands_e>();
+                cmdGrp.CommandClick += OnCommandClick;
 
-            m_ParentGrpSpec = cmdGrp.Spec;
+                m_ParentGrpSpec = cmdGrp.Spec;
 
-            Connect?.Invoke();
+                Connect?.Invoke();
+            }
+            catch 
+            {
+                new GenericMessageService("CAD+").ShowError("Failed to connect add-in");
+                throw;
+            }
         }
 
         private void OnConfigureServices(IXServiceConsumer sender, IXServiceCollection svcColl)

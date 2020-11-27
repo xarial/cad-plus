@@ -7,13 +7,10 @@ using Xarial.XCad.Documents;
 
 namespace Xarial.CadPlus.Batch.InApp
 {
-    internal class ComponentScopeEqualityComparer : IEqualityComparer<IXComponent>
+    internal class ComponentPathEqualityComparer : IEqualityComparer<IXComponent>
     {
         public bool Equals(IXComponent x, IXComponent y)
-        {
-            //TODO: check by path
-            return x == y;
-        }
+            => string.Equals(x.Path, y.Path, StringComparison.CurrentCultureIgnoreCase);
 
         public int GetHashCode(IXComponent obj)
         {

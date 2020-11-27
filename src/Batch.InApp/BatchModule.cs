@@ -49,12 +49,12 @@ namespace Xarial.CadPlus.Batch.InApp
 
             m_Host = (IHostExtensionApplication)host;
             m_Host.Connect += OnConnect;
-
-            m_MacroRunnerSvc = (IMacroRunnerExService)m_Host.Services.GetService(typeof(IMacroRunnerExService));
         }
 
         private void OnConnect()
         {
+            m_MacroRunnerSvc = (IMacroRunnerExService)m_Host.Services.GetService(typeof(IMacroRunnerExService));
+
             m_Host.RegisterCommands<Commands_e>(OnCommandClick);
             m_Page = m_Host.CreatePage<AssemblyBatchData>();
             m_Data = new AssemblyBatchData();
@@ -76,7 +76,7 @@ namespace Xarial.CadPlus.Batch.InApp
                     comps = m_Data.Components;
                 }
 
-                comps = comps.Distinct(new ComponentScopeEqualityComparer());
+                comps = comps.Distinct(new ComponentPathEqualityComparer());
                 
                 var exec = new AssemblyBatchRunJobExecutor(m_Host.Extension.Application, m_MacroRunnerSvc,
                     comps.ToArray(), m_Data.Macros, m_Data.ActivateDocuments);

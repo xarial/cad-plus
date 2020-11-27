@@ -60,7 +60,7 @@ namespace Xarial.CadPlus.AddIn.Sw
             m_Host = new AddInHostApplication(this);
             m_Host.ConfigureServices += OnConfigureModuleServices;
         }
-
+        
         private void OnConfigureModuleServices(IXServiceCollection svc)
         {
             svc.AddOrReplace<IPropertyPageCreator>(
