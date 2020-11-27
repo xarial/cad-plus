@@ -16,7 +16,7 @@ namespace Xarial.CadPlus.XBatch.Base.Core
 
         public string DisplayName { get; protected set; }
         
-        internal string FilePath { get; }
+        public string FilePath { get; }
 
         public JobItemStatus_e Status 
         {

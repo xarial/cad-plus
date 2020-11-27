@@ -28,8 +28,6 @@ namespace Xarial.CadPlus.CustomToolbar
     [Export(typeof(IExtensionModule))]
     public class CustomToolbarModule : IExtensionModule
     {
-        //[CommandGroupInfo(CommandGroups.RootGroupId + 1)]
-        //[CommandGroupParent(CommandGroups.RootGroupId)]
         [Title("Toolbar+")]
         [Description("Toolbar+ configuration")]
         [Icon(typeof(Resources), nameof(Resources.configure_icon))]
@@ -52,9 +50,14 @@ namespace Xarial.CadPlus.CustomToolbar
         private ITriggersManager m_TriggersMgr;
         private IMessageService m_Msg;
 
-        public void Init(IHostExtensionApplication host)
+        public void Init(IHostApplication host)
         {
-            m_Host = host;
+            if (!(host is IHostExtensionApplication))
+            {
+                throw new InvalidCastException("This module is only availabel for extensions");
+            }
+
+            m_Host = (IHostExtensionApplication)host;
             m_Host.Connect += OnConnect;
         }
 
@@ -68,8 +71,8 @@ namespace Xarial.CadPlus.CustomToolbar
         {
             var builder = new ContainerBuilder();
 
-            builder.RegisterInstance(m_Host.Extension);
-            builder.RegisterInstance(m_Host.Extension.Application);
+            builder.RegisterInstance(m_Host.Extension).ExternallyOwned();
+            builder.RegisterInstance(m_Host.Extension.Application).ExternallyOwned();
             builder.RegisterInstance(m_Host.Extension.Logger);
 
             builder.RegisterType<AppLogger>()
@@ -100,6 +103,12 @@ namespace Xarial.CadPlus.CustomToolbar
                 .As<ITriggersManager>().SingleInstance();
 
             builder.RegisterType<UserSettingsService>();
+
+            builder.RegisterInstance((IMacroRunnerExService)m_Host.Services.GetService(typeof(IMacroRunnerExService)))
+                .As<IMacroRunnerExService>();
+
+            builder.RegisterInstance((IMacroFileFilterProvider)m_Host.Services.GetService(typeof(IMacroFileFilterProvider)))
+                .As<IMacroFileFilterProvider>();
 
             m_Container = builder.Build();
         }
@@ -140,8 +149,6 @@ namespace Xarial.CadPlus.CustomToolbar
             }
         }
 
-        public void Dispose()
-        {
-        }
+        public void Dispose() => m_Container.Dispose();
     }
 }

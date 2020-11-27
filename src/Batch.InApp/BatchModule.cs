@@ -14,14 +14,13 @@ using Xarial.CadPlus.Plus;
 using Xarial.XCad.UI.PropertyPage;
 using Xarial.XCad.UI.PropertyPage.Enums;
 using Xarial.XCad.Documents;
+using Xarial.CadPlus.Common.Services;
 
 namespace Xarial.CadPlus.Batch.InApp
 {
     [Export(typeof(IExtensionModule))]
     public class BatchModule : IExtensionModule
     {
-        //[CommandGroupInfo(CommandGroups.RootGroupId + 2)]
-        //[CommandGroupParent(CommandGroups.RootGroupId)]
         [Title("Batch+")]
         [Description("Commands to batch run macros")]
         //[Icon(typeof(Resources), nameof(Resources.configure_icon))]
@@ -39,14 +38,23 @@ namespace Xarial.CadPlus.Batch.InApp
         private IXPropertyPage<AssemblyBatchData> m_Page;
         private AssemblyBatchData m_Data;
 
-        public void Init(IHostExtensionApplication host)
+        private IMacroRunnerExService m_MacroRunnerSvc;
+
+        public void Init(IHostApplication host)
         {
-            m_Host = host;
+            if (!(host is IHostExtensionApplication))
+            {
+                throw new InvalidCastException("Only extension host is supported for this module");
+            }
+
+            m_Host = (IHostExtensionApplication)host;
             m_Host.Connect += OnConnect;
         }
 
         private void OnConnect()
         {
+            m_MacroRunnerSvc = (IMacroRunnerExService)m_Host.Services.GetService(typeof(IMacroRunnerExService));
+
             m_Host.RegisterCommands<Commands_e>(OnCommandClick);
             m_Page = m_Host.CreatePage<AssemblyBatchData>();
             m_Data = new AssemblyBatchData();
@@ -68,9 +76,10 @@ namespace Xarial.CadPlus.Batch.InApp
                     comps = m_Data.Components;
                 }
 
-                comps = comps.Distinct();
-
-                var exec = new AssemblyBatchRunJobExecutor(comps.ToArray());
+                comps = comps.Distinct(new ComponentPathEqualityComparer());
+                
+                var exec = new AssemblyBatchRunJobExecutor(m_Host.Extension.Application, m_MacroRunnerSvc,
+                    comps.ToArray(), m_Data.Macros, m_Data.ActivateDocuments);
 
                 exec.ExecuteAsync();
             }

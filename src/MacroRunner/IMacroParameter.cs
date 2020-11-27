@@ -34,7 +34,10 @@ namespace Xarial.CadPlus.MacroRunner
         public MacroParameter() 
         {
             m_ParamsMgr = new CustomParametersManager();
-            Result = new MacroResult();
+            Result = new MacroResult()
+            {
+                Result = true
+            };
         }
 
         public object Get(string name) => m_ParamsMgr.Get(name);

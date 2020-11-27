@@ -53,8 +53,11 @@
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
     <Reference Include="WindowsBase" />
+    <Reference Include="Xarial.CadPlusPlus, Version=0.1.0.0, Culture=neutral, PublicKeyToken=60dcaf351d4060db, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Xarial.CadPlusPlus.0.1.0-20201126.2\lib\net461\Xarial.CadPlusPlus.dll</HintPath>
+    </Reference>
     <Reference Include="Xarial.XCad, Version=0.6.9.0, Culture=neutral, PublicKeyToken=60dcaf351d4060db, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Xarial.XCad.0.6.9-20201123.3\lib\net461\Xarial.XCad.dll</HintPath>
+      <HintPath>..\..\packages\Xarial.XCad.0.6.9\lib\net461\Xarial.XCad.dll</HintPath>
     </Reference>
     <Reference Include="Xarial.XToolkit, Version=0.2.4.0, Culture=neutral, PublicKeyToken=60dcaf351d4060db, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Xarial.XToolkit.0.2.4\lib\net461\Xarial.XToolkit.dll</HintPath>
@@ -68,6 +71,7 @@
     <Compile Include="Attributes\EnumDisplayNameAttribute.cs" />
     <Compile Include="Controls\PathListBox.cs" />
     <Compile Include="Controls\TaskDashboard.cs" />
+    <Compile Include="Exceptions\MacroRunnerResultError.cs" />
     <Compile Include="Exceptions\UserException.cs" />
     <Compile Include="MixedApplication.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -75,8 +79,11 @@
     <Compile Include="Services\CadAppMessageService.cs" />
     <Compile Include="Services\ConsoleProgressWriter.cs" />
     <Compile Include="Services\GenericMessageService.cs" />
+    <Compile Include="Services\IMacroFileFilterProvider.cs" />
+    <Compile Include="Services\IPropertyPageCreator.cs" />
     <Compile Include="Services\LogWirter.cs" />
     <Compile Include="Services\IMessageService.cs" />
+    <Compile Include="Services\MacroRunnerExService.cs" />
     <Compile Include="Services\ProgressHandler.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -101,6 +108,10 @@
     <ProjectReference Include="..\Init\Init.csproj">
       <Project>{c5008247-53fb-410d-b8e4-1e44312cbedc}</Project>
       <Name>Init</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\MacroRunner\MacroRunner.csproj">
+      <Project>{f17d7e6b-8786-467a-a014-77311b399efc}</Project>
+      <Name>MacroRunner</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -13,7 +13,7 @@ namespace Xarial.CadPlus.XBatch.Base.Core
 {
     public class JobItemFile : JobItem, IJobItemFile
     {
-        internal JobItemFile(string filePath, JobItemMacro[] macros) : base(filePath)
+        public JobItemFile(string filePath, JobItemMacro[] macros) : base(filePath)
         {
             DisplayName = Path.GetFileName(filePath);
             Macros = macros;

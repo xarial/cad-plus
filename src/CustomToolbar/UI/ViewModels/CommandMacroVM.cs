@@ -8,6 +8,7 @@
 using System.ComponentModel;
 using System.IO;
 using System.Windows.Input;
+using Xarial.CadPlus.Common.Services;
 using Xarial.CadPlus.CustomToolbar.Enums;
 using Xarial.CadPlus.CustomToolbar.Structs;
 using Xarial.XToolkit.Wpf;
@@ -48,12 +49,10 @@ namespace Xarial.CadPlus.CustomToolbar.UI.ViewModels
                 {
                     m_BrowseMacroPathCommand = new RelayCommand(() =>
                     {
+                        var filters = m_FilterProvider.GetSupportedMacros();
+
                         if (FileSystemBrowser.BrowseFileOpen(out string macroFile, 
-                            "Select macro file",
-                            FileSystemBrowser.BuildFilterString(
-                                new FileFilter(
-                                    "SOLIDWORKS Macros", "*.swp", "*.swb", "*.dll"), //TODO: make the extensions list a dependency
-                                FileFilter.AllFiles)))
+                            "Select macro file", FileSystemBrowser.BuildFilterString(filters)))
                         {
                             MacroPath = macroFile;
                         }
@@ -134,12 +133,15 @@ namespace Xarial.CadPlus.CustomToolbar.UI.ViewModels
             }
         }
 
+        private readonly IMacroFileFilterProvider m_FilterProvider;
+
         public CommandMacroVM() : this(new CommandMacroInfo())
         {
         }
 
         public CommandMacroVM(CommandMacroInfo cmd) : base(cmd)
         {
+            m_FilterProvider = CustomToolbarModule.Resolve<IMacroFileFilterProvider>();
         }
     }
 }

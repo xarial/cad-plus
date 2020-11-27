@@ -1,18 +1,29 @@
 ﻿using System;
+using System.Collections.Generic;
 using Xarial.CadPlus.Plus;
+using Xarial.XCad;
 
 namespace Xarial.CadPlus.Module.Init
 {
     public abstract class BaseHostApplication : IHostApplication
     {
         public abstract IntPtr ParentWindow { get; }
-        
-        public virtual event ConfigureServicesDelegate ConfigureServices;
-        public virtual event Action Loaded;
+        public abstract IEnumerable<IModule> Modules { get; }
+        public virtual IServiceProvider Services { get; }
 
-        public BaseHostApplication()
+        public abstract event Action Connect;
+        public abstract event Action Disconnect;
+        
+        public virtual void OnStarted() 
+        { 
+        }
+        
+        public virtual void OnConfigureServices(IXServiceCollection svcColl) 
         {
-            //TODO: implement common initiation logic across multiple apps and add-ins, e.g. initate logger
+        }
+        
+        public virtual void Dispose() 
+        {
         }
     }
 }

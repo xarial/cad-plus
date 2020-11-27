@@ -74,8 +74,10 @@ namespace Xarial.CadPlus.MacroRunner
 
             try
             {
-                macroParamsMgr.PushParameter(CreateMacroSessionId(app, macro), param);
+                var sessionId = CreateMacroSessionId(app, macro);
+                macroParamsMgr.PushParameter(sessionId, param);
                 macro.Run(new MacroEntryPoint(moduleName, subName), (MacroRunOptions_e)opts);
+                macroParamsMgr.TryRemoveParameter(sessionId, param);
             }
             finally 
             {
@@ -100,9 +102,8 @@ namespace Xarial.CadPlus.MacroRunner
             {
                 if (createIfNotExist)
                 {
-                    newRegister = new RotRegister();
                     macroParamsMgr = new MacroParameterManager();
-                    newRegister.RegisterObject(macroParamsMgr, MACRO_RUNNER_MONIKER_NAME);
+                    newRegister = new RotRegister(macroParamsMgr, MACRO_RUNNER_MONIKER_NAME);
                 }
                 else
                 {
