@@ -19,32 +19,88 @@ using System.Windows.Interop;
 using System.Windows.Navigation;
 using System.Windows.Threading;
 using Xarial.CadPlus.Module.Init;
+using Xarial.CadPlus.Plus;
 
 namespace Xarial.CadPlus.Common
 {
-    internal static class WindowsApi 
+    internal static class ConsoleHandler
     {
-        [DllImport("Kernel32.dll")]
-        internal static extern bool AttachConsole(int processId);
-    }
+        [DllImport("kernel32.dll", SetLastError = true)]
+        private static extern bool AttachConsole(int dwProcessId);
+        
+        [DllImport("kernel32.dll", SetLastError = true)]
+        private static extern IntPtr GetStdHandle(int nStdHandle);
+        
+        [DllImport("kernel32.dll", SetLastError = true)]
+        private static extern bool SetStdHandle(int nStdHandle, IntPtr handle);
+        
+        [DllImport("kernel32.dll", SetLastError = true)]
+        private static extern int GetFileType(IntPtr handle);
 
-    public class ConsoleHostModule : BaseHostModule
-    {
-        public override IntPtr ParentWindow => IntPtr.Zero;
+        private const int FILE_TYPE_DISK = 0x0001;
+        private const int FILE_TYPE_PIPE = 0x0003;
 
-        public override event Action Loaded;
-
-        internal ConsoleHostModule() 
+        private const int STD_OUTPUT_HANDLE = -11;
+        private const int STD_ERROR_HANDLE = -12;
+        
+        internal static void Attach()
         {
-            Loaded?.Invoke();
+            //need to call before AttachConsoel so the output can be redirected
+            var outHandle = GetStdHandle(STD_OUTPUT_HANDLE);
+
+            if (IsOutputRedirected(outHandle))
+            {
+                var outWriter = Console.Out;
+            }
+
+            bool errorRedirected = IsOutputRedirected(GetStdHandle(STD_ERROR_HANDLE));
+
+            if (errorRedirected) 
+            {
+                var errWriter = Console.Error;
+            }
+
+            AttachConsole(-1);
+
+            if (!errorRedirected)
+            {
+                SetStdHandle(STD_ERROR_HANDLE, outHandle);
+            }
+        }
+
+        private static bool IsOutputRedirected(IntPtr handle)
+        {
+            var fileType = GetFileType(handle);
+
+            return fileType == FILE_TYPE_DISK || fileType == FILE_TYPE_PIPE;
         }
     }
 
-    public class WpfAppHostModule : BaseHostModule
+    public class ConsoleHostApplication : BaseHostApplication
     {
+        public override IntPtr ParentWindow => IntPtr.Zero;
+
+        public override event Action Connect;
+        public override event Action Disconnect;
+
+        public override IEnumerable<IModule> Modules => throw new NotImplementedException();
+
+        internal ConsoleHostApplication() 
+        {
+            base.OnStarted();
+        }
+    }
+
+    public class WpfHostApplication : BaseHostApplication
+    {
+        public override IEnumerable<Plus.IModule> Modules => throw new NotImplementedException();
+
+        public override event Action Connect;
+        public override event Action Disconnect;
+
         private readonly Application m_App;
 
-        internal WpfAppHostModule(Application app)
+        internal WpfHostApplication(Application app)
         {
             m_App = app;
             m_App.Activated += OnAppActivated;
@@ -54,12 +110,10 @@ namespace Xarial.CadPlus.Common
             ? new WindowInteropHelper(m_App.MainWindow).Handle
             : IntPtr.Zero;
 
-        public override event Action Loaded;
-
         private void OnAppActivated(object sender, EventArgs e)
         {
             m_App.Activated -= OnAppActivated;
-            Loaded?.Invoke();
+            base.OnStarted();
         }
     }
 
@@ -67,7 +121,7 @@ namespace Xarial.CadPlus.Common
     {
         private bool m_IsStartWindowCalled;
 
-        private BaseHostModule m_HostModule;
+        private BaseHostApplication m_HostApplication;
 
         protected virtual void OnAppStart()
         {
@@ -124,10 +178,11 @@ namespace Xarial.CadPlus.Common
 
             if (hasArgs)
             {
-                WindowsApi.AttachConsole(-1);
+                //WindowsApi.AttachConsole(-1);
+                ConsoleHandler.Attach();
 
                 SynchronizationContext.SetSynchronizationContext(new SynchronizationContext());
-                m_HostModule = new ConsoleHostModule();
+                m_HostApplication = new ConsoleHostApplication();
                 
                 var res = false;
 
@@ -156,7 +211,7 @@ namespace Xarial.CadPlus.Common
             }
             else
             {
-                m_HostModule = new WpfAppHostModule(this);
+                m_HostApplication = new WpfHostApplication(this);
                 base.OnStartup(e);
             }
         }

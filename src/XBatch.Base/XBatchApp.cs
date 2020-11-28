@@ -16,7 +16,7 @@ using Xarial.CadPlus.XBatch.Base.ViewModels;
 
 namespace Xarial.CadPlus.XBatch.Base
 {
-    public abstract class XBatchApp : MixedApplication<Arguments>
+    public abstract class XBatchApp : MixedApplication<IArguments>
     {
         private FileOptions m_StartupOptions;
 
@@ -43,12 +43,12 @@ namespace Xarial.CadPlus.XBatch.Base
             }
         }
 
-        protected override Task RunConsole(Arguments args)
+        protected override Task RunConsole(IArguments args)
         {
             return RunConsoleBatch(args);
         }
 
-        private async Task RunConsoleBatch(Arguments args)
+        private async Task RunConsoleBatch(IArguments args)
         {
             var appProvider = GetApplicationProvider();
 
@@ -61,7 +61,7 @@ namespace Xarial.CadPlus.XBatch.Base
         }
 
         protected override void TryExtractCliArguments(Parser parser, string[] input, 
-            out Arguments args, out bool hasArguments, out bool hasError)
+            out IArguments args, out bool hasArguments, out bool hasError)
         {
             args = default;
             hasError = false;
@@ -69,14 +69,15 @@ namespace Xarial.CadPlus.XBatch.Base
 
             if (input.Any())
             {
-                Arguments argsLocal = default;
+                IArguments argsLocal = default;
                 bool hasErrorLocal = false;
                 bool hasArgumentsLocal = false;
 
-                parser.ParseArguments<FileOptions, Arguments>(input)
-                    .WithParsed<Arguments>(a => { argsLocal = a; hasArgumentsLocal = true; })
+                parser.ParseArguments<FileOptions, RunOptions, JobOptions>(input)
+                    .WithParsed<RunOptions>(a => { argsLocal = a; hasArgumentsLocal = true; })
+                    .WithParsed<JobOptions>(a => { argsLocal = a; hasArgumentsLocal = true; })
                     .WithParsed<FileOptions>(a => m_StartupOptions = a)
-                    .WithNotParsed(err => hasErrorLocal = true);
+                    .WithNotParsed(err => { hasErrorLocal = true; hasArgumentsLocal = true; });
 
                 args = argsLocal;
                 hasError = hasErrorLocal;

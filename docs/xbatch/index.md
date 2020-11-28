@@ -5,6 +5,8 @@ description: Stand-alone utility to batch run macros on SOLIDWORKS files and fol
 order: 3
 image: xbatch-windows-start.png
 ---
+![xBatch application](xbatch-app.png)
+
 xBatch is a stand-alone utility allowing to run specified macros for each specified SOLIDWORKS models in a batch mode.
 
 This utility ensures integrity of the process by monitoring SOLIDWORKS crashes, hang and restarting application when needed.

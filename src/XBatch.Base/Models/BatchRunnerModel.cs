@@ -73,9 +73,7 @@ namespace Xarial.CadPlus.XBatch.Base.Models
         {
             try
             {
-                var svc = new UserSettingsService();
-
-                var batchJob = svc.ReadSettings<BatchJob>(filePath);
+                var batchJob = BatchJob.FromFile(filePath);
 
                 AppendRecentFiles(filePath);
 

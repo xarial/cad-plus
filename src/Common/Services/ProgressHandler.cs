@@ -40,19 +40,19 @@ namespace Xarial.CadPlus.Common.Services
 
     public interface IProgressHandler
     {
-        void ReportProgress(IJobItemFile file, bool result);
-        void SetJobScope(IJobItemFile[] scope, DateTime startTime);
+        void ReportProgress(IJobItem file, bool result);
+        void SetJobScope(IJobItem[] scope, DateTime startTime);
         void ReportCompleted(TimeSpan duration);
     }
 
     public class ProgressHandler : IProgressHandler
     {
-        public event Action<IJobItemFile, bool> ProgressChanged;
-        public event Action<IJobItemFile[], DateTime> JobScopeSet;
+        public event Action<IJobItem, bool> ProgressChanged;
+        public event Action<IJobItem[], DateTime> JobScopeSet;
         public event Action<TimeSpan> Completed;
 
         public void ReportCompleted(TimeSpan duration) => Completed?.Invoke(duration);
-        public void ReportProgress(IJobItemFile file, bool result) => ProgressChanged?.Invoke(file, result);
-        public void SetJobScope(IJobItemFile[] scope, DateTime startTime) => JobScopeSet?.Invoke(scope, startTime);
+        public void ReportProgress(IJobItem file, bool result) => ProgressChanged?.Invoke(file, result);
+        public void SetJobScope(IJobItem[] scope, DateTime startTime) => JobScopeSet?.Invoke(scope, startTime);
     }
 }

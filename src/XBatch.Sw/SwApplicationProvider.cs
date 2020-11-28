@@ -49,14 +49,14 @@ namespace Xarial.CadPlus.XBatch.Sw
         }
 
         public IEnumerable<AppVersionInfo> GetInstalledVersions() 
-            => SwApplication.GetInstalledVersions()
+            => SwApplicationFactory.GetInstalledVersions()
             .Select(x => new SwAppVersionInfo(x));
 
         public AppVersionInfo ParseVersion(string version)
         {
             if (string.IsNullOrEmpty(version))
             {
-                var installedVers = SwApplication.GetInstalledVersions();
+                var installedVers = SwApplicationFactory.GetInstalledVersions();
                 if (installedVers.Any())
                 {
                     return new SwAppVersionInfo(installedVers.OrderBy(v => (int)v).First());
@@ -85,27 +85,28 @@ namespace Xarial.CadPlus.XBatch.Sw
 
         public IXApplication StartApplication(AppVersionInfo vers, StartupOptions_e opts, CancellationToken cancellationToken)
         {
+            var app = SwApplicationFactory.PreCreate();
+            app.State = XCad.Enums.ApplicationState_e.Default;
+
             var args = new List<string>();
 
             if (opts.HasFlag(StartupOptions_e.Safe))
             {
-                args.Add(SwApplication.CommandLineArguments.SafeMode);
+                app.State |= XCad.Enums.ApplicationState_e.Safe;
             }
 
             if (opts.HasFlag(StartupOptions_e.Background))
             {
-                args.Add(SwApplication.CommandLineArguments.BackgroundMode);
+                app.State |= XCad.Enums.ApplicationState_e.Background;
             }
 
             if (opts.HasFlag(StartupOptions_e.Silent))
             {
-                args.Add(SwApplication.CommandLineArguments.SilentMode);
+                app.State |= XCad.Enums.ApplicationState_e.Silent;
             }
 
-            var app = SwApplication.Start(((SwAppVersionInfo)vers).Version,
-                  string.Join(" ", args),
-                  cancellationToken);
-            
+            app.Commit(cancellationToken);
+                        
             app.Sw.CommandInProgress = true;
 
             return app;

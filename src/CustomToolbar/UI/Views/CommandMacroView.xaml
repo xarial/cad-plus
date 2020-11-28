@@ -7,6 +7,7 @@
              xmlns:ctrls="clr-namespace:Xarial.XToolkit.Wpf.Controls;assembly=Xarial.XToolkit.Wpf"
              xmlns:xconv="clr-namespace:Xarial.XToolkit.Wpf.Converters;assembly=Xarial.XToolkit.Wpf"
 			 xmlns:conv="clr-namespace:Xarial.CadPlus.CustomToolbar.UI.Converters"
+             xmlns:val="clr-namespace:Xarial.CadPlus.CustomToolbar.UI.ValidationRules"
              xmlns:vm="clr-namespace:Xarial.CadPlus.CustomToolbar.UI.ViewModels"
              xmlns:enums="clr-namespace:Xarial.CadPlus.CustomToolbar.Enums"
              xmlns:sys="clr-namespace:System;assembly=mscorlib"
@@ -50,7 +51,15 @@
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
-                    <TextBox Grid.Column="0" Text="{Binding Path=MacroPath, UpdateSourceTrigger=PropertyChanged}" Margin="2" />
+                    <TextBox Grid.Column="0" Margin="2" >
+                        <TextBox.Text>
+                            <Binding Path="MacroPath" UpdateSourceTrigger="PropertyChanged">
+                                <Binding.ValidationRules>
+                                    <val:FileExistsValidationRule ValidatesOnTargetUpdated="True"/>
+                                </Binding.ValidationRules>
+                            </Binding>
+                        </TextBox.Text>
+                    </TextBox>
                     <Button Grid.Column="1" Margin="2" Command="{Binding Path=BrowseMacroPathCommand}">
                         <TextBlock Text="Browse..." Margin="5 0" />
                     </Button>
@@ -59,8 +68,15 @@
                 <TextBlock Text="Entry Point:" VerticalAlignment="Center"  Grid.Column="0" Grid.Row="1" Margin="2" />
                 <ComboBox SelectedItem="{Binding Path=EntryPoint, UpdateSourceTrigger=PropertyChanged}"
 					  Grid.Column="1" Grid.Row="1" Margin="2"
-					  IsSynchronizedWithCurrentItem="True"
-					  ItemsSource="{Binding Path=MacroPath, Converter={StaticResource macroPathToEntryPtsConv}}" />
+					  IsSynchronizedWithCurrentItem="True">
+                    <ComboBox.ItemsSource>
+                        <Binding Path="MacroPath" Converter="{StaticResource macroPathToEntryPtsConv}">
+                            <Binding.ValidationRules>
+                                <val:EntryPointsValidationRules ValidatesOnTargetUpdated="True"/>
+                            </Binding.ValidationRules>
+                        </Binding>
+                    </ComboBox.ItemsSource>
+                </ComboBox>
 
             </Grid>
         </GroupBox>

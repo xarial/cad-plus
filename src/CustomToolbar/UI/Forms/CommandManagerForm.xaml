@@ -24,6 +24,31 @@
                 <sys:Int32>0</sys:Int32>
             </xconv:MatchValueUniversalConverter.TargetValue>
         </xconv:MatchValueUniversalConverter>
+        <Style x:Key="ErrorTemplate" TargetType="Control">
+            <Style.Triggers>
+                <Trigger Property="Validation.HasError" Value="True">
+                    <Setter Property="ToolTip" >
+                        <Setter.Value>
+                            <ToolTip>
+                                <ToolTip.Content>
+                                    <Grid DataContext="{Binding Path=PlacementTarget.(Validation.Errors)[0], RelativeSource={RelativeSource AncestorType={x:Type ToolTip}}}" MaxWidth="200">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="16"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Image Source="/Xarial.CadPlus.CustomToolbar.Module;component/Resources/error.png" VerticalAlignment="Top" Margin="2"/>
+                                        <TextBlock Grid.Column="1" Text="{Binding Path=ErrorContent}" TextWrapping="Wrap"/>
+                                    </Grid>
+                                </ToolTip.Content>
+                            </ToolTip>
+                        </Setter.Value>
+                    </Setter>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <Style TargetType="TextBox" BasedOn="{StaticResource ErrorTemplate}" />
+        <Style TargetType="CheckBox" BasedOn="{StaticResource ErrorTemplate}" />
+        <Style TargetType="ComboBox" BasedOn="{StaticResource ErrorTemplate}" />
     </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>

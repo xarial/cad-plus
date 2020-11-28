@@ -12,6 +12,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Data;
 using Xarial.CadPlus.XBatch.Base.Models;
 using Xarial.XToolkit.Wpf.Extensions;
 
@@ -25,9 +26,15 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
 
         private readonly IBatchRunJobExecutor m_Executor;
 
+        private object m_Lock;
+
         public JobResultLogVM(IBatchRunJobExecutor executor) 
         {
+            m_Lock = new object();
+
             Output = new ObservableCollection<string>();
+            BindingOperations.EnableCollectionSynchronization(Output, m_Lock);
+
             m_Executor = executor;
 
             m_Executor.Log += OnLog;

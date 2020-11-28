@@ -17,6 +17,7 @@ using Xarial.CadPlus.Common.Services;
 using Xarial.CadPlus.XBatch.Base.Exceptions;
 using Xarial.XCad;
 using Xarial.XCad.Documents;
+using Xarial.XCad.Documents.Enums;
 using Xarial.XCad.Documents.Exceptions;
 using Xarial.XCad.Documents.Structures;
 using Xarial.XCad.Exceptions;
@@ -24,54 +25,6 @@ using Xarial.XToolkit.Reporting;
 
 namespace Xarial.CadPlus.XBatch.Base.Core
 {
-    internal class JobItem : IJobItem
-    {
-        public event Action<IJobItem, JobItemStatus_e> StatusChanged;
-
-        public string DisplayName { get; protected set; }
-        
-        internal string FilePath { get; }
-
-        public JobItemStatus_e Status 
-        {
-            get => m_Status;
-            set 
-            {
-                m_Status = value;
-                StatusChanged?.Invoke(this, value);
-            }
-        }
-
-        private JobItemStatus_e m_Status;
-
-        internal JobItem(string filePath) 
-        {
-            FilePath = filePath;
-            m_Status = JobItemStatus_e.AwaitingProcessing;
-        }
-    }
-
-    internal class JobItemMacro : JobItem, IJobItemOperation
-    {
-        internal JobItemMacro(string filePath) : base(filePath)
-        {
-            DisplayName = Path.GetFileNameWithoutExtension(filePath);
-        }
-    }
-
-    internal class JobItemFile : JobItem, IJobItemFile
-    {
-        internal JobItemFile(string filePath, JobItemMacro[] macros) : base(filePath)
-        {
-            DisplayName = Path.GetFileName(filePath);
-            Macros = macros;
-        }
-
-        IEnumerable<IJobItemOperation> IJobItemFile.Operations => Macros;
-
-        public JobItemMacro[] Macros { get; }
-    }
-
     public class BatchRunner : IDisposable
     {
         private const int MAX_ATTEMPTS = 3;
@@ -367,15 +320,28 @@ namespace Xarial.CadPlus.XBatch.Base.Core
 
                     if (doc == null)
                     {
-                        var openArgs = new DocumentOpenArgs()
-                        {
-                            Path = file.FilePath,
-                            Silent = opts.OpenFileOptions.HasFlag(OpenFileOptions_e.Silent),
-                            ReadOnly = opts.OpenFileOptions.HasFlag(OpenFileOptions_e.ReadOnly),
-                            Rapid = opts.OpenFileOptions.HasFlag(OpenFileOptions_e.Rapid)
-                        };
+                        doc = app.Documents.PreCreate<IXDocument>();
 
-                        doc = app.Documents.Open(openArgs);
+                        doc.Path = file.FilePath;
+
+                        var state = DocumentState_e.Default;
+
+                        if (opts.OpenFileOptions.HasFlag(OpenFileOptions_e.Silent)) 
+                        {
+                            state |= DocumentState_e.Silent;
+                        }
+
+                        if (opts.OpenFileOptions.HasFlag(OpenFileOptions_e.ReadOnly)) 
+                        {
+                            state |= DocumentState_e.ReadOnly;
+                        }
+
+                        if (opts.OpenFileOptions.HasFlag(OpenFileOptions_e.Rapid)) 
+                        {
+                            state |= DocumentState_e.Rapid;
+                        }
+
+                        doc.Commit(cancellationToken);
                     }
 
                     app.Documents.Active = doc;

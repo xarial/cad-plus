@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Xarial.CadPlus.Common.Services;
 using Xarial.CadPlus.CustomToolbar.Enums;
 using Xarial.CadPlus.CustomToolbar.Helpers;
 using Xarial.CadPlus.CustomToolbar.Structs;
@@ -105,7 +106,7 @@ namespace Xarial.CadPlus.CustomToolbar.Services
 
         private void OnDocumentClosing(IXDocument doc)
         {
-            if (doc.Visible)
+            if (!doc.State.HasFlag(DocumentState_e.Hidden))
             {
                 InvokeTrigger(Triggers_e.DocumentClose);
             }
@@ -204,12 +205,12 @@ namespace Xarial.CadPlus.CustomToolbar.Services
                     {
                         try
                         {
-                            m_MacroRunner.RunMacro(cmd.MacroPath, cmd.EntryPoint, false);
+                            m_MacroRunner.RunMacro(cmd.MacroPath, cmd.EntryPoint, false, "");
                         }
                         catch(Exception ex)
                         {
                             m_Logger.Log(ex);
-                            m_Msg.ShowError(ex, $"Failed to run a macro on trigger: {trigger}");
+                            m_Msg.ShowError(ex, $"Failed to run a macro '{cmd.Title}' on trigger '{trigger}'");
                         }
                     }
                 }
