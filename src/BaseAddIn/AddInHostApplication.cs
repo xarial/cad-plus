@@ -151,6 +151,8 @@ namespace Xarial.CadPlus.AddIn.Base
         public override void OnConfigureServices(IXServiceCollection svcColl)
         {
             svcColl.AddOrReplace<IXLogger, AppLogger>();
+            svcColl.AddOrReplace<IMessageService>(() => new CadAppMessageService(Extension.Application));
+
             base.OnConfigureServices(svcColl);
         }
         

@@ -90,9 +90,6 @@ namespace Xarial.CadPlus.CustomToolbar
             builder.RegisterType<SettingsProvider>()
                 .As<ISettingsProvider>();
 
-            builder.RegisterType<CadAppMessageService>()
-                .As<IMessageService>();
-
             builder.RegisterType<CommandManagerVM>()
                 .SingleInstance();
 
@@ -106,6 +103,9 @@ namespace Xarial.CadPlus.CustomToolbar
 
             builder.RegisterInstance((IMacroRunnerExService)m_Host.Services.GetService(typeof(IMacroRunnerExService)))
                 .As<IMacroRunnerExService>();
+
+            builder.RegisterInstance((IMessageService)m_Host.Services.GetService(typeof(IMessageService)))
+                .As<IMessageService>();
 
             builder.RegisterInstance((IMacroFileFilterProvider)m_Host.Services.GetService(typeof(IMacroFileFilterProvider)))
                 .As<IMacroFileFilterProvider>();

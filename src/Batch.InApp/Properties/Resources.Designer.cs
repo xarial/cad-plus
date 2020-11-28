@@ -63,6 +63,26 @@ namespace Xarial.CadPlus.Batch.InApp.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap batch_plus_assm_icon {
+            get {
+                object obj = ResourceManager.GetObject("batch_plus_assm_icon", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap batch_plus_icon {
+            get {
+                object obj = ResourceManager.GetObject("batch_plus_icon", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap macros_icon {
             get {
                 object obj = ResourceManager.GetObject("macros_icon", resourceCulture);
