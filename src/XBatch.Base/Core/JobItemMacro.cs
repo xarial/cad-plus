@@ -12,9 +12,12 @@ namespace Xarial.CadPlus.XBatch.Base.Core
 {
     public class JobItemMacro : JobItem, IJobItemOperation
     {
-        public JobItemMacro(string filePath) : base(filePath)
+        public MacroData Macro { get; }
+
+        public JobItemMacro(MacroData macro) : base(macro.FilePath)
         {
-            DisplayName = Path.GetFileNameWithoutExtension(filePath);
+            Macro = macro;
+            DisplayName = Path.GetFileNameWithoutExtension(macro.FilePath);
         }
     }
 }

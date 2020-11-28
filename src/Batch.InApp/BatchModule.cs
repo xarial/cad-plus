@@ -85,7 +85,7 @@ namespace Xarial.CadPlus.Batch.InApp
         {
             if (reason == PageCloseReasons_e.Okay) 
             {
-                if (!m_Data.Macros.Any()) 
+                if (!m_Data.Macros.Macros.Any()) 
                 {
                     arg.Cancel = true;
                     arg.ErrorMessage = "Select macros to run";
@@ -125,7 +125,7 @@ namespace Xarial.CadPlus.Batch.InApp
                     }
 
                     var exec = new AssemblyBatchRunJobExecutor(m_Host.Extension.Application, m_MacroRunnerSvc,
-                        comps.ToArray(), m_Data.Macros, m_Data.ActivateDocuments);
+                        comps.ToArray(), m_Data.Macros.Macros, m_Data.ActivateDocuments);
 
                     var vm = new JobResultVM(assm.Title, exec);
 

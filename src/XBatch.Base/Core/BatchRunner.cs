@@ -151,7 +151,8 @@ namespace Xarial.CadPlus.XBatch.Base.Core
             }
         }
 
-        private IEnumerable<JobItemFile> PrepareJobScope(IEnumerable<string> inputs,  string[] filters, IEnumerable<string> macros) 
+        private IEnumerable<JobItemFile> PrepareJobScope(IEnumerable<string> inputs,  
+            string[] filters, IEnumerable<MacroData> macros) 
         {
             foreach (var input in inputs)
             {

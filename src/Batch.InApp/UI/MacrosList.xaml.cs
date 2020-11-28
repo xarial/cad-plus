@@ -12,17 +12,36 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Xarial.CadPlus.Batch.InApp.ViewModels;
 
 namespace Xarial.CadPlus.Batch.InApp.UI
 {
-    /// <summary>
-    /// Interaction logic for MacrosList.xaml
-    /// </summary>
     public partial class MacrosList : UserControl
     {
         public MacrosList()
         {
             InitializeComponent();
+
+            this.DataContextChanged += OnDataContextChanged;
         }
+
+        private void OnDataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            var oldVm = e.OldValue as MacrosVM;
+
+            if (oldVm != null) 
+            {
+                oldVm.AddMacros -= OnAddMacros;
+            }
+
+            var newVm = e.NewValue as MacrosVM;
+
+            if (newVm != null)
+            {
+                newVm.AddMacros += OnAddMacros;
+            }
+        }
+
+        private void OnAddMacros() => lstMacros.AddFilesCommand.Execute(null);
     }
 }

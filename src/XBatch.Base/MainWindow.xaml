@@ -303,9 +303,19 @@
                     </GroupBox>
                     <GridSplitter Height="5" Background="Gray" Grid.Row="1"/>
                     <GroupBox Header="Macros" Grid.Row="2">
-                        <cmnctrls:PathListBox x:Name="lstMacros" Filters="{Binding Path=MacroFilesFilter}" 
-                                                  Grid.Row="1" ShowAddFolderButton="False" ShowAddFileButton="False" AllowDropFolders="False"
-                                                  PathsSource="{Binding Path=Macros}"/>
+                        <cmnctrls:PathListBox x:Name="lstMacros" Grid.Row="1" ShowAddFolderButton="False" 
+                              ShowAddFileButton="False" AllowDropFolders="False"
+                              PathToItemConverter="{Binding Path=PathToMacroDataConverter}"
+                              ItemToPathConverter="{Binding Path=MacroDataToPathConverter}"
+                              AllowDropFiles="True"
+                              Filters="{Binding Path=MacroFilesFilter}"
+                              PathsSource="{Binding Path=Macros}">
+                            <cmnctrls:PathListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <ctrls:MacroDataControl ShowFullPath="True"/>
+                                </DataTemplate>
+                            </cmnctrls:PathListBox.ItemTemplate>
+                        </cmnctrls:PathListBox>
                     </GroupBox>
                 </Grid>
             </Grid>

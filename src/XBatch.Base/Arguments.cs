@@ -85,7 +85,8 @@ namespace Xarial.CadPlus.XBatch.Base
         [Option('m', "macros", Required = true, HelpText = "List of macros to run")]
         public IEnumerable<string> Macros 
         {
-            set => m_Options.Macros = value?.ToArray();
+            //TODO: add support for args
+            set => m_Options.Macros = value.Select(m => new MacroData() { FilePath = m })?.ToArray();
         }
 
         [Option('e', "error", Required = false, HelpText = "If this option is used execution will continue if any of the macros failed to process, otherwise the process will terminate. Default: true")]

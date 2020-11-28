@@ -99,11 +99,15 @@
     <Compile Include="Controls\JobItemsDataGrid.xaml.cs">
       <DependentUpon>JobItemsDataGrid.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Controls\MacroDataControl.xaml.cs">
+      <DependentUpon>MacroDataControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Controls\ResultsControl.xaml.cs">
       <DependentUpon>ResultsControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="Converters\DocumentTitleConverter.cs" />
     <Compile Include="Converters\CommandEnabledConverter.cs" />
+    <Compile Include="Converters\FilePathConverter.cs" />
     <Compile Include="Converters\FilterTextConverter.cs" />
     <Compile Include="Converters\JobItemStatusToImageConverter.cs" />
     <Compile Include="Converters\JobStatusToImageConverter.cs" />
@@ -114,6 +118,7 @@
     <Compile Include="Core\JobItem.cs" />
     <Compile Include="Core\JobItemFile.cs" />
     <Compile Include="Core\JobItemMacro.cs" />
+    <Compile Include="Core\MacroData.cs" />
     <Compile Include="Core\OpenFileOptions_e.cs" />
     <Compile Include="Core\StartupOptions_e.cs" />
     <Compile Include="Exceptions\JobCancelledException.cs" />
@@ -173,6 +178,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Controls\JobItemsDataGrid.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\MacroDataControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -268,6 +277,9 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\filter.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\arguments-icon.png" />
   </ItemGroup>
   <Import Project="$(SolutionDir)common\common.module.props" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

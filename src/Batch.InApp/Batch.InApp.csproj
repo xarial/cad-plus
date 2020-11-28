@@ -76,6 +76,7 @@
     <Compile Include="UI\ResultsWindow.xaml.cs">
       <DependentUpon>ResultsWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ViewModels\MacrosVM.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

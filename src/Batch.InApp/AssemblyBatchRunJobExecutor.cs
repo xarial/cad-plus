@@ -35,11 +35,11 @@ namespace Xarial.CadPlus.Batch.InApp
         private readonly IXComponent[] m_Comps;
 
         private readonly IMacroRunnerExService m_MacroRunner;
-        private readonly IEnumerable<string> m_Macros;
+        private readonly IEnumerable<MacroData> m_Macros;
         private readonly bool m_ActivateDocs;
 
         internal AssemblyBatchRunJobExecutor(IXApplication app, IMacroRunnerExService macroRunnerSvc,
-            IXComponent[] components, IEnumerable<string> macros, bool activateDocs) 
+            IXComponent[] components, IEnumerable<MacroData> macros, bool activateDocs) 
         {
             m_App = app;
 
@@ -202,7 +202,10 @@ namespace Xarial.CadPlus.Batch.InApp
             try
             {
                 macro.Status = JobItemStatus_e.InProgress;
-                m_MacroRunner.RunMacro(macro.FilePath, null, XCad.Enums.MacroRunOptions_e.UnloadAfterRun, "", doc);
+                
+                m_MacroRunner.RunMacro(macro.Macro.FilePath, null, 
+                    XCad.Enums.MacroRunOptions_e.UnloadAfterRun, macro.Macro.Arguments, doc);
+
                 macro.Status = JobItemStatus_e.Succeeded;
             }
             catch(Exception ex)
