@@ -5,6 +5,7 @@
 //License: https://cadplus.xarial.com/license/
 //*********************************************************************
 
+using Autofac;
 using CommandLine;
 using System;
 using System.Collections.Generic;
@@ -18,6 +19,7 @@ using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Navigation;
 using System.Windows.Threading;
+using Xarial.CadPlus.Common.Services;
 using Xarial.CadPlus.Module.Init;
 using Xarial.CadPlus.Plus;
 
@@ -85,8 +87,11 @@ namespace Xarial.CadPlus.Common
 
         public override IEnumerable<IModule> Modules => throw new NotImplementedException();
 
-        internal ConsoleHostApplication() 
+        public override IServiceProvider Services { get; }
+
+        internal ConsoleHostApplication(IServiceProvider svcProvider) 
         {
+            Services = svcProvider;
             base.OnStarted();
         }
     }
@@ -100,10 +105,14 @@ namespace Xarial.CadPlus.Common
 
         private readonly Application m_App;
 
-        internal WpfHostApplication(Application app)
+        public override IServiceProvider Services { get; }
+
+        internal WpfHostApplication(Application app, IServiceProvider svcProvider)
         {
             m_App = app;
+            Services = svcProvider;
             m_App.Activated += OnAppActivated;
+            m_App.Exit += OnAppExit;
         }
 
         public override IntPtr ParentWindow => m_App.MainWindow != null
@@ -114,6 +123,12 @@ namespace Xarial.CadPlus.Common
         {
             m_App.Activated -= OnAppActivated;
             base.OnStarted();
+            Connect?.Invoke();
+        }
+
+        private void OnAppExit(object sender, ExitEventArgs e)
+        {
+            Disconnect?.Invoke();
         }
     }
 
@@ -121,7 +136,7 @@ namespace Xarial.CadPlus.Common
     {
         private bool m_IsStartWindowCalled;
 
-        protected IHostApplication m_HostApplication;
+        public IHostApplication Host { get; private set; }
 
         protected virtual void OnAppStart()
         {
@@ -176,12 +191,14 @@ namespace Xarial.CadPlus.Common
                 TryExtractCliArguments(parser, e.Args, out args, out hasArgs, out hasError);
             }
 
+            var svc = CreateServiceProvider();
+
             if (hasArgs)
             {
                 ConsoleHandler.Attach();
 
                 SynchronizationContext.SetSynchronizationContext(new SynchronizationContext());
-                m_HostApplication = new ConsoleHostApplication();
+                Host = new ConsoleHostApplication(svc);
                 
                 var res = false;
 
@@ -210,9 +227,25 @@ namespace Xarial.CadPlus.Common
             }
             else
             {
-                m_HostApplication = new WpfHostApplication(this);
+                Host = new WpfHostApplication(this, svc);
                 base.OnStartup(e);
             }
+        }
+
+        private IServiceProvider CreateServiceProvider() 
+        {
+            var builder = new ContainerBuilder();
+            
+            builder.RegisterType<GenericMessageService>()
+                .As<IMessageService>()
+                .WithParameter(new TypedParameter(typeof(string), "Batch+"));
+
+            OnConfigureServices(builder);
+            return new ServiceProvider(builder.Build());
+        }
+
+        protected virtual void OnConfigureServices(ContainerBuilder builder) 
+        {
         }
 
         protected override void OnActivated(EventArgs e)

@@ -24,6 +24,7 @@ using Xarial.CadPlus.Batch.InApp.Properties;
 using System.IO;
 using Xarial.XCad.UI.PropertyPage.Structures;
 using Xarial.XCad.Documents.Enums;
+using Xarial.CadPlus.Common;
 
 namespace Xarial.CadPlus.Batch.InApp
 {
@@ -70,13 +71,13 @@ namespace Xarial.CadPlus.Batch.InApp
 
         private void OnConnect()
         {
-            m_MacroRunnerSvc = (IMacroRunnerExService)m_Host.Services.GetService(typeof(IMacroRunnerExService));
-            m_Msg = (IMessageService)m_Host.Services.GetService(typeof(IMessageService));
-            m_Logger = (IXLogger)m_Host.Services.GetService(typeof(IXLogger));
+            m_MacroRunnerSvc = m_Host.Services.GetService<IMacroRunnerExService>();
+            m_Msg = m_Host.Services.GetService<IMessageService>();
+            m_Logger = m_Host.Services.GetService<IXLogger>();
 
             m_Host.RegisterCommands<Commands_e>(OnCommandClick);
             m_Page = m_Host.CreatePage<AssemblyBatchData>();
-            m_Data = new AssemblyBatchData((IMacroFileFilterProvider)m_Host.Services.GetService(typeof(IMacroFileFilterProvider)));
+            m_Data = new AssemblyBatchData(m_Host.Services.GetService<IMacroFileFilterProvider>());
             m_Page.Closing += OnPageClosing;
             m_Page.Closed += OnPageClosed;
         }

@@ -50,11 +50,11 @@ namespace Xarial.CadPlus.XBatch.Base
 
         private async Task RunConsoleBatch(IArguments args)
         {
-            var appProvider = GetApplicationProvider();
+            var appProvider = Host.Services.GetService<IApplicationProvider>();
 
             var opts = args.GetOptions(appProvider);
 
-            var macroRunnerSvc = (IMacroRunnerExService)m_HostApplication.Services.GetService(typeof(IMacroRunnerExService));
+            var macroRunnerSvc = Host.Services.GetService<IMacroRunnerExService>();
 
             using (var batchRunner = new BatchRunner(appProvider, macroRunnerSvc, Console.Out, new ConsoleProgressWriter()))
             {
@@ -86,7 +86,5 @@ namespace Xarial.CadPlus.XBatch.Base
                 hasArguments = hasArgumentsLocal;
             }
         }
-        
-        public abstract IApplicationProvider GetApplicationProvider();
     }
 }

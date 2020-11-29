@@ -9,8 +9,7 @@ namespace Xarial.CadPlus.Common
 {
     public static class IServiceProviderExtension
     {
-        public static void RegisterFromServiceProvider<TSvc>(this ContainerBuilder builder, IServiceProvider svcProv)
-            where TSvc : class
-            => builder.RegisterInstance((TSvc)svcProv.GetService(typeof(TSvc))).As<TSvc>();
+        public static TSvc GetService<TSvc>(this IServiceProvider svcProv) 
+            => (TSvc)svcProv.GetService(typeof(TSvc));
     }
 }
