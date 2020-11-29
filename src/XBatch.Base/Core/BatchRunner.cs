@@ -411,7 +411,7 @@ namespace Xarial.CadPlus.XBatch.Base.Core
                     macroItem.Status = JobItemStatus_e.InProgress;
                     m_Logger.WriteLine($"Running '{macroItem.FilePath}' macro");
 
-                    m_MacroRunnerSvc.RunMacro(macroItem.Macro.FilePath, null,
+                    m_MacroRunnerSvc.RunMacro(app, macroItem.Macro.FilePath, null,
                         XCad.Enums.MacroRunOptions_e.UnloadAfterRun, 
                         macroItem.Macro.Arguments, doc);
 

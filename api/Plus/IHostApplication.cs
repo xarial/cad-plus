@@ -37,8 +37,9 @@ namespace Xarial.CadPlus.Plus
         /// <remarks>Use this to display any popup windows, such as license or registration/login dialogs</remarks>
         void OnStarted();
         
-        void OnConfigureServices(IXServiceCollection svcColl);
-
+        /// <summary>
+        /// Provides an access to services registered in this host
+        /// </summary>
         IServiceProvider Services { get; }
 
         /// <summary>

@@ -203,7 +203,7 @@ namespace Xarial.CadPlus.Batch.InApp
             {
                 macro.Status = JobItemStatus_e.InProgress;
                 
-                m_MacroRunner.RunMacro(macro.Macro.FilePath, null, 
+                m_MacroRunner.RunMacro(m_App, macro.Macro.FilePath, null, 
                     XCad.Enums.MacroRunOptions_e.UnloadAfterRun, macro.Macro.Arguments, doc);
 
                 macro.Status = JobItemStatus_e.Succeeded;

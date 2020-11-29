@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Autofac;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,15 +13,15 @@ namespace Xarial.CadPlus.Common.Sw
 {
     public static class IXServiceCollectionExtension
     {
-        public static void UsingCommonSwServices(this IXServiceCollection svc, ISwApplication app)
-            => UsingCommonSwServices(svc, () => app);
-
-        public static void UsingCommonSwServices(this IXServiceCollection svc, Func<ISwApplication> appFact)
+        public static void UsingCommonSwServices(this ContainerBuilder svc)
         {
-            var app = appFact.Invoke();
+            svc.RegisterAdapter<IXApplication, ISwApplication>(a => (ISwApplication)a);
 
-            svc.AddOrReplace<IMacroRunnerExService>(() => new SwMacroRunnerExService(app));
-            svc.AddOrReplace<IMacroFileFilterProvider, SwMacroFileFilterProvider>();
+            svc.RegisterType<SwMacroRunnerExService>()
+                .As<IMacroRunnerExService>();
+
+            svc.RegisterType<SwMacroFileFilterProvider>()
+                .As<IMacroFileFilterProvider>();
         }
     }
 }
