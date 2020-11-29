@@ -144,31 +144,22 @@ namespace Xarial.CadPlus.AddIn.Base
         private void OnConfigureExtensionServices(IXServiceConsumer sender, IXServiceCollection svcColl)
         {
             var builder = new ContainerBuilder();
-            
-            ConfigureHostServices(builder, svcColl);
+
+            builder.Populate(svcColl);
+
+            ConfigureHostServices(builder);
 
             ConfigureServices?.Invoke(builder);
 
             m_SvcProvider = new ServiceProvider(builder.Build());
 
-            foreach (var reg in m_SvcProvider.Container.ComponentRegistry.Registrations) 
-            {
-                var svcType = (reg.Services.First() as Autofac.Core.TypedService).ServiceType;
-                svcColl.AddOrReplace(svcType, 
-                    () => m_SvcProvider.Container.Resolve(svcType));
-            }
+            svcColl.Populate(m_SvcProvider.Container);
 
             m_PageCreator = m_SvcProvider.Container.Resolve<IPropertyPageCreator>();
         }
 
-        private void ConfigureHostServices(ContainerBuilder builder, IXServiceCollection svcColl) 
-        {
-            foreach (var svc in svcColl.Services) 
-            {
-                builder.Register<object>(x => svc.Value.Invoke())
-                    .As(svc.Key);
-            }
-
+        private void ConfigureHostServices(ContainerBuilder builder) 
+        {   
             builder.RegisterInstance(Extension.Application);
             builder.RegisterType<AppLogger>().As<IXLogger>();
             builder.RegisterType<CadAppMessageService>()
