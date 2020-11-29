@@ -93,7 +93,7 @@ namespace Xarial.CadPlus.Common
 
     public class WpfHostApplication : BaseHostApplication
     {
-        public override IEnumerable<Plus.IModule> Modules => throw new NotImplementedException();
+        public override IEnumerable<IModule> Modules => throw new NotImplementedException();
 
         public override event Action Connect;
         public override event Action Disconnect;
@@ -121,7 +121,7 @@ namespace Xarial.CadPlus.Common
     {
         private bool m_IsStartWindowCalled;
 
-        private BaseHostApplication m_HostApplication;
+        protected IHostApplication m_HostApplication;
 
         protected virtual void OnAppStart()
         {
@@ -178,7 +178,6 @@ namespace Xarial.CadPlus.Common
 
             if (hasArgs)
             {
-                //WindowsApi.AttachConsole(-1);
                 ConsoleHandler.Attach();
 
                 SynchronizationContext.SetSynchronizationContext(new SynchronizationContext());

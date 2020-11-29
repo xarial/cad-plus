@@ -152,7 +152,7 @@ namespace Xarial.CadPlus.Batch.InApp
                     try
                     {
                         var batchPath = Path.Combine(
-                            Path.GetDirectoryName(this.GetType().Assembly.Location), "xbatch.exe");
+                            Path.GetDirectoryName(this.GetType().Assembly.Location), "batchplus.exe");
 
                         if (File.Exists(batchPath))
                         {

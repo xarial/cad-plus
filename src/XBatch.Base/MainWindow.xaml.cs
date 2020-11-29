@@ -32,7 +32,7 @@ namespace Xarial.CadPlus.XBatch.Base
         {
             InitializeComponent();
             
-            var msgService = new GenericMessageService("xBatch");
+            var msgService = new GenericMessageService("Batch+");
 
             try
             {

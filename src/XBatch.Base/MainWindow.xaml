@@ -12,7 +12,7 @@
         xmlns:vm="clr-namespace:Xarial.CadPlus.XBatch.Base.ViewModels"
         xmlns:ext="clr-namespace:Xarial.CadPlus.XBatch.Base.Extensions"
         xmlns:metro="http://metro.mahapps.com/winfx/xaml/controls"
-        Title="xBatch" Icon="Resources/xbatch.png"
+        Title="Batch+" Icon="Resources/xbatch.png"
         mc:Ignorable="d" WindowState="Maximized" TitleCharacterCasing="Normal" WindowTransitionsEnabled="False"
         Height="450" Width="800">
     <metro:MetroWindow.Resources>

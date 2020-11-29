@@ -78,6 +78,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="IXServiceCollectionExtension.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\SwMacroFileFilterProvider.cs" />
     <Compile Include="Services\SwMacroRunnerExService.cs" />

@@ -32,11 +32,15 @@ namespace Xarial.CadPlus.XBatch.Base.Core
         private readonly TextWriter m_Logger;
         private readonly IProgressHandler m_ProgressHandler;
         private readonly IApplicationProvider m_AppProvider;
+        private readonly IMacroRunnerExService m_MacroRunnerSvc;
 
-        public BatchRunner(IApplicationProvider appProvider, TextWriter logger, IProgressHandler progressHandler)
+        public BatchRunner(IApplicationProvider appProvider, 
+            IMacroRunnerExService macroRunnerSvc,
+            TextWriter logger, IProgressHandler progressHandler)
         {
             m_Logger = logger;
             m_ProgressHandler = progressHandler;
+            m_MacroRunnerSvc = macroRunnerSvc;
             m_AppProvider = appProvider;   
         }
 
@@ -407,8 +411,10 @@ namespace Xarial.CadPlus.XBatch.Base.Core
                     macroItem.Status = JobItemStatus_e.InProgress;
                     m_Logger.WriteLine($"Running '{macroItem.FilePath}' macro");
 
-                    var macro = app.OpenMacro(macroItem.FilePath);
-                    macro.Run();
+                    m_MacroRunnerSvc.RunMacro(macroItem.Macro.FilePath, null,
+                        XCad.Enums.MacroRunOptions_e.UnloadAfterRun, 
+                        macroItem.Macro.Arguments, doc);
+
                     macroItem.Status = JobItemStatus_e.Succeeded;
                 }
                 catch (Exception ex)

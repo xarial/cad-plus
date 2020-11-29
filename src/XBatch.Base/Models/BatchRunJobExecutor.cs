@@ -70,7 +70,7 @@ namespace Xarial.CadPlus.XBatch.Base.Models
 
                 try
                 {
-                    using (var batchRunner = new BatchRunner(m_AppProvider, m_LogWriter, m_PrgHander))
+                    using (var batchRunner = new BatchRunner(m_AppProvider, null, m_LogWriter, m_PrgHander))
                     {
                         var cancellationToken = m_CurrentCancellationToken.Token;
 

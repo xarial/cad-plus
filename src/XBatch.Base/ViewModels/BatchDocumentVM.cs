@@ -63,6 +63,12 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
 
     public class BatchDocumentVM : INotifyPropertyChanged
     {
+        internal static FileFilter[] FileFilters { get; }
+            = new FileFilter[] 
+            {
+                new FileFilter("Batch+ File", "*.batchplus"),
+                FileFilter.AllFiles };
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         private string m_Name;
@@ -182,8 +188,8 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
         private void SaveAsDocument()
         {
             if (FileSystemBrowser.BrowseFileSave(out m_FilePath, 
-                "Select file path", 
-                FileSystemBrowser.BuildFilterString(new FileFilter("xBatch File", "*.xbatch"), FileFilter.AllFiles))) 
+                "Select file path",
+                FileSystemBrowser.BuildFilterString(FileFilters)))
             {
                 SaveDocument();
                 Name = Path.GetFileNameWithoutExtension(m_FilePath);

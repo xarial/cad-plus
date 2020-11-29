@@ -21,6 +21,7 @@ using System.Reflection;
 using Xarial.XToolkit.Reflection;
 using Xarial.CadPlus.Plus;
 using Xarial.CadPlus.Common.Sw.Services;
+using Xarial.CadPlus.Common.Sw;
 
 namespace Xarial.CadPlus.AddIn.Sw
 {
@@ -66,9 +67,7 @@ namespace Xarial.CadPlus.AddIn.Sw
             svc.AddOrReplace<IPropertyPageCreator>(
                 () => new SwPropertyPageCreator<SwGeneralPropertyManagerPageHandler>(this));
 
-            svc.AddOrReplace<IMacroRunnerExService>(() => new SwMacroRunnerExService(Application));
-
-            svc.AddOrReplace<IMacroFileFilterProvider, SwMacroFileFilterProvider>();
+            svc.UsingCommonSwServices(Application);
         }
 
         protected override void Dispose(bool disposing)

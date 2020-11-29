@@ -94,6 +94,10 @@ namespace Xarial.CadPlus.Common.Services
             catch (MacroUserInterruptException) //do not consider this as an error
             {
             }
+            catch (MacroRunnerResultError resEx) 
+            {
+                throw new MacroRunFailedException(macroPath, -1, resEx.Message);
+            }
         }
 
         protected abstract string MacroRunnerProgId { get; }

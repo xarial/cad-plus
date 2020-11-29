@@ -15,7 +15,7 @@ using Xarial.CadPlus.XBatch.Base.Core;
 
 namespace Xarial.CadPlus.XBatch.Base
 {
-    [Verb("file", HelpText = "Managing xBatch files")]
+    [Verb("file", HelpText = "Managing Batch+ files")]
     public class FileOptions
     {
         [Option('o', "open", Required = false, HelpText = "Starts application and opens specified file")]
@@ -35,7 +35,7 @@ namespace Xarial.CadPlus.XBatch.Base
     {
         private BatchJob m_Options;
 
-        [Option('r', "run", Required = true, HelpText = "Full path to *.xbatch file to run")]
+        [Option('r', "run", Required = true, HelpText = "Full path to *.batchplus file to run")]
         public string JobFilePath 
         {
             set 

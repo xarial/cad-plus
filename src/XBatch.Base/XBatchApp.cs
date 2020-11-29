@@ -54,7 +54,9 @@ namespace Xarial.CadPlus.XBatch.Base
 
             var opts = args.GetOptions(appProvider);
 
-            using (var batchRunner = new BatchRunner(appProvider, Console.Out, new ConsoleProgressWriter()))
+            var macroRunnerSvc = (IMacroRunnerExService)m_HostApplication.Services.GetService(typeof(IMacroRunnerExService));
+
+            using (var batchRunner = new BatchRunner(appProvider, macroRunnerSvc, Console.Out, new ConsoleProgressWriter()))
             {
                 await batchRunner.BatchRun(opts).ConfigureAwait(false);
             }
