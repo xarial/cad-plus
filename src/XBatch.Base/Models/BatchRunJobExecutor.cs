@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Xarial.CadPlus.Common.Services;
@@ -37,20 +38,22 @@ namespace Xarial.CadPlus.XBatch.Base.Models
         private CancellationTokenSource m_CurrentCancellationToken;
 
         private readonly BatchJob m_Job;
-        private readonly IApplicationProvider m_AppProvider;
-
+        
         private readonly LogWriter m_LogWriter;
         private readonly ProgressHandler m_PrgHander;
         
         private bool m_IsExecuting;
 
-        public BatchRunJobExecutor(BatchJob job, IApplicationProvider appProvider) 
+        private readonly Func<TextWriter, IProgressHandler, BatchRunner> m_BatchRunnerFact;
+
+        public BatchRunJobExecutor(BatchJob job, Func<TextWriter, IProgressHandler, BatchRunner> batchRunnerFact) 
         {
             m_Job = job;
-            m_AppProvider = appProvider;
-
+            
             m_LogWriter = new LogWriter();
             m_PrgHander = new ProgressHandler();
+
+            m_BatchRunnerFact = batchRunnerFact;
 
             m_IsExecuting = false;
         }
@@ -70,10 +73,10 @@ namespace Xarial.CadPlus.XBatch.Base.Models
 
                 try
                 {
-                    using (var batchRunner = new BatchRunner(m_AppProvider, m_LogWriter, m_PrgHander))
-                    {
-                        var cancellationToken = m_CurrentCancellationToken.Token;
+                    var cancellationToken = m_CurrentCancellationToken.Token;
 
+                    using (var batchRunner = m_BatchRunnerFact.Invoke(m_LogWriter, m_PrgHander)) 
+                    {
                         return await batchRunner.BatchRun(m_Job, cancellationToken).ConfigureAwait(false);
                     }
                 }
@@ -90,7 +93,7 @@ namespace Xarial.CadPlus.XBatch.Base.Models
             }
             else 
             {
-                throw new Exception("Execution is already running");
+                throw new Exception("Job is currently running");
             }
         }
 

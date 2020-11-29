@@ -24,6 +24,7 @@ using Xarial.CadPlus.Batch.InApp.Properties;
 using System.IO;
 using Xarial.XCad.UI.PropertyPage.Structures;
 using Xarial.XCad.Documents.Enums;
+using Xarial.CadPlus.Common;
 
 namespace Xarial.CadPlus.Batch.InApp
 {
@@ -70,13 +71,13 @@ namespace Xarial.CadPlus.Batch.InApp
 
         private void OnConnect()
         {
-            m_MacroRunnerSvc = (IMacroRunnerExService)m_Host.Services.GetService(typeof(IMacroRunnerExService));
-            m_Msg = (IMessageService)m_Host.Services.GetService(typeof(IMessageService));
-            m_Logger = (IXLogger)m_Host.Services.GetService(typeof(IXLogger));
+            m_MacroRunnerSvc = m_Host.Services.GetService<IMacroRunnerExService>();
+            m_Msg = m_Host.Services.GetService<IMessageService>();
+            m_Logger = m_Host.Services.GetService<IXLogger>();
 
             m_Host.RegisterCommands<Commands_e>(OnCommandClick);
             m_Page = m_Host.CreatePage<AssemblyBatchData>();
-            m_Data = new AssemblyBatchData((IMacroFileFilterProvider)m_Host.Services.GetService(typeof(IMacroFileFilterProvider)));
+            m_Data = new AssemblyBatchData(m_Host.Services.GetService<IMacroFileFilterProvider>());
             m_Page.Closing += OnPageClosing;
             m_Page.Closed += OnPageClosed;
         }
@@ -85,7 +86,7 @@ namespace Xarial.CadPlus.Batch.InApp
         {
             if (reason == PageCloseReasons_e.Okay) 
             {
-                if (!m_Data.Macros.Any()) 
+                if (!m_Data.Macros.Macros.Any()) 
                 {
                     arg.Cancel = true;
                     arg.ErrorMessage = "Select macros to run";
@@ -125,12 +126,12 @@ namespace Xarial.CadPlus.Batch.InApp
                     }
 
                     var exec = new AssemblyBatchRunJobExecutor(m_Host.Extension.Application, m_MacroRunnerSvc,
-                        comps.ToArray(), m_Data.Macros, m_Data.ActivateDocuments);
-
+                        comps.ToArray(), m_Data.Macros.Macros, m_Data.ActivateDocuments);
+                    
                     var vm = new JobResultVM(assm.Title, exec);
 
                     exec.ExecuteAsync().Wait();
-
+                    
                     var wnd = m_Host.Extension.CreatePopupWindow<ResultsWindow>();
                     wnd.Control.Title = $"{assm.Title} batch job result";
                     wnd.Control.DataContext = vm;
@@ -152,7 +153,7 @@ namespace Xarial.CadPlus.Batch.InApp
                     try
                     {
                         var batchPath = Path.Combine(
-                            Path.GetDirectoryName(this.GetType().Assembly.Location), "xbatch.exe");
+                            Path.GetDirectoryName(this.GetType().Assembly.Location), "batchplus.exe");
 
                         if (File.Exists(batchPath))
                         {

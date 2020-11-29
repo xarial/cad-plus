@@ -109,6 +109,40 @@ namespace Xarial.CadPlus.Common.Controls
             set { SetValue(FiltersProperty, value); }
         }
 
+        public static readonly DependencyProperty ItemTemplateProperty =
+            DependencyProperty.Register(
+            nameof(ItemTemplate), typeof(DataTemplate),
+            typeof(PathListBox));
+
+        public DataTemplate ItemTemplate
+        {
+            get { return (DataTemplate)GetValue(ItemTemplateProperty); }
+            set { SetValue(ItemTemplateProperty, value); }
+        }
+
+
+        public static readonly DependencyProperty ItemToPathConverterProperty =
+            DependencyProperty.Register(
+            nameof(ItemToPathConverter), typeof(Func<object, string>),
+            typeof(PathListBox));
+
+        public Func<object, string> ItemToPathConverter
+        {
+            get { return (Func<object, string>)GetValue(ItemToPathConverterProperty); }
+            set { SetValue(ItemToPathConverterProperty, value); }
+        }
+
+        public static readonly DependencyProperty PathToItemConverterProperty =
+            DependencyProperty.Register(
+            nameof(PathToItemConverter), typeof(Func<string, object>),
+            typeof(PathListBox));
+
+        public Func<string, object> PathToItemConverter
+        {
+            get { return (Func<string, object>)GetValue(PathToItemConverterProperty); }
+            set { SetValue(PathToItemConverterProperty, value); }
+        }
+
         public PathListBox() 
         {
             AddFilesCommand = new RelayCommand(AddFiles);
@@ -127,7 +161,7 @@ namespace Xarial.CadPlus.Common.Controls
             m_ListBox.DragEnter += OnDragEnter;
             m_ListBox.DragOver += OnDragOver;
             m_ListBox.Drop += OnDrop;
-
+            
             m_ListBox.KeyUp += OnListBoxKeyUp;
             m_AddFileButton.Click += OnAddFilesButtonClick;
             m_AddFolderButton.Click += OnAddFoldersButtonClick;
@@ -249,7 +283,18 @@ namespace Xarial.CadPlus.Common.Controls
                 {
                     if (!ContainsPath(path))
                     {
-                        PathsSource?.Add(path);
+                        object item;
+
+                        if (PathToItemConverter != null)
+                        {
+                            item = PathToItemConverter.Invoke(path);
+                        }
+                        else 
+                        {
+                            item = path;
+                        }
+
+                        PathsSource?.Add(item);
                     }
                 }
             }
@@ -259,8 +304,19 @@ namespace Xarial.CadPlus.Common.Controls
         {
             if (PathsSource != null)
             {
-                foreach (string curPath in PathsSource)
+                foreach (object curItem in PathsSource)
                 {
+                    string curPath;
+
+                    if (ItemToPathConverter != null)
+                    {
+                        curPath = ItemToPathConverter.Invoke(curItem);
+                    }
+                    else 
+                    {
+                        curPath = curItem.ToString();
+                    }
+
                     if (string.Equals(curPath, path, StringComparison.CurrentCultureIgnoreCase))
                     {
                         return true;

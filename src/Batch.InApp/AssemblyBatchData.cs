@@ -16,6 +16,7 @@ using Xarial.XCad.UI.PropertyPage.Enums;
 using Xarial.CadPlus.Batch.InApp.Properties;
 using Xarial.CadPlus.Common.Services;
 using Xarial.XToolkit.Wpf.Utils;
+using Xarial.CadPlus.Batch.InApp.ViewModels;
 
 namespace Xarial.CadPlus.Batch.InApp
 {
@@ -49,7 +50,7 @@ namespace Xarial.CadPlus.Batch.InApp
         [CustomControl(typeof(MacrosList))]
         [ControlOptions(height: 100)]
         [Icon(typeof(Resources), nameof(Resources.macros_icon))]
-        public ObservableCollection<string> Macros { get; set; } = new ObservableCollection<string>();
+        public MacrosVM Macros { get; set; }
 
         [Title("Add Macros...")]
         [ControlOptions(align: ControlLeftAlign_e.Indent)]
@@ -66,22 +67,13 @@ namespace Xarial.CadPlus.Batch.InApp
         {
             m_FilterProvider = filterProvider;
             AddMacros = OnAddMacros;
+
+            Macros = new MacrosVM(m_FilterProvider);
         }
 
         private void OnAddMacros() 
         {
-            var filter = FileSystemBrowser.BuildFilterString(m_FilterProvider.GetSupportedMacros());
-
-            if (FileSystemBrowser.BrowseFilesOpen(out string[] paths, "Select macros to run", filter))
-            {
-                foreach (var path in paths) 
-                {
-                    if (!Macros.Contains(path, StringComparer.CurrentCultureIgnoreCase))
-                    {
-                        Macros.Add(path);
-                    }
-                }
-            }
+            Macros.RequestAddMacros();
         }
     }
 }

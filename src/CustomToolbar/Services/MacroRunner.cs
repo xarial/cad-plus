@@ -22,13 +22,11 @@ namespace Xarial.CadPlus.CustomToolbar.Services
     public class MacroRunner : IMacroRunner
     {
         private readonly IXApplication m_App;
-        private readonly IXLogger m_Logger;
         private readonly IMacroRunnerExService m_Runner;
 
-        public MacroRunner(IXApplication app, IXLogger logger, IMacroRunnerExService runner)
+        public MacroRunner(IXApplication app, IMacroRunnerExService runner)
         {
             m_App = app;
-            m_Logger = logger;
             m_Runner = runner;
         }
 
@@ -36,8 +34,9 @@ namespace Xarial.CadPlus.CustomToolbar.Services
         {
             var opts = unloadAfterRun ? MacroRunOptions_e.UnloadAfterRun : MacroRunOptions_e.Default;
 
-            m_Runner.RunMacro(macroPath, new XCad.Structures.MacroEntryPoint(entryPoint.ModuleName, entryPoint.SubName),
-                    opts, args, null);
+            m_Runner.RunMacro(m_App, macroPath,
+                new XCad.Structures.MacroEntryPoint(entryPoint.ModuleName, entryPoint.SubName),
+                opts, args, null);
         }
     }
 }
