@@ -25,6 +25,9 @@ using Xarial.XToolkit.Wpf.Dialogs;
 using Xarial.CadPlus.AddIn.Base.Properties;
 using Xarial.XCad.Base;
 using Xarial.CadPlus.Common.Services;
+using Autofac;
+using Xarial.CadPlus.Common;
+using Autofac.Core.Registration;
 
 namespace Xarial.CadPlus.AddIn.Base
 {
@@ -32,7 +35,7 @@ namespace Xarial.CadPlus.AddIn.Base
 
     public class AddInHostApplication : BaseHostApplication, IHostExtensionApplication
     {
-        public event Action<IXServiceCollection> ConfigureServices;
+        public event Action<ContainerBuilder> ConfigureServices;
 
         [ImportMany]
         private IEnumerable<IExtensionModule> m_Modules;
@@ -56,7 +59,7 @@ namespace Xarial.CadPlus.AddIn.Base
         
         public override IServiceProvider Services => m_SvcProvider;
         
-        private IServiceProvider m_SvcProvider;
+        private ServiceProvider m_SvcProvider;
 
         private IPropertyPageCreator m_PageCreator;
 
@@ -74,7 +77,7 @@ namespace Xarial.CadPlus.AddIn.Base
                 Extension.Disconnect += OnDisconnect;
                 if (Extension is IXServiceConsumer)
                 {
-                    (Extension as IXServiceConsumer).ConfigureServices += OnConfigureServices;
+                    (Extension as IXServiceConsumer).ConfigureServices += OnConfigureExtensionServices;
                 }
 
                 var modulesDir = Path.Combine(Path.GetDirectoryName(this.GetType().Assembly.Location), "Modules");
@@ -137,25 +140,41 @@ namespace Xarial.CadPlus.AddIn.Base
                 throw;
             }
         }
-
-        private void OnConfigureServices(IXServiceConsumer sender, IXServiceCollection svcColl)
-        {
-            ConfigureServices?.Invoke(svcColl);
-
-            OnConfigureServices(svcColl);
-            m_SvcProvider = svcColl.CreateProvider();//TODO: might need to get the provider created in the extension instead of creating new one
-
-            m_PageCreator = (IPropertyPageCreator)m_SvcProvider.GetService(typeof(IPropertyPageCreator));
-        }
-
-        public override void OnConfigureServices(IXServiceCollection svcColl)
-        {
-            svcColl.AddOrReplace<IXLogger, AppLogger>();
-            svcColl.AddOrReplace<IMessageService>(() => new CadAppMessageService(Extension.Application));
-
-            base.OnConfigureServices(svcColl);
-        }
         
+        private void OnConfigureExtensionServices(IXServiceConsumer sender, IXServiceCollection svcColl)
+        {
+            var builder = new ContainerBuilder();
+            
+            ConfigureHostServices(builder, svcColl);
+
+            ConfigureServices?.Invoke(builder);
+
+            m_SvcProvider = new ServiceProvider(builder.Build());
+
+            foreach (var reg in m_SvcProvider.Container.ComponentRegistry.Registrations) 
+            {
+                var svcType = (reg.Services.First() as Autofac.Core.TypedService).ServiceType;
+                svcColl.AddOrReplace(svcType, 
+                    () => m_SvcProvider.Container.Resolve(svcType));
+            }
+
+            m_PageCreator = m_SvcProvider.Container.Resolve<IPropertyPageCreator>();
+        }
+
+        private void ConfigureHostServices(ContainerBuilder builder, IXServiceCollection svcColl) 
+        {
+            foreach (var svc in svcColl.Services) 
+            {
+                builder.Register<object>(x => svc.Value.Invoke())
+                    .As(svc.Key);
+            }
+
+            builder.RegisterInstance(Extension.Application);
+            builder.RegisterType<AppLogger>().As<IXLogger>();
+            builder.RegisterType<CadAppMessageService>()
+                .As<IMessageService>();
+        }
+                
         public void RegisterCommands<TCmd>(CommandHandler<TCmd> handler)
             where TCmd : Enum
         {

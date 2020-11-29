@@ -70,7 +70,7 @@ namespace Xarial.CadPlus.CustomToolbar
         protected virtual void CreateContainer()
         {
             var builder = new ContainerBuilder();
-
+            
             builder.RegisterInstance(m_Host.Extension).ExternallyOwned();
             builder.RegisterInstance(m_Host.Extension.Application).ExternallyOwned();
             builder.RegisterInstance(m_Host.Extension.Logger);
@@ -100,7 +100,7 @@ namespace Xarial.CadPlus.CustomToolbar
                 .As<ITriggersManager>().SingleInstance();
 
             builder.RegisterType<UserSettingsService>();
-
+            
             builder.RegisterInstance((IMacroRunnerExService)m_Host.Services.GetService(typeof(IMacroRunnerExService)))
                 .As<IMacroRunnerExService>();
 
