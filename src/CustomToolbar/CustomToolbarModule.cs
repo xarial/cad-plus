@@ -22,6 +22,7 @@ using System.ComponentModel.Composition;
 using Xarial.XCad.Base;
 using Xarial.CadPlus.Common.Services;
 using Xarial.CadPlus.Plus;
+using Xarial.CadPlus.Common;
 
 namespace Xarial.CadPlus.CustomToolbar
 {
@@ -100,16 +101,11 @@ namespace Xarial.CadPlus.CustomToolbar
                 .As<ITriggersManager>().SingleInstance();
 
             builder.RegisterType<UserSettingsService>();
+
+            builder.RegisterFromServiceProvider<IMacroRunnerExService>(m_Host.Services);
+            builder.RegisterFromServiceProvider<IMessageService>(m_Host.Services);
+            builder.RegisterFromServiceProvider<IMacroFileFilterProvider>(m_Host.Services);
             
-            builder.RegisterInstance((IMacroRunnerExService)m_Host.Services.GetService(typeof(IMacroRunnerExService)))
-                .As<IMacroRunnerExService>();
-
-            builder.RegisterInstance((IMessageService)m_Host.Services.GetService(typeof(IMessageService)))
-                .As<IMessageService>();
-
-            builder.RegisterInstance((IMacroFileFilterProvider)m_Host.Services.GetService(typeof(IMacroFileFilterProvider)))
-                .As<IMacroFileFilterProvider>();
-
             m_Container = builder.Build();
         }
 
