@@ -33,22 +33,30 @@ namespace Xarial.CadPlus.XBatch.Base
         {
             InitializeComponent();
 
-            var app = Application.Current as XBatchApp;
-
-            var msgService = app.Host.Services.GetService<IMessageService>();
+            XBatchApp app = null;
 
             try
             {
-                var appProvider = app.Host.Services.GetService<IApplicationProvider>();
-                var batchRunnerModel = new Models.BatchRunnerModel(appProvider, new RecentFilesManager());
+                app = (XBatchApp)Application.Current;
 
-                var vm = new BatchManagerVM(batchRunnerModel, msgService);
-                
+                var vm = app.Host.Services.GetService<BatchManagerVM>();
+                                
                 this.DataContext = vm;
             }
             catch (Exception ex)
             {
-                msgService.ShowError(ex.ParseUserError(out _));
+                IMessageService msgSvc;
+
+                try
+                {
+                    msgSvc = app.Host.Services.GetService<IMessageService>();
+                }
+                catch 
+                {
+                    msgSvc = new GenericMessageService("Batch+");
+                }
+
+                msgSvc.ShowError(ex.ParseUserError(out _));
             }
         }
     }

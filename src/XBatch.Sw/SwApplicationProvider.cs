@@ -25,8 +25,6 @@ namespace Xarial.CadPlus.XBatch.Sw
     {
         public FileFilter[] InputFilesFilter { get; }
 
-        public FileFilter[] MacroFilesFilter { get; }
-
         public SwApplicationProvider()
         {
             InputFilesFilter = new FileFilter[]
@@ -35,15 +33,6 @@ namespace Xarial.CadPlus.XBatch.Sw
                 new FileFilter("SOLIDWORKS Assemblies", "*.sldasm"),
                 new FileFilter("SOLIDWORKS Drawings", "*.slddrw"),
                 new FileFilter("SOLIDWORKS Files", "*.sldprt", "*.sldasm", "*.slddrw"),
-                FileFilter.AllFiles
-            };
-
-            MacroFilesFilter = new FileFilter[]
-            {
-                new FileFilter("VBA Macros", "*.swp"),
-                new FileFilter("SWBasic Macros", "*.swb"),
-                new FileFilter("VSTA Macros", "*.dll"),
-                new FileFilter("All Macros", "*.swp", "*.swb", "*.dll"),
                 FileFilter.AllFiles
             };
         }

@@ -138,6 +138,8 @@ namespace Xarial.CadPlus.Common
 
         public IHostApplication Host { get; private set; }
 
+        protected IContainer m_Container;
+
         protected virtual void OnAppStart()
         {
         }
@@ -241,7 +243,10 @@ namespace Xarial.CadPlus.Common
                 .WithParameter(new TypedParameter(typeof(string), "Batch+"));
 
             OnConfigureServices(builder);
-            return new ServiceProvider(builder.Build());
+
+            m_Container = builder.Build();
+
+            return new ServiceProvider(m_Container);
         }
 
         protected virtual void OnConfigureServices(ContainerBuilder builder) 

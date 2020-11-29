@@ -24,6 +24,5 @@ namespace Xarial.CadPlus.XBatch.Base
         AppVersionInfo ParseVersion(string version);
         bool CanProcessFile(string filePath);
         FileFilter[] InputFilesFilter { get; }
-        FileFilter[] MacroFilesFilter { get; }
     }
 }

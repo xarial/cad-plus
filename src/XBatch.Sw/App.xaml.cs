@@ -22,6 +22,8 @@ namespace Xarial.CadPlus.XBatch.Sw
     {
         protected override void OnConfigureServices(ContainerBuilder builder) 
         {
+            base.OnConfigureServices(builder);
+
             builder.RegisterType<SwApplicationProvider>().As<IApplicationProvider>();
             builder.UsingCommonSwServices();
         }

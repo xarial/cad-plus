@@ -5,13 +5,17 @@
 //License: https://cadplus.xarial.com/license/
 //*********************************************************************
 
+using Autofac;
 using CommandLine;
 using System;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Xarial.CadPlus.Common;
 using Xarial.CadPlus.Common.Services;
 using Xarial.CadPlus.XBatch.Base.Core;
+using Xarial.CadPlus.XBatch.Base.Models;
+using Xarial.CadPlus.XBatch.Base.Services;
 using Xarial.CadPlus.XBatch.Base.ViewModels;
 
 namespace Xarial.CadPlus.XBatch.Base
@@ -48,16 +52,27 @@ namespace Xarial.CadPlus.XBatch.Base
             return RunConsoleBatch(args);
         }
 
+        protected override void OnConfigureServices(ContainerBuilder builder)
+        {
+            builder.RegisterType<RecentFilesManager>()
+                .As<IRecentFilesManager>();
+
+            builder.RegisterType<BatchRunner>();
+            builder.RegisterType<BatchRunnerModel>().As<IBatchRunnerModel>();
+            builder.RegisterType<BatchRunJobExecutor>().As<IBatchRunJobExecutor>();
+            builder.RegisterType<BatchManagerVM>();
+        }
+
         private async Task RunConsoleBatch(IArguments args)
         {
-            var appProvider = Host.Services.GetService<IApplicationProvider>();
-
-            var opts = args.GetOptions(appProvider);
-
-            var macroRunnerSvc = Host.Services.GetService<IMacroRunnerExService>();
-
-            using (var batchRunner = new BatchRunner(appProvider, macroRunnerSvc, Console.Out, new ConsoleProgressWriter()))
+            using (var batchRunner = m_Container.Resolve<BatchRunner>(
+                new TypedParameter[]
+                {
+                    new TypedParameter(typeof(TextWriter), Console.Out),
+                    new TypedParameter(typeof(IProgressHandler), new ConsoleProgressWriter())
+                }))
             {
+                var opts = args.GetOptions(Host.Services.GetService<IApplicationProvider>());
                 await batchRunner.BatchRun(opts).ConfigureAwait(false);
             }
         }
