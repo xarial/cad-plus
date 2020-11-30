@@ -8,10 +8,12 @@
 using System;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Windows.Data;
 using System.Windows.Media.Imaging;
 using Xarial.CadPlus.CustomToolbar.Properties;
 using Xarial.CadPlus.CustomToolbar.UI.ViewModels;
+using Xarial.CadPlus.Plus.Modules;
 using Xarial.XToolkit.Wpf.Extensions;
 
 namespace Xarial.CadPlus.CustomToolbar.UI.Converters
@@ -26,18 +28,32 @@ namespace Xarial.CadPlus.CustomToolbar.UI.Converters
             m_DefaultMacroIcon = Resources.macro_icon_default.ToBitmapImage();
             m_DefaultGroupIcon = Resources.group_icon_default.ToBitmapImage();
         }
-        
+
+        public PathToIconConverter() 
+            : this(CustomToolbarModule.Resolve<IIconsProvider[]>())
+        {
+        }
+
+        private readonly IIconsProvider[] m_IconProviders;
+
+        public PathToIconConverter(IIconsProvider[] iconProviders) 
+        {
+            m_IconProviders = iconProviders;
+        }
+
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {
             var iconPath = values[0] as string;
 
             BitmapImage icon = null;
 
-            if (!string.IsNullOrEmpty(iconPath) && File.Exists(iconPath))
+            var provider = m_IconProviders.FirstOrDefault(p => p.Matches(iconPath));
+
+            if (provider != null)
             {
                 try
                 {
-                    icon = new BitmapImage(new Uri(iconPath));
+                    icon = provider.GetThumbnail(iconPath).ToBitmapImage();
                 }
                 catch
                 {
