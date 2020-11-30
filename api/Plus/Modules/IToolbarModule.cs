@@ -10,15 +10,26 @@ namespace Xarial.CadPlus.Plus.Modules
 {
     public class IconFilter 
     {
-        public string Name { get; }
-        public string[] Extensions { get; }
+        public string Name { get; set; }
+        public string[] Extensions { get; set; }
+
+        public IconFilter() 
+        {
+        }
+
+        public IconFilter(string name, params string[] extensions)
+        {
+            Name = name;
+            Extensions = extensions;
+        }
     }
 
     public interface IIconsProvider 
     {
-        IconFilter[] Filters { get; }
-        Image GetThumbnail(string fileName);
-        IXImage GetIcon(string fileName);
+        IconFilter Filter { get; }
+        bool Matches(string filePath);
+        Image GetThumbnail(string filePath);
+        IXImage GetIcon(string filePath);
     }
 
     public interface IToolbarModule : IExtensionModule
