@@ -118,7 +118,7 @@ namespace Xarial.CadPlus.Batch.InApp
 
                     if (m_Data.ProcessAllFiles)
                     {
-                        comps = assm.Components.Flatten();
+                        comps = assm.Components.Flatten().Where(c => !c.State.HasFlag(ComponentState_e.Suppressed));
                     }
                     else
                     {
