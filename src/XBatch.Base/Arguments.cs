@@ -15,7 +15,7 @@ using Xarial.CadPlus.XBatch.Base.Core;
 
 namespace Xarial.CadPlus.XBatch.Base
 {
-    [Verb("file", HelpText = "Managing xBatch files")]
+    [Verb("file", HelpText = "Managing Batch+ files")]
     public class FileOptions
     {
         [Option('o', "open", Required = false, HelpText = "Starts application and opens specified file")]
@@ -35,7 +35,7 @@ namespace Xarial.CadPlus.XBatch.Base
     {
         private BatchJob m_Options;
 
-        [Option('r', "run", Required = true, HelpText = "Full path to *.xbatch file to run")]
+        [Option('r', "run", Required = true, HelpText = "Full path to *.batchplus file to run")]
         public string JobFilePath 
         {
             set 
@@ -85,7 +85,8 @@ namespace Xarial.CadPlus.XBatch.Base
         [Option('m', "macros", Required = true, HelpText = "List of macros to run")]
         public IEnumerable<string> Macros 
         {
-            set => m_Options.Macros = value?.ToArray();
+            //TODO: add support for args
+            set => m_Options.Macros = value.Select(m => new MacroData() { FilePath = m })?.ToArray();
         }
 
         [Option('e', "error", Required = false, HelpText = "If this option is used execution will continue if any of the macros failed to process, otherwise the process will terminate. Default: true")]
@@ -118,7 +119,7 @@ namespace Xarial.CadPlus.XBatch.Base
             set => m_DeferredSetters.Add(new Action<IApplicationProvider>(p => m_Options.Version = p.ParseVersion(value)));
         }
 
-        [Option('o', "open", Required = false, HelpText = "Specifies options (silent, readonly, rapid) for the file opening. Default: silent")]
+        [Option('o', "open", Required = false, HelpText = "Specifies options (silent, readonly, rapid, invisible) for the file opening. Default: silent")]
         public IEnumerable<OpenFileOptions_e> OpenFileOptions
         {
             set

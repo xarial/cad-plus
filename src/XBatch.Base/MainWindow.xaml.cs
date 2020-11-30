@@ -23,6 +23,7 @@ using Xarial.CadPlus.Common.Services;
 using Xarial.CadPlus.XBatch.Base.Services;
 using Xarial.CadPlus.XBatch.Base.ViewModels;
 using Xarial.XToolkit.Reporting;
+using Xarial.CadPlus.Common;
 
 namespace Xarial.CadPlus.XBatch.Base
 {
@@ -31,21 +32,31 @@ namespace Xarial.CadPlus.XBatch.Base
         public MainWindow()
         {
             InitializeComponent();
-            
-            var msgService = new GenericMessageService("xBatch");
+
+            XBatchApp app = null;
 
             try
             {
-                var appProvider = (Application.Current as XBatchApp).GetApplicationProvider();
-                var batchRunnerModel = new Models.BatchRunnerModel(appProvider, new RecentFilesManager());
+                app = (XBatchApp)Application.Current;
 
-                var vm = new BatchManagerVM(batchRunnerModel, msgService);
-                
+                var vm = app.Host.Services.GetService<BatchManagerVM>();
+                                
                 this.DataContext = vm;
             }
             catch (Exception ex)
             {
-                msgService.ShowError(ex.ParseUserError(out _));
+                IMessageService msgSvc;
+
+                try
+                {
+                    msgSvc = app.Host.Services.GetService<IMessageService>();
+                }
+                catch 
+                {
+                    msgSvc = new GenericMessageService("Batch+");
+                }
+
+                msgSvc.ShowError(ex.ParseUserError(out _));
             }
         }
     }

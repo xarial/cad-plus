@@ -5,6 +5,7 @@
 //License: https://cadplus.xarial.com/license/
 //*********************************************************************
 
+using Autofac;
 using CommandLine;
 using System;
 using System.Collections.Generic;
@@ -18,6 +19,7 @@ using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Navigation;
 using System.Windows.Threading;
+using Xarial.CadPlus.Common.Services;
 using Xarial.CadPlus.Module.Init;
 using Xarial.CadPlus.Plus;
 
@@ -85,25 +87,32 @@ namespace Xarial.CadPlus.Common
 
         public override IEnumerable<IModule> Modules => throw new NotImplementedException();
 
-        internal ConsoleHostApplication() 
+        public override IServiceProvider Services { get; }
+
+        internal ConsoleHostApplication(IServiceProvider svcProvider) 
         {
+            Services = svcProvider;
             base.OnStarted();
         }
     }
 
     public class WpfHostApplication : BaseHostApplication
     {
-        public override IEnumerable<Plus.IModule> Modules => throw new NotImplementedException();
+        public override IEnumerable<IModule> Modules => throw new NotImplementedException();
 
         public override event Action Connect;
         public override event Action Disconnect;
 
         private readonly Application m_App;
 
-        internal WpfHostApplication(Application app)
+        public override IServiceProvider Services { get; }
+
+        internal WpfHostApplication(Application app, IServiceProvider svcProvider)
         {
             m_App = app;
+            Services = svcProvider;
             m_App.Activated += OnAppActivated;
+            m_App.Exit += OnAppExit;
         }
 
         public override IntPtr ParentWindow => m_App.MainWindow != null
@@ -114,6 +123,12 @@ namespace Xarial.CadPlus.Common
         {
             m_App.Activated -= OnAppActivated;
             base.OnStarted();
+            Connect?.Invoke();
+        }
+
+        private void OnAppExit(object sender, ExitEventArgs e)
+        {
+            Disconnect?.Invoke();
         }
     }
 
@@ -121,7 +136,9 @@ namespace Xarial.CadPlus.Common
     {
         private bool m_IsStartWindowCalled;
 
-        private BaseHostApplication m_HostApplication;
+        public IHostApplication Host { get; private set; }
+
+        protected IContainer m_Container;
 
         protected virtual void OnAppStart()
         {
@@ -154,6 +171,8 @@ namespace Xarial.CadPlus.Common
             this.DispatcherUnhandledException += OnDispatcherUnhandledException;
             AppDomain.CurrentDomain.UnhandledException += OnDomainUnhandledException;
 
+            this.Exit += OnAppExit;
+
             OnAppStart();
 
             var parserOutput = new StringBuilder();
@@ -176,13 +195,14 @@ namespace Xarial.CadPlus.Common
                 TryExtractCliArguments(parser, e.Args, out args, out hasArgs, out hasError);
             }
 
+            var svc = CreateServiceProvider();
+
             if (hasArgs)
             {
-                //WindowsApi.AttachConsole(-1);
                 ConsoleHandler.Attach();
 
                 SynchronizationContext.SetSynchronizationContext(new SynchronizationContext());
-                m_HostApplication = new ConsoleHostApplication();
+                Host = new ConsoleHostApplication(svc);
                 
                 var res = false;
 
@@ -211,9 +231,33 @@ namespace Xarial.CadPlus.Common
             }
             else
             {
-                m_HostApplication = new WpfHostApplication(this);
+                Host = new WpfHostApplication(this, svc);
                 base.OnStartup(e);
             }
+        }
+
+        private void OnAppExit(object sender, ExitEventArgs e)
+        {
+            m_Container?.Dispose();
+        }
+
+        private IServiceProvider CreateServiceProvider() 
+        {
+            var builder = new ContainerBuilder();
+            
+            builder.RegisterType<GenericMessageService>()
+                .As<IMessageService>()
+                .WithParameter(new TypedParameter(typeof(string), "Batch+"));
+
+            OnConfigureServices(builder);
+
+            m_Container = builder.Build();
+
+            return new ServiceProvider(m_Container);
+        }
+
+        protected virtual void OnConfigureServices(ContainerBuilder builder) 
+        {
         }
 
         protected override void OnActivated(EventArgs e)

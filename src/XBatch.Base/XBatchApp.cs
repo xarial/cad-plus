@@ -5,14 +5,20 @@
 //License: https://cadplus.xarial.com/license/
 //*********************************************************************
 
+using Autofac;
 using CommandLine;
 using System;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Xarial.CadPlus.Common;
 using Xarial.CadPlus.Common.Services;
 using Xarial.CadPlus.XBatch.Base.Core;
+using Xarial.CadPlus.XBatch.Base.Models;
+using Xarial.CadPlus.XBatch.Base.Services;
 using Xarial.CadPlus.XBatch.Base.ViewModels;
+using Xarial.XCad;
+using Xarial.XCad.Base;
 
 namespace Xarial.CadPlus.XBatch.Base
 {
@@ -48,14 +54,47 @@ namespace Xarial.CadPlus.XBatch.Base
             return RunConsoleBatch(args);
         }
 
+        protected override void OnConfigureServices(ContainerBuilder builder)
+        {
+            builder.RegisterType<RecentFilesManager>()
+                .As<IRecentFilesManager>();
+
+            builder.RegisterType<AppLogger>().As<IXLogger>();
+            builder.RegisterType<BatchRunner>();
+            builder.RegisterType<BatchRunnerModel>().As<IBatchRunnerModel>();
+            builder.RegisterType<BatchRunJobExecutor>().As<IBatchRunJobExecutor>();
+            builder.RegisterType<BatchManagerVM>();
+
+            builder.RegisterType<XCad.Toolkit.ServiceCollection>().As<IXServiceCollection>()
+                .SingleInstance()
+                .OnActivating(x => x.Instance.Populate(x.Context));
+
+            builder.RegisterType<JobManager>().As<IJobManager>()
+                .SingleInstance()
+                .OnActivating(x =>
+                {
+                    try
+                    {
+                        x.Instance.Init();
+                    }
+                    catch (Exception ex)
+                    {
+                        var logger = x.Context.Resolve<IXLogger>();
+                        logger.Log(ex);
+                    }
+                });
+        }
+
         private async Task RunConsoleBatch(IArguments args)
         {
-            var appProvider = GetApplicationProvider();
-
-            var opts = args.GetOptions(appProvider);
-
-            using (var batchRunner = new BatchRunner(appProvider, Console.Out, new ConsoleProgressWriter()))
+            using (var batchRunner = m_Container.Resolve<BatchRunner>(
+                new TypedParameter[]
+                {
+                    new TypedParameter(typeof(TextWriter), Console.Out),
+                    new TypedParameter(typeof(IProgressHandler), new ConsoleProgressWriter())
+                }))
             {
+                var opts = args.GetOptions(Host.Services.GetService<IApplicationProvider>());
                 await batchRunner.BatchRun(opts).ConfigureAwait(false);
             }
         }
@@ -84,7 +123,5 @@ namespace Xarial.CadPlus.XBatch.Base
                 hasArguments = hasArgumentsLocal;
             }
         }
-        
-        public abstract IApplicationProvider GetApplicationProvider();
     }
 }

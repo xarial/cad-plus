@@ -9,9 +9,20 @@ using Xarial.CadPlus.XBatch.Base.Models;
 using Xarial.XCad;
 using Xarial.XCad.Documents;
 using Xarial.XCad.Documents.Enums;
+using Xarial.XCad.Exceptions;
+using Xarial.XToolkit.Reporting;
 
 namespace Xarial.CadPlus.Batch.InApp
 {
+    internal class MissingJobItemFile : JobItemFile
+    {
+        public MissingJobItemFile(string fileName, JobItemMacro[] macros) 
+            : base($"{fileName}?", macros)
+        {
+            Status = JobItemStatus_e.Failed;
+        }
+    }
+
     public class AssemblyBatchRunJobExecutor : IBatchRunJobExecutor
     {
         public event Action<IJobItem[], DateTime> JobSet;
@@ -24,11 +35,11 @@ namespace Xarial.CadPlus.Batch.InApp
         private readonly IXComponent[] m_Comps;
 
         private readonly IMacroRunnerExService m_MacroRunner;
-        private readonly IEnumerable<string> m_Macros;
+        private readonly IEnumerable<MacroData> m_Macros;
         private readonly bool m_ActivateDocs;
 
         internal AssemblyBatchRunJobExecutor(IXApplication app, IMacroRunnerExService macroRunnerSvc,
-            IXComponent[] components, IEnumerable<string> macros, bool activateDocs) 
+            IXComponent[] components, IEnumerable<MacroData> macros, bool activateDocs) 
         {
             m_App = app;
 
@@ -51,7 +62,9 @@ namespace Xarial.CadPlus.Batch.InApp
             {
                 using (var prg = m_App.CreateProgress())
                 {
-                    var jobItems = m_Comps.Select(c => new JobItemFile(c.Path, m_Macros.Select(m => new JobItemMacro(m)).ToArray())).ToArray();
+                    LogMessage("Preparing job");
+
+                    var jobItems = PrepareJob();
 
                     JobSet?.Invoke(jobItems, startTime);
 
@@ -80,8 +93,45 @@ namespace Xarial.CadPlus.Batch.InApp
             }
         }
 
+        private JobItemFile[] PrepareJob() 
+        {
+            var processedFiles = new List<string>();
+
+            var jobItems = new List<JobItemFile>();
+
+            foreach (var comp in m_Comps) 
+            {
+                var macros = m_Macros.Select(m => new JobItemMacro(m)).ToArray();
+
+                try
+                {
+                    var path = comp.Path;
+
+                    if (!processedFiles.Contains(path, StringComparer.CurrentCultureIgnoreCase))
+                    {
+                        processedFiles.Add(path);
+                        jobItems.Add(new JobItemFile(path, macros));
+                    }
+                }
+                catch 
+                {
+                    jobItems.Add(new MissingJobItemFile(comp.Name, macros));
+                }
+            }
+
+            return jobItems.ToArray();
+        }
+
         private bool TryProcessFile(JobItemFile file) 
         {
+            LogMessage($"Processing '{file.FilePath}'");
+
+            if (file is MissingJobItemFile) 
+            {
+                LogMessage($"Component '{file.FilePath}' will not be processed as failed to resolve the file path");
+                return false;
+            }
+
             IXDocument doc = null;
 
             try
@@ -125,8 +175,9 @@ namespace Xarial.CadPlus.Batch.InApp
                     file.Status = JobItemStatus_e.Failed;
                 }
             }
-            catch
+            catch(Exception ex)
             {
+                LogMessage($"Failed to process file '{file.FilePath}': {ex.ParseUserError(out _)}");
                 file.Status = JobItemStatus_e.Failed;
             }
             finally 
@@ -151,13 +202,34 @@ namespace Xarial.CadPlus.Batch.InApp
             try
             {
                 macro.Status = JobItemStatus_e.InProgress;
-                m_MacroRunner.RunMacro(macro.FilePath, null, XCad.Enums.MacroRunOptions_e.UnloadAfterRun, "", doc);
+                
+                m_MacroRunner.RunMacro(m_App, macro.Macro.FilePath, null, 
+                    XCad.Enums.MacroRunOptions_e.UnloadAfterRun, macro.Macro.Arguments, doc);
+
                 macro.Status = JobItemStatus_e.Succeeded;
             }
-            catch
+            catch(Exception ex)
             {
+                string errorDesc;
+
+                if (ex is MacroRunFailedException)
+                {
+                    errorDesc = (ex as MacroRunFailedException).Message;
+                }
+                else
+                {
+                    errorDesc = "Unknown error";
+                }
+
+                LogMessage($"Failed to run macro '{macro.FilePath}': {errorDesc}");
+
                 macro.Status = JobItemStatus_e.Failed;
             }
+        }
+
+        private void LogMessage(string msg) 
+        {
+            Log?.Invoke(msg);
         }
     }
 }

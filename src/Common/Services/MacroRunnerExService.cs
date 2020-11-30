@@ -14,7 +14,7 @@ namespace Xarial.CadPlus.Common.Services
 {
     public interface IMacroRunnerExService
     {
-        void RunMacro(string macroPath, MacroEntryPoint entryPoint,
+        void RunMacro(IXApplication app, string macroPath, MacroEntryPoint entryPoint,
             MacroRunOptions_e opts, string args, IXDocument doc);
     }
 
@@ -24,12 +24,10 @@ namespace Xarial.CadPlus.Common.Services
         private static extern IntPtr CommandLineToArgvW(
             [MarshalAs(UnmanagedType.LPWStr)] string lpCmdLine, out int pNumArgs);
 
-        private readonly IXApplication m_App;
         private readonly IMacroRunner m_Runner;
 
-        public MacroRunnerExService(IXApplication app)
+        public MacroRunnerExService()
         {
-            m_App = app;
             m_Runner = TryCreateMacroRunner();
         }
 
@@ -45,14 +43,14 @@ namespace Xarial.CadPlus.Common.Services
             }
         }
 
-        public void RunMacro(string macroPath, MacroEntryPoint entryPoint,
+        public void RunMacro(IXApplication app, string macroPath, MacroEntryPoint entryPoint,
             MacroRunOptions_e opts, string args, IXDocument doc)
         {
             try
             {
                 if (entryPoint == null)
                 {
-                    var macro = m_App.OpenMacro(macroPath);
+                    var macro = app.OpenMacro(macroPath);
                     entryPoint = macro.EntryPoints.First();
                 }
 
@@ -71,7 +69,7 @@ namespace Xarial.CadPlus.Common.Services
                             param.Set("Args", ParseCommandLine(args));
                         }
 
-                        var res = m_Runner.Run(GetAppDispatch(m_App),
+                        var res = m_Runner.Run(GetAppDispatch(app),
                             macroPath, entryPoint.ModuleName,
                             entryPoint.ProcedureName, (int)opts, param, true);
 
@@ -87,12 +85,16 @@ namespace Xarial.CadPlus.Common.Services
                 }
                 else
                 {
-                    var macro = m_App.OpenMacro(macroPath);
+                    var macro = app.OpenMacro(macroPath);
                     macro.Run(entryPoint, opts);
                 }
             }
             catch (MacroUserInterruptException) //do not consider this as an error
             {
+            }
+            catch (MacroRunnerResultError resEx) 
+            {
+                throw new MacroRunFailedException(macroPath, -1, resEx.Message);
             }
         }
 
