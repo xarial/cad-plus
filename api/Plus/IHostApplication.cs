@@ -22,9 +22,20 @@ namespace Xarial.CadPlus.Plus
         IEnumerable<IModule> Modules { get; }
 
         /// <summary>
+        /// Notifies when all modules are initialized
+        /// </summary>
+        /// <remarks>Use this method to invoke modules APIs</remarks>
+        event Action Initialized;
+
+        /// <summary>
         /// Notifies when the application loaded its data and modules can start invoking APIs
         /// </summary>
         event Action Connect;
+
+        /// <summary>
+        /// Allows to inject services to dependency injection container
+        /// </summary>
+        event Action<IContainerBuilder> ConfigureServices;
 
         /// <summary>
         /// Notifies when application closes for modules to release resources
@@ -35,7 +46,7 @@ namespace Xarial.CadPlus.Plus
         /// Invoked when application loaded its UI
         /// </summary>
         /// <remarks>Use this to display any popup windows, such as license or registration/login dialogs</remarks>
-        void OnStarted();
+        event Action Started;
         
         void OnConfigureServices(IXServiceCollection svcColl);
 
