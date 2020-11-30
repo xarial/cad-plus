@@ -16,9 +16,8 @@
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
-                        <TextBox x:Name="PART_LogTextBox" Margin="2" AcceptsReturn="True" AcceptsTab="True" Grid.ColumnSpan="2"
-                             IsReadOnly="True"
-                             VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" />
+                        <ListBox VirtualizingStackPanel.IsVirtualizing="True"
+                                 Margin="2" Grid.ColumnSpan="2" ItemsSource="{TemplateBinding LogSource}" />
                         <ProgressBar Grid.Row="1" Value="{TemplateBinding Progress}" Minimum="0" Margin="2" Maximum="1" />
                         <Button Grid.Row="1" Grid.Column="1" VerticalAlignment="Stretch" Margin="2" Width="75"
                             Command="{TemplateBinding CancelCommand}">

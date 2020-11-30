@@ -20,13 +20,13 @@ image: /logo.svg
 Please see the table below for the list of features and their availability in the specific editions.
 
 | Feature                                                           | Community Edition | Professional Edition |
-|-------------------------------------------------------------------|-------------------|----------------------|
-| [xPort User Interface](/xport/command-line/)                      | 🗸                | 🗸                   |
-| [xPort Command Line](/xport/user-interface/)                      | 🗸                | 🗸                   |
-| [Custom Toolbar](/custom-toolbar)                                 | 🗸                | 🗸                   |
-| [Custom Toolbar Triggers](/custom-toolbar/configuration/triggers) | 🗸                | 🗸                   |
-| [xBatch User Interface](/xbatch/command-line/)                    | 🗸                | 🗸                   |
-| [xBatch Command Line](/xbatch/user-interface/)                    | 🗸                | 🗸                   |
+|-------------------------------------------------------------------|:-----------------:|:--------------------:|
+| [xPort User Interface](/xport/command-line/)                      | &#x2714;          | &#x2714;             |
+| [xPort Command Line](/xport/user-interface/)                      | &#x2714;          | &#x2714;             |
+| [Custom Toolbar](/custom-toolbar)                                 | &#x2714;          | &#x2714;             |
+| [Custom Toolbar Triggers](/custom-toolbar/configuration/triggers) | &#x2714;          | &#x2714;             |
+| [xBatch User Interface](/xbatch/command-line/)                    | &#x2714;          | &#x2714;             |
+| [xBatch Command Line](/xbatch/user-interface/)                    | &#x2714;          | &#x2714;             |
 
 ## Download
 

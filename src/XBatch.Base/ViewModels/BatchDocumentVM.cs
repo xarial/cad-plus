@@ -17,6 +17,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using Xarial.CadPlus.Common.Services;
 using Xarial.CadPlus.XBatch.Base.Core;
+using Xarial.CadPlus.XBatch.Base.Exceptions;
 using Xarial.CadPlus.XBatch.Base.Models;
 using Xarial.XToolkit.Services.UserSettings;
 using Xarial.XToolkit.Wpf;
@@ -62,6 +63,12 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
 
     public class BatchDocumentVM : INotifyPropertyChanged
     {
+        internal static FileFilter[] FileFilters { get; }
+            = new FileFilter[] 
+            {
+                new FileFilter("Batch+ File", "*.batchplus"),
+                FileFilter.AllFiles };
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         private string m_Name;
@@ -69,22 +76,22 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
         public string Name
         {
             get => m_Name;
-            private set 
+            private set
             {
                 m_Name = value;
                 this.NotifyChanged();
             }
         }
-                
+
         public BatchDocumentSettingsVM Settings { get; }
         public JobResultsVM Results { get; }
 
         public ObservableCollection<string> Input { get; }
 
-        public ObservableCollection<string> Macros { get; }
+        public ObservableCollection<MacroData> Macros { get; }
 
         public ObservableCollection<FilterVM> Filters { get; }
-        
+
         public FileFilter[] InputFilesFilter => m_Model.InputFilesFilter;
 
         public FileFilter[] MacroFilesFilter => m_Model.MacroFilesFilter;
@@ -96,7 +103,7 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
 
         public ICommand FilterEditEndingCommand { get; }
 
-        public bool IsDirty 
+        public bool IsDirty
         {
             get => m_IsDirty;
             private set
@@ -115,14 +122,14 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
 
         public string FilePath => m_FilePath;
 
-        public BatchDocumentVM(FileInfo file, BatchJob job, IBatchRunnerModel model, IMessageService msgSvc) 
+        public BatchDocumentVM(FileInfo file, BatchJob job, IBatchRunnerModel model, IMessageService msgSvc)
             : this(Path.GetFileNameWithoutExtension(file.FullName), job, model, msgSvc)
         {
             m_FilePath = file.FullName;
             IsDirty = false;
         }
 
-        public BatchDocumentVM(string name, BatchJob job, IBatchRunnerModel model, IMessageService msgSvc) 
+        public BatchDocumentVM(string name, BatchJob job, IBatchRunnerModel model, IMessageService msgSvc)
         {
             m_Model = model;
             m_Job = job;
@@ -130,7 +137,7 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
 
             IsDirty = true;
 
-            RunJobCommand = new RelayCommand(RunJob, () => Input.Any() && Macros.Any() && Settings.Version != null);
+            RunJobCommand = new RelayCommand(RunJob, () => CanRunJob);
             SaveDocumentCommand = new RelayCommand(SaveDocument, () => IsDirty);
             SaveAsDocumentCommand = new RelayCommand(SaveAsDocument);
             FilterEditEndingCommand = new RelayCommand<DataGridCellEditEndingEventArgs>(FilterEditEnding);
@@ -147,9 +154,17 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
             Input = new ObservableCollection<string>(m_Job.Input ?? Enumerable.Empty<string>());
             Input.CollectionChanged += OnInputCollectionChanged;
 
-            Macros = new ObservableCollection<string>(m_Job.Macros ?? Enumerable.Empty<string>());
+            Macros = new ObservableCollection<MacroData>(m_Job.Macros ?? Enumerable.Empty<MacroData>());
             Macros.CollectionChanged += OnMacrosCollectionChanged;
         }
+
+        public Func<string, object> PathToMacroDataConverter { get; }
+            = new Func<string, object>(p => new MacroData() { FilePath = p });
+
+        public Func<object, string> MacroDataToPathConverter { get; }
+        = new Func<object, string>((m) => ((MacroData)m).FilePath);
+
+        private bool CanRunJob => Input.Any() && Macros.Any() && Settings.Version != null;
 
         private void FilterEditEnding(DataGridCellEditEndingEventArgs args)
         {
@@ -173,8 +188,8 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
         private void SaveAsDocument()
         {
             if (FileSystemBrowser.BrowseFileSave(out m_FilePath, 
-                "Select file path", 
-                FileSystemBrowser.BuildFilterString(new FileFilter("xBatch File", "*.xbatch"), FileFilter.AllFiles))) 
+                "Select file path",
+                FileSystemBrowser.BuildFilterString(FileFilters)))
             {
                 SaveDocument();
                 Name = Path.GetFileNameWithoutExtension(m_FilePath);
@@ -228,8 +243,13 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
             }
         }
 
-        private void RunJob() 
+        internal void RunJob() 
         {
+            if (!CanRunJob) 
+            {
+                throw new UserMessageException("Cannot run this job as preconditions are not met");
+            }
+
             Results.StartNewJob();
         }
     }

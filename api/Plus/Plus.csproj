@@ -1,0 +1,36 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net461</TargetFramework>
+    <RootNamespace>Xarial.CadPlus.Plus</RootNamespace>
+    <AssemblyName>Xarial.CadPlusPlus</AssemblyName>
+    <SignAssembly>false</SignAssembly>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <PackageId>Xarial.CadPlusPlus</PackageId>
+    <VersionPrefix>0.1.0</VersionPrefix>
+    <Authors>Xarial</Authors>
+    <Product>CAD+</Product>
+    <Copyright>© 2020 Xarial Pty Limited</Copyright>
+    <PackageProjectUrl>https://cadplus.xarial.com</PackageProjectUrl>
+    <AssemblyOriginatorKeyFile></AssemblyOriginatorKeyFile>
+    <Company>Xarial Pty Limited</Company>
+    <RepositoryUrl>https://github.com/xarial/cad-plus</RepositoryUrl>
+    <PackageTags>cad,solidworks,tools</PackageTags>
+    <Description>CAD+ Toolset API</Description>
+    <RepositoryType>git</RepositoryType>
+    <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
+    <!--<PackageIcon>icon.png</PackageIcon>
+    <PackageIconUrl>https://cadplus.xarial.com/icon.png</PackageIconUrl>-->
+  </PropertyGroup>
+  <ItemGroup>
+    <Folder Include="Properties\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\LICENSE.md">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Xarial.XCad" Version="0.6.9" />
+  </ItemGroup>
+</Project>

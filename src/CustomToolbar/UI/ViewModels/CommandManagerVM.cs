@@ -11,6 +11,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Windows.Input;
+using Xarial.CadPlus.Common.Services;
 using Xarial.CadPlus.CustomToolbar.Services;
 using Xarial.CadPlus.CustomToolbar.Structs;
 using Xarial.CadPlus.CustomToolbar.UI.Base;
@@ -64,8 +65,7 @@ namespace Xarial.CadPlus.CustomToolbar.UI.ViewModels
             catch
             {
                 isReadOnly = true;
-                m_MsgService.ShowMessage("Failed to load the toolbar from the specification file. Make sure that you have access to the specification file",
-                    MessageType_e.Error);
+                m_MsgService.ShowError("Failed to load the toolbar from the specification file. Make sure that you have access to the specification file");
             }
 
             IsEditable = !isReadOnly;

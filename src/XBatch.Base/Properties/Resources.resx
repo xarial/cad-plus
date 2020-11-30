@@ -130,6 +130,9 @@
   <data name="app_version" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\app-version.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="arguments_icon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\arguments-icon.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="background_mode" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\background-mode.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
@@ -141,6 +144,9 @@
   </data>
   <data name="filter" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\filter.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="invisible_mode" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\invisible-mode.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="no_popup_mode" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\no-popup-mode.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>

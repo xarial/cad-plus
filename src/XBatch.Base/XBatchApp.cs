@@ -5,18 +5,24 @@
 //License: https://cadplus.xarial.com/license/
 //*********************************************************************
 
+using Autofac;
 using CommandLine;
 using System;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Xarial.CadPlus.Common;
 using Xarial.CadPlus.Common.Services;
 using Xarial.CadPlus.XBatch.Base.Core;
+using Xarial.CadPlus.XBatch.Base.Models;
+using Xarial.CadPlus.XBatch.Base.Services;
 using Xarial.CadPlus.XBatch.Base.ViewModels;
+using Xarial.XCad;
+using Xarial.XCad.Base;
 
 namespace Xarial.CadPlus.XBatch.Base
 {
-    public abstract class XBatchApp : MixedApplication<Arguments>
+    public abstract class XBatchApp : MixedApplication<IArguments>
     {
         private FileOptions m_StartupOptions;
 
@@ -43,25 +49,58 @@ namespace Xarial.CadPlus.XBatch.Base
             }
         }
 
-        protected override Task RunConsole(Arguments args)
+        protected override Task RunConsole(IArguments args)
         {
             return RunConsoleBatch(args);
         }
 
-        private async Task RunConsoleBatch(Arguments args)
+        protected override void OnConfigureServices(ContainerBuilder builder)
         {
-            var appProvider = GetApplicationProvider();
+            builder.RegisterType<RecentFilesManager>()
+                .As<IRecentFilesManager>();
 
-            var opts = args.GetOptions(appProvider);
+            builder.RegisterType<AppLogger>().As<IXLogger>();
+            builder.RegisterType<BatchRunner>();
+            builder.RegisterType<BatchRunnerModel>().As<IBatchRunnerModel>();
+            builder.RegisterType<BatchRunJobExecutor>().As<IBatchRunJobExecutor>();
+            builder.RegisterType<BatchManagerVM>();
 
-            using (var batchRunner = new BatchRunner(appProvider, Console.Out, new ConsoleProgressWriter()))
+            builder.RegisterType<XCad.Toolkit.ServiceCollection>().As<IXServiceCollection>()
+                .SingleInstance()
+                .OnActivating(x => x.Instance.Populate(x.Context));
+
+            builder.RegisterType<JobManager>().As<IJobManager>()
+                .SingleInstance()
+                .OnActivating(x =>
+                {
+                    try
+                    {
+                        x.Instance.Init();
+                    }
+                    catch (Exception ex)
+                    {
+                        var logger = x.Context.Resolve<IXLogger>();
+                        logger.Log(ex);
+                    }
+                });
+        }
+
+        private async Task RunConsoleBatch(IArguments args)
+        {
+            using (var batchRunner = m_Container.Resolve<BatchRunner>(
+                new TypedParameter[]
+                {
+                    new TypedParameter(typeof(TextWriter), Console.Out),
+                    new TypedParameter(typeof(IProgressHandler), new ConsoleProgressWriter())
+                }))
             {
+                var opts = args.GetOptions(Host.Services.GetService<IApplicationProvider>());
                 await batchRunner.BatchRun(opts).ConfigureAwait(false);
             }
         }
 
         protected override void TryExtractCliArguments(Parser parser, string[] input, 
-            out Arguments args, out bool hasArguments, out bool hasError)
+            out IArguments args, out bool hasArguments, out bool hasError)
         {
             args = default;
             hasError = false;
@@ -69,21 +108,20 @@ namespace Xarial.CadPlus.XBatch.Base
 
             if (input.Any())
             {
-                Arguments argsLocal = default;
+                IArguments argsLocal = default;
                 bool hasErrorLocal = false;
                 bool hasArgumentsLocal = false;
 
-                parser.ParseArguments<FileOptions, Arguments>(input)
-                    .WithParsed<Arguments>(a => { argsLocal = a; hasArgumentsLocal = true; })
+                parser.ParseArguments<FileOptions, RunOptions, JobOptions>(input)
+                    .WithParsed<RunOptions>(a => { argsLocal = a; hasArgumentsLocal = true; })
+                    .WithParsed<JobOptions>(a => { argsLocal = a; hasArgumentsLocal = true; })
                     .WithParsed<FileOptions>(a => m_StartupOptions = a)
-                    .WithNotParsed(err => hasErrorLocal = true);
+                    .WithNotParsed(err => { hasErrorLocal = true; hasArgumentsLocal = true; });
 
                 args = argsLocal;
                 hasError = hasErrorLocal;
                 hasArguments = hasArgumentsLocal;
             }
         }
-        
-        public abstract IApplicationProvider GetApplicationProvider();
     }
 }

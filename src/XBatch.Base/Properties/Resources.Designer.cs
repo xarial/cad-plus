@@ -103,6 +103,16 @@ namespace Xarial.CadPlus.XBatch.Base.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap arguments_icon {
+            get {
+                object obj = ResourceManager.GetObject("arguments_icon", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap background_mode {
             get {
                 object obj = ResourceManager.GetObject("background_mode", resourceCulture);
@@ -136,6 +146,16 @@ namespace Xarial.CadPlus.XBatch.Base.Properties {
         internal static System.Drawing.Bitmap filter {
             get {
                 object obj = ResourceManager.GetObject("filter", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap invisible_mode {
+            get {
+                object obj = ResourceManager.GetObject("invisible_mode", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

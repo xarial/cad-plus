@@ -67,7 +67,7 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
             {
                 if (!string.IsNullOrEmpty(filePath) ||
                     FileSystemBrowser.BrowseFileOpen(out filePath, "Select file to open",
-                        FileSystemBrowser.BuildFilterString(new FileFilter("xBatch File", "*.xbatch"), FileFilter.AllFiles)))
+                        FileSystemBrowser.BuildFilterString(BatchDocumentVM.FileFilters)))
                 {
                     if (!string.Equals(Document?.FilePath, filePath, StringComparison.CurrentCultureIgnoreCase))
                     {
@@ -104,7 +104,7 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
             {
                 var job = m_Model.CreateNewJobDocument();
 
-                Document = new BatchDocumentVM("xBatch Document", job, m_Model, m_MsgSvc);
+                Document = new BatchDocumentVM("Batch+ Document", job, m_Model, m_MsgSvc);
             }
             else
             {

@@ -30,8 +30,8 @@ namespace Xbatch.Tests
             vm.Document.Input.Add("D:\\folder2");
             vm.Document.Filters.Clear();
             vm.Document.Filters.Add(new FilterVM("*.sld*"));
-            vm.Document.Macros.Add("C:\\macro1.swp");
-            vm.Document.Macros.Add("C:\\macro2.swp");
+            vm.Document.Macros.Add(new MacroData() { FilePath = "C:\\macro1.swp" });
+            vm.Document.Macros.Add(new MacroData() { FilePath = "C:\\macro2.swp" });
             vm.Document.Settings.IsTimeoutEnabled = true;
             vm.Document.Settings.Timeout = 30;
             vm.Document.Settings.OpenFileOptionSilent = true;
@@ -44,7 +44,7 @@ namespace Xbatch.Tests
             vm.Document.RunJobCommand.Execute(null);
 
             Assert.IsTrue(new string[] { "*.sld*" }.SequenceEqual(opts.Filters));
-            Assert.IsTrue(new string[] { "C:\\macro1.swp", "C:\\macro2.swp" }.SequenceEqual(opts.Macros));
+            Assert.IsTrue(new string[] { "C:\\macro1.swp", "C:\\macro2.swp" }.SequenceEqual(opts.Macros.Select(m => m.FilePath)));
             Assert.IsTrue(new string[] { "D:\\folder1", "D:\\folder2" }.SequenceEqual(opts.Input));
             Assert.AreEqual(30, opts.Timeout);
             Assert.AreEqual(OpenFileOptions_e.Silent | OpenFileOptions_e.ReadOnly, opts.OpenFileOptions);
@@ -64,6 +64,10 @@ namespace Xbatch.Tests
             var msgSvcMock = new Mock<IMessageService>().Object;
             var vm = new BatchManagerVM(modelMock, msgSvcMock);
             vm.Document = new BatchDocumentVM("", new BatchJob(), modelMock, msgSvcMock);
+
+            vm.Document.Input.Add("abc");
+            vm.Document.Macros.Add(new MacroData() { FilePath = "xyz" });
+            vm.Document.Settings.Version = new SwAppVersionInfo(SwVersion_e.Sw2019);
 
             vm.Document.Settings.Timeout = 300;
             vm.Document.Settings.IsTimeoutEnabled = false;
@@ -86,7 +90,9 @@ namespace Xbatch.Tests
             var msgSvcMock = new Mock<IMessageService>().Object;
             var vm = new BatchManagerVM(modelMock, msgSvcMock);
             vm.Document = new BatchDocumentVM("", new BatchJob(), modelMock, msgSvcMock);
-
+            vm.Document.Input.Add("abc");
+            vm.Document.Macros.Add(new MacroData() { FilePath = "xyz" });
+            vm.Document.Settings.Version = new SwAppVersionInfo(SwVersion_e.Sw2019);
             vm.Document.Settings.IsTimeoutEnabled = false;
 
             vm.Document.RunJobCommand.Execute(null);

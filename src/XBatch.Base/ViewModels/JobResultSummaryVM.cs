@@ -115,9 +115,9 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
             m_Executor.JobCompleted += OnJobCompleted;
         }
 
-        private void OnJobSet(IJobItemFile[] files, DateTime startTime)
+        private void OnJobSet(IJobItem[] files, DateTime startTime)
         {
-            JobItemFiles = files.Select(f => new JobItemFileVM(f)).ToArray();
+            JobItemFiles = files.Select(f => new JobItemFileVM((IJobItemFile)f)).ToArray();
             StartTime = startTime;
         }
 
@@ -126,7 +126,7 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
             Duration = duration;
         }
 
-        private void OnProgressChanged(IJobItemFile file, bool result)
+        private void OnProgressChanged(IJobItem file, bool result)
         {
             if (IsInitializing)
             {

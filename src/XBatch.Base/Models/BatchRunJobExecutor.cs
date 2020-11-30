@@ -7,29 +7,31 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Xarial.CadPlus.Common.Services;
 using Xarial.CadPlus.XBatch.Base.Core;
+using Xarial.XCad;
 using Xarial.XToolkit.Reporting;
 
 namespace Xarial.CadPlus.XBatch.Base.Models
 {
     public interface IBatchRunJobExecutor
     {
-        event Action<IJobItemFile[], DateTime> JobSet;
+        event Action<IJobItem[], DateTime> JobSet;
         event Action<TimeSpan> JobCompleted;
-        event Action<IJobItemFile, bool> ProgressChanged;
+        event Action<IJobItem, bool> ProgressChanged;
         event Action<string> Log;
 
         Task<bool> ExecuteAsync();
         void Cancel();
     }
 
-    public class BatchRunJobExecutor : IBatchRunJobExecutor
+    public class BatchRunJobExecutor : IBatchRunJobExecutor, IDisposable
     {
-        public event Action<IJobItemFile, bool> ProgressChanged;
-        public event Action<IJobItemFile[], DateTime> JobSet;
+        public event Action<IJobItem, bool> ProgressChanged;
+        public event Action<IJobItem[], DateTime> JobSet;
         public event Action<TimeSpan> JobCompleted;
 
         public event Action<string> Log;
@@ -37,20 +39,22 @@ namespace Xarial.CadPlus.XBatch.Base.Models
         private CancellationTokenSource m_CurrentCancellationToken;
 
         private readonly BatchJob m_Job;
-        private readonly IApplicationProvider m_AppProvider;
-
+        
         private readonly LogWriter m_LogWriter;
         private readonly ProgressHandler m_PrgHander;
         
         private bool m_IsExecuting;
 
-        public BatchRunJobExecutor(BatchJob job, IApplicationProvider appProvider) 
+        private readonly Func<TextWriter, IProgressHandler, BatchRunner> m_BatchRunnerFact;
+
+        public BatchRunJobExecutor(BatchJob job, Func<TextWriter, IProgressHandler, BatchRunner> batchRunnerFact) 
         {
             m_Job = job;
-            m_AppProvider = appProvider;
-
+            
             m_LogWriter = new LogWriter();
             m_PrgHander = new ProgressHandler();
+
+            m_BatchRunnerFact = batchRunnerFact;
 
             m_IsExecuting = false;
         }
@@ -70,10 +74,10 @@ namespace Xarial.CadPlus.XBatch.Base.Models
 
                 try
                 {
-                    using (var batchRunner = new BatchRunner(m_AppProvider, m_LogWriter, m_PrgHander))
-                    {
-                        var cancellationToken = m_CurrentCancellationToken.Token;
+                    var cancellationToken = m_CurrentCancellationToken.Token;
 
+                    using (var batchRunner = m_BatchRunnerFact.Invoke(m_LogWriter, m_PrgHander)) 
+                    {
                         return await batchRunner.BatchRun(m_Job, cancellationToken).ConfigureAwait(false);
                     }
                 }
@@ -90,17 +94,17 @@ namespace Xarial.CadPlus.XBatch.Base.Models
             }
             else 
             {
-                throw new Exception("Execution is already running");
+                throw new Exception("Job is currently running");
             }
         }
 
         private void OnJobCompleted(TimeSpan duration) => JobCompleted?.Invoke(duration);
 
-        private void OnJobScopeSet(IJobItemFile[] files, DateTime startTime) => JobSet?.Invoke(files, startTime);
+        private void OnJobScopeSet(IJobItem[] files, DateTime startTime) => JobSet?.Invoke(files, startTime);
 
         public void Cancel()
         {
-            m_CurrentCancellationToken.Cancel();
+            m_CurrentCancellationToken?.Cancel();
         }
 
         private void OnLog(string line)
@@ -108,9 +112,14 @@ namespace Xarial.CadPlus.XBatch.Base.Models
             Log?.Invoke(line);
         }
 
-        private void OnProgressChanged(IJobItemFile file, bool result)
+        private void OnProgressChanged(IJobItem file, bool result)
         {
             ProgressChanged?.Invoke(file, result);
+        }
+
+        public void Dispose() 
+        {
+            Cancel();
         }
     }
 }
