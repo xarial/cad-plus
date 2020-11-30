@@ -11,11 +11,11 @@ using Xarial.XCad.UI;
 
 namespace Xarial.CadPlus.CustomToolbar.Base
 {
-    public class MacroButtonIcon : IXImage
+    public class ImageIcon : IXImage
     {
         public byte[] Buffer { get; }
 
-        internal MacroButtonIcon(Image icon)
+        internal ImageIcon(Image icon)
         {
             using (var ms = new MemoryStream())
             {

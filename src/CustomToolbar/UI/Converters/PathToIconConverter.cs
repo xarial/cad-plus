@@ -29,12 +29,12 @@ namespace Xarial.CadPlus.CustomToolbar.UI.Converters
             m_DefaultGroupIcon = Resources.group_icon_default.ToBitmapImage();
         }
 
+        private readonly IIconsProvider[] m_IconProviders;
+
         public PathToIconConverter() 
             : this(CustomToolbarModule.Resolve<IIconsProvider[]>())
         {
         }
-
-        private readonly IIconsProvider[] m_IconProviders;
 
         public PathToIconConverter(IIconsProvider[] iconProviders) 
         {

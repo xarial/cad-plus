@@ -83,7 +83,7 @@ namespace Xarial.CadPlus.CustomToolbar.UI.ViewModels
 
             Groups = new CommandsCollection<CommandGroupVM>(
                 (ToolbarInfo.Groups ?? new CommandGroupInfo[0])
-                .Select(g => new CommandGroupVM(g)));
+                .Select(g => new CommandGroupVM(g, m_IconsProviders)));
 
             HandleCommandGroupCommandCreation(Groups.Commands);
 
