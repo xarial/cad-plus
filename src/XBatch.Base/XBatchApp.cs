@@ -17,6 +17,8 @@ using Xarial.CadPlus.XBatch.Base.Core;
 using Xarial.CadPlus.XBatch.Base.Models;
 using Xarial.CadPlus.XBatch.Base.Services;
 using Xarial.CadPlus.XBatch.Base.ViewModels;
+using Xarial.XCad;
+using Xarial.XCad.Base;
 
 namespace Xarial.CadPlus.XBatch.Base
 {
@@ -57,10 +59,30 @@ namespace Xarial.CadPlus.XBatch.Base
             builder.RegisterType<RecentFilesManager>()
                 .As<IRecentFilesManager>();
 
+            builder.RegisterType<AppLogger>().As<IXLogger>();
             builder.RegisterType<BatchRunner>();
             builder.RegisterType<BatchRunnerModel>().As<IBatchRunnerModel>();
             builder.RegisterType<BatchRunJobExecutor>().As<IBatchRunJobExecutor>();
             builder.RegisterType<BatchManagerVM>();
+
+            builder.RegisterType<XCad.Toolkit.ServiceCollection>().As<IXServiceCollection>()
+                .SingleInstance()
+                .OnActivating(x => x.Instance.Populate(x.Context));
+
+            builder.RegisterType<JobManager>().As<IJobManager>()
+                .SingleInstance()
+                .OnActivating(x =>
+                {
+                    try
+                    {
+                        x.Instance.Init();
+                    }
+                    catch (Exception ex)
+                    {
+                        var logger = x.Context.Resolve<IXLogger>();
+                        logger.Log(ex);
+                    }
+                });
         }
 
         private async Task RunConsoleBatch(IArguments args)

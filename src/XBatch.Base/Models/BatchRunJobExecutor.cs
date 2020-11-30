@@ -12,6 +12,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Xarial.CadPlus.Common.Services;
 using Xarial.CadPlus.XBatch.Base.Core;
+using Xarial.XCad;
 using Xarial.XToolkit.Reporting;
 
 namespace Xarial.CadPlus.XBatch.Base.Models
@@ -27,7 +28,7 @@ namespace Xarial.CadPlus.XBatch.Base.Models
         void Cancel();
     }
 
-    public class BatchRunJobExecutor : IBatchRunJobExecutor
+    public class BatchRunJobExecutor : IBatchRunJobExecutor, IDisposable
     {
         public event Action<IJobItem, bool> ProgressChanged;
         public event Action<IJobItem[], DateTime> JobSet;
@@ -103,7 +104,7 @@ namespace Xarial.CadPlus.XBatch.Base.Models
 
         public void Cancel()
         {
-            m_CurrentCancellationToken.Cancel();
+            m_CurrentCancellationToken?.Cancel();
         }
 
         private void OnLog(string line)
@@ -114,6 +115,11 @@ namespace Xarial.CadPlus.XBatch.Base.Models
         private void OnProgressChanged(IJobItem file, bool result)
         {
             ProgressChanged?.Invoke(file, result);
+        }
+
+        public void Dispose() 
+        {
+            Cancel();
         }
     }
 }

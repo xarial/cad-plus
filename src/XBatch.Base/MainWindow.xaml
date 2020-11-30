@@ -221,6 +221,9 @@
                     <fluent:ToggleButton Icon="/XBatch.Base;component/Resources/rapid-mode.png"
                                          LargeIcon="/XBatch.Base;component/Resources/rapid-mode.png" Header="Rapid"
                                          IsChecked="{Binding Path=OpenFileOptionRapid}"/>
+                    <fluent:ToggleButton Icon="/XBatch.Base;component/Resources/invisible-mode.png" 
+                                         LargeIcon="/XBatch.Base;component/Resources/invisible-mode.png" Header="Invisible"
+                                         IsChecked="{Binding Path=OpenFileOptionInvisible}"/>
                 </fluent:RibbonGroupBox>
                 <fluent:RibbonGroupBox Header="Execution">
                     <Grid>

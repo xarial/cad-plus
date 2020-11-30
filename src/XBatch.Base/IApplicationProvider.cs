@@ -17,10 +17,11 @@ using Xarial.XToolkit.Wpf.Utils;
 
 namespace Xarial.CadPlus.XBatch.Base
 {
-    public interface IApplicationProvider
+    public interface IApplicationProvider : IDisposable
     {
         IEnumerable<AppVersionInfo> GetInstalledVersions();
-        IXApplication StartApplication(AppVersionInfo vers, StartupOptions_e opts, CancellationToken cancellationToken);
+        IXApplication StartApplication(AppVersionInfo vers, StartupOptions_e opts,
+            CancellationToken cancellationToken);
         AppVersionInfo ParseVersion(string version);
         bool CanProcessFile(string filePath);
         FileFilter[] InputFilesFilter { get; }

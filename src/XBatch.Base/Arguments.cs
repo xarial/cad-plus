@@ -119,7 +119,7 @@ namespace Xarial.CadPlus.XBatch.Base
             set => m_DeferredSetters.Add(new Action<IApplicationProvider>(p => m_Options.Version = p.ParseVersion(value)));
         }
 
-        [Option('o', "open", Required = false, HelpText = "Specifies options (silent, readonly, rapid) for the file opening. Default: silent")]
+        [Option('o', "open", Required = false, HelpText = "Specifies options (silent, readonly, rapid, invisible) for the file opening. Default: silent")]
         public IEnumerable<OpenFileOptions_e> OpenFileOptions
         {
             set

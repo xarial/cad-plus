@@ -205,7 +205,25 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
                 Modified?.Invoke();
             }
         }
-        
+
+        public bool OpenFileOptionInvisible
+        {
+            get => m_Job.OpenFileOptions.HasFlag(OpenFileOptions_e.Invisible);
+            set
+            {
+                if (value)
+                {
+                    m_Job.OpenFileOptions |= OpenFileOptions_e.Invisible;
+                }
+                else
+                {
+                    m_Job.OpenFileOptions -= OpenFileOptions_e.Invisible;
+                }
+
+                Modified?.Invoke();
+            }
+        }
+
         public AppVersionInfo Version
         {
             get => m_Job.Version;
