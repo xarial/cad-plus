@@ -171,6 +171,8 @@ namespace Xarial.CadPlus.Common
             this.DispatcherUnhandledException += OnDispatcherUnhandledException;
             AppDomain.CurrentDomain.UnhandledException += OnDomainUnhandledException;
 
+            this.Exit += OnAppExit;
+
             OnAppStart();
 
             var parserOutput = new StringBuilder();
@@ -232,6 +234,11 @@ namespace Xarial.CadPlus.Common
                 Host = new WpfHostApplication(this, svc);
                 base.OnStartup(e);
             }
+        }
+
+        private void OnAppExit(object sender, ExitEventArgs e)
+        {
+            m_Container?.Dispose();
         }
 
         private IServiceProvider CreateServiceProvider() 

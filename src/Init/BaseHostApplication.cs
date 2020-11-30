@@ -17,11 +17,7 @@ namespace Xarial.CadPlus.Module.Init
         public virtual void OnStarted() 
         { 
         }
-        
-        public virtual void OnConfigureServices(IXServiceCollection svcColl) 
-        {
-        }
-        
+                
         public virtual void Dispose() 
         {
         }

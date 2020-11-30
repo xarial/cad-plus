@@ -10,13 +10,13 @@ namespace Xarial.CadPlus.Common
 {
     public static class IXServiceCollectionExtension
     {
-        public static void Populate(this IXServiceCollection svcColl, IContainer cont) 
+        public static void Populate(this IXServiceCollection svcColl, IComponentContext context) 
         {
-            foreach (var reg in cont.ComponentRegistry.Registrations)
+            foreach (var reg in context.ComponentRegistry.Registrations)
             {
                 var svcType = (reg.Services.First() as Autofac.Core.TypedService).ServiceType;
                 svcColl.AddOrReplace(svcType,
-                    () => cont.Resolve(svcType));
+                    () => context.Resolve(svcType));
             }
         }
     }
