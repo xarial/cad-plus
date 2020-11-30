@@ -132,6 +132,7 @@
     </Compile>
     <Compile Include="Services\CommandsManager.cs" />
     <Compile Include="Services\CSharpStateResolveCompiler.cs" />
+    <Compile Include="Services\ImageIconsProvider.cs" />
     <Compile Include="Services\IStateResolveCompiler.cs" />
     <Compile Include="Services\MacroEntryPointsExtractor.cs" />
     <Compile Include="Services\MacroRunner.cs" />

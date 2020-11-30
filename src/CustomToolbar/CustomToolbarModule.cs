@@ -23,11 +23,13 @@ using Xarial.XCad.Base;
 using Xarial.CadPlus.Common.Services;
 using Xarial.CadPlus.Plus;
 using Xarial.CadPlus.Common;
+using Xarial.CadPlus.Plus.Modules;
+using System.Collections.Generic;
 
 namespace Xarial.CadPlus.CustomToolbar
 {
     [Export(typeof(IExtensionModule))]
-    public class CustomToolbarModule : IExtensionModule
+    public class CustomToolbarModule : IToolbarModule
     {
         [Title("Toolbar+")]
         [Description("Toolbar+ configuration")]
@@ -50,6 +52,15 @@ namespace Xarial.CadPlus.CustomToolbar
         private ICommandsManager m_CmdsMgr;
         private ITriggersManager m_TriggersMgr;
         private IMessageService m_Msg;
+
+        private List<IIconsProvider> m_IconsProviders;
+
+        public CustomToolbarModule() 
+        {
+            m_IconsProviders = new List<IIconsProvider>();
+            
+            RegisterIconsProvider(new ImageIconsProvider());
+        }
 
         public void Init(IHostApplication host)
         {
@@ -105,7 +116,9 @@ namespace Xarial.CadPlus.CustomToolbar
             builder.RegisterFromServiceProvider<IMacroRunnerExService>(m_Host.Services);
             builder.RegisterFromServiceProvider<IMessageService>(m_Host.Services);
             builder.RegisterFromServiceProvider<IMacroFileFilterProvider>(m_Host.Services);
-            
+
+            builder.RegisterInstance(m_IconsProviders.ToArray());
+
             m_Container = builder.Build();
         }
 
@@ -146,5 +159,7 @@ namespace Xarial.CadPlus.CustomToolbar
         }
 
         public void Dispose() => m_Container.Dispose();
+
+        public void RegisterIconsProvider(IIconsProvider provider) => m_IconsProviders.Add(provider);
     }
 }

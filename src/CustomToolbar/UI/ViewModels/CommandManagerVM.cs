@@ -15,6 +15,7 @@ using Xarial.CadPlus.Common.Services;
 using Xarial.CadPlus.CustomToolbar.Services;
 using Xarial.CadPlus.CustomToolbar.Structs;
 using Xarial.CadPlus.CustomToolbar.UI.Base;
+using Xarial.CadPlus.Plus.Modules;
 using Xarial.XToolkit.Wpf;
 using Xarial.XToolkit.Wpf.Extensions;
 using Xarial.XToolkit.Wpf.Utils;
@@ -42,12 +43,16 @@ namespace Xarial.CadPlus.CustomToolbar.UI.ViewModels
         private readonly IMessageService m_MsgService;
         private bool m_IsEditable;
 
+        private readonly IIconsProvider[] m_IconsProviders;
+
         public CommandManagerVM(IToolbarConfigurationProvider confsProvider,
-            ISettingsProvider settsProvider, IMessageService msgService)
+            ISettingsProvider settsProvider, IMessageService msgService, IIconsProvider[] iconsProviders)
         {
             m_ConfsProvider = confsProvider;
             m_SettsProvider = settsProvider;
             m_MsgService = msgService;
+
+            m_IconsProviders = iconsProviders;
 
             Settings = m_SettsProvider.GetSettings();
 
