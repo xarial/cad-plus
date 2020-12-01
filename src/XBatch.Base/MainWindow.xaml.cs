@@ -24,14 +24,19 @@ using Xarial.CadPlus.XBatch.Base.Services;
 using Xarial.CadPlus.XBatch.Base.ViewModels;
 using Xarial.XToolkit.Reporting;
 using Xarial.CadPlus.Common;
+using System.Windows.Interop;
 
 namespace Xarial.CadPlus.XBatch.Base
 {
     public partial class MainWindow
     {
+        private readonly BatchManagerVM m_BatchManager;
+
         public MainWindow()
         {
             InitializeComponent();
+
+            this.Closing += OnWindowClosing;
 
             XBatchApp app = null;
 
@@ -39,9 +44,10 @@ namespace Xarial.CadPlus.XBatch.Base
             {
                 app = (XBatchApp)Application.Current;
 
-                var vm = app.Host.Services.GetService<BatchManagerVM>();
-                                
-                this.DataContext = vm;
+                m_BatchManager = app.Host.Services.GetService<BatchManagerVM>();
+
+                m_BatchManager.ParentWindowHandle = new WindowInteropHelper(this).EnsureHandle();
+                this.DataContext = m_BatchManager;
             }
             catch (Exception ex)
             {
@@ -58,6 +64,11 @@ namespace Xarial.CadPlus.XBatch.Base
 
                 msgSvc.ShowError(ex.ParseUserError(out _));
             }
+        }
+
+        private void OnWindowClosing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            e.Cancel = !m_BatchManager.CanClose();
         }
     }
 }

@@ -38,7 +38,7 @@ namespace Xarial.CadPlus.Batch.InApp
         public enum Commands_e
         {
             [IconEx(typeof(Resources), nameof(Resources.batch_plus_vector), nameof(Resources.batch_plus_icon))]
-            [Title("Stand-Alone")]
+            [Title("Open Stand-Alone...")]
             [Description("Runs stand-alone Batch+")]
             [CommandItemInfo(true, true, WorkspaceTypes_e.All)]
             RunStandAlone,

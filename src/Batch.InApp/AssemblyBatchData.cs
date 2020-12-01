@@ -50,7 +50,7 @@ namespace Xarial.CadPlus.Batch.InApp
 
         [CustomControl(typeof(MacrosList))]
         [ControlOptions(height: 100)]
-        [Icon(typeof(Resources), nameof(Resources.macros_icon))]
+        [IconEx(typeof(Resources), nameof(Resources.macros_vector), nameof(Resources.macros_icon))]
         public MacrosVM Macros { get; set; }
 
         [Title("Add Macros...")]

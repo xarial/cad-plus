@@ -113,6 +113,11 @@ namespace Xarial.CadPlus.XBatch.Sw
                 app.State |= ApplicationState_e.Silent;
             }
 
+            if (opts.HasFlag(StartupOptions_e.Hidden)) 
+            {
+                app.State |= ApplicationState_e.Hidden;
+            }
+
             try
             {
                 app.Commit(cancellationToken);

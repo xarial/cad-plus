@@ -49,6 +49,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MacroRunner.Sw", "src\Macro
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common.Sw", "src\Common.Sw\Common.Sw.csproj", "{E1D89E3C-EBE7-41AF-B5A9-2048929702E2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Export.InApp", "src\Export.InApp\Export.InApp.csproj", "{DEEA0EFE-822A-489C-A264-5FFF122D5FC5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -193,6 +195,14 @@ Global
 		{E1D89E3C-EBE7-41AF-B5A9-2048929702E2}.Release|Any CPU.Build.0 = Release|Any CPU
 		{E1D89E3C-EBE7-41AF-B5A9-2048929702E2}.Release|x64.ActiveCfg = Release|Any CPU
 		{E1D89E3C-EBE7-41AF-B5A9-2048929702E2}.Release|x64.Build.0 = Release|Any CPU
+		{DEEA0EFE-822A-489C-A264-5FFF122D5FC5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DEEA0EFE-822A-489C-A264-5FFF122D5FC5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DEEA0EFE-822A-489C-A264-5FFF122D5FC5}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{DEEA0EFE-822A-489C-A264-5FFF122D5FC5}.Debug|x64.Build.0 = Debug|Any CPU
+		{DEEA0EFE-822A-489C-A264-5FFF122D5FC5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DEEA0EFE-822A-489C-A264-5FFF122D5FC5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DEEA0EFE-822A-489C-A264-5FFF122D5FC5}.Release|x64.ActiveCfg = Release|Any CPU
+		{DEEA0EFE-822A-489C-A264-5FFF122D5FC5}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -215,6 +225,7 @@ Global
 		{06DF768D-5302-4413-BBA2-C81D2A0BAD88} = {ED96A8B1-758F-42C9-A55D-8DFF1BAB51D5}
 		{F17D7E6B-8786-467A-A014-77311B399EFC} = {06DF768D-5302-4413-BBA2-C81D2A0BAD88}
 		{DA8337D6-678B-41A4-815B-2AAB9D80714D} = {06DF768D-5302-4413-BBA2-C81D2A0BAD88}
+		{DEEA0EFE-822A-489C-A264-5FFF122D5FC5} = {44577B98-DBC0-4368-BB5E-E118FCB7AA43}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {3C2BBB3C-6B3A-4CC2-BD49-20745320B11A}

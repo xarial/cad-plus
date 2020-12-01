@@ -30,7 +30,7 @@ namespace Xarial.CadPlus.XBatch.Base
         {
             this.StartupUri = new Uri("/XBatch.Base;component/MainWindow.xaml", UriKind.Relative);
         }
-
+        
         protected override void OnWindowStarted()
         {
             if (m_StartupOptions != null) 

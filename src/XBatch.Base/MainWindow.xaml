@@ -105,6 +105,15 @@
                                        IsEnabled="{Binding Path=Command, RelativeSource={RelativeSource Mode=Self}, Converter={StaticResource cmdEnabledConv}}"/>
                         <fluent:SeparatorTabItem/>
                         <fluent:Button Header="Close" Command="{Binding Path=CloseDocumentCommand}" />
+                        <fluent:SeparatorTabItem/>
+                        <fluent:Button Header="Help..." Icon="/XBatch.Base;component/Resources/help-icon.png" 
+                                       LargeIcon="/XBatch.Base;component/Resources/help-icon.png"
+                                       Command="{Binding Path=HelpCommand}" 
+                                       IsEnabled="{Binding Path=Command, RelativeSource={RelativeSource Mode=Self}, Converter={StaticResource cmdEnabledConv}}"/>
+                        <fluent:Button Header="About..." Icon="/XBatch.Base;component/Resources/about-icon.png" 
+                                       LargeIcon="/XBatch.Base;component/Resources/about-icon.png"
+                                       Command="{Binding Path=AboutCommand}" 
+                                       IsEnabled="{Binding Path=Command, RelativeSource={RelativeSource Mode=Self}, Converter={StaticResource cmdEnabledConv}}"/>
                     </fluent:BackstageTabControl>
                 </fluent:Backstage>
             </fluent:Ribbon.Menu>
@@ -210,6 +219,9 @@
                     <fluent:ToggleButton Size="Large" Icon="/XBatch.Base;component/Resources/no-popup-mode.png" 
                                          LargeIcon="/XBatch.Base;component/Resources/no-popup-mode.png" Header="Silent"
                                          IsChecked="{Binding Path=StartupOptionSilent}"/>
+                    <fluent:ToggleButton Size="Large" Icon="/XBatch.Base;component/Resources/hidden-application.png" 
+                                         LargeIcon="/XBatch.Base;component/Resources/hidden-application.png" Header="Hidden"
+                                         IsChecked="{Binding Path=StartupOptionHidden}"/>
                 </fluent:RibbonGroupBox>
                 <fluent:RibbonGroupBox Header="File Open Options">
                     <fluent:ToggleButton Icon="/XBatch.Base;component/Resources/silent-mode.png" 
