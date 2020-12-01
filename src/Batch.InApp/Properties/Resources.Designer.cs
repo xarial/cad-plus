@@ -109,5 +109,15 @@ namespace Xarial.CadPlus.Batch.InApp.Properties {
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] macros_vector {
+            get {
+                object obj = ResourceManager.GetObject("macros_vector", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
     }
 }

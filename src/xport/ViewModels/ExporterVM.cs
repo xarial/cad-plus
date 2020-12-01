@@ -10,6 +10,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Windows;
@@ -19,8 +20,10 @@ using WK.Libraries.BetterFolderBrowserNS;
 using Xarial.CadPlus.Common.Services;
 using Xarial.CadPlus.Xport.Core;
 using Xarial.CadPlus.Xport.Models;
+using Xarial.CadPlus.Xport.Properties;
 using Xarial.XToolkit.Reflection;
 using Xarial.XToolkit.Wpf;
+using Xarial.XToolkit.Wpf.Dialogs;
 using Xarial.XToolkit.Wpf.Extensions;
 using Xarial.XToolkit.Wpf.Utils;
 
@@ -107,6 +110,9 @@ namespace Xarial.CadPlus.Xport.ViewModels
         public ICommand CancelExportCommand => m_CancelExportCommand ?? (m_CancelExportCommand = new RelayCommand(CancelExport, () => IsExportInProgress));
         public ICommand BrowseOutputDirectoryCommand => m_BrowseOutputDirectoryCommand ?? (m_BrowseOutputDirectoryCommand = new RelayCommand(BrowseOutputDirectory));
 
+        public ICommand AboutCommand { get; }
+        public ICommand HelpCommand { get; }
+
         public int ActiveTabIndex
         {
             get => m_ActiveTabIndex;
@@ -116,6 +122,8 @@ namespace Xarial.CadPlus.Xport.ViewModels
                 this.NotifyChanged();
             }
         }
+
+        internal IntPtr ParentWindowHandle { get; set; }
 
         private readonly IExporterModel m_Model;
         private readonly IMessageService m_MsgSvc;
@@ -138,6 +146,9 @@ namespace Xarial.CadPlus.Xport.ViewModels
             Filter = "*.*";
             IsTimeoutEnabled = true;
             Timeout = 600;
+
+            AboutCommand = new RelayCommand(ShowAbout);
+            HelpCommand = new RelayCommand(OpenHelp);
         }
 
         private void OnProgressChanged(double prg)
@@ -204,6 +215,23 @@ namespace Xarial.CadPlus.Xport.ViewModels
         private void CancelExport()
         {
             m_Model.Cancel();
+        }
+
+        private void ShowAbout()
+        {
+            AboutDialog.Show(this.GetType().Assembly, Resources.export_plus_icon,
+                        ParentWindowHandle);
+        }
+
+        private void OpenHelp()
+        {
+            try
+            {
+                Process.Start(Settings.Default.HelpLink);
+            }
+            catch
+            {
+            }
         }
 
         private void BrowseOutputDirectory()

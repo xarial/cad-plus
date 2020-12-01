@@ -19,8 +19,10 @@ using System.Windows.Input;
 using Xarial.CadPlus.Common.Services;
 using Xarial.CadPlus.XBatch.Base.Core;
 using Xarial.CadPlus.XBatch.Base.Models;
+using Xarial.CadPlus.XBatch.Base.Properties;
 using Xarial.XToolkit.Services.UserSettings;
 using Xarial.XToolkit.Wpf;
+using Xarial.XToolkit.Wpf.Dialogs;
 using Xarial.XToolkit.Wpf.Extensions;
 using Xarial.XToolkit.Wpf.Utils;
 
@@ -45,6 +47,8 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
         public ICommand NewDocumentCommand { get; }
         public ICommand OpenDocumentCommand { get; }
         public ICommand CloseDocumentCommand { get; }
+        public ICommand AboutCommand { get; }
+        public ICommand HelpCommand { get; }
 
         private readonly IBatchRunnerModel m_Model;
         private readonly IMessageService m_MsgSvc;
@@ -57,10 +61,40 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
             NewDocumentCommand = new RelayCommand(NewDocument);
             OpenDocumentCommand = new RelayCommand<string>(OpenDocument);
             CloseDocumentCommand = new RelayCommand(CloseDocument, () => Document != null);
+            AboutCommand = new RelayCommand(ShowAbout);
+            HelpCommand = new RelayCommand(OpenHelp);
         }
 
         public ObservableCollection<string> RecentFiles => m_Model.RecentFiles;
-        
+
+        internal IntPtr ParentWindowHandle { get; set; }
+
+        internal bool CanClose()
+        {
+            if (Document?.IsDirty == true)
+            {
+                var res = m_MsgSvc.ShowQuestion("Document has unsaved changes. Do you want to save this document?");
+
+                if (res.HasValue)
+                {
+                    if (res.Value)
+                    {
+                        Document.SaveDocument();
+                    }
+
+                    return true;
+                }
+                else 
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                return true;
+            }
+        }
+
         internal void OpenDocument(string filePath)
         {
             try
@@ -115,23 +149,26 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
 
         private void CloseDocument() 
         {
-            if (Document.IsDirty)
-            {
-                var res = m_MsgSvc.ShowQuestion("Document has unsaved changes. Do you want to save this document?");
-
-                if (res.HasValue)
-                {
-                    if (res.Value) 
-                    {
-                        Document.SaveDocument();
-                    }
-
-                    Document = null;
-                }
-            }
-            else 
+            if (CanClose()) 
             {
                 Document = null;
+            }
+        }
+
+        private void ShowAbout() 
+        {
+            AboutDialog.Show(this.GetType().Assembly, Resources.batch_plus_icon,
+                        ParentWindowHandle);
+        }
+
+        private void OpenHelp() 
+        {
+            try
+            {
+                Process.Start(Settings.Default.HelpLink);
+            }
+            catch 
+            {
             }
         }
 
