@@ -25,6 +25,7 @@ using System.IO;
 using Xarial.XCad.UI.PropertyPage.Structures;
 using Xarial.XCad.Documents.Enums;
 using Xarial.CadPlus.Common;
+using Xarial.CadPlus.Common.Attributes;
 
 namespace Xarial.CadPlus.Batch.InApp
 {
@@ -33,16 +34,16 @@ namespace Xarial.CadPlus.Batch.InApp
     {
         [Title("Batch+")]
         [Description("Commands to batch run macros")]
-        [Icon(typeof(Resources), nameof(Resources.batch_plus_icon))]
+        [IconEx(typeof(Resources), nameof(Resources.batch_plus_vector), nameof(Resources.batch_plus_icon))]
         public enum Commands_e
         {
-            [Icon(typeof(Resources), nameof(Resources.batch_plus_icon))]
+            [IconEx(typeof(Resources), nameof(Resources.batch_plus_vector), nameof(Resources.batch_plus_icon))]
             [Title("Stand-Alone")]
             [Description("Runs stand-alone Batch+")]
             [CommandItemInfo(true, true, WorkspaceTypes_e.All)]
             RunStandAlone,
 
-            [Icon(typeof(Resources), nameof(Resources.batch_plus_assm_icon))]
+            [IconEx(typeof(Resources), nameof(Resources.batch_plus_assm_vector), nameof(Resources.batch_plus_assm_icon))]
             [Title("Run")]
             [Description("Runs batch command to active file")]
             [CommandItemInfo(true, true, WorkspaceTypes_e.Assembly)]

@@ -23,6 +23,7 @@ using Xarial.CadPlus.Plus;
 using Xarial.CadPlus.Common.Sw.Services;
 using Xarial.CadPlus.Common.Sw;
 using Autofac;
+using Xarial.CadPlus.Common;
 
 namespace Xarial.CadPlus.AddIn.Sw
 {
@@ -63,8 +64,10 @@ namespace Xarial.CadPlus.AddIn.Sw
             m_Host.ConfigureServices += OnConfigureModuleServices;
         }
         
-        private void OnConfigureModuleServices(ContainerBuilder svc)
+        private void OnConfigureModuleServices(IContainerBuilder builder)
         {
+            var svc = ((ContainerBuilderWrapper)builder).Builder;
+
             svc.RegisterType<SwPropertyPageCreator<SwGeneralPropertyManagerPageHandler>>()
                 .As<IPropertyPageCreator>()
                 .WithParameter(new TypedParameter(typeof(ISwAddInEx), this));
