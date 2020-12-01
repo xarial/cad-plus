@@ -101,7 +101,7 @@ namespace Xarial.CadPlus.XBatch.Base
             set => m_Options.Timeout = value;
         }
         
-        [Option('s', "startup", Required = false, HelpText = "Specifies the startup options (silent, background, safe) for the host application. Defaul: silent and safe")]
+        [Option('s', "startup", Required = false, HelpText = "Specifies the startup options (silent, background, safe, hidden) for the host application. Defaul: silent and safe")]
         public IEnumerable<StartupOptions_e> StartupOptions 
         {
             set 

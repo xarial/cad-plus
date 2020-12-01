@@ -316,6 +316,18 @@
   <ItemGroup>
     <Resource Include="Resources\invisible-mode.png" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\hidden-application.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\about-icon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\help-icon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\batch-plus-icon.png" />
+  </ItemGroup>
   <Import Project="$(SolutionDir)common\common.module.props" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

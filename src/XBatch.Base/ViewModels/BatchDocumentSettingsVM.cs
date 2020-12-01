@@ -152,6 +152,24 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
             }
         }
 
+        public bool StartupOptionHidden
+        {
+            get => m_Job.StartupOptions.HasFlag(StartupOptions_e.Hidden);
+            set
+            {
+                if (value)
+                {
+                    m_Job.StartupOptions |= StartupOptions_e.Hidden;
+                }
+                else
+                {
+                    m_Job.StartupOptions -= StartupOptions_e.Hidden;
+                }
+
+                Modified?.Invoke();
+            }
+        }
+
         public bool OpenFileOptionSilent
         {
             get => m_Job.OpenFileOptions.HasFlag(OpenFileOptions_e.Silent);

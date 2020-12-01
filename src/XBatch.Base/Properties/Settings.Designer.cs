@@ -34,5 +34,17 @@ namespace Xarial.CadPlus.XBatch.Base.Properties {
                 this["AppRootDir"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("https://cadplus.xarial.com/batch/")]
+        public string HelpLink {
+            get {
+                return ((string)(this["HelpLink"]));
+            }
+            set {
+                this["HelpLink"] = value;
+            }
+        }
     }
 }
