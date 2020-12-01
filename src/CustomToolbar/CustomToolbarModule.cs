@@ -25,6 +25,7 @@ using Xarial.CadPlus.Plus;
 using Xarial.CadPlus.Common;
 using Xarial.CadPlus.Plus.Modules;
 using System.Collections.Generic;
+using Xarial.CadPlus.Common.Attributes;
 
 namespace Xarial.CadPlus.CustomToolbar
 {
@@ -33,10 +34,9 @@ namespace Xarial.CadPlus.CustomToolbar
     {
         [Title("Toolbar+")]
         [Description("Toolbar+ configuration")]
-        [Icon(typeof(Resources), nameof(Resources.configure_icon))]
         public enum Commands_e
         {
-            [Icon(typeof(Resources), nameof(Resources.configure_icon))]
+            [IconEx(typeof(Resources), nameof(Resources.configure_vector), nameof(Resources.configure_icon))]
             [Title("Configure...")]
             [Description("Configure custom toolbar")]
             [CommandItemInfo(true, false, WorkspaceTypes_e.All)]
@@ -122,7 +122,7 @@ namespace Xarial.CadPlus.CustomToolbar
             m_Container = builder.Build();
         }
 
-        protected virtual void LoadCommands()
+        private void LoadCommands()
         {
             m_Host.RegisterCommands<Commands_e>(OnCommandClick);
             

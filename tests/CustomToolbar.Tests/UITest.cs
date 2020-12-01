@@ -57,10 +57,6 @@ namespace CustomToolbar.Tests
 
                 m_Container = builder.Build();
             }
-
-            protected override void LoadCommands()
-            {
-            }
         }
 
         [SetUp]

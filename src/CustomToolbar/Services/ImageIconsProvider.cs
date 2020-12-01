@@ -30,7 +30,7 @@ namespace Xarial.CadPlus.CustomToolbar.Services
         public Image GetThumbnail(string filePath) => Image.FromFile(filePath);
 
         public bool Matches(string filePath) 
-            => m_SupportedExtensions.Contains(Path.GetExtension(filePath),
+            => !string.IsNullOrEmpty(filePath) && m_SupportedExtensions.Contains(Path.GetExtension(filePath),
                 StringComparer.CurrentCultureIgnoreCase);
     }
 }

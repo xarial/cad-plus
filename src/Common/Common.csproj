@@ -56,6 +56,7 @@
     <Reference Include="System.Diagnostics.DiagnosticSource, Version=4.0.5.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\..\packages\System.Diagnostics.DiagnosticSource.4.7.1\lib\net46\System.Diagnostics.DiagnosticSource.dll</HintPath>
     </Reference>
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Memory, Version=4.0.1.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\..\packages\System.Memory.4.5.4\lib\net461\System.Memory.dll</HintPath>
     </Reference>
@@ -82,7 +83,7 @@
       <HintPath>..\..\packages\Xarial.CadPlusPlus.0.1.0-20201130.3\lib\net461\Xarial.CadPlusPlus.dll</HintPath>
     </Reference>
     <Reference Include="Xarial.XCad, Version=0.6.10.0, Culture=neutral, PublicKeyToken=60dcaf351d4060db, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Xarial.XCad.0.6.10-20201130.1\lib\net461\Xarial.XCad.dll</HintPath>
+      <HintPath>..\..\packages\Xarial.XCad.0.6.10-20201201.1\lib\net461\Xarial.XCad.dll</HintPath>
     </Reference>
     <Reference Include="Xarial.XToolkit, Version=0.2.4.0, Culture=neutral, PublicKeyToken=60dcaf351d4060db, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Xarial.XToolkit.0.2.4\lib\net461\Xarial.XToolkit.dll</HintPath>
@@ -94,12 +95,14 @@
   <ItemGroup>
     <Compile Include="Attributes\EnumDescriptionAttribute.cs" />
     <Compile Include="Attributes\EnumDisplayNameAttribute.cs" />
+    <Compile Include="Attributes\IconExAttribute.cs" />
     <Compile Include="ContainerBuilderExtension.cs" />
     <Compile Include="ContainerBuilderWrapper.cs" />
     <Compile Include="Controls\PathListBox.cs" />
     <Compile Include="Controls\TaskDashboard.cs" />
     <Compile Include="Exceptions\MacroRunnerResultError.cs" />
     <Compile Include="Exceptions\UserException.cs" />
+    <Compile Include="ImageEx.cs" />
     <Compile Include="IServiceProviderExtension.cs" />
     <Compile Include="IXServiceCollectionExtension.cs" />
     <Compile Include="MixedApplication.cs" />

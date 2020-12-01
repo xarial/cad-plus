@@ -47,19 +47,19 @@ namespace Xarial.CadPlus.CustomToolbar.UI.Converters
 
             BitmapImage icon = null;
 
-            var provider = m_IconProviders.FirstOrDefault(p => p.Matches(iconPath));
-
-            if (provider != null)
+            try
             {
-                try
+                var provider = m_IconProviders.FirstOrDefault(p => p.Matches(iconPath));
+
+                if (provider != null)
                 {
                     icon = provider.GetThumbnail(iconPath).ToBitmapImage();
                 }
-                catch
-                {
-                }
             }
-
+            catch
+            {
+            }
+            
             if (icon == null)
             {
                 if (values[1] is CommandMacroVM) 

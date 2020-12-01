@@ -74,8 +74,8 @@ namespace Xarial.CadPlus.AddIn.Base
                 m_Handlers = new Dictionary<CommandSpec, Tuple<Delegate, Enum>>();
 
                 Extension.StartupCompleted += OnStartupCompleted;
-                Extension.Connect += OnConnect;
-                Extension.Disconnect += OnDisconnect;
+                Extension.Connect += OnExtensionConnect;
+                Extension.Disconnect += OnExtensionDisconnect;
                 if (Extension is IXServiceConsumer)
                 {
                     (Extension as IXServiceConsumer).ConfigureServices += OnConfigureExtensionServices;
@@ -105,7 +105,7 @@ namespace Xarial.CadPlus.AddIn.Base
             }
         }
 
-        private void OnDisconnect(IXExtension ext) => Dispose();
+        private void OnExtensionDisconnect(IXExtension ext) => Dispose();
 
         private ComposablePartCatalog CreateDirectoryCatalog(string path, string searchPattern)
         {
@@ -126,7 +126,7 @@ namespace Xarial.CadPlus.AddIn.Base
             Started?.Invoke();
         }
 
-        private void OnConnect(IXExtension ext) 
+        private void OnExtensionConnect(IXExtension ext) 
         {
             try
             {
