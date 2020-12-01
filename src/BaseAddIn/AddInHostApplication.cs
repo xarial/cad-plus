@@ -35,8 +35,6 @@ namespace Xarial.CadPlus.AddIn.Base
 
     public class AddInHostApplication : BaseHostApplication, IHostExtensionApplication
     {
-        public event Action<ContainerBuilder> ConfigureServices;
-
         [ImportMany]
         private IEnumerable<IExtensionModule> m_Modules;
 
@@ -50,7 +48,10 @@ namespace Xarial.CadPlus.AddIn.Base
 
         public override event Action Connect;
         public override event Action Disconnect;
-        
+        public override event Action Initialized;
+        public override event Action<IContainerBuilder> ConfigureServices;
+        public override event Action Started;
+
         private CommandGroupSpec m_ParentGrpSpec;
 
         private int m_NextId;
@@ -73,8 +74,8 @@ namespace Xarial.CadPlus.AddIn.Base
                 m_Handlers = new Dictionary<CommandSpec, Tuple<Delegate, Enum>>();
 
                 Extension.StartupCompleted += OnStartupCompleted;
-                Extension.Connect += OnConnect;
-                Extension.Disconnect += OnDisconnect;
+                Extension.Connect += OnExtensionConnect;
+                Extension.Disconnect += OnExtensionDisconnect;
                 if (Extension is IXServiceConsumer)
                 {
                     (Extension as IXServiceConsumer).ConfigureServices += OnConfigureExtensionServices;
@@ -94,6 +95,8 @@ namespace Xarial.CadPlus.AddIn.Base
                         module.Init(this);
                     }
                 }
+
+                Initialized?.Invoke();
             }
             catch 
             {
@@ -102,7 +105,7 @@ namespace Xarial.CadPlus.AddIn.Base
             }
         }
 
-        private void OnDisconnect(IXExtension ext) => Dispose();
+        private void OnExtensionDisconnect(IXExtension ext) => Dispose();
 
         private ComposablePartCatalog CreateDirectoryCatalog(string path, string searchPattern)
         {
@@ -120,10 +123,10 @@ namespace Xarial.CadPlus.AddIn.Base
 
         private void OnStartupCompleted(IXExtension ext)
         {
-            OnStarted();
+            Started?.Invoke();
         }
 
-        private void OnConnect(IXExtension ext) 
+        private void OnExtensionConnect(IXExtension ext) 
         {
             try
             {
@@ -149,7 +152,7 @@ namespace Xarial.CadPlus.AddIn.Base
 
             ConfigureHostServices(builder);
 
-            ConfigureServices?.Invoke(builder);
+            ConfigureServices?.Invoke(new ContainerBuilderWrapper(builder));
 
             m_SvcProvider = new ServiceProvider(builder.Build());
 

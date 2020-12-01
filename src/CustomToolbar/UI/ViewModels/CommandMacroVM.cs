@@ -11,6 +11,7 @@ using System.Windows.Input;
 using Xarial.CadPlus.Common.Services;
 using Xarial.CadPlus.CustomToolbar.Enums;
 using Xarial.CadPlus.CustomToolbar.Structs;
+using Xarial.CadPlus.Plus.Modules;
 using Xarial.XToolkit.Wpf;
 using Xarial.XToolkit.Wpf.Extensions;
 using Xarial.XToolkit.Wpf.Utils;
@@ -135,11 +136,11 @@ namespace Xarial.CadPlus.CustomToolbar.UI.ViewModels
 
         private readonly IMacroFileFilterProvider m_FilterProvider;
 
-        public CommandMacroVM() : this(new CommandMacroInfo())
+        public CommandMacroVM() : this(new CommandMacroInfo(), CustomToolbarModule.Resolve<IIconsProvider[]>())
         {
         }
 
-        public CommandMacroVM(CommandMacroInfo cmd) : base(cmd)
+        public CommandMacroVM(CommandMacroInfo cmd, IIconsProvider[] providers) : base(cmd, providers)
         {
             m_FilterProvider = CustomToolbarModule.Resolve<IMacroFileFilterProvider>();
         }

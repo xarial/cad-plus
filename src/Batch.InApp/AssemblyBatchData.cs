@@ -17,6 +17,7 @@ using Xarial.CadPlus.Batch.InApp.Properties;
 using Xarial.CadPlus.Common.Services;
 using Xarial.XToolkit.Wpf.Utils;
 using Xarial.CadPlus.Batch.InApp.ViewModels;
+using Xarial.CadPlus.Common.Attributes;
 
 namespace Xarial.CadPlus.Batch.InApp
 {
@@ -33,7 +34,7 @@ namespace Xarial.CadPlus.Batch.InApp
         }
     }
 
-    [Icon(typeof(Resources), nameof(Resources.batch_plus_assm_icon))]
+    [IconEx(typeof(Resources), nameof(Resources.batch_plus_assm_vector), nameof(Resources.batch_plus_assm_icon))]
     [Title("Batch+")]
     public class AssemblyBatchData
     {

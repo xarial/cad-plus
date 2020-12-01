@@ -8,6 +8,7 @@
 using System;
 using Xarial.CadPlus.CustomToolbar.Enums;
 using Xarial.CadPlus.CustomToolbar.Structs;
+using Xarial.CadPlus.Plus.Modules;
 using Xarial.XCad.UI.Commands.Structures;
 
 namespace Xarial.CadPlus.CustomToolbar.Base
@@ -16,13 +17,13 @@ namespace Xarial.CadPlus.CustomToolbar.Base
     {
         internal CommandMacroInfo Info { get; }
 
-        internal CommandItemInfoSpec(CommandMacroInfo info) : base(info.Id)
+        internal CommandItemInfoSpec(CommandMacroInfo info, IIconsProvider[] iconsProviders) : base(info.Id)
         {
             Info = info;
 
             Title = info.Title;
             Tooltip = info.Description;
-            Icon = info.GetCommandIcon();
+            Icon = info.GetCommandIcon(iconsProviders);
             HasToolbar = info.Location.HasFlag(Location_e.Toolbar);
             HasMenu = info.Location.HasFlag(Location_e.Menu);
             //HasTabBox = info.Location.HasFlag(Location_e.TabBox);

@@ -84,6 +84,9 @@ namespace Xarial.CadPlus.Common
 
         public override event Action Connect;
         public override event Action Disconnect;
+        public override event Action Initialized;
+        public override event Action<IContainerBuilder> ConfigureServices;
+        public override event Action Started;
 
         public override IEnumerable<IModule> Modules => throw new NotImplementedException();
 
@@ -92,7 +95,7 @@ namespace Xarial.CadPlus.Common
         internal ConsoleHostApplication(IServiceProvider svcProvider) 
         {
             Services = svcProvider;
-            base.OnStarted();
+            Started?.Invoke();
         }
     }
 
@@ -102,6 +105,9 @@ namespace Xarial.CadPlus.Common
 
         public override event Action Connect;
         public override event Action Disconnect;
+        public override event Action Initialized;
+        public override event Action<IContainerBuilder> ConfigureServices;
+        public override event Action Started;
 
         private readonly Application m_App;
 
@@ -122,7 +128,7 @@ namespace Xarial.CadPlus.Common
         private void OnAppActivated(object sender, EventArgs e)
         {
             m_App.Activated -= OnAppActivated;
-            base.OnStarted();
+            Started?.Invoke();
             Connect?.Invoke();
         }
 
