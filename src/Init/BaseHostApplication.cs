@@ -13,11 +13,10 @@ namespace Xarial.CadPlus.Module.Init
 
         public abstract event Action Connect;
         public abstract event Action Disconnect;
-        
-        public virtual void OnStarted() 
-        { 
-        }
-                
+        public abstract event Action Initialized;
+        public abstract event Action<IContainerBuilder> ConfigureServices;
+        public abstract event Action Started;
+
         public virtual void Dispose() 
         {
         }
