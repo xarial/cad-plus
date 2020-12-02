@@ -7,6 +7,7 @@
 
 using System.ComponentModel;
 using System.IO;
+using System.Linq;
 using System.Windows.Input;
 using Xarial.CadPlus.Common.Services;
 using Xarial.CadPlus.CustomToolbar.Enums;
@@ -42,6 +43,16 @@ namespace Xarial.CadPlus.CustomToolbar.UI.ViewModels
             }
         }
 
+        public string Arguments
+        {
+            get => Command.Arguments;
+            set
+            {
+                Command.Arguments = value;
+                this.NotifyChanged();
+            }
+        }
+
         public ICommand BrowseMacroPathCommand
         {
             get
@@ -50,7 +61,8 @@ namespace Xarial.CadPlus.CustomToolbar.UI.ViewModels
                 {
                     m_BrowseMacroPathCommand = new RelayCommand(() =>
                     {
-                        var filters = m_FilterProvider.GetSupportedMacros();
+                        var filters = m_FilterProvider.GetSupportedMacros()
+                                    .Union(new FileFilter[] { FileFilter.AllFiles }).ToArray();
 
                         if (FileSystemBrowser.BrowseFileOpen(out string macroFile, 
                             "Select macro file", FileSystemBrowser.BuildFilterString(filters)))

@@ -127,7 +127,9 @@ namespace CustomToolbar.Tests
                 .Returns(new ToolbarSettings());
 
             var vm = new CommandManagerVM(confProviderMock.Object, settsProviderMock.Object,
-                new Mock<IMessageService>().Object, new Xarial.CadPlus.Plus.Modules.IIconsProvider[0]);
+                new Mock<IMessageService>().Object, 
+                new Xarial.CadPlus.Plus.Modules.IIconsProvider[0], 
+                new Mock<IMacroFileFilterProvider>().Object);
 
             var form = new CommandManagerForm();
             form.DataContext = vm;
