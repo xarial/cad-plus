@@ -45,12 +45,23 @@ namespace Xarial.CadPlus.CustomToolbar.UI.ViewModels
 
         private readonly IIconsProvider[] m_IconsProviders;
 
+        private readonly string[] m_MacroExtensions;
+
         public CommandManagerVM(IToolbarConfigurationProvider confsProvider,
-            ISettingsProvider settsProvider, IMessageService msgService, IIconsProvider[] iconsProviders)
+            ISettingsProvider settsProvider, 
+            IMessageService msgService, IIconsProvider[] iconsProviders,
+            IMacroFileFilterProvider macroFilterProvider)
         {
             m_ConfsProvider = confsProvider;
             m_SettsProvider = settsProvider;
             m_MsgService = msgService;
+
+            m_MacroExtensions = macroFilterProvider.GetSupportedMacros()
+                .Select(f => f.Extensions)
+                .SelectMany(x => x)
+                .Select(x => Path.GetExtension(x))
+                .Distinct(StringComparer.InvariantCultureIgnoreCase)
+                .ToArray();
 
             m_IconsProviders = iconsProviders;
 
@@ -339,8 +350,7 @@ namespace Xarial.CadPlus.CustomToolbar.UI.ViewModels
         }
 
         private bool IsValidFilesDrop(string[] files)
-            => files?.All(f =>
-            new string[] { ".swp", ".swb", ".dll" }
+            => files?.All(f => m_MacroExtensions
             .Contains(Path.GetExtension(f), StringComparer.CurrentCultureIgnoreCase)) == true;
 
         private void MoveCommand(ICommandVM cmd, bool forward)

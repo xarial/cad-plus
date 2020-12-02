@@ -55,7 +55,8 @@ namespace Xarial.CadPlus.XBatch.Base.Models
             RecentFiles = new ObservableCollection<string>(m_RecentFilesMgr.RecentFiles);
 
             InputFilesFilter = appProvider.InputFilesFilter;
-            MacroFilesFilter = macroFilterProvider.GetSupportedMacros();
+            MacroFilesFilter = macroFilterProvider.GetSupportedMacros()
+                .Union(new FileFilter[] { FileFilter.AllFiles }).ToArray();
 
             m_ExecFact = execFact;
 

@@ -27,7 +27,8 @@ namespace Xarial.CadPlus.Batch.InApp.ViewModels
         public MacrosVM(IMacroFileFilterProvider fileFilterProvider) 
         {
             Macros = new ObservableCollection<MacroData>();
-            MacroFilesFilter = fileFilterProvider.GetSupportedMacros();
+            MacroFilesFilter = fileFilterProvider.GetSupportedMacros()
+                .Union(new FileFilter[] { FileFilter.AllFiles }).ToArray();
         }
 
         internal void RequestAddMacros() => AddMacros?.Invoke();
