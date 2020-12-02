@@ -99,6 +99,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Models\ExporterModel.cs" />
+    <Compile Include="ViewModels\EDrawingAppVersion_e.cs" />
     <Compile Include="ViewModels\ExporterVM.cs" />
     <Compile Include="ViewModels\FormatExtensionAttribute.cs" />
     <Compile Include="ViewModels\Format_e.cs" />
