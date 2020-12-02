@@ -94,6 +94,8 @@ namespace Xarial.CadPlus.Xport.ViewModels
 
         public bool ContinueOnError { get; set; }
 
+        public EDrawingAppVersion_e Version { get; set; }
+
         public int Timeout { get; set; }
 
         public bool IsTimeoutEnabled
@@ -177,7 +179,8 @@ namespace Xarial.CadPlus.Xport.ViewModels
                     Format = ExtractFormats(),
                     OutputDirectory = IsSameDirectoryOutput ? "" : OutputDirectory,
                     ContinueOnError = ContinueOnError,
-                    Timeout = IsTimeoutEnabled ? Timeout : -1
+                    Timeout = IsTimeoutEnabled ? Timeout : -1,
+                    Version = (int)Version
                 };
 
                 await m_Model.Export(opts).ConfigureAwait(false);

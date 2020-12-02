@@ -33,7 +33,8 @@ namespace Xarial.CadPlus.Xport
                 Format = args.Format?.ToArray(),
                 Timeout = args.Timeout,
                 OutputDirectory = args.OutputDirectory,
-                ContinueOnError = args.ContinueOnError
+                ContinueOnError = args.ContinueOnError,
+                Version = args.Version
             };
 
             using (var exporter = new Exporter(Console.Out, new ConsoleProgressWriter()))

@@ -6,7 +6,10 @@
 //*********************************************************************
 
 using System;
+using System.Diagnostics;
+using System.Linq;
 using Xarial.CadPlus.Xport.EDrawingsHost;
+using Xarial.CadPlus.Xport.SwEDrawingsHost;
 
 namespace Xarial.CadPlus.Xport.StandAloneExporter
 {
@@ -21,8 +24,22 @@ namespace Xarial.CadPlus.Xport.StandAloneExporter
             {
                 var srcFile = args[0];
                 var outFile = args[1];
+                var versNmb = args[2];
 
-                using (var publisher = new EDrawingsPublisher())
+                var vers = EDrawingsVersion_e.Default;
+
+                foreach (EDrawingsVersion_e curVer in Enum.GetValues(typeof(EDrawingsVersion_e))) 
+                {
+                    if (string.Equals(curVer.ToString(), $"v{versNmb}")) 
+                    {
+                        vers = curVer;
+                        break;
+                    }
+                }
+
+                WriteLine($"eDrawings version: {vers}");
+
+                using (var publisher = new EDrawingsPublisher(vers))
                 {
                     WriteLine($"Opening '{srcFile}'...");
                     publisher.OpenDocument(srcFile).GetAwaiter().GetResult();
