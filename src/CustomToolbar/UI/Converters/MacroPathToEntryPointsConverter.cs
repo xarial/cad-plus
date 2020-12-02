@@ -30,7 +30,14 @@ namespace Xarial.CadPlus.CustomToolbar.UI.Converters
         {
             if (value is string)
             {
-                return m_Extractor.GetEntryPoints(value as string);
+                try
+                {
+                    return m_Extractor.GetEntryPoints(value as string);
+                }
+                catch
+                {
+                    return null;
+                }
             }
 
             return null;

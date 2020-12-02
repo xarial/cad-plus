@@ -13,6 +13,17 @@ using Xarial.XCad.Base.Attributes;
 using System.ComponentModel;
 using Xarial.XToolkit.Wpf.Dialogs;
 using Xarial.CadPlus.AddIn.Base;
+using Xarial.XCad;
+using Xarial.XCad.Base;
+using Xarial.CadPlus.Common.Services;
+using Xarial.XCad.UI.PropertyPage;
+using System.Reflection;
+using Xarial.XToolkit.Reflection;
+using Xarial.CadPlus.Plus;
+using Xarial.CadPlus.Common.Sw.Services;
+using Xarial.CadPlus.Common.Sw;
+using Autofac;
+using Xarial.CadPlus.Common;
 
 namespace Xarial.CadPlus.AddIn.Sw
 {
@@ -21,16 +32,52 @@ namespace Xarial.CadPlus.AddIn.Sw
     [Description("The toolset of utilities to complement SOLIDWORKS functionality")]
     public class CadPlusSwAddIn : SwAddInEx
     {
-        private AddInController m_Controller;
-
-        public override void OnConnect()
+        private class LocalAppConfigBindingRedirectReferenceResolver : AppConfigBindingRedirectReferenceResolver
         {
-            m_Controller = new AddInController(this);
+            protected override Assembly[] GetRequestingAssemblies(Assembly requestingAssembly)
+            {
+                if (requestingAssembly != null)
+                {
+                    return new Assembly[] { requestingAssembly };
+                }
+                else
+                {
+                    return new Assembly[] 
+                    {
+                        typeof(CadPlusSwAddIn).Assembly,
+                        typeof(CadPlusCommands_e).Assembly 
+                    };
+                }
+            }   
         }
 
-        public override void OnDisconnect()
+        static CadPlusSwAddIn() 
         {
-            m_Controller.Dispose();
+            AppDomain.CurrentDomain.ResolveBindingRedirects(new LocalAppConfigBindingRedirectReferenceResolver());
+        }
+
+        private readonly AddInHostApplication m_Host;
+
+        public CadPlusSwAddIn()
+        {
+            m_Host = new AddInHostApplication(this);
+            m_Host.ConfigureServices += OnConfigureModuleServices;
+        }
+        
+        private void OnConfigureModuleServices(IContainerBuilder builder)
+        {
+            var svc = ((ContainerBuilderWrapper)builder).Builder;
+
+            svc.RegisterType<SwPropertyPageCreator<SwGeneralPropertyManagerPageHandler>>()
+                .As<IPropertyPageCreator>()
+                .WithParameter(new TypedParameter(typeof(ISwAddInEx), this));
+            
+            svc.UsingCommonSwServices();
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            base.Dispose(disposing);
         }
     }
 }

@@ -5,6 +5,8 @@
 //License: https://cadplus.xarial.com/license/
 //*********************************************************************
 
+using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -17,17 +19,53 @@ namespace Xarial.CadPlus.XBatch.Base.Core
 {
     public class BatchJobVersionTransformer : BaseUserSettingsVersionsTransformer
     {
+        public BatchJobVersionTransformer()
+        {
+            Add(new Version("1.0.0"), new Version("1.1.0"), t =>
+            {
+                var macrosField = t.Children<JProperty>().First(p => p.Name == "Macros");
+
+                var macrosOld = macrosField?.Value as JArray;
+
+                if (macrosOld != null) 
+                {
+                    var macros = new JArray();
+
+                    foreach (var macro in macrosOld) 
+                    {
+                        var macroData = new JObject();
+                        macroData.Add(new JProperty("FilePath", macro.Value<string>()));
+                        macroData.Add(new JProperty("Arguments", null));
+
+                        macros.Add(macroData);
+                    }
+
+                    macrosField.Value = macros;
+                }
+                
+                return t;
+            });
+        }
     }
 
-    [UserSettingVersion("1.0.0", typeof(BatchJobVersionTransformer))]
+    [UserSettingVersion("1.1.0", typeof(BatchJobVersionTransformer))]
     public class BatchJob
     {
+        internal static BatchJob FromFile(string filePath) 
+        {
+            var svc = new UserSettingsService();
+
+            var batchJob = svc.ReadSettings<BatchJob>(filePath);
+
+            return batchJob;
+        }
+
         public string[] Input { get; set; }
         public string[] Filters { get; set; }
         
         public bool ContinueOnError { get; set; }
         public int Timeout { get; set; }
-        public string[] Macros { get; set; }
+        public MacroData[] Macros { get; set; }
 
         public AppVersionInfo Version { get; set; }
         public StartupOptions_e StartupOptions { get; set; }

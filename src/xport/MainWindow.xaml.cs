@@ -5,21 +5,28 @@
 //License: https://cadplus.xarial.com/license/
 //*********************************************************************
 
+using MahApps.Metro.Controls;
 using System.Windows;
+using System.Windows.Interop;
 using Xarial.CadPlus.Common.Services;
 using Xarial.CadPlus.Xport.Models;
 using Xarial.CadPlus.Xport.ViewModels;
 
 namespace Xarial.CadPlus.Xport
 {
-    public partial class MainWindow : Window
+    public partial class MainWindow : MetroWindow
     {
         public MainWindow()
         {
             InitializeComponent();
-            this.DataContext = new ExporterVM(
+
+            var vm = new ExporterVM(
                 new ExporterModel(),
-                new MessageService("xPort"));
+                new GenericMessageService("eXport+"));
+
+            vm.ParentWindowHandle = new WindowInteropHelper(this).EnsureHandle();
+
+            this.DataContext = vm;
         }
     }
 }

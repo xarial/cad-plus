@@ -77,10 +77,14 @@ namespace Xarial.CadPlus.Xport.Core
         {
             m_Logger.WriteLine($"Exporting Started");
 
-            var curTime = DateTime.Now;
+            var startTime = DateTime.Now;
 
             var jobs = ParseOptions(opts);
-            
+
+            var formats = jobs.SelectMany(j => j.Formats).ToArray();
+
+            m_ProgressHandler.SetJobScope(formats, startTime);
+
             foreach (var job in jobs)
             {
                 var file = job.FilePath;
@@ -141,12 +145,14 @@ namespace Xarial.CadPlus.Xport.Core
                             throw ex;
                         }
                     }
-                }
 
-                m_ProgressHandler?.ReportProgress(job, true);
+                    m_ProgressHandler?.ReportProgress(outFile, true);
+                }
             }
 
-            m_Logger.WriteLine($"Exporting completed in {DateTime.Now.Subtract(curTime).ToString(@"hh\:mm\:ss")}");
+            var duration = DateTime.Now.Subtract(startTime);
+            m_ProgressHandler.ReportCompleted(duration);
+            m_Logger.WriteLine($"Exporting completed in {duration.ToString(@"hh\:mm\:ss")}");
         }
 
         private Task<bool> StartWaitProcessAsync(ProcessStartInfo prcStartInfo,

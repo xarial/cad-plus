@@ -18,7 +18,7 @@ namespace Xarial.CadPlus.Common.Services
         private int m_TotalFiles;
         private int m_ProcessedFiles;
 
-        public void ReportProgress(IJobItemFile file, bool result)
+        public void ReportProgress(IJobItem file, bool result)
         {
             m_ProcessedFiles++;
             var prg = m_ProcessedFiles / (double)m_TotalFiles;
@@ -28,7 +28,7 @@ namespace Xarial.CadPlus.Common.Services
             Console.ResetColor();
         }
 
-        public void SetJobScope(IJobItemFile[] scope, DateTime startTime)
+        public void SetJobScope(IJobItem[] scope, DateTime startTime)
         {
             m_TotalFiles = scope.Length;
             Console.WriteLine($"Processing {scope.Length} file(s)");
