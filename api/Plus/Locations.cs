@@ -15,9 +15,9 @@ using Xarial.CadPlus.Plus.Properties;
 
 namespace Xarial.CadPlus.Plus
 {
-    internal static class Locations
+    public static class Locations
     {
-        internal static string AppDirectoryPath
+        public static string AppDirectoryPath
         {
             get
             {
