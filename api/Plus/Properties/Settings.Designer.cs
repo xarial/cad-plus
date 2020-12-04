@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Xarial.CadPlus.XBatch.Base.Properties {
+namespace Xarial.CadPlus.Plus.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
@@ -25,13 +25,13 @@ namespace Xarial.CadPlus.XBatch.Base.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("https://cadplus.xarial.com/batch/")]
-        public string HelpLink {
+        [global::System.Configuration.DefaultSettingValueAttribute("Xarial\\CADPlusToolset")]
+        public string AppRootDir {
             get {
-                return ((string)(this["HelpLink"]));
+                return ((string)(this["AppRootDir"]));
             }
             set {
-                this["HelpLink"] = value;
+                this["AppRootDir"] = value;
             }
         }
     }

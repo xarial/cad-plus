@@ -145,7 +145,6 @@
     <Compile Include="Structs\CommandItemInfo.cs" />
     <Compile Include="Structs\CommandMacroInfo.cs" />
     <Compile Include="Structs\CustomToolbarInfo.cs" />
-    <Compile Include="Structs\Locations.cs" />
     <Compile Include="Structs\MacroStartFunction.cs" />
     <Compile Include="Structs\ToolbarSettings.cs" />
     <Compile Include="UI\Base\CommandDataTemplateSelector.cs" />

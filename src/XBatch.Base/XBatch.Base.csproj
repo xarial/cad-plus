@@ -155,7 +155,6 @@
     <Compile Include="Exceptions\UserException.cs" />
     <Compile Include="Extensions\DataGridExtension.cs" />
     <Compile Include="IApplicationProvider.cs" />
-    <Compile Include="Locations.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
     </Compile>

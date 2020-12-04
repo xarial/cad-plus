@@ -6,15 +6,18 @@
 //*********************************************************************
 
 using System;
+using System.Collections.Generic;
 using System.IO;
-using Xarial.CadPlus.CustomToolbar.Properties;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Xarial.CadPlus.Plus.Properties;
 
-namespace Xarial.CadPlus.CustomToolbar.Structs
+namespace Xarial.CadPlus.Plus
 {
-    //TODO: move to Module
-    internal static class Locations
+    public static class Locations
     {
-        internal static string AppDirectoryPath
+        public static string AppDirectoryPath
         {
             get
             {
