@@ -7,15 +7,26 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Xarial.CadPlus.Plus.Properties;
 
 namespace Xarial.CadPlus.Plus
 {
-    public interface IContainerBuilder
+    internal static class Locations
     {
-        void Register<TImplementer, TService>()
-            where TImplementer : TService;
+        internal static string AppDirectoryPath
+        {
+            get
+            {
+                var appDir = Path.Combine(Environment.GetFolderPath(
+                    Environment.SpecialFolder.LocalApplicationData),
+                    Settings.Default.AppRootDir);
+
+                return appDir;
+            }
+        }
     }
 }
