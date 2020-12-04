@@ -229,7 +229,7 @@ namespace Xarial.CadPlus.XBatch.Base.Core
             }
         }
 
-        private IXApplication AttemptStartApplication(AppVersionInfo versionInfo, StartupOptions_e opts, 
+        private IXApplication AttemptStartApplication(IXVersion versionInfo, StartupOptions_e opts, 
             CancellationToken cancellationToken, TimeSpan? timeout) 
         {   
             int curAttempt = 1;
@@ -316,7 +316,8 @@ namespace Xarial.CadPlus.XBatch.Base.Core
                 {
                     TryShutDownApplication(appPrc);
 
-                    app = AttemptStartApplication(opts.Version, opts.StartupOptions, cancellationToken, timeout);
+                    var vers = m_AppProvider.ParseVersion(opts.VersionId);
+                    app = AttemptStartApplication(vers, opts.StartupOptions, cancellationToken, timeout);
                     
                     appPrc = app.Process;
                 }

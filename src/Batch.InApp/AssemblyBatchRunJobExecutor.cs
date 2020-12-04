@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Xarial.CadPlus.Common.Services;
 using Xarial.CadPlus.XBatch.Base.Core;
@@ -14,12 +15,13 @@ using Xarial.XToolkit.Reporting;
 
 namespace Xarial.CadPlus.Batch.InApp
 {
-    internal class MissingJobItemFile : JobItemFile
+    internal class JobItemDocument : JobItemFile
     {
-        public MissingJobItemFile(string fileName, JobItemMacro[] macros) 
-            : base($"{fileName}?", macros)
+        public IXDocument Document { get; }
+
+        public JobItemDocument(IXDocument doc, JobItemMacro[] macros) : base(doc.Path, macros)
         {
-            Status = JobItemStatus_e.Failed;
+            Document = doc;
         }
     }
 
@@ -32,19 +34,19 @@ namespace Xarial.CadPlus.Batch.InApp
 
         private readonly IXApplication m_App;
 
-        private readonly IXComponent[] m_Comps;
+        private readonly IXDocument[] m_Docs;
 
         private readonly IMacroRunnerExService m_MacroRunner;
         private readonly IEnumerable<MacroData> m_Macros;
         private readonly bool m_ActivateDocs;
 
         internal AssemblyBatchRunJobExecutor(IXApplication app, IMacroRunnerExService macroRunnerSvc,
-            IXComponent[] components, IEnumerable<MacroData> macros, bool activateDocs) 
+            IXDocument[] documents, IEnumerable<MacroData> macros, bool activateDocs) 
         {
             m_App = app;
 
             m_MacroRunner = macroRunnerSvc;
-            m_Comps = components;
+            m_Docs = documents;
             m_Macros = macros;
             m_ActivateDocs = activateDocs;
         }
@@ -74,7 +76,7 @@ namespace Xarial.CadPlus.Batch.InApp
                         
                         prg.SetStatus($"Processing {jobItem.FilePath}");
 
-                        var res = TryProcessFile(jobItem);
+                        var res = TryProcessFile(jobItem, default);
                         
                         ProgressChanged?.Invoke(jobItem, res);
                         prg.Report((double)i / (double)jobItems.Length);
@@ -93,54 +95,29 @@ namespace Xarial.CadPlus.Batch.InApp
             }
         }
 
-        private JobItemFile[] PrepareJob() 
+        private JobItemDocument[] PrepareJob() 
         {
-            var processedFiles = new List<string>();
+            var jobItems = new List<JobItemDocument>();
 
-            var jobItems = new List<JobItemFile>();
-
-            foreach (var comp in m_Comps) 
+            foreach (var doc in m_Docs) 
             {
                 var macros = m_Macros.Select(m => new JobItemMacro(m)).ToArray();
-
-                try
-                {
-                    var path = comp.Path;
-
-                    if (!processedFiles.Contains(path, StringComparer.CurrentCultureIgnoreCase))
-                    {
-                        processedFiles.Add(path);
-                        jobItems.Add(new JobItemFile(path, macros));
-                    }
-                }
-                catch 
-                {
-                    jobItems.Add(new MissingJobItemFile(comp.Name, macros));
-                }
+                
+                jobItems.Add(new JobItemDocument(doc, macros));
             }
 
             return jobItems.ToArray();
         }
 
-        private bool TryProcessFile(JobItemFile file) 
+        private bool TryProcessFile(JobItemDocument file, CancellationToken cancellationToken) 
         {
             LogMessage($"Processing '{file.FilePath}'");
-
-            if (file is MissingJobItemFile) 
-            {
-                LogMessage($"Component '{file.FilePath}' will not be processed as failed to resolve the file path");
-                return false;
-            }
-
-            IXDocument doc = null;
+            
+            var doc = file.Document;
 
             try
             {
-                doc = m_App.Documents.FirstOrDefault(
-                    d => string.Equals(d.Path, file.FilePath,
-                    StringComparison.CurrentCultureIgnoreCase));
-
-                if (doc == null)
+                if (!doc.IsCommitted)
                 {
                     var state = DocumentState_e.Silent;
 
@@ -149,7 +126,8 @@ namespace Xarial.CadPlus.Batch.InApp
                         state |= DocumentState_e.Hidden;
                     }
 
-                    doc = m_App.Documents.Open(file.FilePath, state);
+                    doc.State = state;
+                    doc.Commit(cancellationToken);
                 }
 
                 if (m_ActivateDocs)

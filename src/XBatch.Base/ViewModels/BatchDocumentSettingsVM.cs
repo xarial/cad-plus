@@ -14,6 +14,7 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using Xarial.CadPlus.XBatch.Base.Core;
 using Xarial.CadPlus.XBatch.Base.Models;
+using Xarial.XCad;
 using Xarial.XToolkit.Wpf;
 using Xarial.XToolkit.Wpf.Extensions;
 
@@ -242,18 +243,18 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
             }
         }
 
-        public AppVersionInfo Version
+        public IXVersion Version
         {
-            get => m_Job.Version;
+            get => m_Model.ParseVersion(m_Job.VersionId);
             set
             {
-                m_Job.Version = value;
+                m_Job.VersionId = m_Model.GetVersionId(value);
                 this.NotifyChanged();
                 Modified?.Invoke();
             }
         }
 
-        public AppVersionInfo[] InstalledVersions { get; set; }
+        public IXVersion[] InstalledVersions { get; set; }
 
         public ICommand SelectVersionCommand { get; }
 
@@ -272,11 +273,11 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
 
             InstalledVersions = m_Model.InstalledVersions;
 
-            if (m_Job.Version != null)
+            if (!string.IsNullOrEmpty(m_Job.VersionId))
             {
                 try
                 {
-                    Version = m_Model.ParseVersion(m_Job.Version?.Id);
+                    Version = m_Model.ParseVersion(m_Job.VersionId);
                 }
                 catch
                 {
@@ -287,10 +288,10 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
                 Version = InstalledVersions.FirstOrDefault();
             }
 
-            SelectVersionCommand = new RelayCommand<AppVersionInfo>(SelectVersion);
+            SelectVersionCommand = new RelayCommand<IXVersion>(SelectVersion);
         }
 
-        private void SelectVersion(AppVersionInfo versInfo) 
+        private void SelectVersion(IXVersion versInfo) 
         {
             Version = versInfo;
         }

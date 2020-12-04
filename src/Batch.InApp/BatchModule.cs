@@ -29,6 +29,13 @@ using Xarial.CadPlus.Common.Attributes;
 
 namespace Xarial.CadPlus.Batch.InApp
 {
+    internal class DocumentEqualityComparer : IEqualityComparer<IXDocument>
+    {
+        public bool Equals(IXDocument x, IXDocument y) 
+            => string.Equals(x.Path, y.Path, StringComparison.CurrentCultureIgnoreCase);
+        public int GetHashCode(IXDocument obj) => 0;
+    }
+
     [Export(typeof(IExtensionModule))]
     public class BatchModule : IExtensionModule
     {
@@ -92,14 +99,7 @@ namespace Xarial.CadPlus.Batch.InApp
                     arg.Cancel = true;
                     arg.ErrorMessage = "Select macros to run";
                 }
-
-                if (m_Data.ProcessAllFiles
-                    && m_Host.Extension.Application.Documents.Active.State.HasFlag(DocumentState_e.ViewOnly)) 
-                {
-                    arg.Cancel = true;
-                    arg.ErrorMessage = "'Process All Files' option is not currently supported for the Large Design Review assembly";
-                }
-
+                
                 if (!m_Data.Components.Any() && !m_Data.ProcessAllFiles) 
                 {
                     arg.Cancel = true;
@@ -114,20 +114,21 @@ namespace Xarial.CadPlus.Batch.InApp
             {
                 try
                 {
-                    IEnumerable<IXComponent> comps;
+                    IXDocument[] docs = null;
                     var assm = m_Host.Extension.Application.Documents.Active as IXAssembly;
 
                     if (m_Data.ProcessAllFiles)
                     {
-                        comps = assm.Components.Flatten().Where(c => !c.State.HasFlag(ComponentState_e.Suppressed));
+                        docs = assm.Dependencies;
                     }
                     else
                     {
-                        comps = m_Data.Components;
+                        docs = m_Data.Components.Select(c => c.Document)
+                            .Distinct(new DocumentEqualityComparer()).ToArray();
                     }
 
                     var exec = new AssemblyBatchRunJobExecutor(m_Host.Extension.Application, m_MacroRunnerSvc,
-                        comps.ToArray(), m_Data.Macros.Macros, m_Data.ActivateDocuments);
+                        docs, m_Data.Macros.Macros, m_Data.ActivateDocuments);
                     
                     var vm = new JobResultVM(assm.Title, exec);
 

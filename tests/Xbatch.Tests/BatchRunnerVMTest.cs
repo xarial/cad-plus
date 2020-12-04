@@ -7,6 +7,7 @@ using Xarial.CadPlus.XBatch.Base.Core;
 using Xarial.CadPlus.XBatch.Base.Models;
 using Xarial.CadPlus.XBatch.Base.ViewModels;
 using Xarial.CadPlus.XBatch.Sw;
+using Xarial.XCad.SolidWorks;
 using Xarial.XCad.SolidWorks.Enums;
 
 namespace Xbatch.Tests
@@ -19,7 +20,7 @@ namespace Xbatch.Tests
             var mock = new Mock<IBatchRunnerModel>();
             BatchJob opts = null;
             mock.Setup(m => m.CreateExecutor(It.IsAny<BatchJob>())).Callback<BatchJob>(e => opts = e).Returns(new Mock<IBatchRunJobExecutor>().Object);
-            mock.Setup(m => m.InstalledVersions).Returns(new AppVersionInfo[] { new SwAppVersionInfo(SwVersion_e.Sw2019), new SwAppVersionInfo(SwVersion_e.Sw2020) });
+            mock.Setup(m => m.InstalledVersions).Returns(new ISwVersion[] { SwApplicationFactory.CreateVersion(SwVersion_e.Sw2019), SwApplicationFactory.CreateVersion(SwVersion_e.Sw2020) });
 
             var modelMock = mock.Object;
             var msgSvcMock = new Mock<IMessageService>().Object;
@@ -39,7 +40,7 @@ namespace Xbatch.Tests
             vm.Document.Settings.StartupOptionBackground = true;
             vm.Document.Settings.StartupOptionSilent = false;
             vm.Document.Settings.StartupOptionSafe = false;
-            vm.Document.Settings.Version = new SwAppVersionInfo(SwVersion_e.Sw2020);
+            vm.Document.Settings.Version = SwApplicationFactory.CreateVersion(SwVersion_e.Sw2020);
 
             vm.Document.RunJobCommand.Execute(null);
 
@@ -49,7 +50,7 @@ namespace Xbatch.Tests
             Assert.AreEqual(30, opts.Timeout);
             Assert.AreEqual(OpenFileOptions_e.Silent | OpenFileOptions_e.ReadOnly, opts.OpenFileOptions);
             Assert.AreEqual(StartupOptions_e.Background, opts.StartupOptions);
-            Assert.AreEqual(new SwAppVersionInfo(SwVersion_e.Sw2020), opts.Version);
+            Assert.AreEqual("Sw2020", opts.VersionId);
         }
 
         [Test]
@@ -58,7 +59,7 @@ namespace Xbatch.Tests
             var mock = new Mock<IBatchRunnerModel>();
             BatchJob opts = null;
             mock.Setup(m => m.CreateExecutor(It.IsAny<BatchJob>())).Callback<BatchJob>(e => opts = e).Returns(new Mock<IBatchRunJobExecutor>().Object);
-            mock.Setup(m => m.InstalledVersions).Returns(new AppVersionInfo[] { new SwAppVersionInfo(SwVersion_e.Sw2019), new SwAppVersionInfo(SwVersion_e.Sw2020) });
+            mock.Setup(m => m.InstalledVersions).Returns(new ISwVersion[] { SwApplicationFactory.CreateVersion(SwVersion_e.Sw2019), SwApplicationFactory.CreateVersion(SwVersion_e.Sw2020) });
 
             var modelMock = mock.Object;
             var msgSvcMock = new Mock<IMessageService>().Object;
@@ -67,7 +68,7 @@ namespace Xbatch.Tests
 
             vm.Document.Input.Add("abc");
             vm.Document.Macros.Add(new MacroData() { FilePath = "xyz" });
-            vm.Document.Settings.Version = new SwAppVersionInfo(SwVersion_e.Sw2019);
+            vm.Document.Settings.Version = SwApplicationFactory.CreateVersion(SwVersion_e.Sw2019);
 
             vm.Document.Settings.Timeout = 300;
             vm.Document.Settings.IsTimeoutEnabled = false;
@@ -84,7 +85,7 @@ namespace Xbatch.Tests
             var mock = new Mock<IBatchRunnerModel>();
             BatchJob opts = null;
             mock.Setup(m => m.CreateExecutor(It.IsAny<BatchJob>())).Callback<BatchJob>(e => opts = e).Returns(new Mock<IBatchRunJobExecutor>().Object);
-            mock.Setup(m => m.InstalledVersions).Returns(new AppVersionInfo[] { new SwAppVersionInfo(SwVersion_e.Sw2019), new SwAppVersionInfo(SwVersion_e.Sw2020) });
+            mock.Setup(m => m.InstalledVersions).Returns(new ISwVersion[] { SwApplicationFactory.CreateVersion(SwVersion_e.Sw2019), SwApplicationFactory.CreateVersion(SwVersion_e.Sw2020) });
 
             var modelMock = mock.Object;
             var msgSvcMock = new Mock<IMessageService>().Object;
@@ -92,7 +93,7 @@ namespace Xbatch.Tests
             vm.Document = new BatchDocumentVM("", new BatchJob(), modelMock, msgSvcMock);
             vm.Document.Input.Add("abc");
             vm.Document.Macros.Add(new MacroData() { FilePath = "xyz" });
-            vm.Document.Settings.Version = new SwAppVersionInfo(SwVersion_e.Sw2019);
+            vm.Document.Settings.Version = SwApplicationFactory.CreateVersion(SwVersion_e.Sw2019);
             vm.Document.Settings.IsTimeoutEnabled = false;
 
             vm.Document.RunJobCommand.Execute(null);

@@ -16,8 +16,7 @@ namespace Xarial.CadPlus.Common.Sw.Services
                 new FileFilter("VBA Macros", "*.swp"),
                 new FileFilter("SWBasic Macros", "*.swb"),
                 new FileFilter("VSTA Macros", "*.dll"),
-                new FileFilter("All Macros", "*.swp", "*.swb", "*.dll"),
-                FileFilter.AllFiles
+                new FileFilter("All Macros", "*.swp", "*.swb", "*.dll")
             };
     }
 }

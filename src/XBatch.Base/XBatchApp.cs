@@ -94,8 +94,7 @@ namespace Xarial.CadPlus.XBatch.Base
                     new TypedParameter(typeof(IProgressHandler), new ConsoleProgressWriter())
                 }))
             {
-                var opts = args.GetOptions(Host.Services.GetService<IApplicationProvider>());
-                await batchRunner.BatchRun(opts).ConfigureAwait(false);
+                await batchRunner.BatchRun((BatchJob)args).ConfigureAwait(false);
             }
         }
 
