@@ -22,20 +22,21 @@ using System.ComponentModel.Composition;
 using Xarial.XCad.Base;
 using Xarial.CadPlus.Common.Services;
 using Xarial.CadPlus.Plus;
+using Xarial.CadPlus.Common;
+using Xarial.CadPlus.Plus.Modules;
+using System.Collections.Generic;
+using Xarial.CadPlus.Common.Attributes;
 
 namespace Xarial.CadPlus.CustomToolbar
 {
     [Export(typeof(IExtensionModule))]
-    public class CustomToolbarModule : IExtensionModule
+    public class CustomToolbarModule : IToolbarModule
     {
-        //[CommandGroupInfo(CommandGroups.RootGroupId + 1)]
-        //[CommandGroupParent(CommandGroups.RootGroupId)]
         [Title("Toolbar+")]
         [Description("Toolbar+ configuration")]
-        [Icon(typeof(Resources), nameof(Resources.configure_icon))]
         public enum Commands_e
         {
-            [Icon(typeof(Resources), nameof(Resources.configure_icon))]
+            [IconEx(typeof(Resources), nameof(Resources.configure_vector), nameof(Resources.configure_icon))]
             [Title("Configure...")]
             [Description("Configure custom toolbar")]
             [CommandItemInfo(true, false, WorkspaceTypes_e.All)]
@@ -52,9 +53,23 @@ namespace Xarial.CadPlus.CustomToolbar
         private ITriggersManager m_TriggersMgr;
         private IMessageService m_Msg;
 
-        public void Init(IHostExtensionApplication host)
+        private List<IIconsProvider> m_IconsProviders;
+
+        public CustomToolbarModule() 
         {
-            m_Host = host;
+            m_IconsProviders = new List<IIconsProvider>();
+            
+            RegisterIconsProvider(new ImageIconsProvider());
+        }
+
+        public void Init(IHostApplication host)
+        {
+            if (!(host is IHostExtensionApplication))
+            {
+                throw new InvalidCastException("This module is only availabel for extensions");
+            }
+
+            m_Host = (IHostExtensionApplication)host;
             m_Host.Connect += OnConnect;
         }
 
@@ -67,9 +82,9 @@ namespace Xarial.CadPlus.CustomToolbar
         protected virtual void CreateContainer()
         {
             var builder = new ContainerBuilder();
-
-            builder.RegisterInstance(m_Host.Extension);
-            builder.RegisterInstance(m_Host.Extension.Application);
+            
+            builder.RegisterInstance(m_Host.Extension).ExternallyOwned();
+            builder.RegisterInstance(m_Host.Extension.Application).ExternallyOwned();
             builder.RegisterInstance(m_Host.Extension.Logger);
 
             builder.RegisterType<AppLogger>()
@@ -87,9 +102,6 @@ namespace Xarial.CadPlus.CustomToolbar
             builder.RegisterType<SettingsProvider>()
                 .As<ISettingsProvider>();
 
-            builder.RegisterType<CadAppMessageService>()
-                .As<IMessageService>();
-
             builder.RegisterType<CommandManagerVM>()
                 .SingleInstance();
 
@@ -101,10 +113,16 @@ namespace Xarial.CadPlus.CustomToolbar
 
             builder.RegisterType<UserSettingsService>();
 
+            builder.RegisterFromServiceProvider<IMacroRunnerExService>(m_Host.Services);
+            builder.RegisterFromServiceProvider<IMessageService>(m_Host.Services);
+            builder.RegisterFromServiceProvider<IMacroFileFilterProvider>(m_Host.Services);
+
+            builder.RegisterInstance(m_IconsProviders.ToArray());
+
             m_Container = builder.Build();
         }
 
-        protected virtual void LoadCommands()
+        private void LoadCommands()
         {
             m_Host.RegisterCommands<Commands_e>(OnCommandClick);
             
@@ -140,8 +158,8 @@ namespace Xarial.CadPlus.CustomToolbar
             }
         }
 
-        public void Dispose()
-        {
-        }
+        public void Dispose() => m_Container.Dispose();
+
+        public void RegisterIconsProvider(IIconsProvider provider) => m_IconsProviders.Add(provider);
     }
 }

@@ -14,29 +14,26 @@ using Xarial.XCad;
 
 namespace Xarial.CadPlus.CustomToolbar.Services
 {
-    public partial class CommandsManager
+    public class VbNetStateResolveCompiler : RoslynStateResolveCompiler
     {
-        public class VbNetStateResolveCompiler : RoslynStateResolveCompiler
+        public VbNetStateResolveCompiler(string codeTemplate, IXApplication app) : base(codeTemplate, app)
         {
-            public VbNetStateResolveCompiler(string codeTemplate, IXApplication app) : base(codeTemplate, app)
-            {
-            }
+        }
 
-            protected override Compilation CreateCompilation(IEnumerable<SyntaxTree> code, string dllName, IEnumerable<MetadataReference> refs, CompilationOptions opts)
-                => VisualBasicCompilation.Create(dllName, code, refs, (VisualBasicCompilationOptions)opts);
+        protected override Compilation CreateCompilation(IEnumerable<SyntaxTree> code, string dllName, IEnumerable<MetadataReference> refs, CompilationOptions opts)
+            => VisualBasicCompilation.Create(dllName, code, refs, (VisualBasicCompilationOptions)opts);
 
-            protected override CompilationOptions CreateCompilationOptions()
-                => new VisualBasicCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
-                    .WithOptionStrict(OptionStrict.Off);
+        protected override CompilationOptions CreateCompilationOptions()
+            => new VisualBasicCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
+                .WithOptionStrict(OptionStrict.Off);
 
-            protected override SyntaxTree CreateSyntaxTree(SourceText src)
-                => SyntaxFactory.ParseSyntaxTree(src,
-                    VisualBasicParseOptions.Default.WithLanguageVersion(LanguageVersion.VisualBasic16), "");
+        protected override SyntaxTree CreateSyntaxTree(SourceText src)
+            => SyntaxFactory.ParseSyntaxTree(src,
+                VisualBasicParseOptions.Default.WithLanguageVersion(LanguageVersion.VisualBasic16), "");
 
-            protected override IEnumerable<MetadataReference> GetReferences()
-            {
-                yield return MetadataReference.CreateFromFile(typeof(IVbHost).Assembly.Location);
-            }
+        protected override IEnumerable<MetadataReference> GetReferences()
+        {
+            yield return MetadataReference.CreateFromFile(typeof(IVbHost).Assembly.Location);
         }
     }
 }

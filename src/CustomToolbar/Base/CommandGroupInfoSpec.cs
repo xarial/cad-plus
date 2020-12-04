@@ -9,6 +9,7 @@ using System;
 using System.Linq;
 using Xarial.CadPlus.CustomToolbar.Enums;
 using Xarial.CadPlus.CustomToolbar.Structs;
+using Xarial.CadPlus.Plus.Modules;
 using Xarial.XCad.UI;
 using Xarial.XCad.UI.Commands.Structures;
 
@@ -16,16 +17,16 @@ namespace Xarial.CadPlus.CustomToolbar.Base
 {
     internal class CommandGroupInfoSpec : CommandGroupSpec
     {
-        internal CommandGroupInfoSpec(CommandGroupInfo info) : base(info.Id)
+        internal CommandGroupInfoSpec(CommandGroupInfo info, IIconsProvider[] iconsProviders) : base(info.Id)
         {
             Title = info.Title;
             Tooltip = info.Description;
-            Icon = info.GetCommandIcon();
+            Icon = info.GetCommandIcon(iconsProviders);
 
             if (info.Commands != null)
             {
                 Commands = info.Commands.Where(c => c.Triggers.HasFlag(Triggers_e.Button)).Select(
-                    c => new CommandItemInfoSpec(c)).ToArray();
+                    c => new CommandItemInfoSpec(c, iconsProviders)).ToArray();
             }
             else
             {

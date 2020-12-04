@@ -43,6 +43,7 @@
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
                 <TextBlock Margin="2" VerticalAlignment="Center"  Text="Path:" Grid.Column="0" Grid.Row="0" />
@@ -77,6 +78,9 @@
                         </Binding>
                     </ComboBox.ItemsSource>
                 </ComboBox>
+
+                <TextBlock Text="Arguments:" VerticalAlignment="Center" Grid.Column="0" Grid.Row="2" Margin="2" />
+                <TextBox Text="{Binding Path=Arguments, UpdateSourceTrigger=PropertyChanged}" Grid.Column="1" Grid.Row="2" Margin="2"/>
 
             </Grid>
         </GroupBox>

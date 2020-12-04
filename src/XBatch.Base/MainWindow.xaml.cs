@@ -23,30 +23,52 @@ using Xarial.CadPlus.Common.Services;
 using Xarial.CadPlus.XBatch.Base.Services;
 using Xarial.CadPlus.XBatch.Base.ViewModels;
 using Xarial.XToolkit.Reporting;
+using Xarial.CadPlus.Common;
+using System.Windows.Interop;
 
 namespace Xarial.CadPlus.XBatch.Base
 {
     public partial class MainWindow
     {
+        private readonly BatchManagerVM m_BatchManager;
+
         public MainWindow()
         {
             InitializeComponent();
-            
-            var msgService = new GenericMessageService("xBatch");
+
+            this.Closing += OnWindowClosing;
+
+            XBatchApp app = null;
 
             try
             {
-                var appProvider = (Application.Current as XBatchApp).GetApplicationProvider();
-                var batchRunnerModel = new Models.BatchRunnerModel(appProvider, new RecentFilesManager());
+                app = (XBatchApp)Application.Current;
 
-                var vm = new BatchManagerVM(batchRunnerModel, msgService);
-                
-                this.DataContext = vm;
+                m_BatchManager = app.Host.Services.GetService<BatchManagerVM>();
+
+                m_BatchManager.ParentWindowHandle = new WindowInteropHelper(this).EnsureHandle();
+                this.DataContext = m_BatchManager;
             }
             catch (Exception ex)
             {
-                msgService.ShowError(ex.ParseUserError(out _));
+                IMessageService msgSvc;
+
+                try
+                {
+                    msgSvc = app.Host.Services.GetService<IMessageService>();
+                }
+                catch 
+                {
+                    msgSvc = new GenericMessageService("Batch+");
+                }
+
+                msgSvc.ShowError(ex.ParseUserError(out _));
             }
+        }
+
+        private void OnWindowClosing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            e.Cancel = !m_BatchManager.CanClose();
         }
     }
 }

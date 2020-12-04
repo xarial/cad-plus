@@ -71,6 +71,16 @@ namespace Xarial.CadPlus.CustomToolbar.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] configure_vector {
+            get {
+                object obj = ResourceManager.GetObject("configure_vector", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         internal static System.Drawing.Bitmap error {

@@ -152,6 +152,24 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
             }
         }
 
+        public bool StartupOptionHidden
+        {
+            get => m_Job.StartupOptions.HasFlag(StartupOptions_e.Hidden);
+            set
+            {
+                if (value)
+                {
+                    m_Job.StartupOptions |= StartupOptions_e.Hidden;
+                }
+                else
+                {
+                    m_Job.StartupOptions -= StartupOptions_e.Hidden;
+                }
+
+                Modified?.Invoke();
+            }
+        }
+
         public bool OpenFileOptionSilent
         {
             get => m_Job.OpenFileOptions.HasFlag(OpenFileOptions_e.Silent);
@@ -205,7 +223,25 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
                 Modified?.Invoke();
             }
         }
-        
+
+        public bool OpenFileOptionInvisible
+        {
+            get => m_Job.OpenFileOptions.HasFlag(OpenFileOptions_e.Invisible);
+            set
+            {
+                if (value)
+                {
+                    m_Job.OpenFileOptions |= OpenFileOptions_e.Invisible;
+                }
+                else
+                {
+                    m_Job.OpenFileOptions -= OpenFileOptions_e.Invisible;
+                }
+
+                Modified?.Invoke();
+            }
+        }
+
         public AppVersionInfo Version
         {
             get => m_Job.Version;
