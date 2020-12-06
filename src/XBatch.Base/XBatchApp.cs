@@ -65,10 +65,6 @@ namespace Xarial.CadPlus.XBatch.Base
             builder.RegisterType<BatchRunJobExecutor>().As<IBatchRunJobExecutor>();
             builder.RegisterType<BatchManagerVM>();
 
-            builder.RegisterType<XCad.Toolkit.ServiceCollection>().As<IXServiceCollection>()
-                .SingleInstance()
-                .OnActivating(x => x.Instance.Populate(x.Context));
-
             builder.RegisterType<JobManager>().As<IJobManager>()
                 .SingleInstance()
                 .OnActivating(x =>

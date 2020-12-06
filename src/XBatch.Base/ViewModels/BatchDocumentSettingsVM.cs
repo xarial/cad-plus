@@ -243,6 +243,42 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
             }
         }
 
+        public bool ForbidUpgrade 
+        {
+            get => m_Job.OpenFileOptions.HasFlag(OpenFileOptions_e.ForbidUpgrade);
+            set 
+            {
+                if (value)
+                {
+                    m_Job.OpenFileOptions |= OpenFileOptions_e.ForbidUpgrade;
+                }
+                else
+                {
+                    m_Job.OpenFileOptions -= OpenFileOptions_e.ForbidUpgrade;
+                }
+
+                Modified?.Invoke();
+            }
+        }
+
+        public bool AutoSaveDocuments
+        {
+            get => m_Job.Actions.HasFlag(Actions_e.AutoSaveDocuments);
+            set
+            {
+                if (value)
+                {
+                    m_Job.Actions |= Actions_e.AutoSaveDocuments;
+                }
+                else
+                {
+                    m_Job.Actions -= Actions_e.AutoSaveDocuments;
+                }
+
+                Modified?.Invoke();
+            }
+        }
+
         public IXVersion Version
         {
             get => m_Model.ParseVersion(m_Job.VersionId);

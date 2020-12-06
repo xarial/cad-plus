@@ -20,6 +20,7 @@ using Xarial.XCad.Base;
 using Xarial.XCad.Enums;
 using Xarial.XCad.SolidWorks;
 using Xarial.XCad.SolidWorks.Enums;
+using Xarial.XCad.Toolkit;
 using Xarial.XToolkit.Wpf.Utils;
 
 namespace Xarial.CadPlus.XBatch.Sw
@@ -34,7 +35,7 @@ namespace Xarial.CadPlus.XBatch.Sw
 
         private readonly IXServiceCollection m_CustomServices;
 
-        public SwApplicationProvider(IXLogger logger, IXServiceCollection customServices)
+        public SwApplicationProvider(IXLogger logger)
         {
             InputFilesFilter = new FileFilter[]
             {
@@ -47,7 +48,8 @@ namespace Xarial.CadPlus.XBatch.Sw
 
             m_Logger = logger;
 
-            m_CustomServices = customServices;
+            m_CustomServices = new ServiceCollection();
+            m_CustomServices.AddOrReplace<IXLogger>(() => m_Logger);
 
             m_ForceDisabledAddIns = new Dictionary<Process, List<string>>();
         }

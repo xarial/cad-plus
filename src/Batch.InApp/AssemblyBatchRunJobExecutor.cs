@@ -115,6 +115,8 @@ namespace Xarial.CadPlus.Batch.InApp
             
             var doc = file.Document;
 
+            var closeDoc = !doc.IsCommitted || doc.State.HasFlag(DocumentState_e.Hidden);
+
             try
             {
                 if (!doc.IsCommitted)
@@ -160,15 +162,18 @@ namespace Xarial.CadPlus.Batch.InApp
             }
             finally 
             {
-                try
+                if (closeDoc)
                 {
-                    if (doc != null)
+                    try
                     {
-                        doc.Close();
+                        if (doc != null && doc.IsCommitted)
+                        {
+                            doc.Close();
+                        }
                     }
-                }
-                catch 
-                {
+                    catch
+                    {
+                    }
                 }
             }
 

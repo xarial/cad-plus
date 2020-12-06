@@ -103,7 +103,7 @@ namespace Xarial.CadPlus.XBatch.Base
             set => m_Options.VersionId = value;
         }
 
-        [Option('o', "open", Required = false, HelpText = "Specifies options (silent, readonly, rapid, invisible) for the file opening. Default: silent")]
+        [Option('o', "open", Required = false, HelpText = "Specifies options (silent, readonly, rapid, invisible, forbidupgrade) for the file opening. Default: silent")]
         public IEnumerable<OpenFileOptions_e> OpenFileOptions
         {
             set
@@ -111,6 +111,18 @@ namespace Xarial.CadPlus.XBatch.Base
                 if (value?.Any() == true)
                 {
                     m_Options.OpenFileOptions = value.Aggregate((OpenFileOptions_e)0, (o, c) => o | c);
+                }
+            }
+        }
+
+        [Option('a', "actions", Required = false, HelpText = "Specifies actions (autosavedocuments) to perform for documents. Default: none")]
+        public IEnumerable<Actions_e> Actions 
+        {
+            set 
+            {
+                if (value?.Any() == true)
+                {
+                    m_Options.Actions = value.Aggregate((Actions_e)0, (o, c) => o | c);
                 }
             }
         }

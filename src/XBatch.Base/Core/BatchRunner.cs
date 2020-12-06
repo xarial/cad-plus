@@ -199,7 +199,7 @@ namespace Xarial.CadPlus.XBatch.Base.Core
 
         private void TryCloseDocument(IXDocument doc)
         {
-            if (doc != null)
+            if (doc != null && doc.IsCommitted)
             {
                 try
                 {
@@ -380,12 +380,28 @@ namespace Xarial.CadPlus.XBatch.Base.Core
                             state |= DocumentState_e.Hidden;
                         }
 
+                        if (opts.OpenFileOptions.HasFlag(OpenFileOptions_e.ForbidUpgrade)) 
+                        {
+                            if (app.Version.Compare(doc.Version) == VersionEquality_e.Newer) 
+                            {
+                                if (!state.HasFlag(DocumentState_e.ReadOnly))
+                                {
+                                    m_UserLogger.WriteLine($"Setting the readonly flag to {file.FilePath} to prevent upgrade of the file");
+                                    state |= DocumentState_e.ReadOnly;
+                                }
+                            }
+                        }
+
+                        doc.State = state;
                         doc.Commit(cancellationToken);
                     }
 
-                    app.Documents.Active = doc;
+                    if (!opts.OpenFileOptions.HasFlag(OpenFileOptions_e.Invisible))
+                    {
+                        app.Documents.Active = doc;
+                    }
 
-                    AttempRunMacros(app, doc, macrosStack, cancellationToken);
+                    AttempRunMacros(app, doc, macrosStack, opts.Actions, cancellationToken);
 
                     file.Status = macrosStack.Any() ? JobItemStatus_e.Warning : JobItemStatus_e.Succeeded;
                     m_UserLogger.WriteLine($"Processing file '{file.FilePath}' completed. Execution time {DateTime.Now.Subtract(fileProcessStartTime).ToString(@"hh\:mm\:ss")}");
@@ -433,8 +449,9 @@ namespace Xarial.CadPlus.XBatch.Base.Core
 
             return false;
         }
-
-        private void AttempRunMacros(IXApplication app, IXDocument doc, List<JobItemMacro> macrosStack, CancellationToken cancellationToken)
+        
+        private void AttempRunMacros(IXApplication app, IXDocument doc, 
+            List<JobItemMacro> macrosStack, Actions_e actions, CancellationToken cancellationToken)
         {
             while (macrosStack.Any())
             {
@@ -455,6 +472,12 @@ namespace Xarial.CadPlus.XBatch.Base.Core
                         macroItem.Macro.Arguments, doc);
 
                     macroItem.Status = JobItemStatus_e.Succeeded;
+
+                    if (actions.HasFlag(Actions_e.AutoSaveDocuments)) 
+                    {
+                        m_UserLogger.WriteLine("Saving the document");
+                        doc.Save();
+                    }
                 }
                 catch (JobCancelledException)
                 {

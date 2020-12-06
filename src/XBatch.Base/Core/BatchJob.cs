@@ -76,6 +76,7 @@ namespace Xarial.CadPlus.XBatch.Base.Core
         public string VersionId { get; set; }
         public StartupOptions_e StartupOptions { get; set; }
         public OpenFileOptions_e OpenFileOptions { get; set; }
+        public Actions_e Actions { get; set; }
         public int BatchSize { get; set; }
 
         public BatchJob() 
@@ -86,6 +87,7 @@ namespace Xarial.CadPlus.XBatch.Base.Core
             ContinueOnError = true;
             StartupOptions = StartupOptions_e.Silent | StartupOptions_e.Safe;
             OpenFileOptions = OpenFileOptions_e.Silent;
+            Actions = Actions_e.None;
         }
     }
 }
