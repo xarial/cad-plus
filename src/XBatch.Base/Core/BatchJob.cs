@@ -12,6 +12,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Xarial.XCad;
 using Xarial.XToolkit.Services.UserSettings;
 using Xarial.XToolkit.Services.UserSettings.Attributes;
 
@@ -42,7 +43,12 @@ namespace Xarial.CadPlus.XBatch.Base.Core
 
                     macrosField.Value = macros;
                 }
-                
+
+                var versionField = t.Children<JProperty>().First(p => p.Name == "Version");
+                var versId = versionField.Value["Id"].ToString();
+
+                versionField.Replace(new JProperty("VersionId", versId));
+
                 return t;
             });
         }
@@ -67,9 +73,10 @@ namespace Xarial.CadPlus.XBatch.Base.Core
         public int Timeout { get; set; }
         public MacroData[] Macros { get; set; }
 
-        public AppVersionInfo Version { get; set; }
+        public string VersionId { get; set; }
         public StartupOptions_e StartupOptions { get; set; }
         public OpenFileOptions_e OpenFileOptions { get; set; }
+        public Actions_e Actions { get; set; }
         public int BatchSize { get; set; }
 
         public BatchJob() 
@@ -79,7 +86,8 @@ namespace Xarial.CadPlus.XBatch.Base.Core
             BatchSize = 25;
             ContinueOnError = true;
             StartupOptions = StartupOptions_e.Silent | StartupOptions_e.Safe;
-            OpenFileOptions = OpenFileOptions_e.Silent;
+            OpenFileOptions = OpenFileOptions_e.Silent | OpenFileOptions_e.ForbidUpgrade;
+            Actions = Actions_e.None;
         }
     }
 }

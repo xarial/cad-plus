@@ -65,10 +65,6 @@ namespace Xarial.CadPlus.XBatch.Base
             builder.RegisterType<BatchRunJobExecutor>().As<IBatchRunJobExecutor>();
             builder.RegisterType<BatchManagerVM>();
 
-            builder.RegisterType<XCad.Toolkit.ServiceCollection>().As<IXServiceCollection>()
-                .SingleInstance()
-                .OnActivating(x => x.Instance.Populate(x.Context));
-
             builder.RegisterType<JobManager>().As<IJobManager>()
                 .SingleInstance()
                 .OnActivating(x =>
@@ -94,8 +90,7 @@ namespace Xarial.CadPlus.XBatch.Base
                     new TypedParameter(typeof(IProgressHandler), new ConsoleProgressWriter())
                 }))
             {
-                var opts = args.GetOptions(Host.Services.GetService<IApplicationProvider>());
-                await batchRunner.BatchRun(opts).ConfigureAwait(false);
+                await batchRunner.BatchRun((BatchJob)args).ConfigureAwait(false);
             }
         }
 

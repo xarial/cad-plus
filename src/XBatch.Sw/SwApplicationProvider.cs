@@ -20,6 +20,7 @@ using Xarial.XCad.Base;
 using Xarial.XCad.Enums;
 using Xarial.XCad.SolidWorks;
 using Xarial.XCad.SolidWorks.Enums;
+using Xarial.XCad.Toolkit;
 using Xarial.XToolkit.Wpf.Utils;
 
 namespace Xarial.CadPlus.XBatch.Sw
@@ -34,7 +35,7 @@ namespace Xarial.CadPlus.XBatch.Sw
 
         private readonly IXServiceCollection m_CustomServices;
 
-        public SwApplicationProvider(IXLogger logger, IXServiceCollection customServices)
+        public SwApplicationProvider(IXLogger logger)
         {
             InputFilesFilter = new FileFilter[]
             {
@@ -47,23 +48,27 @@ namespace Xarial.CadPlus.XBatch.Sw
 
             m_Logger = logger;
 
-            m_CustomServices = customServices;
+            m_CustomServices = new ServiceCollection();
+            m_CustomServices.AddOrReplace<IXLogger>(() => m_Logger);
 
             m_ForceDisabledAddIns = new Dictionary<Process, List<string>>();
         }
 
-        public IEnumerable<AppVersionInfo> GetInstalledVersions() 
-            => SwApplicationFactory.GetInstalledVersions()
-            .Select(x => new SwAppVersionInfo(x));
+        public SwApplicationProvider()
+        {
+        }
 
-        public AppVersionInfo ParseVersion(string version)
+        public IEnumerable<IXVersion> GetInstalledVersions() 
+            => SwApplicationFactory.GetInstalledVersions();
+
+        public IXVersion ParseVersion(string version)
         {
             if (string.IsNullOrEmpty(version))
             {
                 var installedVers = SwApplicationFactory.GetInstalledVersions();
                 if (installedVers.Any())
                 {
-                    return new SwAppVersionInfo(installedVers.OrderBy(v => (int)v).First());
+                    return installedVers.OrderBy(v => (int)v.Major).First();
                 }
                 else
                 {
@@ -73,25 +78,26 @@ namespace Xarial.CadPlus.XBatch.Sw
             else if (int.TryParse(version, out int rev))
             {
                 var swVers = (SwVersion_e)Enum.Parse(typeof(SwVersion_e), $"Sw{rev}");
-                return new SwAppVersionInfo(swVers);
+                return SwApplicationFactory.CreateVersion(swVers);
             }
             else if (version.StartsWith("solidworks", StringComparison.CurrentCultureIgnoreCase))
             {
                 var swVers = (SwVersion_e)Enum.Parse(typeof(SwVersion_e), $"Sw{version.Substring("solidworks".Length).Trim()}");
-                return new SwAppVersionInfo(swVers);
+                return SwApplicationFactory.CreateVersion(swVers);
             }
             else 
             {
                 var swVers = (SwVersion_e)Enum.Parse(typeof(SwVersion_e), version);
-                return new SwAppVersionInfo(swVers);
+                return SwApplicationFactory.CreateVersion(swVers);
             }
         }
 
-        public IXApplication StartApplication(AppVersionInfo vers, StartupOptions_e opts, 
+        public IXApplication StartApplication(IXVersion vers, StartupOptions_e opts, 
             CancellationToken cancellationToken)
         {
             var app = SwApplicationFactory.PreCreate();
             app.State = ApplicationState_e.Default;
+            app.Version = (ISwVersion)vers;
 
             app.CustomServices = m_CustomServices;
 
@@ -130,6 +136,7 @@ namespace Xarial.CadPlus.XBatch.Sw
                 }
             }
 
+            app.Sw.UserControlBackground = true;
             app.Sw.CommandInProgress = true;
 
             //Note. By some reasons the process from IXApplication::Process does not fire exited event
@@ -199,5 +206,7 @@ namespace Xarial.CadPlus.XBatch.Sw
 
             TryEnableAddIns(guids.ToList());
         }
+
+        public string GetVersionId(IXVersion value) => (value as ISwVersion)?.Major.ToString();
     }
 }

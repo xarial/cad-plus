@@ -27,7 +27,6 @@ namespace Xarial.CadPlus.XBatch.Base
 
     public interface IArguments 
     {
-        BatchJob GetOptions(IApplicationProvider appProvider);
     }
 
     [Verb("job", HelpText = "Accessing job files")]
@@ -43,30 +42,15 @@ namespace Xarial.CadPlus.XBatch.Base
                 m_Options = BatchJob.FromFile(value);
             }
         }
-
-        public BatchJob GetOptions(IApplicationProvider appProvider) 
-        {
-            m_Options.Version = appProvider.ParseVersion(m_Options.Version?.Id);
-            return m_Options;
-        }
     }
 
     [Verb("run", isDefault: true, HelpText = "Runs jobs by specifying parameters")]
     public class RunOptions : IArguments
     {
         private BatchJob m_Options;
-
-        public BatchJob GetOptions(IApplicationProvider appProvider) 
-        {
-            m_DeferredSetters.ForEach(s => s.Invoke(appProvider));
-            return m_Options;
-        }
-
-        private List<Action<IApplicationProvider>> m_DeferredSetters;
-
+               
         public RunOptions() 
         {
-            m_DeferredSetters = new List<Action<IApplicationProvider>>();
             m_Options = new BatchJob();
         }
         
@@ -116,10 +100,10 @@ namespace Xarial.CadPlus.XBatch.Base
         [Option('v', "hostversion", Required = false, HelpText = "Version of host application. Default: oldest")]
         public string Version
         {
-            set => m_DeferredSetters.Add(new Action<IApplicationProvider>(p => m_Options.Version = p.ParseVersion(value)));
+            set => m_Options.VersionId = value;
         }
 
-        [Option('o', "open", Required = false, HelpText = "Specifies options (silent, readonly, rapid, invisible) for the file opening. Default: silent")]
+        [Option('o', "open", Required = false, HelpText = "Specifies options (silent, readonly, rapid, invisible, forbidupgrade) for the file opening. Default: silent")]
         public IEnumerable<OpenFileOptions_e> OpenFileOptions
         {
             set
@@ -127,6 +111,18 @@ namespace Xarial.CadPlus.XBatch.Base
                 if (value?.Any() == true)
                 {
                     m_Options.OpenFileOptions = value.Aggregate((OpenFileOptions_e)0, (o, c) => o | c);
+                }
+            }
+        }
+
+        [Option('a', "actions", Required = false, HelpText = "Specifies actions (autosavedocuments) to perform for documents. Default: none")]
+        public IEnumerable<Actions_e> Actions 
+        {
+            set 
+            {
+                if (value?.Any() == true)
+                {
+                    m_Options.Actions = value.Aggregate((Actions_e)0, (o, c) => o | c);
                 }
             }
         }

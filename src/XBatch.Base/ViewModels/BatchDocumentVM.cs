@@ -66,7 +66,7 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
         internal static FileFilter[] FileFilters { get; }
             = new FileFilter[] 
             {
-                new FileFilter("Batch+ File", "*.batchplus"),
+                new FileFilter("Batch+ Job File", "*.bpj"),
                 FileFilter.AllFiles };
 
         public event PropertyChangedEventHandler PropertyChanged;
