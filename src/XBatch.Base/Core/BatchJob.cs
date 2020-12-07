@@ -86,7 +86,7 @@ namespace Xarial.CadPlus.XBatch.Base.Core
             BatchSize = 25;
             ContinueOnError = true;
             StartupOptions = StartupOptions_e.Silent | StartupOptions_e.Safe;
-            OpenFileOptions = OpenFileOptions_e.Silent;
+            OpenFileOptions = OpenFileOptions_e.Silent | OpenFileOptions_e.ForbidUpgrade;
             Actions = Actions_e.None;
         }
     }
