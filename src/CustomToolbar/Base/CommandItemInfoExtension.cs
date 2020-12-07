@@ -8,6 +8,7 @@
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using Xarial.CadPlus.Common;
 using Xarial.CadPlus.CustomToolbar.Properties;
 using Xarial.CadPlus.CustomToolbar.Structs;
 using Xarial.CadPlus.Plus.Modules;
@@ -38,11 +39,13 @@ namespace Xarial.CadPlus.CustomToolbar.Base
             {
                 if (info is CommandMacroInfo)
                 {
-                    icon = new ImageIcon(Resources.macro_icon_default);
+                    icon = new ImageEx(ImageIcon.ImageToByteArray(Resources.macro_icon_default), 
+                        Resources.macro_vector);
                 }
                 else if (info is CommandGroupInfo) 
                 {
-                    icon = new ImageIcon(Resources.group_icon_default);
+                    icon = new ImageEx(ImageIcon.ImageToByteArray(Resources.group_icon_default),
+                        Resources.macros_vector);
                 }
             }
 

@@ -136,6 +136,9 @@
   <data name="arguments_icon" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\arguments-icon.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="auto_save_docs" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\auto-save-docs.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="background_mode" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\background-mode.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
@@ -150,6 +153,9 @@
   </data>
   <data name="filter" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\filter.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="forbid_upgrade" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\forbid-upgrade.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="help_icon" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\help-icon.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>

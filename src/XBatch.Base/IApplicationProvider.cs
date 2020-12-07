@@ -19,11 +19,12 @@ namespace Xarial.CadPlus.XBatch.Base
 {
     public interface IApplicationProvider : IDisposable
     {
-        IEnumerable<AppVersionInfo> GetInstalledVersions();
-        IXApplication StartApplication(AppVersionInfo vers, StartupOptions_e opts,
+        IEnumerable<IXVersion> GetInstalledVersions();
+        IXApplication StartApplication(IXVersion vers, StartupOptions_e opts,
             CancellationToken cancellationToken);
-        AppVersionInfo ParseVersion(string version);
+        IXVersion ParseVersion(string version);
         bool CanProcessFile(string filePath);
         FileFilter[] InputFilesFilter { get; }
+        string GetVersionId(IXVersion value);
     }
 }

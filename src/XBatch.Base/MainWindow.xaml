@@ -227,9 +227,6 @@
                     <fluent:ToggleButton Icon="/XBatch.Base;component/Resources/silent-mode.png" 
                                          LargeIcon="/XBatch.Base;component/Resources/silent-mode.png" Header="Silent"
                                          IsChecked="{Binding Path=OpenFileOptionSilent}"/>
-                    <fluent:ToggleButton Icon="/XBatch.Base;component/Resources/read-only-mode.png" 
-                                         LargeIcon="/XBatch.Base;component/Resources/read-only-mode.png" Header="Read Only"
-                                         IsChecked="{Binding Path=OpenFileOptionReadOnly}"/>
                     <fluent:ToggleButton Icon="/XBatch.Base;component/Resources/rapid-mode.png"
                                          LargeIcon="/XBatch.Base;component/Resources/rapid-mode.png" Header="Rapid"
                                          IsChecked="{Binding Path=OpenFileOptionRapid}"/>
@@ -237,6 +234,20 @@
                                          LargeIcon="/XBatch.Base;component/Resources/invisible-mode.png" Header="Invisible"
                                          IsChecked="{Binding Path=OpenFileOptionInvisible}"/>
                 </fluent:RibbonGroupBox>
+                <fluent:RibbonGroupBox Header="Protection">
+                    <fluent:ToggleButton Icon="/XBatch.Base;component/Resources/read-only-mode.png" 
+                                         LargeIcon="/XBatch.Base;component/Resources/read-only-mode.png" Header="Read Only"
+                                         IsChecked="{Binding Path=OpenFileOptionReadOnly}"/>
+                    <fluent:ToggleButton Icon="/XBatch.Base;component/Resources/forbid-upgrade.png" 
+                                         LargeIcon="/XBatch.Base;component/Resources/forbid-upgrade.png" Header="Forbid Files Upgrade"
+                                         IsChecked="{Binding Path=ForbidUpgrade}"/>
+                </fluent:RibbonGroupBox>
+                <fluent:RibbonGroupBox Header="Actions">
+                    <fluent:ToggleButton Icon="/XBatch.Base;component/Resources/auto-save-docs.png" 
+                                         LargeIcon="/XBatch.Base;component/Resources/auto-save-docs.png" Header="Automatically Save Documents"
+                                         IsChecked="{Binding Path=AutoSaveDocuments}"/>
+                </fluent:RibbonGroupBox>
+
                 <fluent:RibbonGroupBox Header="Execution">
                     <Grid>
                         <Grid.ColumnDefinitions>

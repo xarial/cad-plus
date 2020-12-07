@@ -17,10 +17,15 @@ namespace Xarial.CadPlus.CustomToolbar.Base
 
         internal ImageIcon(Image icon)
         {
+            Buffer = ImageToByteArray(icon);
+        }
+
+        internal static byte[] ImageToByteArray(Image img) 
+        {
             using (var ms = new MemoryStream())
             {
-                icon.Save(ms, icon.RawFormat);
-                Buffer = ms.ToArray();
+                img.Save(ms, img.RawFormat);
+                return ms.ToArray();
             }
         }
     }

@@ -199,7 +199,7 @@ namespace Xarial.CadPlus.XBatch.Base.Core
 
         private void TryCloseDocument(IXDocument doc)
         {
-            if (doc != null)
+            if (doc != null && doc.IsCommitted)
             {
                 try
                 {
@@ -229,7 +229,7 @@ namespace Xarial.CadPlus.XBatch.Base.Core
             }
         }
 
-        private IXApplication AttemptStartApplication(AppVersionInfo versionInfo, StartupOptions_e opts, 
+        private IXApplication AttemptStartApplication(IXVersion versionInfo, StartupOptions_e opts, 
             CancellationToken cancellationToken, TimeSpan? timeout) 
         {   
             int curAttempt = 1;
@@ -316,7 +316,8 @@ namespace Xarial.CadPlus.XBatch.Base.Core
                 {
                     TryShutDownApplication(appPrc);
 
-                    app = AttemptStartApplication(opts.Version, opts.StartupOptions, cancellationToken, timeout);
+                    var vers = m_AppProvider.ParseVersion(opts.VersionId);
+                    app = AttemptStartApplication(vers, opts.StartupOptions, cancellationToken, timeout);
                     
                     appPrc = app.Process;
                 }
@@ -351,6 +352,8 @@ namespace Xarial.CadPlus.XBatch.Base.Core
                     
                     doc = app.Documents.FirstOrDefault(d => string.Equals(d.Path, file.FilePath));
 
+                    var forbidSaving = false;
+
                     if (doc == null)
                     {
                         doc = app.Documents.PreCreate<IXDocument>();
@@ -379,17 +382,43 @@ namespace Xarial.CadPlus.XBatch.Base.Core
                             state |= DocumentState_e.Hidden;
                         }
 
+                        if (opts.OpenFileOptions.HasFlag(OpenFileOptions_e.ForbidUpgrade)) 
+                        {
+                            if (app.Version.Compare(doc.Version) == VersionEquality_e.Newer) 
+                            {
+                                forbidSaving = true;
+
+                                if (!state.HasFlag(DocumentState_e.ReadOnly))
+                                {
+                                    m_UserLogger.WriteLine($"Setting the readonly flag to {file.FilePath} to prevent upgrade of the file");
+                                    state |= DocumentState_e.ReadOnly;
+                                }
+                            }
+                        }
+
+                        doc.State = state;
                         doc.Commit(cancellationToken);
                     }
 
-                    app.Documents.Active = doc;
+                    if (!opts.OpenFileOptions.HasFlag(OpenFileOptions_e.Invisible))
+                    {
+                        app.Documents.Active = doc;
+                    }
 
-                    AttempRunMacros(app, doc, macrosStack, cancellationToken);
+                    AttempRunMacros(app, doc, macrosStack, opts.Actions, forbidSaving, cancellationToken);
 
-                    file.Status = macrosStack.Any() ? JobItemStatus_e.Warning : JobItemStatus_e.Succeeded;
+                    if (file.Macros.All(m => m.Status == JobItemStatus_e.Succeeded))
+                    {
+                        file.Status = JobItemStatus_e.Succeeded;
+                    }
+                    else 
+                    {
+                        file.Status = file.Macros.Any(m => m.Status == JobItemStatus_e.Succeeded) ? JobItemStatus_e.Warning : JobItemStatus_e.Failed;
+                    }
+                    
                     m_UserLogger.WriteLine($"Processing file '{file.FilePath}' completed. Execution time {DateTime.Now.Subtract(fileProcessStartTime).ToString(@"hh\:mm\:ss")}");
 
-                    return true;
+                    return file.Status != JobItemStatus_e.Failed;
                 }
                 catch(Exception ex)
                 {
@@ -432,8 +461,9 @@ namespace Xarial.CadPlus.XBatch.Base.Core
 
             return false;
         }
-
-        private void AttempRunMacros(IXApplication app, IXDocument doc, List<JobItemMacro> macrosStack, CancellationToken cancellationToken)
+        
+        private void AttempRunMacros(IXApplication app, IXDocument doc, 
+            List<JobItemMacro> macrosStack, Actions_e actions, bool forbidSaving, CancellationToken cancellationToken)
         {
             while (macrosStack.Any())
             {
@@ -454,6 +484,19 @@ namespace Xarial.CadPlus.XBatch.Base.Core
                         macroItem.Macro.Arguments, doc);
 
                     macroItem.Status = JobItemStatus_e.Succeeded;
+
+                    if (actions.HasFlag(Actions_e.AutoSaveDocuments)) 
+                    {
+                        if (!forbidSaving)
+                        {
+                            m_UserLogger.WriteLine("Saving the document");
+                            doc.Save();
+                        }
+                        else 
+                        {
+                            throw new SaveForbiddenException();
+                        }
+                    }
                 }
                 catch (JobCancelledException)
                 {
@@ -465,9 +508,11 @@ namespace Xarial.CadPlus.XBatch.Base.Core
 
                     string errorDesc;
 
-                    if (ex is MacroRunFailedException)
+                    if (ex is MacroRunFailedException 
+                        || ex is SaveForbiddenException 
+                        || ex is SaveDocumentFailedException)
                     {
-                        errorDesc = (ex as MacroRunFailedException).Message;
+                        errorDesc = ex.Message;
                     }
                     else
                     {
@@ -476,7 +521,7 @@ namespace Xarial.CadPlus.XBatch.Base.Core
 
                     m_UserLogger.WriteLine($"Failed to run macro '{macroItem}': {errorDesc}");
 
-                    if (!IsDocAlive(doc))
+                    if (!doc.IsAlive)
                     {
                         throw new UserMessageException("Document has been disconnected");
                     }
@@ -507,20 +552,7 @@ namespace Xarial.CadPlus.XBatch.Base.Core
                 }
             }
         }
-
-        private bool IsDocAlive(IXDocument doc) 
-        {
-            try
-            {
-                var testTitle = doc.Title;
-                return true;
-            }
-            catch 
-            {
-                return false;
-            }
-        }
-
+        
         public void Dispose()
         {
             m_AppProvider.Dispose();

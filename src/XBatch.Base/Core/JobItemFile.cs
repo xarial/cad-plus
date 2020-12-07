@@ -8,6 +8,7 @@
 using System.Collections.Generic;
 using System.IO;
 using Xarial.CadPlus.Common.Services;
+using Xarial.XCad.Documents;
 
 namespace Xarial.CadPlus.XBatch.Base.Core
 {
