@@ -23,7 +23,11 @@
                             <RowDefinition Height="*" />
                             <RowDefinition Height="Auto" />
                         </Grid.RowDefinitions>
-                        <ListBox x:Name="PART_ListBox" Margin="2" Grid.ColumnSpan="3" ItemsSource="{TemplateBinding PathsSource}" SelectionMode="Extended"/>
+                        <ListBox x:Name="PART_ListBox" Margin="2" Grid.ColumnSpan="3" 
+                                 ItemsSource="{TemplateBinding PathsSource}" 
+                                 HorizontalContentAlignment="Stretch"
+                                 SelectionMode="Extended" ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                                 ItemTemplate="{TemplateBinding ItemTemplate}"/>
                         <Button x:Name="PART_AddFilesButton" Grid.Row="1" Grid.Column="1" 
                                 Visibility="{TemplateBinding ShowAddFileButton, Converter={StaticResource boolToVisConv}}"
                                 VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2">

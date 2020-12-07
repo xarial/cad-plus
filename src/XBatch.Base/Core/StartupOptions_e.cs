@@ -22,6 +22,9 @@ namespace Xarial.CadPlus.XBatch.Base.Core
         Background = 2,
 
         [Summary("Suppresses all popup windows")]
-        Silent = 4
+        Silent = 4,
+
+        [Summary("Hides the main window of the application")]
+        Hidden = 8
     }
 }
