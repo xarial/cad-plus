@@ -118,6 +118,9 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="about_icon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\about-icon.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="add_file" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\add-file.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
@@ -130,8 +133,17 @@
   <data name="app_version" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\app-version.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="arguments_icon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\arguments-icon.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="auto_save_docs" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\auto-save-docs.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="background_mode" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\background-mode.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="batch_plus_icon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\batch-plus-icon.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="browse_file" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\browse-file.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -141,6 +153,18 @@
   </data>
   <data name="filter" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\filter.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="forbid_upgrade" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\forbid-upgrade.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="help_icon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\help-icon.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="hidden_application" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\hidden-application.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="invisible_mode" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\invisible-mode.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="no_popup_mode" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\no-popup-mode.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>

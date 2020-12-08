@@ -29,5 +29,8 @@ namespace Xarial.CadPlus.Xport
 
         [Option('t', "timeout", Required = false, HelpText = "Timeout in seconds for processing a single item (e.g. exporting single file to a single format)")]
         public int Timeout { get; set; }
+
+        [Option('v', "appversion", Required = false, HelpText = "Version of eDrawings to run")]
+        public int Version { get; set; }
     }
 }

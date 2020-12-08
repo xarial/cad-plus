@@ -7,9 +7,12 @@
 
 using System.ComponentModel;
 using System.IO;
+using System.Linq;
 using System.Windows.Input;
+using Xarial.CadPlus.Common.Services;
 using Xarial.CadPlus.CustomToolbar.Enums;
 using Xarial.CadPlus.CustomToolbar.Structs;
+using Xarial.CadPlus.Plus.Modules;
 using Xarial.XToolkit.Wpf;
 using Xarial.XToolkit.Wpf.Extensions;
 using Xarial.XToolkit.Wpf.Utils;
@@ -40,6 +43,16 @@ namespace Xarial.CadPlus.CustomToolbar.UI.ViewModels
             }
         }
 
+        public string Arguments
+        {
+            get => Command.Arguments;
+            set
+            {
+                Command.Arguments = value;
+                this.NotifyChanged();
+            }
+        }
+
         public ICommand BrowseMacroPathCommand
         {
             get
@@ -48,12 +61,11 @@ namespace Xarial.CadPlus.CustomToolbar.UI.ViewModels
                 {
                     m_BrowseMacroPathCommand = new RelayCommand(() =>
                     {
+                        var filters = m_FilterProvider.GetSupportedMacros()
+                                    .Union(new FileFilter[] { FileFilter.AllFiles }).ToArray();
+
                         if (FileSystemBrowser.BrowseFileOpen(out string macroFile, 
-                            "Select macro file",
-                            FileSystemBrowser.BuildFilterString(
-                                new FileFilter(
-                                    "SOLIDWORKS Macros", "*.swp", "*.swb", "*.dll"), //TODO: make the extensions list a dependency
-                                FileFilter.AllFiles)))
+                            "Select macro file", FileSystemBrowser.BuildFilterString(filters)))
                         {
                             MacroPath = macroFile;
                         }
@@ -134,12 +146,15 @@ namespace Xarial.CadPlus.CustomToolbar.UI.ViewModels
             }
         }
 
-        public CommandMacroVM() : this(new CommandMacroInfo())
+        private readonly IMacroFileFilterProvider m_FilterProvider;
+
+        public CommandMacroVM() : this(new CommandMacroInfo(), CustomToolbarModule.Resolve<IIconsProvider[]>())
         {
         }
 
-        public CommandMacroVM(CommandMacroInfo cmd) : base(cmd)
+        public CommandMacroVM(CommandMacroInfo cmd, IIconsProvider[] providers) : base(cmd, providers)
         {
+            m_FilterProvider = CustomToolbarModule.Resolve<IMacroFileFilterProvider>();
         }
     }
 }

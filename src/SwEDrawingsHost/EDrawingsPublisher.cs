@@ -25,8 +25,11 @@ namespace Xarial.CadPlus.Xport.EDrawingsHost
 
         private readonly PopupKiller m_PopupKiller;
 
-        public EDrawingsPublisher()
+        private readonly EDrawingsVersion_e m_Version;
+
+        public EDrawingsPublisher(EDrawingsVersion_e version)
         {
+            m_Version = version;
             m_PopupKiller = new PopupKiller(Process.GetCurrentProcess());
 
             m_Control = Load();
@@ -77,7 +80,7 @@ namespace Xarial.CadPlus.Xport.EDrawingsHost
         private IEDrawingsControl Load()
         {
             m_HostForm = new Form();
-            var edrwHost = new EDrawingsAxHost();
+            var edrwHost = new EDrawingsAxHost(m_Version);
             m_HostForm.Controls.Add(edrwHost);
             edrwHost.Dock = DockStyle.Fill;
             m_HostForm.ShowIcon = false;

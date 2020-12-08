@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Xarial.CadPlus.CustomToolbar.Structs;
 using Xarial.CadPlus.CustomToolbar.UI.Base;
+using Xarial.CadPlus.Plus.Modules;
 
 namespace Xarial.CadPlus.CustomToolbar.UI.ViewModels
 {
@@ -26,16 +27,16 @@ namespace Xarial.CadPlus.CustomToolbar.UI.ViewModels
         }
 
         public CommandGroupVM()
-            : this(new CommandGroupInfo())
+            : this(new CommandGroupInfo(), CustomToolbarModule.Resolve<IIconsProvider[]>())
         {
         }
 
-        public CommandGroupVM(CommandGroupInfo cmdGrp) : base(cmdGrp)
+        public CommandGroupVM(CommandGroupInfo cmdGrp, IIconsProvider[] providers) : base(cmdGrp, providers)
         {
             m_CmdGrp = cmdGrp;
             m_Commands = new CommandsCollection<CommandMacroVM>(
                 (cmdGrp.Commands ?? new CommandMacroInfo[0])
-                .Select(c => new CommandMacroVM(c)));
+                .Select(c => new CommandMacroVM(c, providers)));
 
             m_Commands.CommandsChanged += OnCommandsCollectionChanged;
         }

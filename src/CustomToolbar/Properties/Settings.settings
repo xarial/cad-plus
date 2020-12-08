@@ -5,9 +5,6 @@
     <Setting Name="ToolbarsSpecFile" Type="System.String" Scope="User">
       <Value Profile="(Default)">toolbars.setts</Value>
     </Setting>
-    <Setting Name="AppRootDir" Type="System.String" Scope="User">
-      <Value Profile="(Default)">Xarial\CADPlusToolset</Value>
-    </Setting>
     <Setting Name="XToolbarSettingsFile" Type="System.String" Scope="User">
       <Value Profile="(Default)">xtoolbar.json</Value>
     </Setting>

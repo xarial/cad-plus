@@ -23,6 +23,13 @@ namespace Xarial.CadPlus.XBatch.Base.Core
         ReadOnly = 2,
 
         [Summary("Opens documents in the rapid mode. Some of the APIs might be unavailable")]
-        Rapid = 4
+        Rapid = 4,
+
+        [Summary("Opens documents invisible. Some of the APIs might be unavailable")]
+        Invisible = 8,
+
+        [Title("Forbig Upgrade")]
+        [Summary("Forbid upgrading of documents to a new version")]
+        ForbidUpgrade = 16
     }
 }

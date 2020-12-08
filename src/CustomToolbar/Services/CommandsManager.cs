@@ -13,14 +13,16 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using Xarial.CadPlus.Common.Services;
 using Xarial.CadPlus.CustomToolbar.Base;
 using Xarial.CadPlus.CustomToolbar.Enums;
 using Xarial.CadPlus.CustomToolbar.Helpers;
 using Xarial.CadPlus.CustomToolbar.Properties;
 using Xarial.CadPlus.CustomToolbar.Structs;
-using Xarial.CadPlus.ExtensionModule;
+using Xarial.CadPlus.Plus.Modules;
 using Xarial.XCad;
 using Xarial.XCad.Base;
+using Xarial.XCad.Exceptions;
 using Xarial.XCad.Extensions;
 
 namespace Xarial.CadPlus.CustomToolbar.Services
@@ -41,6 +43,7 @@ namespace Xarial.CadPlus.CustomToolbar.Services
         private readonly ISettingsProvider m_SettsProvider;
         private readonly IToolbarConfigurationProvider m_ToolbarConfProvider;
         private readonly IXLogger m_Logger;
+        private readonly IIconsProvider[] m_IconsProviders;
 
         private readonly Dictionary<CommandMacroInfo, bool> m_CachedToggleStates;
         private readonly ConcurrentDictionary<CommandMacroInfo, IToggleButtonStateResolver> m_StateResolvers;
@@ -51,7 +54,7 @@ namespace Xarial.CadPlus.CustomToolbar.Services
             IMacroRunner macroRunner,
             IMessageService msg, ISettingsProvider settsProvider,
             IToolbarConfigurationProvider toolbarConfProvider,
-            IXLogger logger)
+            IXLogger logger, IIconsProvider[] iconsProviders)
         {
             m_AddIn = addIn;
             m_App = app;
@@ -60,6 +63,7 @@ namespace Xarial.CadPlus.CustomToolbar.Services
             m_SettsProvider = settsProvider;
             m_ToolbarConfProvider = toolbarConfProvider;
             m_Logger = logger;
+            m_IconsProviders = iconsProviders;
 
             m_CachedToggleStates = new Dictionary<CommandMacroInfo, bool>();
             m_StateResolvers = new ConcurrentDictionary<CommandMacroInfo, IToggleButtonStateResolver>();
@@ -78,7 +82,7 @@ namespace Xarial.CadPlus.CustomToolbar.Services
         {
             try
             {
-                m_MacroRunner.RunMacro(cmd.MacroPath, cmd.EntryPoint, cmd.UnloadAfterRun);
+                m_MacroRunner.RunMacro(cmd.MacroPath, cmd.EntryPoint, cmd.UnloadAfterRun, cmd.Arguments);
                 err = null;
                 return true;
             }
@@ -98,8 +102,7 @@ namespace Xarial.CadPlus.CustomToolbar.Services
 
             if (isToolbarChanged)
             {
-                m_Msg.ShowMessage("Toolbar specification has changed. Please restart SOLIDWORKS",
-                    MessageType_e.Info);
+                m_Msg.ShowInformation("Toolbar specification has changed. Please restart SOLIDWORKS");
             }
         }
 
@@ -114,7 +117,7 @@ namespace Xarial.CadPlus.CustomToolbar.Services
                 foreach (var grp in toolbarInfo.Groups
                     .Where(g => g.Commands?.Any(c => c.Triggers.HasFlag(Triggers_e.Button)) == true))
                 {
-                    var cmdGrp = new CommandGroupInfoSpec(grp);
+                    var cmdGrp = new CommandGroupInfoSpec(grp, m_IconsProviders);
                     
                     m_Logger.Log($"Adding command group: {cmdGrp.Title} [{cmdGrp.Id}]. Commands: {string.Join(", ", cmdGrp.Commands.Select(c => $"{c.Title} [{c.UserId}]").ToArray())}");
 
@@ -144,7 +147,7 @@ namespace Xarial.CadPlus.CustomToolbar.Services
                 m_Logger.Log($"Toggle state code compilation errors");
                 m_Logger.Log(ex);
 
-                m_Msg.ShowMessage($"Failed to compile the toggle state code", MessageType_e.Error);
+                m_Msg.ShowError($"Failed to compile the toggle state code");
             }
         }
 
@@ -193,16 +196,19 @@ namespace Xarial.CadPlus.CustomToolbar.Services
 
             if (RunMacroCommand(macroInfo, out Exception err)) 
             {
-                if (macroInfo.ResolveButtonStateCodeOnce || macroInfo.ToggleButtonStateCodeType == ToggleButtonStateCode_e.None)
+                if (macroInfo.Triggers.HasFlag(Triggers_e.ToggleButton))
                 {
-                    if (m_CachedToggleStates.TryGetValue(macroInfo, out bool isChecked))
+                    if (macroInfo.ResolveButtonStateCodeOnce || macroInfo.ToggleButtonStateCodeType == ToggleButtonStateCode_e.None)
                     {
-                        isChecked = !isChecked;
-                        m_CachedToggleStates[macroInfo] = isChecked;
-                    }
-                    else
-                    {
-                        Debug.Assert(false, "State should have been resolved by SOLIDWORKS before this call");
+                        if (m_CachedToggleStates.TryGetValue(macroInfo, out bool isChecked))
+                        {
+                            isChecked = !isChecked;
+                            m_CachedToggleStates[macroInfo] = isChecked;
+                        }
+                        else
+                        {
+                            Debug.Assert(false, "State should have been resolved by SOLIDWORKS before this call");
+                        }
                     }
                 }
             }

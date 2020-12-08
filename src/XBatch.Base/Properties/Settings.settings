@@ -2,8 +2,8 @@
 <SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="Xarial.CadPlus.XBatch.Base.Properties" GeneratedClassName="Settings">
   <Profiles />
   <Settings>
-    <Setting Name="AppRootDir" Type="System.String" Scope="User">
-      <Value Profile="(Default)">Xarial\CADPlusToolset</Value>
+    <Setting Name="HelpLink" Type="System.String" Scope="User">
+      <Value Profile="(Default)">https://cadplus.xarial.com/batch/</Value>
     </Setting>
   </Settings>
 </SettingsFile>

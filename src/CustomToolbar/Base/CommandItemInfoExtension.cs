@@ -7,23 +7,28 @@
 
 using System.Drawing;
 using System.IO;
+using System.Linq;
+using Xarial.CadPlus.Common;
 using Xarial.CadPlus.CustomToolbar.Properties;
 using Xarial.CadPlus.CustomToolbar.Structs;
+using Xarial.CadPlus.Plus.Modules;
 using Xarial.XCad.UI;
 
 namespace Xarial.CadPlus.CustomToolbar.Base
 {
     internal static class CommandItemInfoExtension
     {
-        internal static IXImage GetCommandIcon(this CommandItemInfo info)
+        internal static IXImage GetCommandIcon(this CommandItemInfo info, IIconsProvider[] iconsProviders)
         {
-            Image icon = null;
+            IXImage icon = null;
 
             try
             {
-                if (File.Exists(info.IconPath))
+                var provider = iconsProviders.FirstOrDefault(p => p.Matches(info.IconPath));
+
+                if (provider != null) 
                 {
-                    icon = Image.FromFile(info.IconPath);
+                    icon = provider.GetIcon(info.IconPath);
                 }
             }
             catch
@@ -34,15 +39,17 @@ namespace Xarial.CadPlus.CustomToolbar.Base
             {
                 if (info is CommandMacroInfo)
                 {
-                    icon = Resources.macro_icon_default;
+                    icon = new ImageEx(ImageIcon.ImageToByteArray(Resources.macro_icon_default), 
+                        Resources.macro_vector);
                 }
                 else if (info is CommandGroupInfo) 
                 {
-                    icon = Resources.group_icon_default;
+                    icon = new ImageEx(ImageIcon.ImageToByteArray(Resources.group_icon_default),
+                        Resources.macros_vector);
                 }
             }
 
-            return new MacroButtonIcon(icon);
+            return icon;
         }
     }
 }

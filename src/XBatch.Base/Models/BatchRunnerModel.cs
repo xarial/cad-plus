@@ -15,6 +15,7 @@ using Xarial.CadPlus.Common.Services;
 using Xarial.CadPlus.XBatch.Base.Core;
 using Xarial.CadPlus.XBatch.Base.Exceptions;
 using Xarial.CadPlus.XBatch.Base.Services;
+using Xarial.XCad;
 using Xarial.XToolkit.Services.UserSettings;
 using Xarial.XToolkit.Wpf.Utils;
 
@@ -23,7 +24,7 @@ namespace Xarial.CadPlus.XBatch.Base.Models
     public interface IBatchRunnerModel 
     {
         ObservableCollection<string> RecentFiles { get; }
-        AppVersionInfo[] InstalledVersions { get; }
+        IXVersion[] InstalledVersions { get; }
 
         FileFilter[] InputFilesFilter { get; }
         FileFilter[] MacroFilesFilter { get; }
@@ -32,9 +33,11 @@ namespace Xarial.CadPlus.XBatch.Base.Models
         BatchJob LoadJobFromFile(string filePath);
         BatchJob CreateNewJobDocument();
 
-        AppVersionInfo ParseVersion(string id);
+        IXVersion ParseVersion(string id);
 
         IBatchRunJobExecutor CreateExecutor(BatchJob job);
+
+        string GetVersionId(IXVersion value);
     }
 
     public class BatchRunnerModel : IBatchRunnerModel
@@ -45,11 +48,20 @@ namespace Xarial.CadPlus.XBatch.Base.Models
 
         public ObservableCollection<string> RecentFiles { get; }
 
-        public BatchRunnerModel(IApplicationProvider appProvider, IRecentFilesManager recentFilesMgr) 
+        private readonly Func<BatchJob, IBatchRunJobExecutor> m_ExecFact;
+
+        public BatchRunnerModel(IApplicationProvider appProvider, IRecentFilesManager recentFilesMgr, 
+            IMacroFileFilterProvider macroFilterProvider, Func<BatchJob, IBatchRunJobExecutor> execFact) 
         {
             m_AppProvider = appProvider;
             m_RecentFilesMgr = recentFilesMgr;
             RecentFiles = new ObservableCollection<string>(m_RecentFilesMgr.RecentFiles);
+
+            InputFilesFilter = appProvider.InputFilesFilter;
+            MacroFilesFilter = macroFilterProvider.GetSupportedMacros()
+                .Union(new FileFilter[] { FileFilter.AllFiles }).ToArray();
+
+            m_ExecFact = execFact;
 
             InstalledVersions = m_AppProvider.GetInstalledVersions().ToArray();
 
@@ -59,13 +71,13 @@ namespace Xarial.CadPlus.XBatch.Base.Models
             }
         }
 
-        public FileFilter[] InputFilesFilter => m_AppProvider.InputFilesFilter;
+        public FileFilter[] InputFilesFilter { get; }
 
-        public FileFilter[] MacroFilesFilter => m_AppProvider.MacroFilesFilter;
+        public FileFilter[] MacroFilesFilter { get; }
 
-        public AppVersionInfo[] InstalledVersions { get; }
+        public IXVersion[] InstalledVersions { get; }
 
-        public IBatchRunJobExecutor CreateExecutor(BatchJob job) => new BatchRunJobExecutor(job, m_AppProvider);
+        public IBatchRunJobExecutor CreateExecutor(BatchJob job) => m_ExecFact.Invoke(job);
 
         public BatchJob CreateNewJobDocument() => new BatchJob();
 
@@ -87,7 +99,7 @@ namespace Xarial.CadPlus.XBatch.Base.Models
             }
         }
 
-        public AppVersionInfo ParseVersion(string id) => m_AppProvider.ParseVersion(id);
+        public IXVersion ParseVersion(string id) => m_AppProvider.ParseVersion(id);
 
         public void SaveJobToFile(BatchJob job, string filePath)
         {
@@ -113,5 +125,7 @@ namespace Xarial.CadPlus.XBatch.Base.Models
                 RecentFiles.Add(recFile);
             }
         }
+
+        public string GetVersionId(IXVersion value) => m_AppProvider.GetVersionId(value);
     }
 }

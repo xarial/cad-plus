@@ -5,7 +5,10 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(SolutionDir)common\ProductInfo.cs">
-      <Link>Properties\ProductInfo.cs.cs</Link>
+      <Link>Properties\ProductInfo.cs</Link>
+    </Compile>
+	<Compile Include="$(SolutionDir)common\VersionInfo.cs">
+      <Link>Properties\VersionInfo.cs</Link>
     </Compile>
   </ItemGroup>
 </Project>
