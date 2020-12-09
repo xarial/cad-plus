@@ -21,12 +21,12 @@ Please see the table below for the list of features and their availability in th
 
 | Feature                                                           | Community Edition | Professional Edition |
 |-------------------------------------------------------------------|:-----------------:|:--------------------:|
-| [xPort User Interface](/xport/command-line/)                      | &#x2714;          | &#x2714;             |
-| [xPort Command Line](/xport/user-interface/)                      | &#x2714;          | &#x2714;             |
-| [Custom Toolbar](/custom-toolbar)                                 | &#x2714;          | &#x2714;             |
-| [Custom Toolbar Triggers](/custom-toolbar/configuration/triggers) | &#x2714;          | &#x2714;             |
-| [xBatch User Interface](/xbatch/command-line/)                    | &#x2714;          | &#x2714;             |
-| [xBatch Command Line](/xbatch/user-interface/)                    | &#x2714;          | &#x2714;             |
+| [eXport+ User Interface](/export/command-line/)                      | &#x2714;          | &#x2714;             |
+| [eXport+ Command Line](/export/user-interface/)                      | &#x2714;          | &#x2714;             |
+| [Toolbar+](/toolbar)                                 | &#x2714;          | &#x2714;             |
+| [Toolbar+ Triggers](/toolbar/configuration/triggers) | &#x2714;          | &#x2714;             |
+| [Batch+ User Interface](/batch/command-line/)                    | &#x2714;          | &#x2714;             |
+| [Batch+ Command Line](/batch/user-interface/)                    | &#x2714;          | &#x2714;             |
 
 ## Download
 

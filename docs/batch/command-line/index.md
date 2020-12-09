@@ -1,18 +1,20 @@
 ---
 caption: Command Line
-title: Command line for running and configuring xBatch
-description: Technical documentation for configuring and running the publishing job of xBatch using command line
+title: Command line for running and configuring Batch+
+description: Technical documentation for configuring and running the publishing job of Batch+ using command line
 order: 2
-image: xbatch-command-line.png
+image: batch-command-line.png
+redirect-from:
+  - /xbatch/command-line/
 ---
-![Command line output of xBatch](xbatch-command-line.png)
+![Command line output of Batch+](batch-command-line.png)
 
 Refer the list of available arguments below. Use -- symbol to use arguments. Use --help argument to display help i the console.
 
-For example the below command will open all SOLIDWORKS part files from the *D:\Demo\xBatch\Models* folder and run 2 macros: Macro1.swp and Macro2.swp. SOLIDWORKS 2020 will be started silently and in the background.
+For example the below command will open all SOLIDWORKS part files from the *D:\Demo\Batch\Models* folder and run 2 macros: Macro1.swp and Macro2.swp. SOLIDWORKS 2020 will be started silently and in the background.
 
 ~~~
-> xbatch.exe -i "D:\Demo\xBatch\Models" -f "*.sldprt*" -e -m "D:\Demo\xBatch\Macros\Macro1.swp" "D:\Demo\xBatch\Macros\Macro2.swp" -s silent background -v 2020
+> batchplus.exe -i "D:\Demo\Batch\Models" -f "*.sldprt*" -e -m "D:\Demo\Batch\Macros\Macro1.swp" "D:\Demo\Batch\Macros\Macro2.swp" -s silent background -v 2020
 ~~~
 
 ## Run job with input parameters
@@ -33,22 +35,22 @@ Job can be created dynamically with specified input parameters and settings.
 
 ## Run existing job
 
-Use **job** verb with the below parameters to run existing *.xbatch file from the command line
+Use **job** verb with the below parameters to run existing *.bpj file from the command line
 
 ~~~
-> xbatch.exe job --run D:\sample.xbatch
+> batchplus.exe job --run D:\sample.bpj
 ~~~
 
 | Short Flag  | Flag  |Required   | Summary  |
 |---|---|---|---|
-| -r  |  --run | Yes  | Full path to *.xbatch file to run
+| -r  |  --run | Yes  | Full path to *.bpj file to run
 
 ## Start with initial document
 
-xBatch user interface can be started with initial document. Use **file** verb with the below parameters to start interface with pre-opened file.
+Batch+ user interface can be started with initial document. Use **file** verb with the below parameters to start interface with pre-opened file.
 
 ~~~
-> xbatch.exe file --new
+> batchplus.exe file --new
 ~~~
 
 | Short Flag  | Flag  |Required   | Summary  |

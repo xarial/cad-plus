@@ -1,12 +1,14 @@
 ---
-title: Configuring toggles in Custom Toolbar
+title: Configuring toggles in Toolbar+
 caption: Toggles
-description: Setting up the checked/unchecked toggle button in Custom Toolbar for SOLIDWORKS
+description: Setting up the checked/unchecked toggle button in Toolbar+ for SOLIDWORKS
 labels: [configure,toggle]
 order: 2
 image: togle-button.gif
+redirect-from:
+  - /custom-toolbar/configuration/toggles
 ---
-![Toggle button in SOLIDWORKS toolbar](togle-button.gif)
+![Toggle button in SOLIDWORKS toolbar](toggle-button.gif)
 
 Toggle behavior can be assigned to the button and menu command allowing to switch between checked/unchecked state of the button.
 

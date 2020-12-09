@@ -1,21 +1,23 @@
 ---
 caption: Command Line
-title: Command line for running and configuring xProps
-description: Technical documentation for configuring and running the publishing job of xProps using command line
+title: Command line for running and configuring eXport+
+description: Technical documentation for configuring and running the publishing job of eXport+ using command line
 order: 2
 image: command-line-output.png
+redirect-from:
+  - /xport/command-line/
 ---
 ![Command line exporting process](command-line-output.png){ width=600 }
 
-xPort can be executed from the command line. This can be especially useful if the exporting functionality needs to be integrated in the automation workflow.
+eXport+ can be executed from the command line. This can be especially useful if the exporting functionality needs to be integrated in the automation workflow.
 
-Navigate to **xport.exe** file in the instalation folder (usually *C:\Program Files\Xarial\CAD+ Toolset\xport.exe*).
+Navigate to **exportplus.exe** file in the instalation folder (usually *C:\Program Files\Xarial\CAD+ Toolset\exportplus.exe*).
 
 Refer the list of available arguments below. Use -- symbol to use arguments. Use --help argument to display help i the console.
 
 For example the below command will export all drawing files (*.slddrw) from the *D:\Input Files* folder to html and pdf formats to the same folder as original files. Export operation will ignore errors and continue with next file with timeout of 2 minutes (120 seconds).
 
-> \> xport.exe --i "D:\Input Files" --f html pdf --filter *.slddrw --e --t 120
+> \> exportplus.exe --i "D:\Input Files" --f html pdf --filter *.slddrw --e --t 120
 
 | Short Flag  | Flag  |Required   | Summary  |
 |---|---|---|---|

@@ -1,10 +1,12 @@
 ---
-title: Configuring triggers in Custom Toolbar
+title: Configuring triggers in Toolbar+
 caption: Triggers
-description: Executing macro based on triggers using Custom Toolbar of CAD+ Toolset
+description: Executing macro based on triggers using Toolbar+ of CAD+ Toolset
 labels: [configure,trigger]
 order: 1
 image: macro-triggers.png
+redirect-from:
+  - /custom-toolbar/configuration/triggers/
 ---
 It is possible to configure the trigger for the macro to be executed. Multiple triggers for the same macro are supported.
 

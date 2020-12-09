@@ -1,13 +1,15 @@
 ---
-title: Sharing the SOLIDWORKS toolbars using Custom Toolbar in multi-user environment
+title: Sharing the SOLIDWORKS toolbars using Toolbar+ in multi-user environment
 caption: Multi-User
-description: Sharing the SOLIDWORKS toolbars and macro buttons using Custom Toolbar with multiple users
+description: Sharing the SOLIDWORKS toolbars and macro buttons using Toolbar+ with multiple users
 labels: [shared toolbar,unc,multi-user]
 order: 3
+redirect-from:
+  - /custom-toolbar/multi-user/
 ---
-Custom Toolbar supports sharing of the toolbar configuration with multiple users.
+Toolbar+ supports sharing of the toolbar configuration with multiple users.
 
-Custom Toolbar configuration and all macros and icons can be placed in the shared folder to enable multi-user environment. In this case the changes in the macros or toolbar configuration will be propagated to all users.
+Toolbar+ configuration and all macros and icons can be placed in the shared folder to enable multi-user environment. In this case the changes in the macros or toolbar configuration will be propagated to all users.
 
 Create a shared folder which will host the configuration and macros. This folder should be created on a server machine by the administrator and all users which will use the toolbar should have a read-only (or read-write) access to this folder. Copy all macros and icons to this folder.
 
@@ -20,12 +22,12 @@ Relink the paths to the icons and macros to use UNC location instead of the loca
 
 ![Macro buttons referencing shared library files](shared-macro-icon.png){ width=550 }
 
-In most cases it is required to allow the editing of configuration by administrator only. Custom Toolbar supports a read-only mode. Either assign the read-only attribute to the *toolbar.setts* file or configure the required permissions.
+In most cases it is required to allow the editing of configuration by administrator only. Toolbar+ supports a read-only mode. Either assign the read-only attribute to the *toolbar.setts* file or configure the required permissions.
 
 ![Read-Only attribute for toolbar configuration file](read-only-toolbar-config-file.png){ width=450 }
 
-Custom Toolbar will check these options and load the toolbar as read-only if corresponding settings are set.
+Toolbar+ will check these options and load the toolbar as read-only if corresponding settings are set.
 
 Users which are required to access the toolbar should select the toolbar path from the shared location as shown below. This setting is only required to be set once and will be maintained.
 
-![Read only toolbar in Custom Toolbar configuration window](read-only-toolbar.png){ width=550 }
+![Read only toolbar in Toolbar+ configuration window](read-only-toolbar.png){ width=550 }

@@ -1,15 +1,17 @@
 ---
 caption: User Interface
-title: User Interface for running and configuring xBatch
-description: Technical documentation for configuring and running the publishing job of xBatch using User Interface
+title: User Interface for running and configuring Batch+
+description: Technical documentation for configuring and running the publishing job of Batch+ using User Interface
 order: 1
 image: input-tab.png
+redirect-from:
+  - /xbatch/user-interface/
 ---
 User Interface provides a visual way to configure the batch process.
 
-Batch document (*.xbatch) can be saved and loaded from the external files. 
+Batch document (*.bpj) can be saved and loaded from the external files. 
 
-xBatch document behaves similar to other file based applications (e.g. office, SOLIDWORKS, etc.). If it has unsaved changes it will be marked with * symbol. Additionally xBatch has quick access menu in the document title header.
+Batch+ document behaves similar to other file based applications (e.g. office, SOLIDWORKS, etc.). If it has unsaved changes it will be marked with * symbol. Additionally Batch+ has quick access menu in the document title header.
 
 Once the batch process is run it creates job. It is possible to run multiple jobs in parallel in a single session.
 
@@ -78,7 +80,7 @@ Document settings can be controlled in the settings group.
     * For parts and assemblies - currently not supported and will be ignored
 1. Processing timeout in seconds for processing a single file
 1. Allows batch process to continue if any of the files failed to process (for example file cannot be opened). If this option is not checked, batch process will be terminated once the error appears.
-1. Batch size - maximum number of files allowed to process within single session of SOLIDWORKS. Once this maximum is reached xBatch automatically restarts SOLIDWORKS and continues to process files. This option allows to release resources and improve the performance of batch operations.
+1. Batch size - maximum number of files allowed to process within single session of SOLIDWORKS. Once this maximum is reached Batch+ automatically restarts SOLIDWORKS and continues to process files. This option allows to release resources and improve the performance of batch operations.
 
 ### Job
 

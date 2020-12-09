@@ -1,17 +1,19 @@
 ---
-title: Configuring macro buttons in Custom Toolbar add-in for SOLIDWORKS
+title: Configuring macro buttons in Toolbar+ add-in for SOLIDWORKS
 caption: Configuration
-description: Adding, removing and customizing (tooltips and icons) toolbars and macro buttons in Custom Toolbar add-in for SOLIDWORKS
+description: Adding, removing and customizing (tooltips and icons) toolbars and macro buttons in Toolbar+ add-in for SOLIDWORKS
 labels: [configure,macro button icon,macro button tooltip]
 order: 1
+redirect-from:
+  - /custom-toolbar/configuration/
 ---
 ## Adding Macro Buttons And Toolbars
 
-Macro buttons can be configured by clicking on 'Configure...' command in Custom Toolbar menu in SOLIDWORKS
+Macro buttons can be configured by clicking on 'Configure...' command in Toolbar+ menu in SOLIDWORKS
 
-![Custom Toolbar add-in menu in SOLIDWORKS](custom-toolbar-menu.png){ width=550 }
+![Toolbar+ add-in menu in SOLIDWORKS](custom-toolbar-menu.png){ width=550 }
 
-1. Custom Toolbar sub-menu in SOLIDWORKS Tools menu
+1. Toolbar+ sub-menu in SOLIDWORKS Tools menu
 1. Button to configure toolbar
 
 Configuration dialog is displayed and existing toolbar and buttons can be modified as well as new can be added.
@@ -22,7 +24,7 @@ Configure the parameters as shown below:
 
 ### Configuring Macro Buttons In Toolbar
 
-![Editing macro button in Custom Toolbar](edit-macro.png){ width=650 }
+![Editing macro button in Toolbar+](edit-macro.png){ width=650 }
 
 1. Path to toolbar file. This setting is stored locally to the user. UNC path is supported if required to configure a [shared toolbar](../multi-user/)
 1. Add new toolbar
@@ -31,7 +33,7 @@ Configure the parameters as shown below:
 1. Description of the macro button. It displayed as a sub-header in the tooltip and in the SOLIDWORKS task bar in the bottom right corner when mouse hovers a button in SOLIDWORKS toolbar
 1. Path to icon of the macro button. Optimal size is between 16x16 and 120x120 in PNG format, however image will be automatically scaled and aligned which allows support for any size (including different width and height). Transparency is supported.
 1. Full path to macro to run
-1. Macro entry point. This is the subroutine which should be run first when executing the macro. This is a parameterless subroutine (usually named main). Custom Toolbar will try to automatically find the best suitable subroutine
+1. Macro entry point. This is the subroutine which should be run first when executing the macro. This is a parameterless subroutine (usually named main). Toolbar+ will try to automatically find the best suitable subroutine
 1. Triggers. Macro trigger options. Follow [triggers](triggers) article for more information
 1. Command scope. Identifies the scope (part, assembly, drawing, no documents) where macro can be run. Macro will be disabled in the not selected environments
 1. Command location. Identifies where command should be added (menu, toolbar). This option is only available for **Button** and **Toggle Button** triggers
@@ -40,7 +42,7 @@ Configure the parameters as shown below:
 
 ### Configuring Toolbar
 
-![Editing toolbar in Custom Toolbar](edit-toolbar.png){ width=650 }
+![Editing toolbar in Toolbar+](edit-toolbar.png){ width=650 }
 
 1. Toolbar title to be displayed in the SOLIDWORKS toolbars manager
 1. Toolbar tooltip
@@ -65,7 +67,7 @@ Select macro buttons and toolbars to load and edit the parameters. Use context m
 
 If toolbar configuration changed the following message is displayed and SOLIDWORKS needs to be restarted for settings to take effect (unless toolbar is read-only in multi-user environment).
 
-![Custom Toolbar specification changed notification](toolbar-spec-changed.png){ width=350 }
+![Toolbar+ specification changed notification](toolbar-spec-changed.png){ width=350 }
 
 ## Accessing Macro Buttons
 

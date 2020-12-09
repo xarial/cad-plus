@@ -1,9 +1,11 @@
 ---
 caption: User Interface
-title: User Interface for running and configuring xProps
+title: User Interface for running and configuring eXport+
 description: Technical documentation for configuring and running the publishing job of xProps using User Interface
 order: 1
 image: xport-settings-tab.png
+redirect-from:
+  - /xport/user-interface/
 ---
 User Interface provides a visual way to configure the export process. There are 2 tabs in the application
 
@@ -12,7 +14,7 @@ User Interface provides a visual way to configure the export process. There are 
 
 ## Settings
 
-![xPort settings tab](xport-settings-tab.png)
+![eXport+ settings tab](export-settings-tab.png)
 
 3. Input files and folders scope. Use *Add Files...* (4) and *Add Folders...* (5) buttons to add new files and folders. Press *del* button on keyboard to remove the selected files or folders from the list. Alternatively drag-n-drop files and folders directly to the list.
 3. Browsing the files to add to the exporting process.
@@ -31,7 +33,7 @@ User Interface provides a visual way to configure the export process. There are 
 
 ## Log
 
-![xPort log tab](xport-logs-tab.png)
+![eXport+ log tab](export-logs-tab.png)
 
 1. Text log of the operations. Use this log to troubleshoot errors.
 1. Current progress of export operation
