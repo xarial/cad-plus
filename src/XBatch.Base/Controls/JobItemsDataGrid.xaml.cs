@@ -74,7 +74,6 @@ namespace Xarial.CadPlus.XBatch.Base.Controls
 			return statusCol;
 		}
 
-
 		private void LoadItems(IEnumerable<JobItemFileVM> items) 
 		{
 			dgrdJobItems.Columns.Clear();

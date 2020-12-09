@@ -15,5 +15,6 @@ namespace Xarial.CadPlus.Xport.Core
         public string[] Format { get; set; }
         public bool ContinueOnError { get; set; }
         public int Timeout { get; set; }
+        public int Version { get; set; }
     }
 }

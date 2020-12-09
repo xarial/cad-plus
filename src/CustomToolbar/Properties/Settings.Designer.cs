@@ -37,18 +37,6 @@ namespace Xarial.CadPlus.CustomToolbar.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Xarial\\CADPlusToolset")]
-        public string AppRootDir {
-            get {
-                return ((string)(this["AppRootDir"]));
-            }
-            set {
-                this["AppRootDir"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("xtoolbar.json")]
         public string XToolbarSettingsFile {
             get {

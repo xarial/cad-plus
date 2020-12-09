@@ -15,7 +15,7 @@ using Xarial.CadPlus.XBatch.Base.Core;
 
 namespace Xarial.CadPlus.XBatch.Base
 {
-    [Verb("file", HelpText = "Managing xBatch files")]
+    [Verb("file", HelpText = "Managing Batch+ files")]
     public class FileOptions
     {
         [Option('o', "open", Required = false, HelpText = "Starts application and opens specified file")]
@@ -27,7 +27,6 @@ namespace Xarial.CadPlus.XBatch.Base
 
     public interface IArguments 
     {
-        BatchJob GetOptions(IApplicationProvider appProvider);
     }
 
     [Verb("job", HelpText = "Accessing job files")]
@@ -35,7 +34,7 @@ namespace Xarial.CadPlus.XBatch.Base
     {
         private BatchJob m_Options;
 
-        [Option('r', "run", Required = true, HelpText = "Runs the job from the specified file")]
+        [Option('r', "run", Required = true, HelpText = "Full path to *.batchplus file to run")]
         public string JobFilePath 
         {
             set 
@@ -43,30 +42,15 @@ namespace Xarial.CadPlus.XBatch.Base
                 m_Options = BatchJob.FromFile(value);
             }
         }
-
-        public BatchJob GetOptions(IApplicationProvider appProvider) 
-        {
-            m_Options.Version = appProvider.ParseVersion(m_Options.Version?.Id);
-            return m_Options;
-        }
     }
 
     [Verb("run", isDefault: true, HelpText = "Runs jobs by specifying parameters")]
     public class RunOptions : IArguments
     {
         private BatchJob m_Options;
-
-        public BatchJob GetOptions(IApplicationProvider appProvider) 
-        {
-            m_DeferredSetters.ForEach(s => s.Invoke(appProvider));
-            return m_Options;
-        }
-
-        private List<Action<IApplicationProvider>> m_DeferredSetters;
-
+               
         public RunOptions() 
         {
-            m_DeferredSetters = new List<Action<IApplicationProvider>>();
             m_Options = new BatchJob();
         }
         
@@ -85,7 +69,8 @@ namespace Xarial.CadPlus.XBatch.Base
         [Option('m', "macros", Required = true, HelpText = "List of macros to run")]
         public IEnumerable<string> Macros 
         {
-            set => m_Options.Macros = value?.ToArray();
+            //TODO: add support for args
+            set => m_Options.Macros = value.Select(m => new MacroData() { FilePath = m })?.ToArray();
         }
 
         [Option('e', "error", Required = false, HelpText = "If this option is used execution will continue if any of the macros failed to process, otherwise the process will terminate. Default: true")]
@@ -94,13 +79,13 @@ namespace Xarial.CadPlus.XBatch.Base
             set => m_Options.ContinueOnError = value;
         }
 
-        [Option('t', "timeout", Required = false, HelpText = "Timeout in seconds for processing a single item (e.g. running macro on a single file). Defauult: 600 seconds")]
+        [Option('t', "timeout", Required = false, HelpText = "Timeout in seconds for processing a single item (e.g. running macro on a single file). Default: 600 seconds")]
         public int Timeout
         {
             set => m_Options.Timeout = value;
         }
         
-        [Option('s', "startup", Required = false, HelpText = "Specifies the startup options (silent, background, safe) for the host application. Defaul: silent and safe")]
+        [Option('s', "startup", Required = false, HelpText = "Specifies the startup options (silent, background, safe, hidden) for the host application. Defaul: silent and safe")]
         public IEnumerable<StartupOptions_e> StartupOptions 
         {
             set 
@@ -115,10 +100,10 @@ namespace Xarial.CadPlus.XBatch.Base
         [Option('v', "hostversion", Required = false, HelpText = "Version of host application. Default: oldest")]
         public string Version
         {
-            set => m_DeferredSetters.Add(new Action<IApplicationProvider>(p => m_Options.Version = p.ParseVersion(value)));
+            set => m_Options.VersionId = value;
         }
 
-        [Option('o', "open", Required = false, HelpText = "Specifies options (silent, readonly, rapid) for the file opening. Default: silent")]
+        [Option('o', "open", Required = false, HelpText = "Specifies options (silent, readonly, rapid, invisible, forbidupgrade) for the file opening. Default: silent")]
         public IEnumerable<OpenFileOptions_e> OpenFileOptions
         {
             set
@@ -128,6 +113,24 @@ namespace Xarial.CadPlus.XBatch.Base
                     m_Options.OpenFileOptions = value.Aggregate((OpenFileOptions_e)0, (o, c) => o | c);
                 }
             }
+        }
+
+        [Option('a', "actions", Required = false, HelpText = "Specifies actions (autosavedocuments) to perform for documents. Default: none")]
+        public IEnumerable<Actions_e> Actions 
+        {
+            set 
+            {
+                if (value?.Any() == true)
+                {
+                    m_Options.Actions = value.Aggregate((Actions_e)0, (o, c) => o | c);
+                }
+            }
+        }
+
+        [Option('b', "batch", Required = false, HelpText = "maximum number of files to process in the single session of CAD application before restarting. Default: 25")]
+        public int BatchSize
+        {
+            set => m_Options.BatchSize = value;
         }
     }
 }

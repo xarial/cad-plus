@@ -12,7 +12,7 @@
         xmlns:vm="clr-namespace:Xarial.CadPlus.XBatch.Base.ViewModels"
         xmlns:ext="clr-namespace:Xarial.CadPlus.XBatch.Base.Extensions"
         xmlns:metro="http://metro.mahapps.com/winfx/xaml/controls"
-        Title="xBatch" Icon="Resources/xbatch.png"
+        Title="Batch+" Icon="Resources/xbatch.png"
         mc:Ignorable="d" WindowState="Maximized" TitleCharacterCasing="Normal" WindowTransitionsEnabled="False"
         Height="450" Width="800">
     <metro:MetroWindow.Resources>
@@ -105,6 +105,15 @@
                                        IsEnabled="{Binding Path=Command, RelativeSource={RelativeSource Mode=Self}, Converter={StaticResource cmdEnabledConv}}"/>
                         <fluent:SeparatorTabItem/>
                         <fluent:Button Header="Close" Command="{Binding Path=CloseDocumentCommand}" />
+                        <fluent:SeparatorTabItem/>
+                        <fluent:Button Header="Help..." Icon="/XBatch.Base;component/Resources/help-icon.png" 
+                                       LargeIcon="/XBatch.Base;component/Resources/help-icon.png"
+                                       Command="{Binding Path=HelpCommand}" 
+                                       IsEnabled="{Binding Path=Command, RelativeSource={RelativeSource Mode=Self}, Converter={StaticResource cmdEnabledConv}}"/>
+                        <fluent:Button Header="About..." Icon="/XBatch.Base;component/Resources/about-icon.png" 
+                                       LargeIcon="/XBatch.Base;component/Resources/about-icon.png"
+                                       Command="{Binding Path=AboutCommand}" 
+                                       IsEnabled="{Binding Path=Command, RelativeSource={RelativeSource Mode=Self}, Converter={StaticResource cmdEnabledConv}}"/>
                     </fluent:BackstageTabControl>
                 </fluent:Backstage>
             </fluent:Ribbon.Menu>
@@ -210,18 +219,35 @@
                     <fluent:ToggleButton Size="Large" Icon="/XBatch.Base;component/Resources/no-popup-mode.png" 
                                          LargeIcon="/XBatch.Base;component/Resources/no-popup-mode.png" Header="Silent"
                                          IsChecked="{Binding Path=StartupOptionSilent}"/>
+                    <fluent:ToggleButton Size="Large" Icon="/XBatch.Base;component/Resources/hidden-application.png" 
+                                         LargeIcon="/XBatch.Base;component/Resources/hidden-application.png" Header="Hidden"
+                                         IsChecked="{Binding Path=StartupOptionHidden}"/>
                 </fluent:RibbonGroupBox>
                 <fluent:RibbonGroupBox Header="File Open Options">
                     <fluent:ToggleButton Icon="/XBatch.Base;component/Resources/silent-mode.png" 
                                          LargeIcon="/XBatch.Base;component/Resources/silent-mode.png" Header="Silent"
                                          IsChecked="{Binding Path=OpenFileOptionSilent}"/>
-                    <fluent:ToggleButton Icon="/XBatch.Base;component/Resources/read-only-mode.png" 
-                                         LargeIcon="/XBatch.Base;component/Resources/read-only-mode.png" Header="Read Only"
-                                         IsChecked="{Binding Path=OpenFileOptionReadOnly}"/>
                     <fluent:ToggleButton Icon="/XBatch.Base;component/Resources/rapid-mode.png"
                                          LargeIcon="/XBatch.Base;component/Resources/rapid-mode.png" Header="Rapid"
                                          IsChecked="{Binding Path=OpenFileOptionRapid}"/>
+                    <fluent:ToggleButton Icon="/XBatch.Base;component/Resources/invisible-mode.png" 
+                                         LargeIcon="/XBatch.Base;component/Resources/invisible-mode.png" Header="Invisible"
+                                         IsChecked="{Binding Path=OpenFileOptionInvisible}"/>
                 </fluent:RibbonGroupBox>
+                <fluent:RibbonGroupBox Header="Protection">
+                    <fluent:ToggleButton Icon="/XBatch.Base;component/Resources/read-only-mode.png" 
+                                         LargeIcon="/XBatch.Base;component/Resources/read-only-mode.png" Header="Read Only"
+                                         IsChecked="{Binding Path=OpenFileOptionReadOnly}"/>
+                    <fluent:ToggleButton Icon="/XBatch.Base;component/Resources/forbid-upgrade.png" 
+                                         LargeIcon="/XBatch.Base;component/Resources/forbid-upgrade.png" Header="Forbid Files Upgrade"
+                                         IsChecked="{Binding Path=ForbidUpgrade}"/>
+                </fluent:RibbonGroupBox>
+                <fluent:RibbonGroupBox Header="Actions">
+                    <fluent:ToggleButton Icon="/XBatch.Base;component/Resources/auto-save-docs.png" 
+                                         LargeIcon="/XBatch.Base;component/Resources/auto-save-docs.png" Header="Automatically Save Documents"
+                                         IsChecked="{Binding Path=AutoSaveDocuments}"/>
+                </fluent:RibbonGroupBox>
+
                 <fluent:RibbonGroupBox Header="Execution">
                     <Grid>
                         <Grid.ColumnDefinitions>
@@ -303,9 +329,19 @@
                     </GroupBox>
                     <GridSplitter Height="5" Background="Gray" Grid.Row="1"/>
                     <GroupBox Header="Macros" Grid.Row="2">
-                        <cmnctrls:PathListBox x:Name="lstMacros" Filters="{Binding Path=MacroFilesFilter}" 
-                                                  Grid.Row="1" ShowAddFolderButton="False" ShowAddFileButton="False" AllowDropFolders="False"
-                                                  PathsSource="{Binding Path=Macros}"/>
+                        <cmnctrls:PathListBox x:Name="lstMacros" Grid.Row="1" ShowAddFolderButton="False" 
+                              ShowAddFileButton="False" AllowDropFolders="False"
+                              PathToItemConverter="{Binding Path=PathToMacroDataConverter}"
+                              ItemToPathConverter="{Binding Path=MacroDataToPathConverter}"
+                              AllowDropFiles="True"
+                              Filters="{Binding Path=MacroFilesFilter}"
+                              PathsSource="{Binding Path=Macros}">
+                            <cmnctrls:PathListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <ctrls:MacroDataControl ShowFullPath="True"/>
+                                </DataTemplate>
+                            </cmnctrls:PathListBox.ItemTemplate>
+                        </cmnctrls:PathListBox>
                     </GroupBox>
                 </Grid>
             </Grid>
@@ -365,62 +401,7 @@
                             <RowDefinition Height="*"/>
                             <RowDefinition Height="Auto"/>
                         </Grid.RowDefinitions>
-                        <TabControl Grid.Row="0" Style="{x:Null}">
-                            <TabItem Header="Summary">
-                                <Grid Margin="5" Visibility="{Binding Converter={StaticResource objIsNotNullToVisConv}}"
-                                  DataContext="{Binding Path=Summary}">
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="Auto"/>
-                                        <RowDefinition Height="*"/>
-                                        <RowDefinition Height="Auto"/>
-                                    </Grid.RowDefinitions>
-                                    <Grid Grid.Row="0" Margin="5">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="Auto"/>
-                                            <ColumnDefinition Width="10"/>
-                                            <ColumnDefinition Width="*"/>
-                                        </Grid.ColumnDefinitions>
-                                        <Grid.RowDefinitions>
-                                            <RowDefinition Height="Auto"/>
-                                            <RowDefinition Height="Auto"/>
-                                            <RowDefinition Height="Auto"/>
-                                            <RowDefinition Height="Auto"/>
-                                            <RowDefinition Height="Auto"/>
-                                            <RowDefinition Height="Auto"/>
-                                        </Grid.RowDefinitions>
-
-                                        <TextBlock Text="Start Time:" Grid.Row="0" Grid.Column="0" Margin="2"/>
-                                        <TextBlock Text="{Binding Path=StartTime}" Grid.Row="0" Grid.Column="2" Margin="2"/>
-
-                                        <TextBlock Text="Duration:" Grid.Row="1" Grid.Column="0" Margin="2"/>
-                                        <TextBlock Text="{Binding Path=Duration, StringFormat=hh\\:mm\\:ss}" Grid.Row="1" Grid.Column="2" Margin="2"/>
-
-                                        <TextBlock Text="Total Files:" Grid.Row="2" Grid.Column="0" Margin="2"/>
-                                        <TextBlock Text="{Binding Path=JobItemFiles.Length}" Grid.Row="2" Grid.Column="2" Margin="2"/>
-
-                                        <TextBlock Text="Processed Files:" Grid.Row="3" Grid.Column="0" Margin="2"/>
-                                        <TextBlock Text="{Binding Path=ProcessedFiles}" Grid.Row="3" Grid.Column="2" Margin="2"/>
-
-                                        <TextBlock Text="Failed Files:" Grid.Row="4" Grid.Column="0" Margin="2"/>
-                                        <TextBlock Text="{Binding Path=FailedFiles}" Grid.Row="4" Grid.Column="2" Margin="2"/>
-
-                                    </Grid>
-                                </Grid>
-                            </TabItem>
-                            <TabItem Header="Status">
-                                <Grid Visibility="{Binding Converter={StaticResource objIsNotNullToVisConv}}"
-                                  DataContext="{Binding Path=Summary}">
-                                    <ctrls:JobItemsDataGrid ItemsSource="{Binding Path=JobItemFiles}" Grid.Row="1" Margin="5"/>
-                                </Grid>
-                            </TabItem>
-                            <TabItem Header="Log">
-                                <Grid Visibility="{Binding Converter={StaticResource objIsNotNullToVisConv}}"
-                                  DataContext="{Binding Path=Log}">
-                                    <ListBox VirtualizingStackPanel.IsVirtualizing="True"
-                                         Margin="2" Grid.ColumnSpan="2" ItemsSource="{Binding Path=Output}" />
-                                </Grid>
-                            </TabItem>
-                        </TabControl>
+                        <ctrls:ResultsControl Grid.Row="0"/>
                         <metro:MetroProgressBar Grid.Row="1" IsIndeterminate="{Binding Path=Summary.IsInitializing}"
                                                 Margin="0,5"
                                                 Visibility="{Binding Path=IsBatchInProgress, Converter={StaticResource boolToVisConv}}"

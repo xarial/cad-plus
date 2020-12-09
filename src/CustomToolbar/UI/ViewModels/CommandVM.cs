@@ -6,8 +6,10 @@
 //*********************************************************************
 
 using System.ComponentModel;
+using System.Linq;
 using System.Windows.Input;
 using Xarial.CadPlus.CustomToolbar.Structs;
+using Xarial.CadPlus.Plus.Modules;
 using Xarial.XToolkit.Wpf;
 using Xarial.XToolkit.Wpf.Extensions;
 using Xarial.XToolkit.Wpf.Utils;
@@ -86,9 +88,12 @@ namespace Xarial.CadPlus.CustomToolbar.UI.ViewModels
                 {
                     m_BrowseIconCommand = new RelayCommand(() =>
                     {
+                        var filters = m_IconProviders.Select(p => new FileFilter(p.Filter.Name, p.Filter.Extensions))
+                            .Union(new FileFilter[] { FileFilter.AllFiles }).ToArray();
+
                         if (FileSystemBrowser.BrowseFileOpen(out string imgFile,
                             "Select image file for icon",
-                            FileSystemBrowser.BuildFilterString(FileFilter.ImageFiles))) 
+                            FileSystemBrowser.BuildFilterString(filters))) 
                         {
                             IconPath = imgFile;
                         }
@@ -107,9 +112,12 @@ namespace Xarial.CadPlus.CustomToolbar.UI.ViewModels
             }
         }
 
-        protected CommandVM(TCmdInfo cmd)
+        private readonly IIconsProvider[] m_IconProviders;
+
+        protected CommandVM(TCmdInfo cmd, IIconsProvider[] providers)
         {
             m_Command = cmd;
+            m_IconProviders = providers;
         }
     }
 }

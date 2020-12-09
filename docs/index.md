@@ -20,7 +20,7 @@ image: /logo.svg
 Please see the table below for the list of features and their availability in the specific editions.
 
 | Feature                                                           | Community Edition | Professional Edition |
-|-------------------------------------------------------------------|:-------------------:|:----------------------:|
+|-------------------------------------------------------------------|:-----------------:|:--------------------:|
 | [xPort User Interface](/xport/command-line/)                      | &#x2714;          | &#x2714;             |
 | [xPort Command Line](/xport/user-interface/)                      | &#x2714;          | &#x2714;             |
 | [Custom Toolbar](/custom-toolbar)                                 | &#x2714;          | &#x2714;             |

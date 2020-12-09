@@ -63,6 +63,12 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
 
     public class BatchDocumentVM : INotifyPropertyChanged
     {
+        internal static FileFilter[] FileFilters { get; }
+            = new FileFilter[] 
+            {
+                new FileFilter("Batch+ Job File", "*.bpj"),
+                FileFilter.AllFiles };
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         private string m_Name;
@@ -70,22 +76,22 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
         public string Name
         {
             get => m_Name;
-            private set 
+            private set
             {
                 m_Name = value;
                 this.NotifyChanged();
             }
         }
-                
+
         public BatchDocumentSettingsVM Settings { get; }
         public JobResultsVM Results { get; }
 
         public ObservableCollection<string> Input { get; }
 
-        public ObservableCollection<string> Macros { get; }
+        public ObservableCollection<MacroData> Macros { get; }
 
         public ObservableCollection<FilterVM> Filters { get; }
-        
+
         public FileFilter[] InputFilesFilter => m_Model.InputFilesFilter;
 
         public FileFilter[] MacroFilesFilter => m_Model.MacroFilesFilter;
@@ -97,7 +103,7 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
 
         public ICommand FilterEditEndingCommand { get; }
 
-        public bool IsDirty 
+        public bool IsDirty
         {
             get => m_IsDirty;
             private set
@@ -116,7 +122,7 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
 
         public string FilePath => m_FilePath;
 
-        public BatchDocumentVM(FileInfo file, BatchJob job, IBatchRunnerModel model, IMessageService msgSvc) 
+        public BatchDocumentVM(FileInfo file, BatchJob job, IBatchRunnerModel model, IMessageService msgSvc)
             : this(Path.GetFileNameWithoutExtension(file.FullName), job, model, msgSvc)
         {
             m_FilePath = file.FullName;
@@ -148,9 +154,15 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
             Input = new ObservableCollection<string>(m_Job.Input ?? Enumerable.Empty<string>());
             Input.CollectionChanged += OnInputCollectionChanged;
 
-            Macros = new ObservableCollection<string>(m_Job.Macros ?? Enumerable.Empty<string>());
+            Macros = new ObservableCollection<MacroData>(m_Job.Macros ?? Enumerable.Empty<MacroData>());
             Macros.CollectionChanged += OnMacrosCollectionChanged;
         }
+
+        public Func<string, object> PathToMacroDataConverter { get; }
+            = new Func<string, object>(p => new MacroData() { FilePath = p });
+
+        public Func<object, string> MacroDataToPathConverter { get; }
+        = new Func<object, string>((m) => ((MacroData)m).FilePath);
 
         private bool CanRunJob => Input.Any() && Macros.Any() && Settings.Version != null;
 
@@ -176,8 +188,8 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
         private void SaveAsDocument()
         {
             if (FileSystemBrowser.BrowseFileSave(out m_FilePath, 
-                "Select file path", 
-                FileSystemBrowser.BuildFilterString(new FileFilter("xBatch File", "*.xbatch"), FileFilter.AllFiles))) 
+                "Select file path",
+                FileSystemBrowser.BuildFilterString(FileFilters)))
             {
                 SaveDocument();
                 Name = Path.GetFileNameWithoutExtension(m_FilePath);

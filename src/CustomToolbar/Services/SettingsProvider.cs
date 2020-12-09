@@ -7,9 +7,11 @@
 
 using System;
 using System.IO;
+using Xarial.CadPlus.Common.Exceptions;
 using Xarial.CadPlus.CustomToolbar.Exceptions;
 using Xarial.CadPlus.CustomToolbar.Properties;
 using Xarial.CadPlus.CustomToolbar.Structs;
+using Xarial.CadPlus.Plus;
 using Xarial.XToolkit.Services.UserSettings;
 
 namespace Xarial.CadPlus.CustomToolbar.Services

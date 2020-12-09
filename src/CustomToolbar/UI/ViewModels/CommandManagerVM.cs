@@ -11,9 +11,11 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Windows.Input;
+using Xarial.CadPlus.Common.Services;
 using Xarial.CadPlus.CustomToolbar.Services;
 using Xarial.CadPlus.CustomToolbar.Structs;
 using Xarial.CadPlus.CustomToolbar.UI.Base;
+using Xarial.CadPlus.Plus.Modules;
 using Xarial.XToolkit.Wpf;
 using Xarial.XToolkit.Wpf.Extensions;
 using Xarial.XToolkit.Wpf.Utils;
@@ -41,12 +43,27 @@ namespace Xarial.CadPlus.CustomToolbar.UI.ViewModels
         private readonly IMessageService m_MsgService;
         private bool m_IsEditable;
 
+        private readonly IIconsProvider[] m_IconsProviders;
+
+        private readonly string[] m_MacroExtensions;
+
         public CommandManagerVM(IToolbarConfigurationProvider confsProvider,
-            ISettingsProvider settsProvider, IMessageService msgService)
+            ISettingsProvider settsProvider, 
+            IMessageService msgService, IIconsProvider[] iconsProviders,
+            IMacroFileFilterProvider macroFilterProvider)
         {
             m_ConfsProvider = confsProvider;
             m_SettsProvider = settsProvider;
             m_MsgService = msgService;
+
+            m_MacroExtensions = macroFilterProvider.GetSupportedMacros()
+                .Select(f => f.Extensions)
+                .SelectMany(x => x)
+                .Select(x => Path.GetExtension(x))
+                .Distinct(StringComparer.InvariantCultureIgnoreCase)
+                .ToArray();
+
+            m_IconsProviders = iconsProviders;
 
             Settings = m_SettsProvider.GetSettings();
 
@@ -64,8 +81,7 @@ namespace Xarial.CadPlus.CustomToolbar.UI.ViewModels
             catch
             {
                 isReadOnly = true;
-                m_MsgService.ShowMessage("Failed to load the toolbar from the specification file. Make sure that you have access to the specification file",
-                    MessageType_e.Error);
+                m_MsgService.ShowError("Failed to load the toolbar from the specification file. Make sure that you have access to the specification file");
             }
 
             IsEditable = !isReadOnly;
@@ -78,7 +94,7 @@ namespace Xarial.CadPlus.CustomToolbar.UI.ViewModels
 
             Groups = new CommandsCollection<CommandGroupVM>(
                 (ToolbarInfo.Groups ?? new CommandGroupInfo[0])
-                .Select(g => new CommandGroupVM(g)));
+                .Select(g => new CommandGroupVM(g, m_IconsProviders)));
 
             HandleCommandGroupCommandCreation(Groups.Commands);
 
@@ -334,8 +350,7 @@ namespace Xarial.CadPlus.CustomToolbar.UI.ViewModels
         }
 
         private bool IsValidFilesDrop(string[] files)
-            => files?.All(f =>
-            new string[] { ".swp", ".swb", ".dll" }
+            => files?.All(f => m_MacroExtensions
             .Contains(Path.GetExtension(f), StringComparer.CurrentCultureIgnoreCase)) == true;
 
         private void MoveCommand(ICommandVM cmd, bool forward)
