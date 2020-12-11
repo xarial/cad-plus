@@ -10,7 +10,7 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Xarial.CadPlus.MacroRunner</RootNamespace>
-    <AssemblyName>Xarial.CadPlus.MacroRunner.Module</AssemblyName>
+    <AssemblyName>Xarial.CadPlus.MacroRunner</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
