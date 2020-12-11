@@ -13,7 +13,7 @@
         mc:Ignorable="d"
         d:DataContext="{x:Type vm:CommandManagerVM}"
         Height="600" Width="800" WindowStartupLocation="CenterOwner" ShowInTaskbar="False"
-		Title="Custom Toolbar Configuration" WindowStyle="ToolWindow">
+		Title="Toolbar+ Configuration" WindowStyle="ToolWindow">
     <Window.Resources>
         <conv:CommandContextMenuTitleConverter x:Key="menuTitleConv" />
         <xconv:ObjectIsNotNullUniversalConverter x:Key="objIsNotNulToBool"/>

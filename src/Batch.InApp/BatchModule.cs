@@ -154,8 +154,8 @@ namespace Xarial.CadPlus.Batch.InApp
                 case Commands_e.RunStandAlone:
                     try
                     {
-                        var batchPath = Path.Combine(
-                            Path.GetDirectoryName(this.GetType().Assembly.Location), "batchplus.exe");
+                        var batchPath = Path.GetFullPath(Path.Combine(
+                            Path.GetDirectoryName(this.GetType().Assembly.Location), @"..\..\batchplus.exe"));
 
                         if (File.Exists(batchPath))
                         {
