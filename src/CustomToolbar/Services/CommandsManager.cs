@@ -30,7 +30,7 @@ namespace Xarial.CadPlus.CustomToolbar.Services
     public interface ICommandsManager : IDisposable
     {
         CustomToolbarInfo ToolbarInfo { get; }
-        void UpdatedToolbarConfiguration(ToolbarSettings toolbarSets, CustomToolbarInfo toolbarConf, bool isEditable);
+        void UpdateToolbarConfiguration(ToolbarSettings toolbarSets, CustomToolbarInfo toolbarConf, bool isEditable);
         bool RunMacroCommand(CommandMacroInfo cmd, out Exception err);
     }
 
@@ -94,7 +94,7 @@ namespace Xarial.CadPlus.CustomToolbar.Services
             }
         }
 
-        public void UpdatedToolbarConfiguration(ToolbarSettings toolbarSets, CustomToolbarInfo toolbarConf, bool isEditable)
+        public void UpdateToolbarConfiguration(ToolbarSettings toolbarSets, CustomToolbarInfo toolbarConf, bool isEditable)
         {
             bool isToolbarChanged;
 

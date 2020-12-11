@@ -64,12 +64,12 @@ namespace Xarial.CadPlus.Export.InApp
                 case Commands_e.RunStandAlone:
                     try
                     {
-                        var batchPath = Path.Combine(
-                            Path.GetDirectoryName(this.GetType().Assembly.Location), "exportplus.exe");
+                        var exportPath = Path.GetFullPath(Path.Combine(
+                            Path.GetDirectoryName(this.GetType().Assembly.Location), @"..\..\exportplus.exe"));
 
-                        if (File.Exists(batchPath))
+                        if (File.Exists(exportPath))
                         {
-                            System.Diagnostics.Process.Start(batchPath);
+                            System.Diagnostics.Process.Start(exportPath);
                         }
                         else
                         {

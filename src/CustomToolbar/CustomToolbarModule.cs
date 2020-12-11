@@ -147,7 +147,7 @@ namespace Xarial.CadPlus.CustomToolbar
                     {
                         try
                         {
-                            m_CmdsMgr.UpdatedToolbarConfiguration(vm.Settings, vm.ToolbarInfo, vm.IsEditable);
+                            m_CmdsMgr.UpdateToolbarConfiguration(vm.Settings, vm.ToolbarInfo, vm.IsEditable);
                         }
                         catch (Exception ex)
                         {
