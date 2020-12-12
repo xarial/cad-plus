@@ -26,4 +26,5 @@ For example the below command will export all drawing files (*.slddrw) from the 
 |  -o |  --out |  No | Path to the directory to export results to. Tool will automatically create directory if it doesn’t exist. If this parameter is not specified, files will be exported to the same folder as the input file  |
 | -f  | --format  |  Yes | List of formats to export the files to. Supported formats: .jpg, .tif, .bmp, .png, .stl, .exe, .htm, .html, .pdf, .zip, .edrw, .eprt, and .easm. Specify .e to export to the corresponding format of eDrawings (e.g. .sldprt is exported to .eprt, .sldasm to .easm, .slddrw to .edrw). If this parameter is not specified than file will be exported to eDrawings. PDF format is only supported on Windows 10  |
 | -e  |  --error | No  | If this option is used export will continue if any of the files or formats failed to process, otherwise the export will terminate  |
-| -t  |  --timeout | No  | Timeout in seconds for processing a single item (e.g. exporting single file to a single format)")]
+| -t  |  --timeout | No  | Timeout in seconds for processing a single item (e.g. exporting single file to a single format) |
+| -v  |  --appversion | No  | Version of eDrawings to run (expected values 2019, 2020, 2021) |

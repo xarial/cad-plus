@@ -29,6 +29,7 @@ User Interface provides a visual way to configure the export process. There are 
 8. Output files in the same directory as original files
 8. Allows exporting process to continue if any of the export operations fail (for example one of the files in the queue is broken). If this option is not checked, export process will be terminated once the error appears.
 8. Processing timeout in seconds of exporting a single file to single output format (e.g. exporting Part1.sldprt to Part1.html)
+8. Version of eDrawings to run
 8. Button to start exporting process. Export button enables when all required inputs are specified (input folders and files and export formats)
 
 ## Log

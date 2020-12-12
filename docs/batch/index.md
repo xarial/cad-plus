@@ -17,4 +17,8 @@ Once installed application icon is available in the Windows start menu
 
 ![Batch+ command in the Windows start menu](batch-windows-start.png)
 
+Application can also be started directly from SOLIDWORKS menu
+
+![Batch+ command in SOLIDWORKS menu](batch-sw-menu-start.png)
+
 > It is strongly recommended to backup your data before using the batch operation as it may irrevocably modify files

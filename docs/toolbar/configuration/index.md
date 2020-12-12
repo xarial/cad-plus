@@ -31,9 +31,10 @@ Configure the parameters as shown below:
 1. Add new macro button in toolbar
 1. Title of the macro button. It displayed as a bold header in the tooltip when mouse hovers a button in SOLIDWORKS toolbar
 1. Description of the macro button. It displayed as a sub-header in the tooltip and in the SOLIDWORKS task bar in the bottom right corner when mouse hovers a button in SOLIDWORKS toolbar
-1. Path to icon of the macro button. Optimal size is between 16x16 and 120x120 in PNG format, however image will be automatically scaled and aligned which allows support for any size (including different width and height). Transparency is supported.
+1. Path to icon of the macro button. Raster image files - optimal size is between 16x16 and 120x120 in PNG format, however image will be automatically scaled and aligned which allows support for any size (including different width and height). Transparency is supported. Scalable Vector Graphics images in SVG (recommended option). Provides the best quality for icons as it will be scaled without quality loss depending on the resolution of the screen and button sizes.
 1. Full path to macro to run
 1. Macro entry point. This is the subroutine which should be run first when executing the macro. This is a parameterless subroutine (usually named main). Toolbar+ will try to automatically find the best suitable subroutine
+1. Macro custom arguments. See [arguments](arguments/) article for more information
 1. Triggers. Macro trigger options. Follow [triggers](triggers) article for more information
 1. Command scope. Identifies the scope (part, assembly, drawing, no documents) where macro can be run. Macro will be disabled in the not selected environments
 1. Command location. Identifies where command should be added (menu, toolbar). This option is only available for **Button** and **Toggle Button** triggers

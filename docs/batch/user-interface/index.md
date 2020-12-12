@@ -43,6 +43,8 @@ Backstage panel is available when **File** command is clicked in the ribbon tool
 1. Save current document
 1. Save current document as new file
 1. Close active document
+1. Navigate to help web page
+1. Open About dialog
 
 > When creating new document or opening existing one while there is an active document, command will open new window.
 
@@ -70,17 +72,50 @@ Document settings can be controlled in the settings group.
 ![Settings ribbon group](ribbon-bar-settings.png)
 
 1. Version of SOLIDWORKS to launch for opening files and running macros
-1. Safe startup options - runs SOLIDWORKS in safe mode bypassing options
+1. Safe startup options - runs SOLIDWORKS in safe mode bypassing options. If this option is selected none of the add-ins will be loaded to the session of SOLIDWORKS
 1. Background startup - runs SOLIDWORKS in background. This option only available for SOLIDWORKS Professional or higher
 1. Silent startup option - runs SOLIDWORKS and with disabled popup messages and splash screen
+1. Hidden startup option - hides SOLIDWORKS window. This can improve performance however some of the API might not work properly in this mode
 1. Silent file open option - suppresses all popup dialogs, such as missing references when opening file
-1. Read Only file open option - open files in read-only mode ensuring it cannot be overwritten
 1. Rapid file open option - open files in a rapid mode:
     * For drawings - opens in detailing mode. Some of the APIs might not be available in this mode
-    * For parts and assemblies - currently not supported and will be ignored
+    * For assemblies - components are loaded lightweight
+    * For parts - currently not supported and will be ignored
+1. Invisible mode. Allows to open all files invisibly. This significantly improves the performance however some of the API might not be accessible. Macro need to access arguments to connect to the target document as active model will not be available due to it was opened in invisible mode. Read [Model pointer in invisible mode](#model-pointer-in-invisible-mode) for more information
+1. Read Only file open option - open files in read-only mode ensuring it cannot be overwritten
+1. Forbid Files Upgrade - allows to forbid upgrade of the file if it is of a later version than the SOLIDWORKS. SOLIDWORKS is backward compatible, but not forward compatible which means that files cannot be opened in the older version of SOLIDWORKS. This option checks if current session of SOLIDWORKS is newer than the file and rejects saving operation if this is the case. It is recommended to keep this option selected unless it is explicitly required to upgrade files.
+1. Automatically Save Documents - this option will perform the save of the document after each macro run
 1. Processing timeout in seconds for processing a single file
 1. Allows batch process to continue if any of the files failed to process (for example file cannot be opened). If this option is not checked, batch process will be terminated once the error appears.
 1. Batch size - maximum number of files allowed to process within single session of SOLIDWORKS. Once this maximum is reached Batch+ automatically restarts SOLIDWORKS and continues to process files. This option allows to release resources and improve the performance of batch operations.
+
+#### Model pointer in invisible mode
+
+Most VBA macros will connect to active SOLIDWORKS model and perform the operation. The code will look like this:
+
+~~~ vb jagged-bottom
+Dim swApp As SldWorks.SldWorks
+Dim swModel As SldWorks.ModelDoc2
+~~~
+
+~~~ vb jagged
+Set swModel = swApp.ActiveDoc
+~~~
+
+When invisible mode is selected document is opened hidden thus the ISldWorks::ActiveDoc API will return Nothing as there is no active visible document.
+
+In this case it is required to access the pointer to the model from the arguments passed from Batch+ to the macro.
+
+~~~ vb jagged
+Dim macroRunner As Object
+Set macroRunner = CreateObject("CadPlus.MacroRunner.Sw")
+
+Dim param As Object
+Set param = macroRunner.PopParameter(swApp)
+
+Dim swModel As SldWorks.ModelDoc2
+Set swModel = param.Get("Model")
+~~~
 
 ### Job
 
@@ -103,9 +138,14 @@ Select items and hit **Del** button to remove them from the scope.
 
 ![Macros panel](macros-panel.png)
 
+1. Path to the macro
+2. Optional macro arguments
+
 This panel defines list of macros to run on each file. Drag-n-drop macros directly to the panel or use [input group in ribbon](#input) to add macros with browse dialogs.
 
 Select items and hit **Del** button to remove macros from the scope.
+
+Specify the arguments in the command line format if macro supports ones. Follow [Macro Arguments](/macro-arguments/) article of the instructions of how to use macro arguments.
 
 ## Jobs
 

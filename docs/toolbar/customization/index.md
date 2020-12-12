@@ -32,3 +32,19 @@ Drag-n-drop the required command into the SOLIDWORKS toolbar area (other toolbar
 ![Adding macro button to command tab box](drag-n-drop-command.png)
 
 > Due to current limitation, the commands are not rendered properly in the *Buttons* area as shown on the picture below. But still can be dragged onto the toolbar and will function as normal.
+
+## Adding commands to context menu
+
+Some commands usually execute in the selection context (for example requires preselection of certain objects, e.g. components).
+
+![Command in context menu](context-menu.png)
+
+In this case it will be beneficial to host command in context menu.
+
+In order to add command to context menu. Select the target context menu and click **Customize...**
+
+![Customizing context menu](context-menu-customize.png)
+
+Find the required command and drag-n-drop it to the target position in the context menu.
+
+![Drag-n-drop command to context menu](drag-drop-context-menu.png)

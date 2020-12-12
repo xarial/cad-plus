@@ -11,22 +11,24 @@ image: /logo.svg
 
 ## Features
 
-**CAD+ Toolset** is packaged in 2 editions:
+**CAD+ Toolset** is packaged in 4 editions:
 
 * **Community Edition**. Free and open source version of the application. Source code is available on the [GitHub](https://github.com/xarial/cad-plus). Community edition can also be used for commercial use.
 
-* **Professional Edition**. Paid version of the application. Provides additional features and benefits.
+* **Standard Edition**, **Professional Edition**, **Premium Edition**. Paid versions of the application. Provides additional features and benefits.
 
 Please see the table below for the list of features and their availability in the specific editions.
 
-| Feature                                                           | Community Edition | Professional Edition |
-|-------------------------------------------------------------------|:-----------------:|:--------------------:|
-| [eXport+ User Interface](/export/command-line/)                      | &#x2714;          | &#x2714;             |
-| [eXport+ Command Line](/export/user-interface/)                      | &#x2714;          | &#x2714;             |
-| [Toolbar+](/toolbar)                                 | &#x2714;          | &#x2714;             |
-| [Toolbar+ Triggers](/toolbar/configuration/triggers) | &#x2714;          | &#x2714;             |
-| [Batch+ User Interface](/batch/command-line/)                    | &#x2714;          | &#x2714;             |
-| [Batch+ Command Line](/batch/user-interface/)                    | &#x2714;          | &#x2714;             |
+| Feature                                                           | Community Edition | Standard Edition | Professional Edition | Premium Edition |
+|-------------------------------------------------------------------|:-----------------:|:--------------------:|:--------------------:|:--------------------:|
+| [eXport+ User Interface](/export/command-line/)                      | &#x2714;          | &#x2714;             | &#x2714;             | &#x2714;             |
+| [eXport+ Command Line](/export/user-interface/)                      | &#x2714;          | &#x2714;             | &#x2714;             | &#x2714;             |
+| [Toolbar+](/toolbar)                                 | &#x2714;          | &#x2714;             | &#x2714;             | &#x2714;             |
+| [Toolbar+ Triggers](/toolbar/configuration/triggers) | &#x2714;          | &#x2714;             | &#x2714;             | &#x2714;             |
+| [Batch+ User Interface](/batch/command-line/)                    | &#x2714;          | &#x2714;             | &#x2714;             | &#x2714;             |
+| [Batch+ Command Line](/batch/user-interface/)                    | &#x2714;          | &#x2714;             | &#x2714;             | &#x2714;             |
+| [Batch+ For Assemblies](/batch/assembly/)                    | &#x2714;          | &#x2714;             | &#x2714;             | &#x2714;             |
+| [Arguments supported macros](/macro-arguments/)                    | &#x2714;          | &#x2714;             | &#x2714;             | &#x2714;             |
 
 ## Download
 
@@ -38,7 +40,7 @@ When starting the application for the first time the following message will be d
 
 You can continue to use unregistered version, but we encourage you to register your copy to suppress the popup message. Please find more information on [register](/register/) page
 
-**Professional Edition** is not yet available for download.
+**Standard Edition**, **Professional Edition**, **Premium Edition** are not yet available for download.
 
 ## Updates
 

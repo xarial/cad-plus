@@ -41,4 +41,8 @@ After installation of CAD+ Toolset, eXport+ application can be found in the Wind
 
 ![eXport+ application in the Windows start menu](export-start-menu.png)
 
+Application can also be started directly from SOLIDWORKS menu
+
+![eXport+ command in SOLIDWORKS menu](export-sw-menu-start.png)
+
 eXport+ provides [user interface](user-interface) and [command line interface](command-line) for configuring the publishing job.

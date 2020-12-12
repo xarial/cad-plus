@@ -9,6 +9,8 @@ redirect-from:
 ---
 ![Command line output of Batch+](batch-command-line.png)
 
+**batchplus.exe** can be found in the installation folder (usually *C:\Program Files\Xarial\CAD+ Toolset\batchplus.exe*).
+
 Refer the list of available arguments below. Use -- symbol to use arguments. Use --help argument to display help i the console.
 
 For example the below command will open all SOLIDWORKS part files from the *D:\Demo\Batch\Models* folder and run 2 macros: Macro1.swp and Macro2.swp. SOLIDWORKS 2020 will be started silently and in the background.
@@ -31,7 +33,7 @@ Job can be created dynamically with specified input parameters and settings.
 | -s  |  --startup | No  | Specifies the startup options (silent, background, safe) for the host application. Multiple option can be used |
 | -b  |  --batch|No|Maximum number of files to process in the single session of CAD application before restarting
 | -v  |  --hostversion | No  | Version of SOLIDWORKS application. Use one of the following formats: 2020, Sw2020, SOLIDWORKS 2020. If this option is not specified than the oldest version installed on this system will be used. |
-| -o  |  --open | No  | Specifies options (silent, readonly, rapid) for the file opening. Default: silent |
+| -o  |  --open | No  | Specifies options (silent, readonly, rapid, invisible) for the file opening. Default: silent |
 
 ## Run existing job
 
