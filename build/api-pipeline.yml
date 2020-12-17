@@ -34,7 +34,7 @@ stages:
         displayName: 'NuGet restore'
         inputs:
           command: restore
-          projects: 'api/Plus/Plus.csproj'
+          projects: '$(ProjectPath)'
 
       - task: DownloadSecureFile@1
         name: Certificate
