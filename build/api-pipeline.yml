@@ -14,7 +14,7 @@ stages:
   - name: buildConfiguration
     value: Release
   - name: projectPath
-    value: api/Plus/Plus.csproj
+    value: src/Plus/Plus.csproj
 
   jobs:
   - job:
