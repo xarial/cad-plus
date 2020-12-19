@@ -10,6 +10,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Xarial.CadPlus.Common.Services;
 using Xarial.CadPlus.Xport.SwEDrawingsHost;
 
 namespace Xarial.CadPlus.Xport.EDrawingsHost
@@ -30,7 +31,8 @@ namespace Xarial.CadPlus.Xport.EDrawingsHost
         public EDrawingsPublisher(EDrawingsVersion_e version)
         {
             m_Version = version;
-            m_PopupKiller = new PopupKiller(Process.GetCurrentProcess());
+            m_PopupKiller = new PopupKiller(new AppLogger());
+            m_PopupKiller.Start(Process.GetCurrentProcess(), TimeSpan.FromSeconds(1));
 
             m_Control = Load();
 

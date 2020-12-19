@@ -58,10 +58,12 @@ namespace Xarial.CadPlus.XBatch.Base.Core
 
         private readonly Func<TimeSpan?, IResilientWorker<BatchJobContext>> m_WorkerFact;
 
+        private readonly IPopupKiller m_PopupKiller;
+
         public BatchRunner(IApplicationProvider appProvider, 
             IMacroRunnerExService macroRunnerSvc,
             TextWriter userLogger, IProgressHandler progressHandler, IJobManager jobMgr, IXLogger logger,
-            Func<TimeSpan?, IResilientWorker<BatchJobContext>> workerFact)
+            Func<TimeSpan?, IResilientWorker<BatchJobContext>> workerFact, IPopupKiller popupKiller)
         {
             m_UserLogger = userLogger;
             m_ProgressHandler = progressHandler;
@@ -69,9 +71,18 @@ namespace Xarial.CadPlus.XBatch.Base.Core
             m_AppProvider = appProvider;
             m_WorkerFact = workerFact;
 
+            m_PopupKiller = popupKiller;
+            m_PopupKiller.PopupNotClosed += OnPopupNotClosed;
+
             m_Logger = logger;
 
             m_JobMgr = jobMgr;
+        }
+
+        private void OnPopupNotClosed(Process prc)
+        {
+            m_UserLogger.WriteLine("Failed to close the blocking popup window");
+            TryShutDownApplication(prc);
         }
 
         public async Task<bool> BatchRun(BatchJob opts, CancellationToken cancellationToken = default)
@@ -268,6 +279,11 @@ namespace Xarial.CadPlus.XBatch.Base.Core
                         appPrc.Kill();
                     }
                 }
+
+                if (m_PopupKiller.IsStarted)
+                {
+                    m_PopupKiller.Stop();
+                }
             }
             catch 
             {
@@ -416,6 +432,11 @@ namespace Xarial.CadPlus.XBatch.Base.Core
             {
                 app = m_AppProvider.StartApplication(versionInfo,
                     opts, cancellationToken);
+
+                if (opts.HasFlag(StartupOptions_e.Silent)) 
+                {
+                    m_PopupKiller.Start(app.Process, TimeSpan.FromSeconds(2));
+                }
             }
             catch (Exception ex)
             {

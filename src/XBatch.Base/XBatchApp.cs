@@ -69,6 +69,7 @@ namespace Xarial.CadPlus.XBatch.Base
             builder.RegisterType<PollyResilientWorker<BatchJobContext>>()
                 .As<IResilientWorker<BatchJobContext>>()
                 .WithParameter(new TypedParameter(typeof(int), MAX_RETRIES));
+            builder.RegisterType<PopupKiller>().As<IPopupKiller>();
 
             builder.RegisterType<JobManager>().As<IJobManager>()
                 .SingleInstance()
