@@ -48,8 +48,6 @@ namespace Xarial.CadPlus.XBatch.Base.Core
 
     public class BatchRunner : IDisposable
     {
-        //private const int MAX_ATTEMPTS = 3;
-
         private readonly TextWriter m_UserLogger;
         private readonly IProgressHandler m_ProgressHandler;
         private readonly IApplicationProvider m_AppProvider;
@@ -173,16 +171,11 @@ namespace Xarial.CadPlus.XBatch.Base.Core
             return jobResult;
         }
 
-        private void OnRetry(Exception err, int attempt, BatchJobContext context)
+        private void OnRetry(Exception err, int retry, BatchJobContext context)
         {
-            m_UserLogger.WriteLine($"Failed to run macro ({attempt}): {err.ParseUserError(out _)}");
+            m_UserLogger.WriteLine($"Failed to run macro: {err.ParseUserError(out _)}. Retrying (retry #{retry})...");
 
-            if (err is ICriticalException) 
-            {
-                m_UserLogger.WriteLine("Critical error - restarting application");
-
-                TryShutDownApplication(context.CurrentApplicationProcess);
-            }
+            ProcessError(err, context);
 
             m_Logger.Log(err);
         }
@@ -253,6 +246,8 @@ namespace Xarial.CadPlus.XBatch.Base.Core
             {
                 try
                 {
+                    m_UserLogger.WriteLine($"Closing '{doc.Path}'");
+
                     doc.Close();
                 }
                 catch
@@ -316,6 +311,8 @@ namespace Xarial.CadPlus.XBatch.Base.Core
                 }
                 catch (Exception ex)
                 {
+                    ProcessError(ex, context);
+
                     m_UserLogger.WriteLine(ex.ParseUserError(out _));
                     m_Logger.Log(ex);
                 }
@@ -333,6 +330,16 @@ namespace Xarial.CadPlus.XBatch.Base.Core
             m_UserLogger.WriteLine($"Processing file '{context.CurrentFile.FilePath}' completed. Execution time {DateTime.Now.Subtract(fileProcessStartTime).ToString(@"hh\:mm\:ss")}");
 
             return context.CurrentFile.Status != JobItemStatus_e.Failed;
+        }
+
+        private void ProcessError(Exception err, BatchJobContext context) 
+        {
+            if (err is ICriticalException)
+            {
+                m_UserLogger.WriteLine("Critical error - restarting application");
+
+                TryShutDownApplication(context.CurrentApplicationProcess);
+            }
         }
 
         private void RunMacro(BatchJobContext context, CancellationToken cancellationToken) 
@@ -468,6 +475,8 @@ namespace Xarial.CadPlus.XBatch.Base.Core
 
                 try
                 {
+                    m_UserLogger.WriteLine($"Opening '{filePath}'");
+
                     doc.Commit(cancellationToken);
                 }
                 catch (OpenDocumentFailedException ex)
