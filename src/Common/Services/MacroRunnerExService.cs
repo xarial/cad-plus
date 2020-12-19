@@ -51,7 +51,15 @@ namespace Xarial.CadPlus.Common.Services
                 if (entryPoint == null)
                 {
                     var macro = app.OpenMacro(macroPath);
-                    entryPoint = macro.EntryPoints.First();
+
+                    if (macro.EntryPoints != null)
+                    {
+                        entryPoint = macro.EntryPoints.First();
+                    }
+                    else 
+                    {
+                        throw new MacroRunFailedException(macro.Path, -1, "Failed to extract entry point");
+                    }
                 }
 
                 if (!string.IsNullOrEmpty(args) || doc != null)

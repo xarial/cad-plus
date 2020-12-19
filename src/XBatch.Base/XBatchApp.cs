@@ -24,6 +24,8 @@ namespace Xarial.CadPlus.XBatch.Base
 {
     public abstract class XBatchApp : MixedApplication<IArguments>
     {
+        private const int MAX_RETRIES = 2;
+
         private FileOptions m_StartupOptions;
 
         protected override void OnAppStart()
@@ -64,6 +66,9 @@ namespace Xarial.CadPlus.XBatch.Base
             builder.RegisterType<BatchRunnerModel>().As<IBatchRunnerModel>();
             builder.RegisterType<BatchRunJobExecutor>().As<IBatchRunJobExecutor>();
             builder.RegisterType<BatchManagerVM>();
+            builder.RegisterType<PollyResilientWorker<BatchJobContext>>()
+                .As<IResilientWorker<BatchJobContext>>()
+                .WithParameter(new TypedParameter(typeof(int), MAX_RETRIES));
 
             builder.RegisterType<JobManager>().As<IJobManager>()
                 .SingleInstance()
