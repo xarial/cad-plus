@@ -34,95 +34,73 @@ namespace Xarial.CadPlus.MacroRunner
 
         public IMacroParameter PopParameter(object appDisp)
         {
-            try
-            {
-                var app = CastApplication(appDisp);
+            var app = CastApplication(appDisp);
 
-                GetMacroParametersManager(false, out _, out IMacroParameterManager macroParamsMgr);
+            GetMacroParametersManager(false, out _, out IMacroParameterManager macroParamsMgr);
 
-                if (macroParamsMgr != null)
-                {
-                    var sessionId = GetCurrentMacroSessionId(app);
-                    var param = macroParamsMgr.PopParameter(sessionId);
-                    return param;
-                }
-                else
-                {
-                    throw new COMException("Failed to retrieve the macro parameters manager");
-                }
-            }
-            catch (COMException)
+            if (macroParamsMgr != null)
             {
-                throw;
+                var sessionId = GetCurrentMacroSessionId(app);
+                var param = macroParamsMgr.PopParameter(sessionId);
+                return param;
             }
-            catch (Exception ex)
+            else
             {
-                throw new COMException(ex.Message, ex.InnerException);
+                throw new Exception("Failed to retrieve the macro parameters manager");
             }
         }
 
         public IMacroResult Run(object appDisp, string macroPath, string moduleName, 
             string subName, int opts, IMacroParameter param, bool cacheReg = false)
         {
+            var app = CastApplication(appDisp);
+
+            var macro = app.OpenMacro(macroPath);
+
+            GetMacroParametersManager(true, out RotRegister newReg, out IMacroParameterManager macroParamsMgr);
+
+            if (newReg != null)
+            {
+                if (cacheReg)
+                {
+                    if (m_Register != null)
+                    {
+                        try
+                        {
+                            m_Register.Dispose();
+                        }
+                        catch
+                        {
+                        }
+                    }
+
+                    m_Register = newReg;
+                }
+            }
+
             try
             {
-                var app = CastApplication(appDisp);
-
-                var macro = app.OpenMacro(macroPath);
-
-                GetMacroParametersManager(true, out RotRegister newReg, out IMacroParameterManager macroParamsMgr);
-
-                if (newReg != null)
-                {
-                    if (cacheReg)
-                    {
-                        if (m_Register != null)
-                        {
-                            try
-                            {
-                                m_Register.Dispose();
-                            }
-                            catch
-                            {
-                            }
-                        }
-
-                        m_Register = newReg;
-                    }
-                }
+                var sessionId = CreateMacroSessionId(app, macro);
+                macroParamsMgr.PushParameter(sessionId, param);
 
                 try
                 {
-                    var sessionId = CreateMacroSessionId(app, macro);
-                    macroParamsMgr.PushParameter(sessionId, param);
-
-                    try
-                    {
-                        macro.Run(new MacroEntryPoint(moduleName, subName), (MacroRunOptions_e)opts);
-                    }
-                    finally
-                    {
-                        macroParamsMgr.TryRemoveParameter(sessionId, param);
-                    }
+                    macro.Run(new MacroEntryPoint(moduleName, subName), (MacroRunOptions_e)opts);
                 }
                 finally
                 {
-                    if (newReg != null && !cacheReg)
-                    {
-                        newReg.Dispose();
-                    }
+                    macroParamsMgr.TryRemoveParameter(sessionId, param);
                 }
+            }
+            finally
+            {
+                if (newReg != null && !cacheReg)
+                {
+                    newReg.Dispose();
+                }
+            }
 
-                return param.Result;
-            }
-            catch (COMException) 
-            {
-                throw;
-            }
-            catch (Exception ex)
-            {
-                throw new COMException(ex.Message, ex.InnerException);
-            }
+            return param.Result;
         }
 
         protected abstract IXApplication CastApplication(object app);
@@ -142,7 +120,7 @@ namespace Xarial.CadPlus.MacroRunner
                 }
                 else
                 {
-                    throw new COMException("Macro parameters manager is not registered");
+                    throw new Exception("Macro parameters manager is not registered");
                 }
             }
             else 

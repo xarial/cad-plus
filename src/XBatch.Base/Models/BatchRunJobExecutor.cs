@@ -12,6 +12,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Xarial.CadPlus.Common.Services;
 using Xarial.CadPlus.XBatch.Base.Core;
+using Xarial.CadPlus.XBatch.Base.Exceptions;
 using Xarial.XCad;
 using Xarial.XToolkit.Reporting;
 
@@ -76,12 +77,12 @@ namespace Xarial.CadPlus.XBatch.Base.Models
                 {
                     var cancellationToken = m_CurrentCancellationToken.Token;
 
-                    using (var batchRunner = m_BatchRunnerFact.Invoke(m_LogWriter, m_PrgHander)) 
+                    using (var batchRunner = m_BatchRunnerFact.Invoke(m_LogWriter, m_PrgHander))
                     {
                         return await batchRunner.BatchRun(m_Job, cancellationToken).ConfigureAwait(false);
                     }
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     m_LogWriter.WriteLine(ex.ParseUserError(out _));
                     throw;
