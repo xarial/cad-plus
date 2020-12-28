@@ -11,9 +11,12 @@ namespace Xarial.CadPlus.Plus.Attributes
     {
         public string SettingsFileName { get; }
 
-        public SettingsAttribute(string settsFileName) 
+        public string[] AltSettsFileNames { get; }
+
+        public SettingsAttribute(string settsFileName, params string[] altSettsFileNames) 
         {
             SettingsFileName = settsFileName;
+            AltSettsFileNames = altSettsFileNames;
         }
     }
 }
