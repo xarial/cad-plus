@@ -1,8 +1,8 @@
 trigger:
   branches:
     include:
-    - !api-master
-    - !api-dev
+    - '!api-master'
+    - '!api-dev'
   paths:
     include:
     - src/*
