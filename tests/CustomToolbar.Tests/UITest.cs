@@ -123,7 +123,7 @@ namespace CustomToolbar.Tests
             confProviderMock.Setup(m => m.GetToolbar(out It.Ref<bool>.IsAny, It.IsAny<string>())).
                 Returns(toolbar);
 
-            settsProviderMock.Setup(p => p.GetSettings())
+            settsProviderMock.Setup(p => p.ReadSettings<ToolbarSettings>())
                 .Returns(new ToolbarSettings());
 
             var vm = new CommandManagerVM(confProviderMock.Object, settsProviderMock.Object,

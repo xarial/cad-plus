@@ -19,6 +19,7 @@ using Xarial.CadPlus.CustomToolbar.Enums;
 using Xarial.CadPlus.CustomToolbar.Helpers;
 using Xarial.CadPlus.CustomToolbar.Properties;
 using Xarial.CadPlus.CustomToolbar.Structs;
+using Xarial.CadPlus.Plus;
 using Xarial.CadPlus.Plus.Modules;
 using Xarial.XCad;
 using Xarial.XCad.Base;
@@ -223,11 +224,11 @@ namespace Xarial.CadPlus.CustomToolbar.Services
         {
             isToolbarChanged = false;
 
-            var oldToolbarSetts = m_SettsProvider.GetSettings();
+            var oldToolbarSetts = m_SettsProvider.ReadSettings<ToolbarSettings>();
 
             if (!DeepCompare(toolbarSets, oldToolbarSetts))
             {
-                m_SettsProvider.SaveSettings(toolbarSets);
+                m_SettsProvider.WriteSettings(toolbarSets);
             }
             
             bool isReadOnly;
@@ -301,7 +302,7 @@ namespace Xarial.CadPlus.CustomToolbar.Services
         {
             get
             {
-                return m_SettsProvider.GetSettings().SpecificationFile;
+                return m_SettsProvider.ReadSettings<ToolbarSettings>().SpecificationFile;
             }
         }
 

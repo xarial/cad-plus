@@ -29,11 +29,21 @@ using Xarial.CadPlus.Common.Attributes;
 
 namespace Xarial.CadPlus.Batch.InApp
 {
-    internal class DocumentEqualityComparer : IEqualityComparer<IXDocument>
+    internal class ComponentDocumentSafeEqualityComparer : IEqualityComparer<IXComponent>
     {
-        public bool Equals(IXDocument x, IXDocument y) 
-            => string.Equals(x.Path, y.Path, StringComparison.CurrentCultureIgnoreCase);
-        public int GetHashCode(IXDocument obj) => 0;
+        public bool Equals(IXComponent x, IXComponent y)
+        {
+            try
+            {
+                return string.Equals(x.Path, y.Path, StringComparison.CurrentCultureIgnoreCase);
+            }
+            catch 
+            {
+                return false;
+            }
+        }
+
+        public int GetHashCode(IXComponent obj) => 0;
     }
 
     [Export(typeof(IExtensionModule))]
@@ -123,8 +133,9 @@ namespace Xarial.CadPlus.Batch.InApp
                     }
                     else
                     {
-                        docs = m_Data.Components.Select(c => c.Document)
-                            .Distinct(new DocumentEqualityComparer()).ToArray();
+                        docs = m_Data.Components
+                            .Distinct(new ComponentDocumentSafeEqualityComparer())
+                            .Select(c => c.Document).ToArray();
                     }
 
                     var exec = new AssemblyBatchRunJobExecutor(m_Host.Extension.Application, m_MacroRunnerSvc,

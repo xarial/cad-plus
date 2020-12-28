@@ -15,6 +15,7 @@ using Xarial.CadPlus.Common.Services;
 using Xarial.CadPlus.CustomToolbar.Services;
 using Xarial.CadPlus.CustomToolbar.Structs;
 using Xarial.CadPlus.CustomToolbar.UI.Base;
+using Xarial.CadPlus.Plus;
 using Xarial.CadPlus.Plus.Modules;
 using Xarial.XToolkit.Wpf;
 using Xarial.XToolkit.Wpf.Extensions;
@@ -65,7 +66,7 @@ namespace Xarial.CadPlus.CustomToolbar.UI.ViewModels
 
             m_IconsProviders = iconsProviders;
 
-            Settings = m_SettsProvider.GetSettings();
+            Settings = m_SettsProvider.ReadSettings<ToolbarSettings>();
 
             LoadCommands();
         }

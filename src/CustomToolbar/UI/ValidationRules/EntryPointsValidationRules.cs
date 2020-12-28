@@ -19,7 +19,7 @@ namespace Xarial.CadPlus.CustomToolbar.UI.ValidationRules
                 {
                     return new ValidationResult(false, "No enry points in the macro");
                 }
-                else 
+                else
                 {
                     return ValidationResult.ValidResult;
                 }

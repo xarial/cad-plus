@@ -81,21 +81,9 @@ namespace Xarial.CadPlus.AddIn.Base
                     (Extension as IXServiceConsumer).ConfigureServices += OnConfigureExtensionServices;
                 }
 
-                var modulesDir = Path.Combine(Path.GetDirectoryName(this.GetType().Assembly.Location), "Modules");
-
-                var catalog = CreateDirectoryCatalog(modulesDir, "*.Module.dll");
-
-                var container = new CompositionContainer(catalog);
-                container.SatisfyImportsOnce(this);
-
-                if (m_Modules?.Any() == true)
-                {
-                    foreach (var module in m_Modules)
-                    {
-                        module.Init(this);
-                    }
-                }
-
+                var modulesLoader = new ModulesLoader();
+                modulesLoader.Load(this);
+                
                 Initialized?.Invoke();
             }
             catch 
@@ -106,20 +94,6 @@ namespace Xarial.CadPlus.AddIn.Base
         }
 
         private void OnExtensionDisconnect(IXExtension ext) => Dispose();
-
-        private ComposablePartCatalog CreateDirectoryCatalog(string path, string searchPattern)
-        {
-            var catalog = new AggregateCatalog();
-
-            catalog.Catalogs.Add(new DirectoryCatalog(path, searchPattern));
-
-            foreach (var subDir in Directory.GetDirectories(path, "*.*", SearchOption.AllDirectories))
-            {
-                catalog.Catalogs.Add(new DirectoryCatalog(subDir, searchPattern));
-            }
-
-            return catalog;
-        }
 
         private void OnStartupCompleted(IXExtension ext)
         {
@@ -167,6 +141,8 @@ namespace Xarial.CadPlus.AddIn.Base
             builder.RegisterType<AppLogger>().As<IXLogger>();
             builder.RegisterType<CadAppMessageService>()
                 .As<IMessageService>();
+            builder.RegisterType<SettingsProvider>()
+                .As<ISettingsProvider>();
         }
                 
         public void RegisterCommands<TCmd>(CommandHandler<TCmd> handler)
