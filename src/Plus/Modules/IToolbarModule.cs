@@ -39,7 +39,7 @@ namespace Xarial.CadPlus.Plus.Modules
         IXImage GetIcon(string filePath);
     }
 
-    public interface IToolbarModule : IExtensionModule
+    public interface IToolbarModule : IModule
     {
         void RegisterIconsProvider(IIconsProvider provider);
     }
