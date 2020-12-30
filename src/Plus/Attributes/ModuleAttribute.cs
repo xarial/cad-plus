@@ -23,10 +23,20 @@ namespace Xarial.CadPlus.Plus.Attributes
     public class ModuleAttribute : ExportAttribute, IModuleMetadata
     {
         public string[] TargetHostIds { get; }
+        public Type TargetHostType { get; }
 
-        public ModuleAttribute(params string[] targetHostIds) : base(typeof(IModule)) 
+        public ModuleAttribute(Type targetHostType, params string[] targetHostIds) : base(typeof(IModule)) 
         {
+            TargetHostType = targetHostType;
             TargetHostIds = targetHostIds;
+        }
+
+        public ModuleAttribute(params string[] targetHostIds) : this(null, targetHostIds)
+        {
+        }
+
+        public ModuleAttribute(Type targetHostType) : this(targetHostType, new string[0])
+        {
         }
     }
 }
