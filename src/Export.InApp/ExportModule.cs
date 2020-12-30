@@ -18,8 +18,8 @@ using Xarial.CadPlus.Common.Attributes;
 
 namespace Xarial.CadPlus.Export.InApp
 {
-    [Export(typeof(IExtensionModule))]
-    public class ExportModule : IExtensionModule
+    [Plus.Attributes.Module]
+    public class ExportModule : IModule
     {
         [Title("eXport+")]
         [Description("Commands to export files in a batch mode")]
@@ -32,6 +32,8 @@ namespace Xarial.CadPlus.Export.InApp
             [CommandItemInfo(true, true, WorkspaceTypes_e.All)]
             RunStandAlone,
         }
+
+        public Guid Id => Guid.Parse("961248D6-FB9B-442C-B7ED-16C113E48AEF");
 
         private IHostExtensionApplication m_Host;
 

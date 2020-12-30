@@ -7,8 +7,10 @@ namespace Xarial.CadPlus.Module.Init
 {
     public abstract class BaseHostApplication : IHostApplication
     {
+        public abstract Guid Id { get; }
+
         public abstract IntPtr ParentWindow { get; }
-        public abstract IEnumerable<IModule> Modules { get; }
+        public abstract IModule[] Modules { get; }
         public virtual IServiceProvider Services { get; }
 
         public abstract event Action Connect;

@@ -88,9 +88,11 @@ namespace Xarial.CadPlus.Common
         public override event Action<IContainerBuilder> ConfigureServices;
         public override event Action Started;
 
-        public override IEnumerable<IModule> Modules => throw new NotImplementedException();
+        public override IModule[] Modules => throw new NotImplementedException();
 
         public override IServiceProvider Services { get; }
+
+        public override Guid Id => Guid.Parse("620B36A1-49D6-44FC-8C08-E015A8F679E6");
 
         internal ConsoleHostApplication(IServiceProvider svcProvider) 
         {
@@ -101,7 +103,9 @@ namespace Xarial.CadPlus.Common
 
     public class WpfHostApplication : BaseHostApplication
     {
-        public override IEnumerable<IModule> Modules => throw new NotImplementedException();
+        public override Guid Id => Guid.Parse("C214AB7C-50B4-46F5-ABF3-808DC779ECC7");
+
+        public override IModule[] Modules => throw new NotImplementedException();
 
         public override event Action Connect;
         public override event Action Disconnect;
@@ -253,7 +257,7 @@ namespace Xarial.CadPlus.Common
             
             builder.RegisterType<GenericMessageService>()
                 .As<IMessageService>()
-                .WithParameter(new TypedParameter(typeof(string), "Batch+"));
+                .WithParameter(new TypedParameter(typeof(string), "CAD+"));
 
             OnConfigureServices(builder);
 

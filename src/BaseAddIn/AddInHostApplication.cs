@@ -36,7 +36,7 @@ namespace Xarial.CadPlus.AddIn.Base
     public class AddInHostApplication : BaseHostApplication, IHostExtensionApplication
     {
         [ImportMany]
-        private IEnumerable<IExtensionModule> m_Modules;
+        private IModule[] m_Modules;
 
         internal const int ROOT_GROUP_ID = 1000;
 
@@ -44,7 +44,7 @@ namespace Xarial.CadPlus.AddIn.Base
 
         public IXExtension Extension { get; }
 
-        public override IEnumerable<IModule> Modules => m_Modules;
+        public override IModule[] Modules => m_Modules;
 
         public override event Action Connect;
         public override event Action Disconnect;
@@ -64,8 +64,12 @@ namespace Xarial.CadPlus.AddIn.Base
 
         private IPropertyPageCreator m_PageCreator;
 
-        public AddInHostApplication(IXExtension ext) 
+        public override Guid Id { get; }
+
+        public AddInHostApplication(IXExtension ext, Guid specificId) 
         {
+            Id = specificId;
+
             try
             {
                 Extension = ext;

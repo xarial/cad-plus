@@ -46,8 +46,8 @@ namespace Xarial.CadPlus.Batch.InApp
         public int GetHashCode(IXComponent obj) => 0;
     }
 
-    [Export(typeof(IExtensionModule))]
-    public class BatchModule : IExtensionModule
+    [Plus.Attributes.Module()]
+    public class BatchModule : IModule
     {
         [Title("Batch+")]
         [Description("Commands to batch run macros")]
@@ -66,6 +66,8 @@ namespace Xarial.CadPlus.Batch.InApp
             [CommandItemInfo(true, true, WorkspaceTypes_e.Assembly)]
             RunInApp
         }
+
+        public Guid Id => Guid.Parse("EBB21DBD-5310-42ED-9301-229847676459");
 
         private IHostExtensionApplication m_Host;
 

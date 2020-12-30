@@ -29,7 +29,7 @@ using Xarial.CadPlus.Common.Attributes;
 
 namespace Xarial.CadPlus.CustomToolbar
 {
-    [Export(typeof(IExtensionModule))]
+    [Plus.Attributes.Module]
     public class CustomToolbarModule : IToolbarModule
     {
         [Title("Toolbar+")]
@@ -45,7 +45,7 @@ namespace Xarial.CadPlus.CustomToolbar
 
         protected static Autofac.IContainer m_Container;
 
-        public static TService Resolve<TService>() 
+        public static TService Resolve<TService>()
             => m_Container.Resolve<TService>();
 
         private IHostExtensionApplication m_Host;
@@ -54,6 +54,8 @@ namespace Xarial.CadPlus.CustomToolbar
         private IMessageService m_Msg;
 
         private List<IIconsProvider> m_IconsProviders;
+
+        public Guid Id => Guid.Parse("A4C69B9C-3DA4-4D1B-B533-A2FF66E13457");
 
         public CustomToolbarModule() 
         {
