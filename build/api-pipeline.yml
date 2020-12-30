@@ -35,6 +35,8 @@ stages:
         inputs:
           command: restore
           projects: '$(ProjectPath)'
+          feedsToUse: config
+          nugetConfigPath: 'nuget.config'
 
       - task: DownloadSecureFile@1
         name: Certificate
