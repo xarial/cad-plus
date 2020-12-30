@@ -16,6 +16,7 @@ namespace Xarial.CadPlus.Plus.Attributes
 {
     public interface IModuleMetadata
     {
+        Type TargetHostType { get; }
         string[] TargetHostIds { get; }
     }
 
