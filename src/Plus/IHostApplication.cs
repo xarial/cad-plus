@@ -24,7 +24,7 @@ namespace Xarial.CadPlus.Plus
         /// <summary>
         /// Accesses the registered modules
         /// </summary>
-        IEnumerable<IModule> Modules { get; }
+        IModule[] Modules { get; }
 
         /// <summary>
         /// Notifies when all modules are initialized
