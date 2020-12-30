@@ -16,7 +16,7 @@ namespace Xarial.CadPlus.Plus.Modules
 {
     public delegate void BeforeDocumentsLoadDelegate(ref IXDocument[] docs);
 
-    public interface IPropertiesModule
+    public interface IPropertiesModule : IModule
     {
         event BeforeDocumentsLoadDelegate BeforeDocumentsLoad;
     }
