@@ -15,9 +15,11 @@ using Xarial.XCad.Documents;
 namespace Xarial.CadPlus.Plus.Modules
 {
     public delegate void BeforeDocumentsLoadDelegate(ref IXDocument[] docs);
+    public delegate void AfterDocumentsProcessedDelegate(IXDocument[] docs);
 
     public interface IPropertiesModule : IModule
     {
         event BeforeDocumentsLoadDelegate BeforeDocumentsLoad;
+        event AfterDocumentsProcessedDelegate AfterDocumentsProcessed;
     }
 }
