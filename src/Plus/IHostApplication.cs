@@ -17,6 +17,11 @@ namespace Xarial.CadPlus.Plus
     public interface IHostApplication : IDisposable
     {
         /// <summary>
+        /// Permanend identifier of this host
+        /// </summary>
+        Guid Id { get; }
+
+        /// <summary>
         /// Accesses the registered modules
         /// </summary>
         IEnumerable<IModule> Modules { get; }

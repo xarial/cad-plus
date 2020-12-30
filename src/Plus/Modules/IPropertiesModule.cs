@@ -10,15 +10,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Xarial.XCad.Documents;
 
-namespace Xarial.CadPlus.Plus
+namespace Xarial.CadPlus.Plus.Modules
 {
-    public interface ISettingsProvider
-    {
-        T ReadSettings<T>()
-            where T : new();
+    public delegate void BeforeDocumentsLoadDelegate(ref IXDocument[] docs);
 
-        void WriteSettings<T>(T setts)
-            where T : new();
+    public interface IPropertiesModule
+    {
+        event BeforeDocumentsLoadDelegate BeforeDocumentsLoad;
     }
 }
