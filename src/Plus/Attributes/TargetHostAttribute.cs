@@ -11,23 +11,26 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Xarial.CadPlus.Plus
+namespace Xarial.CadPlus.Plus.Attributes
 {
     /// <summary>
-    /// Represents the extension module for this host application
+    /// Defines the hosts where this module can be loaded
     /// </summary>
-    public interface IModule : IDisposable
+    [AttributeUsage(AttributeTargets.Class)]
+    public class TargetHostAttribute : Attribute
     {
         /// <summary>
-        /// Permanent identifier of this module
+        /// Host ids when this module is supported
         /// </summary>
-        Guid Id { get; }
+        public Guid[] HostIds { get; }
 
         /// <summary>
-        /// Called when instance of the module is created
+        /// Default attribute
         /// </summary>
-        /// <remarks>Only subscribe to events and implement the actual loading from <see cref="IHostApplication.Connect"/></remarks>
-        /// <param name="host">Current host</param>
-        void Init(IHostApplication host);
+        /// <param name="hostIds">Supported host ids</param>
+        public TargetHostAttribute(params string[] hostIds) 
+        {
+            HostIds = hostIds.Select(g => Guid.Parse(g)).ToArray();
+        }
     }
 }
