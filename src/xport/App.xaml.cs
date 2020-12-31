@@ -19,6 +19,8 @@ namespace Xarial.CadPlus.Xport
 {
     public class XPortApp : MixedApplication<Arguments>
     {
+        protected override Guid HostId => Guid.Parse("EA027A58-D1AF-4D3F-840D-1A11BD23A182");
+
         protected override Task RunConsole(Arguments args)
         {
             return RunConsoleExporter(args);

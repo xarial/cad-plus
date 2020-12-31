@@ -16,11 +16,9 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Interop;
 using System.Windows.Navigation;
 using System.Windows.Threading;
 using Xarial.CadPlus.Common.Services;
-using Xarial.CadPlus.Module.Init;
 using Xarial.CadPlus.Plus;
 
 namespace Xarial.CadPlus.Common
@@ -78,70 +76,6 @@ namespace Xarial.CadPlus.Common
         }
     }
 
-    public class ConsoleHostApplication : BaseHostApplication
-    {
-        public override IntPtr ParentWindow => IntPtr.Zero;
-
-        public override event Action Connect;
-        public override event Action Disconnect;
-        public override event Action Initialized;
-        public override event Action<IContainerBuilder> ConfigureServices;
-        public override event Action Started;
-
-        public override IModule[] Modules => throw new NotImplementedException();
-
-        public override IServiceProvider Services { get; }
-
-        public override Guid Id => Guid.Parse("620B36A1-49D6-44FC-8C08-E015A8F679E6");
-
-        internal ConsoleHostApplication(IServiceProvider svcProvider) 
-        {
-            Services = svcProvider;
-            Started?.Invoke();
-        }
-    }
-
-    public class WpfHostApplication : BaseHostApplication
-    {
-        public override Guid Id => Guid.Parse("C214AB7C-50B4-46F5-ABF3-808DC779ECC7");
-
-        public override IModule[] Modules => throw new NotImplementedException();
-
-        public override event Action Connect;
-        public override event Action Disconnect;
-        public override event Action Initialized;
-        public override event Action<IContainerBuilder> ConfigureServices;
-        public override event Action Started;
-
-        private readonly Application m_App;
-
-        public override IServiceProvider Services { get; }
-
-        internal WpfHostApplication(Application app, IServiceProvider svcProvider)
-        {
-            m_App = app;
-            Services = svcProvider;
-            m_App.Activated += OnAppActivated;
-            m_App.Exit += OnAppExit;
-        }
-
-        public override IntPtr ParentWindow => m_App.MainWindow != null
-            ? new WindowInteropHelper(m_App.MainWindow).Handle
-            : IntPtr.Zero;
-
-        private void OnAppActivated(object sender, EventArgs e)
-        {
-            m_App.Activated -= OnAppActivated;
-            Started?.Invoke();
-            Connect?.Invoke();
-        }
-
-        private void OnAppExit(object sender, ExitEventArgs e)
-        {
-            Disconnect?.Invoke();
-        }
-    }
-
     public abstract class MixedApplication<TCliArgs> : Application
     {
         private bool m_IsStartWindowCalled;
@@ -175,6 +109,8 @@ namespace Xarial.CadPlus.Common
                 hasArguments = true;
             }
         }
+
+        protected abstract Guid HostId { get; }
 
         protected override void OnStartup(StartupEventArgs e)
         {
@@ -212,7 +148,7 @@ namespace Xarial.CadPlus.Common
                 ConsoleHandler.Attach();
 
                 SynchronizationContext.SetSynchronizationContext(new SynchronizationContext());
-                Host = new ConsoleHostApplication(svc);
+                Host = new ConsoleHostApplication(svc, HostId);
                 
                 var res = false;
 
@@ -241,7 +177,7 @@ namespace Xarial.CadPlus.Common
             }
             else
             {
-                Host = new WpfHostApplication(this, svc);
+                Host = new WpfHostApplication(this, svc, HostId);
                 base.OnStartup(e);
             }
         }

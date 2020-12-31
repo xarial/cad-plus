@@ -45,14 +45,21 @@ namespace Xarial.CadPlus.Common.Services
 
             var container = new CompositionContainer(catalog);
 
+            bool MatchesHostType(Type hostType) => hostType == null || hostType.IsAssignableFrom(host.GetType());
+            bool MatchesHostId(string[] hostIds) => hostIds?.Any() == false || hostIds.Any(i => Guid.Parse(i).Equals(host.Id));
+
             var modules = container.GetExports<IModule, IModuleMetadata>()
-                .Where(e => e.Metadata.TargetHostIds.Any() == false
-                        || e.Metadata.TargetHostIds.Any(i => Guid.Parse(i).Equals(host.Id)))
+                .Where(e => MatchesHostType(e.Metadata.TargetHostType) && MatchesHostId(e.Metadata.TargetHostIds))
                 .Select(e => e.Value).ToArray();
 
             var field = host.GetType().GetFields(BindingFlags.Public | BindingFlags.Instance | BindingFlags.NonPublic)
                 .First(f => f.FieldType == typeof(IModule[]) 
                 && f.GetCustomAttributes<ImportManyAttribute>(true).Any());
+
+            if (field == null) 
+            {
+                throw new Exception("Cannot find the modules import field");
+            }
 
             field.SetValue(host, modules);
 

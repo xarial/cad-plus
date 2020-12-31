@@ -29,7 +29,7 @@ using Xarial.CadPlus.Common.Attributes;
 
 namespace Xarial.CadPlus.CustomToolbar
 {
-    [Plus.Attributes.Module]
+    [Plus.Attributes.Module(typeof(IHostExtensionApplication))]
     public class CustomToolbarModule : IToolbarModule
     {
         [Title("Toolbar+")]

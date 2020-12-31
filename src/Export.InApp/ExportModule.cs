@@ -18,7 +18,7 @@ using Xarial.CadPlus.Common.Attributes;
 
 namespace Xarial.CadPlus.Export.InApp
 {
-    [Plus.Attributes.Module]
+    [Plus.Attributes.Module(typeof(IHostExtensionApplication))]
     public class ExportModule : IModule
     {
         [Title("eXport+")]

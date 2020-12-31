@@ -46,7 +46,7 @@ namespace Xarial.CadPlus.Batch.InApp
         public int GetHashCode(IXComponent obj) => 0;
     }
 
-    [Plus.Attributes.Module()]
+    [Plus.Attributes.Module(typeof(IHostExtensionApplication))]
     public class BatchModule : IModule
     {
         [Title("Batch+")]
