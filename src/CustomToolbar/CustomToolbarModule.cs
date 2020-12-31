@@ -26,10 +26,11 @@ using Xarial.CadPlus.Common;
 using Xarial.CadPlus.Plus.Modules;
 using System.Collections.Generic;
 using Xarial.CadPlus.Common.Attributes;
+using Xarial.CadPlus.Plus.Attributes;
 
 namespace Xarial.CadPlus.CustomToolbar
 {
-    [Plus.Attributes.Module(typeof(IHostExtensionApplication))]
+    [Module(typeof(IHostExtensionApplication))]
     public class CustomToolbarModule : IToolbarModule
     {
         [Title("Toolbar+")]

@@ -26,6 +26,7 @@ using Xarial.XCad.UI.PropertyPage.Structures;
 using Xarial.XCad.Documents.Enums;
 using Xarial.CadPlus.Common;
 using Xarial.CadPlus.Common.Attributes;
+using Xarial.CadPlus.Plus.Attributes;
 
 namespace Xarial.CadPlus.Batch.InApp
 {
@@ -46,7 +47,7 @@ namespace Xarial.CadPlus.Batch.InApp
         public int GetHashCode(IXComponent obj) => 0;
     }
 
-    [Plus.Attributes.Module(typeof(IHostExtensionApplication))]
+    [Module(typeof(IHostExtensionApplication))]
     public class BatchModule : IModule
     {
         [Title("Batch+")]

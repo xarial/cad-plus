@@ -11,6 +11,7 @@ using System.Linq;
 using Xarial.CadPlus.Common;
 using Xarial.CadPlus.CustomToolbar.Properties;
 using Xarial.CadPlus.CustomToolbar.Structs;
+using Xarial.CadPlus.Plus;
 using Xarial.CadPlus.Plus.Modules;
 using Xarial.XCad.UI;
 

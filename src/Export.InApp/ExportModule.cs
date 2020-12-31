@@ -15,6 +15,7 @@ using Xarial.XCad.UI.Commands.Enums;
 using Xarial.CadPlus.Common;
 using Xarial.CadPlus.Export.InApp.Properties;
 using Xarial.CadPlus.Common.Attributes;
+using Xarial.CadPlus.Plus.Attributes;
 
 namespace Xarial.CadPlus.Export.InApp
 {
