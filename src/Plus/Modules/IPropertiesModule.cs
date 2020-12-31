@@ -14,12 +14,14 @@ using Xarial.XCad.Documents;
 
 namespace Xarial.CadPlus.Plus.Modules
 {
-    public delegate void BeforeDocumentsLoadDelegate(ref IXDocument[] docs);
-    public delegate void AfterDocumentsProcessedDelegate(IXDocument[] docs);
+    public delegate void PreLoadDocumentsDelegate(ref IXDocument[] docs);
+    public delegate void DisposeDocumentsCacheDelegate(IXDocument[] docs);
+    public delegate void ApplyDocumentsChangesDelegate(IXDocument[] docs);
 
     public interface IPropertiesModule : IModule
     {
-        event BeforeDocumentsLoadDelegate BeforeDocumentsLoad;
-        event AfterDocumentsProcessedDelegate AfterDocumentsProcessed;
+        event PreLoadDocumentsDelegate PreLoadDocuments;
+        event DisposeDocumentsCacheDelegate DisposeDocumentsCache;
+        event ApplyDocumentsChangesDelegate ApplyDocumentsChanges;
     }
 }
