@@ -13,7 +13,15 @@ using System.Threading.Tasks;
 
 namespace Xarial.CadPlus.Plus
 {
-    public interface IHostWpfApplication : IHostApplication
+    public class ImageEx : IXSvgImage
     {
+        public byte[] SvgBuffer { get; }
+        public byte[] Buffer { get; }
+
+        public ImageEx(byte[] imgBuffer, byte[] svgBuffer)
+        {
+            Buffer = imgBuffer;
+            SvgBuffer = svgBuffer;
+        }
     }
 }
