@@ -14,6 +14,7 @@ using System.Threading.Tasks;
 using Xarial.CadPlus.Common;
 using Xarial.CadPlus.Common.Services;
 using Xarial.CadPlus.Plus;
+using Xarial.CadPlus.Plus.Services;
 using Xarial.CadPlus.XBatch.Base.Core;
 using Xarial.CadPlus.XBatch.Base.Models;
 using Xarial.CadPlus.XBatch.Base.Services;
@@ -34,7 +35,7 @@ namespace Xarial.CadPlus.XBatch.Base
             this.StartupUri = new Uri("/XBatch.Base;component/MainWindow.xaml", UriKind.Relative);
         }
 
-        protected override Guid HostId => Guid.Parse(Hosts.BatchStandAlone);
+        protected override Guid HostId => Guid.Parse(HostIds.BatchStandAlone);
 
         protected override void OnWindowStarted()
         {

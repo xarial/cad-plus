@@ -28,6 +28,7 @@ using Xarial.CadPlus.Common.Services;
 using Autofac;
 using Xarial.CadPlus.Common;
 using Autofac.Core.Registration;
+using Xarial.CadPlus.Plus.Services;
 
 namespace Xarial.CadPlus.AddIn.Base
 {

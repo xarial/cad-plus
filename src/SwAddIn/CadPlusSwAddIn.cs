@@ -60,7 +60,7 @@ namespace Xarial.CadPlus.AddIn.Sw
 
         public CadPlusSwAddIn()
         {
-            m_Host = new AddInHostApplication(this, Guid.Parse(Hosts.SwAddIn));
+            m_Host = new AddInHostApplication(this, Guid.Parse(HostIds.SolidWorksAddIn));
             m_Host.ConfigureServices += OnConfigureModuleServices;
         }
         

@@ -17,6 +17,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using Xarial.CadPlus.Common.Exceptions;
 using Xarial.CadPlus.Common.Services;
+using Xarial.CadPlus.Plus.Exceptions;
 using Xarial.CadPlus.XBatch.Base.Core;
 using Xarial.CadPlus.XBatch.Base.Exceptions;
 using Xarial.CadPlus.XBatch.Base.Models;

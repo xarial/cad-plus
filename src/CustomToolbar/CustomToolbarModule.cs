@@ -27,6 +27,7 @@ using Xarial.CadPlus.Plus.Modules;
 using System.Collections.Generic;
 using Xarial.CadPlus.Common.Attributes;
 using Xarial.CadPlus.Plus.Attributes;
+using Xarial.CadPlus.Plus.Services;
 
 namespace Xarial.CadPlus.CustomToolbar
 {

@@ -10,6 +10,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using Xarial.CadPlus.Common.Exceptions;
 using Xarial.CadPlus.MacroRunner;
+using Xarial.CadPlus.Plus.Exceptions;
 using Xarial.XCad;
 using Xarial.XCad.Base;
 using Xarial.XCad.Documents;
