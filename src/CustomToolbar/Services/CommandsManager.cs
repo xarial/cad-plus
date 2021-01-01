@@ -21,6 +21,7 @@ using Xarial.CadPlus.CustomToolbar.Properties;
 using Xarial.CadPlus.CustomToolbar.Structs;
 using Xarial.CadPlus.Plus;
 using Xarial.CadPlus.Plus.Modules;
+using Xarial.CadPlus.Plus.Services;
 using Xarial.XCad;
 using Xarial.XCad.Base;
 using Xarial.XCad.Exceptions;

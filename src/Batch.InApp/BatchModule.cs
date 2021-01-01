@@ -47,7 +47,7 @@ namespace Xarial.CadPlus.Batch.InApp
         public int GetHashCode(IXComponent obj) => 0;
     }
 
-    [Module(typeof(IHostExtensionApplication))]
+    [Module(typeof(IHostExtension))]
     public class BatchModule : IModule
     {
         [Title("Batch+")]
@@ -70,7 +70,7 @@ namespace Xarial.CadPlus.Batch.InApp
 
         public Guid Id => Guid.Parse("EBB21DBD-5310-42ED-9301-229847676459");
 
-        private IHostExtensionApplication m_Host;
+        private IHostExtension m_Host;
 
         private IXPropertyPage<AssemblyBatchData> m_Page;
         private AssemblyBatchData m_Data;
@@ -79,14 +79,14 @@ namespace Xarial.CadPlus.Batch.InApp
         private IMessageService m_Msg;
         private IXLogger m_Logger;
 
-        public void Init(IHostApplication host)
+        public void Init(IHost host)
         {
-            if (!(host is IHostExtensionApplication))
+            if (!(host is IHostExtension))
             {
                 throw new InvalidCastException("Only extension host is supported for this module");
             }
 
-            m_Host = (IHostExtensionApplication)host;
+            m_Host = (IHostExtension)host;
             m_Host.Connect += OnConnect;
         }
 

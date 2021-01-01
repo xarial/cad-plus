@@ -56,11 +56,11 @@ namespace Xarial.CadPlus.AddIn.Sw
             AppDomain.CurrentDomain.ResolveBindingRedirects(new LocalAppConfigBindingRedirectReferenceResolver());
         }
 
-        private readonly AddInHostApplication m_Host;
+        private readonly AddInHost m_Host;
 
         public CadPlusSwAddIn()
         {
-            m_Host = new AddInHostApplication(this, Guid.Parse(HostIds.SolidWorksAddIn));
+            m_Host = new AddInHost(new CadExtensionApplication(this, Guid.Parse(Plus.Applications.Ids.SolidWorksAddIn)));
             m_Host.ConfigureServices += OnConfigureModuleServices;
         }
         

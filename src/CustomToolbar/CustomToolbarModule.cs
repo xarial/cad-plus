@@ -31,7 +31,7 @@ using Xarial.CadPlus.Plus.Services;
 
 namespace Xarial.CadPlus.CustomToolbar
 {
-    [Module(typeof(IHostExtensionApplication))]
+    [Module(typeof(IHostExtension))]
     public class CustomToolbarModule : IToolbarModule
     {
         [Title("Toolbar+")]
@@ -50,7 +50,7 @@ namespace Xarial.CadPlus.CustomToolbar
         public static TService Resolve<TService>()
             => m_Container.Resolve<TService>();
 
-        private IHostExtensionApplication m_Host;
+        private IHostExtension m_Host;
         private ICommandsManager m_CmdsMgr;
         private ITriggersManager m_TriggersMgr;
         private IMessageService m_Msg;
@@ -66,14 +66,14 @@ namespace Xarial.CadPlus.CustomToolbar
             RegisterIconsProvider(new ImageIconsProvider());
         }
 
-        public void Init(IHostApplication host)
+        public void Init(IHost host)
         {
-            if (!(host is IHostExtensionApplication))
+            if (!(host is IHostExtension))
             {
                 throw new InvalidCastException("This module is only availabel for extensions");
             }
 
-            m_Host = (IHostExtensionApplication)host;
+            m_Host = (IHostExtension)host;
             m_Host.Connect += OnConnect;
         }
 

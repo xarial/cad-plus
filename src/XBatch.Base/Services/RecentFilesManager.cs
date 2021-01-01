@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Xarial.CadPlus.Plus;
+using Xarial.CadPlus.Plus.Hosts;
 
 namespace Xarial.CadPlus.XBatch.Base.Services
 {

@@ -19,7 +19,9 @@ using System.Windows;
 using System.Windows.Navigation;
 using System.Windows.Threading;
 using Xarial.CadPlus.Common.Services;
+using Xarial.CadPlus.Init;
 using Xarial.CadPlus.Plus;
+using Xarial.CadPlus.Plus.Hosts;
 
 namespace Xarial.CadPlus.Common
 {
@@ -80,9 +82,18 @@ namespace Xarial.CadPlus.Common
     {
         private bool m_IsStartWindowCalled;
 
-        public IHostApplication Host { get; private set; }
+        public IHost Host { get; private set; }
 
         protected IContainer m_Container;
+
+        private readonly IApplication m_App;
+        private readonly IInitiator m_Initiator;
+
+        protected MixedApplication(IApplication app) 
+        {
+            m_App = app;
+            m_Initiator = new Initiator();
+        }
 
         protected virtual void OnAppStart()
         {
@@ -109,8 +120,6 @@ namespace Xarial.CadPlus.Common
                 hasArguments = true;
             }
         }
-
-        protected abstract Guid HostId { get; }
 
         protected override void OnStartup(StartupEventArgs e)
         {
@@ -148,8 +157,9 @@ namespace Xarial.CadPlus.Common
                 ConsoleHandler.Attach();
 
                 SynchronizationContext.SetSynchronizationContext(new SynchronizationContext());
-                Host = new ConsoleHostApplication(svc, HostId);
-                
+                Host = new HostConsole(m_App, svc);
+                m_Initiator.Init(Host);
+
                 var res = false;
 
                 if (!hasError)
@@ -177,7 +187,8 @@ namespace Xarial.CadPlus.Common
             }
             else
             {
-                Host = new WpfHostApplication(this, svc, HostId);
+                Host = new HostWpf(m_App, this, svc);
+                m_Initiator.Init(Host);
                 base.OnStartup(e);
             }
         }

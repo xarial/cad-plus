@@ -66,6 +66,7 @@
       <HintPath>..\..\packages\Newtonsoft.Json.12.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Data" />
@@ -87,6 +88,12 @@
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="WindowsFormsIntegration" />
+    <Reference Include="Xarial.CadPlusPlus, Version=0.2.0.0, Culture=neutral, PublicKeyToken=60dcaf351d4060db, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Xarial.CadPlusPlus.0.2.0-20210101.2\lib\net461\Xarial.CadPlusPlus.dll</HintPath>
+    </Reference>
+    <Reference Include="Xarial.XCad, Version=0.6.11.0, Culture=neutral, PublicKeyToken=60dcaf351d4060db, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Xarial.XCad.0.6.11-20201230.2\lib\net461\Xarial.XCad.dll</HintPath>
+    </Reference>
     <Reference Include="Xarial.XToolkit, Version=0.2.5.0, Culture=neutral, PublicKeyToken=60dcaf351d4060db, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Xarial.XToolkit.0.2.5\lib\net461\Xarial.XToolkit.dll</HintPath>
     </Reference>

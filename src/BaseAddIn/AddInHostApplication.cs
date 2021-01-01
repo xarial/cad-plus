@@ -7,7 +7,6 @@
 
 using System;
 using Xarial.XCad.Extensions;
-using Xarial.CadPlus.Module.Init;
 using Xarial.CadPlus.Plus;
 using Xarial.XCad;
 using Xarial.XCad.UI.Commands;
@@ -29,29 +28,31 @@ using Autofac;
 using Xarial.CadPlus.Common;
 using Autofac.Core.Registration;
 using Xarial.CadPlus.Plus.Services;
+using Xarial.CadPlus.Plus.Applications;
+using Xarial.CadPlus.Init;
 
 namespace Xarial.CadPlus.AddIn.Base
 {
     public delegate IXPropertyPage<TData> CreatePageDelegate<TData>();
 
-    public class AddInHostApplication : BaseHostApplication, IHostExtensionApplication
+    public class AddInHost : IHostExtension
     {
         [ImportMany]
         private IModule[] m_Modules;
 
         internal const int ROOT_GROUP_ID = 1000;
 
-        public override IntPtr ParentWindow => Extension.Application.WindowHandle;
+        public IntPtr ParentWindow => Extension.Application.WindowHandle;
 
         public IXExtension Extension { get; }
 
-        public override IModule[] Modules => m_Modules;
+        public IModule[] Modules => m_Modules;
 
-        public override event Action Connect;
-        public override event Action Disconnect;
-        public override event Action Initialized;
-        public override event Action<IContainerBuilder> ConfigureServices;
-        public override event Action Started;
+        public event Action Connect;
+        public event Action Disconnect;
+        public event Action Initialized;
+        public event Action<IContainerBuilder> ConfigureServices;
+        public event Action Started;
 
         private CommandGroupSpec m_ParentGrpSpec;
 
@@ -59,21 +60,29 @@ namespace Xarial.CadPlus.AddIn.Base
 
         private readonly Dictionary<CommandSpec, Tuple<Delegate, Enum>> m_Handlers;
         
-        public override IServiceProvider Services => m_SvcProvider;
-        
+        public IServiceProvider Services => m_SvcProvider;
+
+        public IApplication Application { get; }
+
         private ServiceProvider m_SvcProvider;
 
         private IPropertyPageCreator m_PageCreator;
 
-        public override Guid Id { get; }
+        private readonly IModulesLoader m_ModulesLoader;
 
-        public AddInHostApplication(IXExtension ext, Guid specificId) 
+        private readonly IInitiator m_Initiator;
+
+        public AddInHost(ICadExtensionApplication app) 
         {
-            Id = specificId;
+            m_Initiator = new Initiator();
+            m_Initiator.Init(this);
 
+            Application = app;
+            
             try
             {
-                Extension = ext;
+                Extension = app.Extension;
+
                 m_NextId = ROOT_GROUP_ID + 1;
 
                 m_Handlers = new Dictionary<CommandSpec, Tuple<Delegate, Enum>>();
@@ -86,8 +95,8 @@ namespace Xarial.CadPlus.AddIn.Base
                     (Extension as IXServiceConsumer).ConfigureServices += OnConfigureExtensionServices;
                 }
 
-                var modulesLoader = new ModulesLoader();
-                modulesLoader.Load(this);
+                m_ModulesLoader = new ModulesLoader();
+                m_ModulesLoader.Load(this);
                 
                 Initialized?.Invoke();
             }
@@ -202,7 +211,7 @@ namespace Xarial.CadPlus.AddIn.Base
             }
         }
 
-        public override void Dispose()
+        public void Dispose()
         {
             Disconnect?.Invoke();
 

@@ -24,18 +24,25 @@ using Xarial.XCad.Base;
 
 namespace Xarial.CadPlus.XBatch.Base
 {
+    public class BatchApplication : IApplication
+    {
+        public Guid Id => Guid.Parse(Plus.Applications.Ids.BatchStandAlone);
+    }
+
     public abstract class XBatchApp : MixedApplication<IArguments>
     {
         private const int MAX_RETRIES = 2;
 
         private FileOptions m_StartupOptions;
 
+        public XBatchApp() : base(new BatchApplication())
+        {
+        }
+
         protected override void OnAppStart()
         {
             this.StartupUri = new Uri("/XBatch.Base;component/MainWindow.xaml", UriKind.Relative);
         }
-
-        protected override Guid HostId => Guid.Parse(HostIds.BatchStandAlone);
 
         protected override void OnWindowStarted()
         {

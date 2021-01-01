@@ -20,7 +20,7 @@ using Xarial.XCad.UI.Commands.Enums;
 
 namespace Xarial.CadPlus.AddIn.Base
 {
-    [CommandGroupInfo(AddInHostApplication.ROOT_GROUP_ID)]
+    [CommandGroupInfo(AddInHost.ROOT_GROUP_ID)]
     [Title("CAD+")]
     [Description("CAD+ Toolset features and options")]
     public enum CadPlusCommands_e

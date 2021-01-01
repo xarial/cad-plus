@@ -9,6 +9,7 @@ using System.IO;
 using Xarial.CadPlus.CustomToolbar.Properties;
 using Xarial.CadPlus.Plus;
 using Xarial.CadPlus.Plus.Attributes;
+using Xarial.CadPlus.Plus.Hosts;
 using Xarial.XToolkit.Services.UserSettings;
 using Xarial.XToolkit.Services.UserSettings.Attributes;
 

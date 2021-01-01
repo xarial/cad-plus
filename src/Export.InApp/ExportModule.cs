@@ -19,7 +19,7 @@ using Xarial.CadPlus.Plus.Attributes;
 
 namespace Xarial.CadPlus.Export.InApp
 {
-    [Plus.Attributes.Module(typeof(IHostExtensionApplication))]
+    [Module(typeof(IHostExtension))]
     public class ExportModule : IModule
     {
         [Title("eXport+")]
@@ -36,19 +36,19 @@ namespace Xarial.CadPlus.Export.InApp
 
         public Guid Id => Guid.Parse("961248D6-FB9B-442C-B7ED-16C113E48AEF");
 
-        private IHostExtensionApplication m_Host;
+        private IHostExtension m_Host;
 
         private IMessageService m_Msg;
         private IXLogger m_Logger;
 
-        public void Init(IHostApplication host)
+        public void Init(IHost host)
         {
-            if (!(host is IHostExtensionApplication))
+            if (!(host is IHostExtension))
             {
                 throw new InvalidCastException("Only extension host is supported for this module");
             }
 
-            m_Host = (IHostExtensionApplication)host;
+            m_Host = (IHostExtension)host;
             m_Host.Connect += OnConnect;
         }
 
