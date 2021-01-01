@@ -38,9 +38,12 @@ namespace Xarial.CadPlus.Plus.Hosts
 
         private bool m_IsLoaded;
 
+        private readonly IInitiator m_Initiator;
+
         public HostWpf(IApplication app, Application wpfApp, IServiceProvider svcProvider, IInitiator initiator)
         {
-            initiator.Init(this);
+            m_Initiator = initiator;
+            m_Initiator.Init(this);
 
             Application = app;
             m_WpfApp = wpfApp;
