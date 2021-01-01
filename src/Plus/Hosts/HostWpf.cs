@@ -36,8 +36,9 @@ namespace Xarial.CadPlus.Plus.Hosts
 
         private readonly IModulesLoader m_ModulesLoader;
 
-        public HostWpf(Application wpfApp, IServiceProvider svcProvider)
+        public HostWpf(IApplication app, Application wpfApp, IServiceProvider svcProvider)
         {
+            Application = app;
             m_WpfApp = wpfApp;
             Services = svcProvider;
 
@@ -54,7 +55,7 @@ namespace Xarial.CadPlus.Plus.Hosts
             ? new WindowInteropHelper(m_WpfApp.MainWindow).Handle
             : IntPtr.Zero;
 
-        public IApplication Application => throw new NotImplementedException();
+        public IApplication Application { get; }
 
         private void OnAppActivated(object sender, EventArgs e)
         {
