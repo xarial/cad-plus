@@ -40,14 +40,15 @@ namespace Xarial.CadPlus.Plus.Hosts
 
         private readonly IInitiator m_Initiator;
 
-        public HostWpf(IApplication app, Application wpfApp, IServiceProvider svcProvider, IInitiator initiator)
+        public HostWpf(IApplication app, Application wpfApp, IContainerBuilder builder, IInitiator initiator)
         {
             m_Initiator = initiator;
             m_Initiator.Init(this);
 
             Application = app;
             m_WpfApp = wpfApp;
-            Services = svcProvider;
+            ConfigureServices?.Invoke(builder);
+            Services = builder.Build();
 
             m_WpfApp.Activated += OnAppActivated;
             m_WpfApp.Exit += OnAppExit;
