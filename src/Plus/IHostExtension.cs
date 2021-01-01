@@ -17,10 +17,10 @@ namespace Xarial.CadPlus.Plus
     /// <summary>
     /// Represents specific hsot application which runs inside the CAD host process
     /// </summary>
-    public interface IHostExtensionApplication : IHostApplication
+    public interface IHostExtension : IHost
     {
         /// <summary>
-        /// Pointer to the extension add0in
+        /// Pointer to the extension add-in
         /// </summary>
         IXExtension Extension { get; }
 

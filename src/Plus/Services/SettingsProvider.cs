@@ -13,12 +13,22 @@ using System.Text;
 using System.Threading.Tasks;
 using Xarial.CadPlus.Plus.Attributes;
 using Xarial.CadPlus.Plus.Exceptions;
+using Xarial.CadPlus.Plus.Hosts;
 using Xarial.XCad.Reflection;
 using Xarial.XToolkit.Reflection;
 using Xarial.XToolkit.Services.UserSettings;
 
 namespace Xarial.CadPlus.Plus.Services
 {
+    public interface ISettingsProvider
+    {
+        T ReadSettings<T>()
+            where T : new();
+
+        void WriteSettings<T>(T setts)
+            where T : new();
+    }
+
     public class SettingsProvider : ISettingsProvider
     {
         private readonly UserSettingsService m_UserSettsSrv;

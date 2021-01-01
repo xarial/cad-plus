@@ -14,12 +14,12 @@ namespace Xarial.CadPlus.Plus
     /// <summary>
     /// Represents stan-alone application
     /// </summary>
-    public interface IHostApplication : IDisposable
+    public interface IHost : IDisposable
     {
         /// <summary>
-        /// Permanend identifier of this host
+        /// Pointer to the application hosted in this host
         /// </summary>
-        Guid Id { get; }
+        IApplication Application { get; }
 
         /// <summary>
         /// Accesses the registered modules
@@ -33,7 +33,7 @@ namespace Xarial.CadPlus.Plus
         event Action Initialized;
 
         /// <summary>
-        /// Notifies when the application loaded its data and modules can start invoking APIs
+        /// Notifies when the application loaded its data and modules can start invoking APIs of this application
         /// </summary>
         event Action Connect;
 

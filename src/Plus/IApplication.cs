@@ -10,12 +10,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Xarial.XCad.UI;
 
 namespace Xarial.CadPlus.Plus
 {
-    public interface IXSvgImage : IXImage
+    public interface IApplication
     {
-        byte[] SvgBuffer { get; }
+        /// <summary>
+        /// Permanent identifier of this application
+        /// </summary>
+        Guid Id { get; }
     }
 }

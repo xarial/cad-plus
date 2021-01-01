@@ -12,6 +12,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Xarial.CadPlus.Plus.Data;
 using Xarial.XCad.Base.Attributes;
 using Xarial.XCad.Reflection;
 using Xarial.XCad.UI;

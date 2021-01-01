@@ -17,19 +17,20 @@ namespace Xarial.CadPlus.Plus.Attributes
     public interface IModuleMetadata
     {
         Type TargetHostType { get; }
-        string[] TargetHostIds { get; }
+        string[] TargetApplicationIds { get; }
     }
 
     [AttributeUsage(AttributeTargets.Class), MetadataAttribute]
     public class ModuleAttribute : ExportAttribute, IModuleMetadata
     {
-        public string[] TargetHostIds { get; }
+        public string[] TargetApplicationIds { get; }
         public Type TargetHostType { get; }
 
-        public ModuleAttribute(Type targetHostType, params string[] targetHostIds) : base(typeof(IModule)) 
+        public ModuleAttribute(Type targetHostType, params string[] targetApplicationIds) 
+            : base(typeof(IModule)) 
         {
             TargetHostType = targetHostType;
-            TargetHostIds = targetHostIds;
+            TargetApplicationIds = targetApplicationIds;
         }
 
         public ModuleAttribute(params string[] targetHostIds) : this(null, targetHostIds)

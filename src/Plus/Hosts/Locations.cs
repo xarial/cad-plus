@@ -7,21 +7,26 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Xarial.CadPlus.Plus.Properties;
 
-namespace Xarial.CadPlus.Plus
+namespace Xarial.CadPlus.Plus.Hosts
 {
-    public class ImageEx : IXSvgImage
+    public static class Locations
     {
-        public byte[] SvgBuffer { get; }
-        public byte[] Buffer { get; }
-
-        public ImageEx(byte[] imgBuffer, byte[] svgBuffer)
+        public static string AppDirectoryPath
         {
-            Buffer = imgBuffer;
-            SvgBuffer = svgBuffer;
+            get
+            {
+                var appDir = Path.Combine(Environment.GetFolderPath(
+                    Environment.SpecialFolder.LocalApplicationData),
+                    Settings.Default.AppRootDir);
+
+                return appDir;
+            }
         }
     }
 }

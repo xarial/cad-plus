@@ -10,15 +10,20 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Xarial.XCad.Documents;
 
-namespace Xarial.CadPlus.Plus
+namespace Xarial.CadPlus.Plus.Applications
 {
-    public interface ISettingsProvider
+    public interface IDocumentHandler 
     {
-        T ReadSettings<T>()
-            where T : new();
+        string[] SupportedFileExtensions { get; }
+        IXDocument GetDocument(string path);
+    }
 
-        void WriteSettings<T>(T setts)
-            where T : new();
+    public interface IPropertiesApplication : IApplication
+    {
+        IDocumentHandler[] DocumentHandlers { get; }
+
+        void RegisterDocumentHandler(IDocumentHandler handler);
     }
 }
