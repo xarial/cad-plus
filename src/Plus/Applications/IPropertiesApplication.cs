@@ -22,8 +22,8 @@ namespace Xarial.CadPlus.Plus.Applications
 
     public interface IPropertiesApplication : IApplication
     {
+        void OpenFile(string filePath);
         IDocumentHandler[] DocumentHandlers { get; }
-
         void RegisterDocumentHandler(IDocumentHandler handler);
     }
 }
