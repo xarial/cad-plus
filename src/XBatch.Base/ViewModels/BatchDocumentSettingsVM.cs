@@ -12,6 +12,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using Xarial.CadPlus.Plus.Applications;
 using Xarial.CadPlus.XBatch.Base.Core;
 using Xarial.CadPlus.XBatch.Base.Models;
 using Xarial.XCad;

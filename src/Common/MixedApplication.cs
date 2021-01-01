@@ -150,7 +150,7 @@ namespace Xarial.CadPlus.Common
                 TryExtractCliArguments(parser, e.Args, out args, out hasArgs, out hasError);
             }
 
-            var svc = CreateServiceProvider();
+            var svc = CreateContainerBuilder();
 
             if (hasArgs)
             {
@@ -196,7 +196,7 @@ namespace Xarial.CadPlus.Common
             m_Container?.Dispose();
         }
 
-        private IServiceProvider CreateServiceProvider() 
+        private IContainerBuilder CreateContainerBuilder() 
         {
             var builder = new ContainerBuilder();
             
@@ -206,9 +206,7 @@ namespace Xarial.CadPlus.Common
 
             OnConfigureServices(builder);
 
-            m_Container = builder.Build();
-
-            return new ServiceProvider(m_Container);
+            return new ContainerBuilderWrapper(builder);
         }
 
         protected virtual void OnConfigureServices(ContainerBuilder builder) 

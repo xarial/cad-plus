@@ -15,6 +15,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Xarial.CadPlus.Common.Exceptions;
 using Xarial.CadPlus.Common.Services;
+using Xarial.CadPlus.Plus.Applications;
 using Xarial.CadPlus.Plus.Exceptions;
 using Xarial.CadPlus.XBatch.Base.Exceptions;
 using Xarial.CadPlus.XBatch.Base.Services;

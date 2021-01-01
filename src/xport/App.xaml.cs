@@ -14,18 +14,15 @@ using System.Windows;
 using Xarial.CadPlus.Common;
 using Xarial.CadPlus.Common.Services;
 using Xarial.CadPlus.Plus;
+using Xarial.CadPlus.Plus.Applications;
 using Xarial.CadPlus.Xport.Core;
 
 namespace Xarial.CadPlus.Xport
 {
-    public class ExportApplication : IApplication
-    {
-        public Guid Id => Guid.Parse("EA027A58-D1AF-4D3F-840D-1A11BD23A182");
-    }
-
     public class XPortApp : MixedApplication<Arguments>
     {
-        public XPortApp() : base(new ExportApplication()) 
+        public XPortApp() 
+            : base(new BaseApplication("EA027A58-D1AF-4D3F-840D-1A11BD23A182"))
         {
         }
 

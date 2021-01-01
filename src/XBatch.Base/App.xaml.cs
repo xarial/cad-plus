@@ -8,28 +8,46 @@
 using Autofac;
 using CommandLine;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
+using System.Windows;
 using Xarial.CadPlus.Common;
 using Xarial.CadPlus.Common.Services;
 using Xarial.CadPlus.Plus;
+using Xarial.CadPlus.Plus.Applications;
 using Xarial.CadPlus.Plus.Services;
+using Xarial.CadPlus.XBatch.Base;
 using Xarial.CadPlus.XBatch.Base.Core;
 using Xarial.CadPlus.XBatch.Base.Models;
 using Xarial.CadPlus.XBatch.Base.Services;
 using Xarial.CadPlus.XBatch.Base.ViewModels;
-using Xarial.XCad;
 using Xarial.XCad.Base;
 
 namespace Xarial.CadPlus.XBatch.Base
 {
-    public class BatchApplication : IApplication
+    public class BatchApplication : IBatchApplication
     {
-        public Guid Id => Guid.Parse(Plus.Applications.Ids.BatchStandAlone);
+        public Guid Id => Guid.Parse(ApplicationIds.BatchStandAlone);
+
+        public IApplicationProvider[] ApplicationProviders => m_ApplicationProviders.ToArray();
+
+        private readonly List<IApplicationProvider> m_ApplicationProviders;
+
+        internal BatchApplication() 
+        {
+            m_ApplicationProviders = new List<IApplicationProvider>();
+        }
+
+        public void RegisterApplicationProvider(IApplicationProvider provider)
+        {
+            m_ApplicationProviders.Add(provider);
+        }
     }
 
-    public abstract class XBatchApp : MixedApplication<IArguments>
+    public class XBatchApp : MixedApplication<IArguments>
     {
         private const int MAX_RETRIES = 2;
 
@@ -46,16 +64,16 @@ namespace Xarial.CadPlus.XBatch.Base
 
         protected override void OnWindowStarted()
         {
-            if (m_StartupOptions != null) 
+            if (m_StartupOptions != null)
             {
                 var vm = (BatchManagerVM)this.MainWindow.DataContext;
 
-                if (!string.IsNullOrEmpty(m_StartupOptions.FilePath)) 
+                if (!string.IsNullOrEmpty(m_StartupOptions.FilePath))
                 {
                     vm.OpenDocument(m_StartupOptions.FilePath);
                 }
 
-                if (m_StartupOptions.CreateNew) 
+                if (m_StartupOptions.CreateNew)
                 {
                     vm.NewDocument();
                 }
@@ -111,7 +129,7 @@ namespace Xarial.CadPlus.XBatch.Base
             }
         }
 
-        protected override void TryExtractCliArguments(Parser parser, string[] input, 
+        protected override void TryExtractCliArguments(Parser parser, string[] input,
             out IArguments args, out bool hasArguments, out bool hasError)
         {
             args = default;

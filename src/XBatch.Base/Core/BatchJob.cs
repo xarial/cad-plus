@@ -12,6 +12,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Xarial.CadPlus.Plus.Applications;
 using Xarial.XCad;
 using Xarial.XToolkit.Services.UserSettings;
 using Xarial.XToolkit.Services.UserSettings.Attributes;

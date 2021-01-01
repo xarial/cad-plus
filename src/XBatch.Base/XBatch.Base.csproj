@@ -6,9 +6,9 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{C64AE433-7BB9-4EDA-A54F-D71F2BF1B015}</ProjectGuid>
-    <OutputType>Library</OutputType>
+    <OutputType>WinExe</OutputType>
     <RootNamespace>Xarial.CadPlus.XBatch.Base</RootNamespace>
-    <AssemblyName>XBatch.Base</AssemblyName>
+    <AssemblyName>batchplus</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -113,7 +113,7 @@
     <Reference Include="PresentationFramework" />
     <Reference Include="WindowsFormsIntegration" />
     <Reference Include="Xarial.CadPlusPlus, Version=0.2.0.0, Culture=neutral, PublicKeyToken=60dcaf351d4060db, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Xarial.CadPlusPlus.0.2.0-20210101.4\lib\net461\Xarial.CadPlusPlus.dll</HintPath>
+      <HintPath>..\..\packages\Xarial.CadPlusPlus.0.2.0-20210101.5\lib\net461\Xarial.CadPlusPlus.dll</HintPath>
     </Reference>
     <Reference Include="Xarial.XCad, Version=0.6.11.0, Culture=neutral, PublicKeyToken=60dcaf351d4060db, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Xarial.XCad.0.6.11-20201231.6\lib\net461\Xarial.XCad.dll</HintPath>
@@ -129,6 +129,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="App.xaml.cs">
+      <DependentUpon>App.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Arguments.cs" />
     <Compile Include="Controls\HomePage.xaml.cs">
       <DependentUpon>HomePage.xaml</DependentUpon>
@@ -158,11 +161,9 @@
     <Compile Include="Core\JobItemMacro.cs" />
     <Compile Include="Core\MacroData.cs" />
     <Compile Include="Core\OpenFileOptions_e.cs" />
-    <Compile Include="Core\StartupOptions_e.cs" />
     <Compile Include="Exceptions\JobCancelledException.cs" />
     <Compile Include="Exceptions\SaveForbiddenException.cs" />
     <Compile Include="Extensions\DataGridExtension.cs" />
-    <Compile Include="IApplicationProvider.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
     </Compile>
@@ -193,7 +194,6 @@
     <Compile Include="ViewModels\JobResultVM.cs" />
     <Compile Include="ViewModels\BatchDocumentSettingsVM.cs" />
     <Compile Include="ViewModels\BatchManagerVM.cs" />
-    <Compile Include="XBatchApp.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
@@ -212,6 +212,10 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ApplicationDefinition Include="App.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </ApplicationDefinition>
     <Page Include="Controls\HomePage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

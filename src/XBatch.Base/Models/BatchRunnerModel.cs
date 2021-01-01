@@ -13,6 +13,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Xarial.CadPlus.Common.Exceptions;
 using Xarial.CadPlus.Common.Services;
+using Xarial.CadPlus.Plus.Applications;
 using Xarial.CadPlus.Plus.Exceptions;
 using Xarial.CadPlus.XBatch.Base.Core;
 using Xarial.CadPlus.XBatch.Base.Exceptions;
@@ -44,7 +45,7 @@ namespace Xarial.CadPlus.XBatch.Base.Models
 
     public class BatchRunnerModel : IBatchRunnerModel
     {
-        private readonly IApplicationProvider m_AppProvider;
+        private readonly  IApplicationProvider m_AppProvider;
 
         private readonly IRecentFilesManager m_RecentFilesMgr;
 
@@ -59,7 +60,7 @@ namespace Xarial.CadPlus.XBatch.Base.Models
             m_RecentFilesMgr = recentFilesMgr;
             RecentFiles = new ObservableCollection<string>(m_RecentFilesMgr.RecentFiles);
 
-            InputFilesFilter = appProvider.InputFilesFilter;
+            InputFilesFilter = appProvider.InputFilesFilter?.Select(f => new FileFilter(f.Name, f.Extensions)).ToArray();
             MacroFilesFilter = macroFilterProvider.GetSupportedMacros()
                 .Union(new FileFilter[] { FileFilter.AllFiles }).ToArray();
 
