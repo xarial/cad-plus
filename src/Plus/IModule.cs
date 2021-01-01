@@ -26,8 +26,8 @@ namespace Xarial.CadPlus.Plus
         /// <summary>
         /// Called when instance of the module is created
         /// </summary>
-        /// <remarks>Only subscribe to events and implement the actual loading from <see cref="IHostApplication.Connect"/></remarks>
+        /// <remarks>Only subscribe to events and implement the actual loading from <see cref="IHost.Connect"/></remarks>
         /// <param name="host">Current host</param>
-        void Init(IHostApplication host);
+        void Init(IHost host);
     }
 }

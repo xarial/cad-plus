@@ -21,7 +21,7 @@ namespace Xarial.CadPlus.Plus.Services
 {
     public interface IModulesLoader
     {
-        void Load(IHostApplication host);
+        void Load(IHost host);
     }
 
     public class ModulesLoader : IModulesLoader
@@ -33,7 +33,7 @@ namespace Xarial.CadPlus.Plus.Services
             m_SettsProvider = new SettingsProvider();
         }
 
-        public void Load(IHostApplication host)
+        public void Load(IHost host)
         {
             var modulesDir = Path.Combine(Path.GetDirectoryName(this.GetType().Assembly.Location), "Modules");
 
@@ -52,10 +52,10 @@ namespace Xarial.CadPlus.Plus.Services
             var container = new CompositionContainer(catalog);
 
             bool MatchesHostType(Type hostType) => hostType == null || hostType.IsAssignableFrom(host.GetType());
-            bool MatchesHostId(string[] hostIds) => hostIds?.Any() == false || hostIds.Any(i => Guid.Parse(i).Equals(host.Id));
+            bool MatchesAppId(string[] appIds) => appIds?.Any() == false || appIds.Any(i => Guid.Parse(i).Equals(host.Application.Id));
 
             var modules = container.GetExports<IModule, IModuleMetadata>()
-                .Where(e => MatchesHostType(e.Metadata.TargetHostType) && MatchesHostId(e.Metadata.TargetHostIds))
+                .Where(e => MatchesHostType(e.Metadata.TargetHostType) && MatchesAppId(e.Metadata.TargetApplicationIds))
                 .Select(e => e.Value).ToArray();
 
             var field = host.GetType().GetFields(BindingFlags.Public | BindingFlags.Instance | BindingFlags.NonPublic)

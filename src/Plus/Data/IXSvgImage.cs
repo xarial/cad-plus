@@ -10,20 +10,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Xarial.XCad.Documents;
+using Xarial.XCad.UI;
 
-namespace Xarial.CadPlus.Plus.Hosts
+namespace Xarial.CadPlus.Plus.Data
 {
-    public interface IDocumentHandler 
+    public interface IXSvgImage : IXImage
     {
-        string[] SupportedFileExtensions { get; }
-        IXDocument GetDocument(string path);
-    }
-
-    public interface IPropertiesHostApplication : IHostApplication
-    {
-        IDocumentHandler[] DocumentHandlers { get; }
-
-        void RegisterDocumentHandler(IDocumentHandler handler);
+        byte[] SvgBuffer { get; }
     }
 }

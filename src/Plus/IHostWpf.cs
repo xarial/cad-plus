@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace Xarial.CadPlus.Plus
 {
-    public interface IHostConsoleApplication : IHostApplication
+    public interface IHostWpf : IHost
     {
     }
 }
