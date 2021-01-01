@@ -16,12 +16,12 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Interop;
 using System.Windows.Navigation;
 using System.Windows.Threading;
 using Xarial.CadPlus.Common.Services;
-using Xarial.CadPlus.Module.Init;
+using Xarial.CadPlus.Init;
 using Xarial.CadPlus.Plus;
+using Xarial.CadPlus.Plus.Hosts;
 
 namespace Xarial.CadPlus.Common
 {
@@ -78,73 +78,22 @@ namespace Xarial.CadPlus.Common
         }
     }
 
-    public class ConsoleHostApplication : BaseHostApplication
-    {
-        public override IntPtr ParentWindow => IntPtr.Zero;
-
-        public override event Action Connect;
-        public override event Action Disconnect;
-        public override event Action Initialized;
-        public override event Action<IContainerBuilder> ConfigureServices;
-        public override event Action Started;
-
-        public override IEnumerable<IModule> Modules => throw new NotImplementedException();
-
-        public override IServiceProvider Services { get; }
-
-        internal ConsoleHostApplication(IServiceProvider svcProvider) 
-        {
-            Services = svcProvider;
-            Started?.Invoke();
-        }
-    }
-
-    public class WpfHostApplication : BaseHostApplication
-    {
-        public override IEnumerable<IModule> Modules => throw new NotImplementedException();
-
-        public override event Action Connect;
-        public override event Action Disconnect;
-        public override event Action Initialized;
-        public override event Action<IContainerBuilder> ConfigureServices;
-        public override event Action Started;
-
-        private readonly Application m_App;
-
-        public override IServiceProvider Services { get; }
-
-        internal WpfHostApplication(Application app, IServiceProvider svcProvider)
-        {
-            m_App = app;
-            Services = svcProvider;
-            m_App.Activated += OnAppActivated;
-            m_App.Exit += OnAppExit;
-        }
-
-        public override IntPtr ParentWindow => m_App.MainWindow != null
-            ? new WindowInteropHelper(m_App.MainWindow).Handle
-            : IntPtr.Zero;
-
-        private void OnAppActivated(object sender, EventArgs e)
-        {
-            m_App.Activated -= OnAppActivated;
-            Started?.Invoke();
-            Connect?.Invoke();
-        }
-
-        private void OnAppExit(object sender, ExitEventArgs e)
-        {
-            Disconnect?.Invoke();
-        }
-    }
-
     public abstract class MixedApplication<TCliArgs> : Application
     {
         private bool m_IsStartWindowCalled;
 
-        public IHostApplication Host { get; private set; }
+        public IHost Host { get; private set; }
 
         protected IContainer m_Container;
+
+        private readonly IApplication m_App;
+        private readonly IInitiator m_Initiator;
+
+        protected MixedApplication(IApplication app) 
+        {
+            m_App = app;
+            m_Initiator = new Initiator();
+        }
 
         protected virtual void OnAppStart()
         {
@@ -208,8 +157,8 @@ namespace Xarial.CadPlus.Common
                 ConsoleHandler.Attach();
 
                 SynchronizationContext.SetSynchronizationContext(new SynchronizationContext());
-                Host = new ConsoleHostApplication(svc);
-                
+                Host = new HostConsole(m_App, svc, m_Initiator);
+
                 var res = false;
 
                 if (!hasError)
@@ -237,7 +186,7 @@ namespace Xarial.CadPlus.Common
             }
             else
             {
-                Host = new WpfHostApplication(this, svc);
+                Host = new HostWpf(m_App, this, svc, m_Initiator);
                 base.OnStartup(e);
             }
         }
@@ -253,7 +202,7 @@ namespace Xarial.CadPlus.Common
             
             builder.RegisterType<GenericMessageService>()
                 .As<IMessageService>()
-                .WithParameter(new TypedParameter(typeof(string), "Batch+"));
+                .WithParameter(new TypedParameter(typeof(string), "CAD+"));
 
             OnConfigureServices(builder);
 

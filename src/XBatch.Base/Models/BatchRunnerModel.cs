@@ -11,7 +11,9 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Xarial.CadPlus.Common.Exceptions;
 using Xarial.CadPlus.Common.Services;
+using Xarial.CadPlus.Plus.Exceptions;
 using Xarial.CadPlus.XBatch.Base.Core;
 using Xarial.CadPlus.XBatch.Base.Exceptions;
 using Xarial.CadPlus.XBatch.Base.Services;
@@ -67,7 +69,7 @@ namespace Xarial.CadPlus.XBatch.Base.Models
 
             if (!InstalledVersions.Any()) 
             {
-                throw new UserMessageException("Failed to detect any installed version of the host application");
+                throw new UserException("Failed to detect any installed version of the host application");
             }
         }
 

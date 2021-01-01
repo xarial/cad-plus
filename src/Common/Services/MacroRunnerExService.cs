@@ -1,8 +1,16 @@
-﻿using System;
+﻿//*********************************************************************
+//CAD+ Toolset
+//Copyright(C) 2020 Xarial Pty Limited
+//Product URL: https://cadplus.xarial.com
+//License: https://cadplus.xarial.com/license/
+//*********************************************************************
+
+using System;
 using System.Linq;
 using System.Runtime.InteropServices;
 using Xarial.CadPlus.Common.Exceptions;
 using Xarial.CadPlus.MacroRunner;
+using Xarial.CadPlus.Plus.Exceptions;
 using Xarial.XCad;
 using Xarial.XCad.Base;
 using Xarial.XCad.Documents;
@@ -51,7 +59,15 @@ namespace Xarial.CadPlus.Common.Services
                 if (entryPoint == null)
                 {
                     var macro = app.OpenMacro(macroPath);
-                    entryPoint = macro.EntryPoints.First();
+
+                    if (macro.EntryPoints != null)
+                    {
+                        entryPoint = macro.EntryPoints.First();
+                    }
+                    else 
+                    {
+                        throw new MacroRunFailedException(macro.Path, -1, "Failed to extract entry point");
+                    }
                 }
 
                 if (!string.IsNullOrEmpty(args) || doc != null)

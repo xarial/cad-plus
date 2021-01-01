@@ -13,11 +13,12 @@
     <PackageReference Include="nunit" Version="3.12.0" />
     <PackageReference Include="NUnit3TestAdapter" Version="3.15.1" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.2.0" />
-    <PackageReference Include="Xarial.CadPlusPlus" Version="0.1.0-20201204.2" />
-    <PackageReference Include="Xarial.XCad" Version="0.6.10-20201207.5" />
+    <PackageReference Include="Xarial.CadPlusPlus" Version="0.2.0-20210101.2" />
+    <PackageReference Include="Xarial.XCad" Version="0.6.11-20201231.6" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\src\Common\Common.csproj" />
     <ProjectReference Include="..\..\src\CustomToolbar\CustomToolbar.csproj" />
   </ItemGroup>
 

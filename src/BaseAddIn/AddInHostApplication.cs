@@ -7,7 +7,6 @@
 
 using System;
 using Xarial.XCad.Extensions;
-using Xarial.CadPlus.Module.Init;
 using Xarial.CadPlus.Plus;
 using Xarial.XCad;
 using Xarial.XCad.UI.Commands;
@@ -28,29 +27,32 @@ using Xarial.CadPlus.Common.Services;
 using Autofac;
 using Xarial.CadPlus.Common;
 using Autofac.Core.Registration;
+using Xarial.CadPlus.Plus.Services;
+using Xarial.CadPlus.Plus.Applications;
+using Xarial.CadPlus.Init;
 
 namespace Xarial.CadPlus.AddIn.Base
 {
     public delegate IXPropertyPage<TData> CreatePageDelegate<TData>();
 
-    public class AddInHostApplication : BaseHostApplication, IHostExtensionApplication
+    public class AddInHost : IHostExtension
     {
         [ImportMany]
-        private IEnumerable<IExtensionModule> m_Modules;
+        private IModule[] m_Modules;
 
         internal const int ROOT_GROUP_ID = 1000;
 
-        public override IntPtr ParentWindow => Extension.Application.WindowHandle;
+        public IntPtr ParentWindow => Extension.Application.WindowHandle;
 
         public IXExtension Extension { get; }
 
-        public override IEnumerable<IModule> Modules => m_Modules;
+        public IModule[] Modules => m_Modules;
 
-        public override event Action Connect;
-        public override event Action Disconnect;
-        public override event Action Initialized;
-        public override event Action<IContainerBuilder> ConfigureServices;
-        public override event Action Started;
+        public event Action Connect;
+        public event Action Disconnect;
+        public event Action Initialized;
+        public event Action<IContainerBuilder> ConfigureServices;
+        public event Action Started;
 
         private CommandGroupSpec m_ParentGrpSpec;
 
@@ -58,17 +60,29 @@ namespace Xarial.CadPlus.AddIn.Base
 
         private readonly Dictionary<CommandSpec, Tuple<Delegate, Enum>> m_Handlers;
         
-        public override IServiceProvider Services => m_SvcProvider;
-        
+        public IServiceProvider Services => m_SvcProvider;
+
+        public IApplication Application { get; }
+
         private ServiceProvider m_SvcProvider;
 
         private IPropertyPageCreator m_PageCreator;
 
-        public AddInHostApplication(IXExtension ext) 
+        private readonly IModulesLoader m_ModulesLoader;
+
+        private readonly IInitiator m_Initiator;
+
+        public AddInHost(ICadExtensionApplication app, IInitiator initiator) 
         {
+            m_Initiator = initiator;
+            m_Initiator.Init(this);
+
+            Application = app;
+            
             try
             {
-                Extension = ext;
+                Extension = app.Extension;
+
                 m_NextId = ROOT_GROUP_ID + 1;
 
                 m_Handlers = new Dictionary<CommandSpec, Tuple<Delegate, Enum>>();
@@ -81,21 +95,9 @@ namespace Xarial.CadPlus.AddIn.Base
                     (Extension as IXServiceConsumer).ConfigureServices += OnConfigureExtensionServices;
                 }
 
-                var modulesDir = Path.Combine(Path.GetDirectoryName(this.GetType().Assembly.Location), "Modules");
-
-                var catalog = CreateDirectoryCatalog(modulesDir, "*.Module.dll");
-
-                var container = new CompositionContainer(catalog);
-                container.SatisfyImportsOnce(this);
-
-                if (m_Modules?.Any() == true)
-                {
-                    foreach (var module in m_Modules)
-                    {
-                        module.Init(this);
-                    }
-                }
-
+                m_ModulesLoader = new ModulesLoader();
+                m_ModulesLoader.Load(this);
+                
                 Initialized?.Invoke();
             }
             catch 
@@ -106,20 +108,6 @@ namespace Xarial.CadPlus.AddIn.Base
         }
 
         private void OnExtensionDisconnect(IXExtension ext) => Dispose();
-
-        private ComposablePartCatalog CreateDirectoryCatalog(string path, string searchPattern)
-        {
-            var catalog = new AggregateCatalog();
-
-            catalog.Catalogs.Add(new DirectoryCatalog(path, searchPattern));
-
-            foreach (var subDir in Directory.GetDirectories(path, "*.*", SearchOption.AllDirectories))
-            {
-                catalog.Catalogs.Add(new DirectoryCatalog(subDir, searchPattern));
-            }
-
-            return catalog;
-        }
 
         private void OnStartupCompleted(IXExtension ext)
         {
@@ -167,6 +155,8 @@ namespace Xarial.CadPlus.AddIn.Base
             builder.RegisterType<AppLogger>().As<IXLogger>();
             builder.RegisterType<CadAppMessageService>()
                 .As<IMessageService>();
+            builder.RegisterType<SettingsProvider>()
+                .As<ISettingsProvider>();
         }
                 
         public void RegisterCommands<TCmd>(CommandHandler<TCmd> handler)
@@ -221,7 +211,7 @@ namespace Xarial.CadPlus.AddIn.Base
             }
         }
 
-        public override void Dispose()
+        public void Dispose()
         {
             Disconnect?.Invoke();
 

@@ -15,7 +15,9 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Input;
+using Xarial.CadPlus.Common.Exceptions;
 using Xarial.CadPlus.Common.Services;
+using Xarial.CadPlus.Plus.Exceptions;
 using Xarial.CadPlus.XBatch.Base.Core;
 using Xarial.CadPlus.XBatch.Base.Exceptions;
 using Xarial.CadPlus.XBatch.Base.Models;
@@ -247,7 +249,7 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
         {
             if (!CanRunJob) 
             {
-                throw new UserMessageException("Cannot run this job as preconditions are not met");
+                throw new UserException("Cannot run this job as preconditions are not met");
             }
 
             Results.StartNewJob();

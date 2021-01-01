@@ -15,11 +15,12 @@ using Xarial.XCad.UI.Commands.Enums;
 using Xarial.CadPlus.Common;
 using Xarial.CadPlus.Export.InApp.Properties;
 using Xarial.CadPlus.Common.Attributes;
+using Xarial.CadPlus.Plus.Attributes;
 
 namespace Xarial.CadPlus.Export.InApp
 {
-    [Export(typeof(IExtensionModule))]
-    public class ExportModule : IExtensionModule
+    [Module(typeof(IHostExtension))]
+    public class ExportModule : IModule
     {
         [Title("eXport+")]
         [Description("Commands to export files in a batch mode")]
@@ -33,19 +34,21 @@ namespace Xarial.CadPlus.Export.InApp
             RunStandAlone,
         }
 
-        private IHostExtensionApplication m_Host;
+        public Guid Id => Guid.Parse("961248D6-FB9B-442C-B7ED-16C113E48AEF");
+
+        private IHostExtension m_Host;
 
         private IMessageService m_Msg;
         private IXLogger m_Logger;
 
-        public void Init(IHostApplication host)
+        public void Init(IHost host)
         {
-            if (!(host is IHostExtensionApplication))
+            if (!(host is IHostExtension))
             {
                 throw new InvalidCastException("Only extension host is supported for this module");
             }
 
-            m_Host = (IHostExtensionApplication)host;
+            m_Host = (IHostExtension)host;
             m_Host.Connect += OnConnect;
         }
 
@@ -64,12 +67,12 @@ namespace Xarial.CadPlus.Export.InApp
                 case Commands_e.RunStandAlone:
                     try
                     {
-                        var batchPath = Path.Combine(
-                            Path.GetDirectoryName(this.GetType().Assembly.Location), "exportplus.exe");
+                        var exportPath = Path.GetFullPath(Path.Combine(
+                            Path.GetDirectoryName(this.GetType().Assembly.Location), @"..\..\exportplus.exe"));
 
-                        if (File.Exists(batchPath))
+                        if (File.Exists(exportPath))
                         {
-                            System.Diagnostics.Process.Start(batchPath);
+                            System.Diagnostics.Process.Start(exportPath);
                         }
                         else
                         {

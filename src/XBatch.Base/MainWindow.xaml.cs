@@ -46,8 +46,9 @@ namespace Xarial.CadPlus.XBatch.Base
 
                 m_BatchManager = app.Host.Services.GetService<BatchManagerVM>();
 
-                m_BatchManager.ParentWindowHandle = new WindowInteropHelper(this).EnsureHandle();
                 this.DataContext = m_BatchManager;
+
+                m_BatchManager.ParentWindowHandle = new WindowInteropHelper(this).EnsureHandle();
             }
             catch (Exception ex)
             {

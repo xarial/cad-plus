@@ -13,6 +13,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Xarial.CadPlus.Common;
 using Xarial.CadPlus.Common.Services;
+using Xarial.CadPlus.Plus;
+using Xarial.CadPlus.Plus.Services;
 using Xarial.CadPlus.XBatch.Base.Core;
 using Xarial.CadPlus.XBatch.Base.Models;
 using Xarial.CadPlus.XBatch.Base.Services;
@@ -22,15 +24,26 @@ using Xarial.XCad.Base;
 
 namespace Xarial.CadPlus.XBatch.Base
 {
+    public class BatchApplication : IApplication
+    {
+        public Guid Id => Guid.Parse(Plus.Applications.Ids.BatchStandAlone);
+    }
+
     public abstract class XBatchApp : MixedApplication<IArguments>
     {
+        private const int MAX_RETRIES = 2;
+
         private FileOptions m_StartupOptions;
+
+        public XBatchApp() : base(new BatchApplication())
+        {
+        }
 
         protected override void OnAppStart()
         {
             this.StartupUri = new Uri("/XBatch.Base;component/MainWindow.xaml", UriKind.Relative);
         }
-        
+
         protected override void OnWindowStarted()
         {
             if (m_StartupOptions != null) 
@@ -64,6 +77,10 @@ namespace Xarial.CadPlus.XBatch.Base
             builder.RegisterType<BatchRunnerModel>().As<IBatchRunnerModel>();
             builder.RegisterType<BatchRunJobExecutor>().As<IBatchRunJobExecutor>();
             builder.RegisterType<BatchManagerVM>();
+            builder.RegisterType<PollyResilientWorker<BatchJobContext>>()
+                .As<IResilientWorker<BatchJobContext>>()
+                .WithParameter(new TypedParameter(typeof(int), MAX_RETRIES));
+            builder.RegisterType<PopupKiller>().As<IPopupKiller>();
 
             builder.RegisterType<JobManager>().As<IJobManager>()
                 .SingleInstance()

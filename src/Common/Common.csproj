@@ -52,6 +52,7 @@
     <Reference Include="System.Buffers, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\..\packages\System.Buffers.4.5.1\lib\net461\System.Buffers.dll</HintPath>
     </Reference>
+    <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Core" />
     <Reference Include="System.Diagnostics.DiagnosticSource, Version=4.0.5.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\..\packages\System.Diagnostics.DiagnosticSource.4.7.1\lib\net46\System.Diagnostics.DiagnosticSource.dll</HintPath>
@@ -79,36 +80,32 @@
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
     <Reference Include="WindowsBase" />
-    <Reference Include="Xarial.CadPlusPlus, Version=0.1.0.0, Culture=neutral, PublicKeyToken=60dcaf351d4060db, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Xarial.CadPlusPlus.0.1.0-20201204.2\lib\net461\Xarial.CadPlusPlus.dll</HintPath>
+    <Reference Include="Xarial.CadPlusPlus, Version=0.2.0.0, Culture=neutral, PublicKeyToken=60dcaf351d4060db, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Xarial.CadPlusPlus.0.2.0-20210101.4\lib\net461\Xarial.CadPlusPlus.dll</HintPath>
     </Reference>
-    <Reference Include="Xarial.XCad, Version=0.6.10.0, Culture=neutral, PublicKeyToken=60dcaf351d4060db, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Xarial.XCad.0.6.10-20201207.5\lib\net461\Xarial.XCad.dll</HintPath>
+    <Reference Include="Xarial.XCad, Version=0.6.11.0, Culture=neutral, PublicKeyToken=60dcaf351d4060db, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Xarial.XCad.0.6.11-20201231.6\lib\net461\Xarial.XCad.dll</HintPath>
     </Reference>
-    <Reference Include="Xarial.XToolkit, Version=0.2.4.0, Culture=neutral, PublicKeyToken=60dcaf351d4060db, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Xarial.XToolkit.0.2.4\lib\net461\Xarial.XToolkit.dll</HintPath>
+    <Reference Include="Xarial.XToolkit, Version=0.2.5.0, Culture=neutral, PublicKeyToken=60dcaf351d4060db, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Xarial.XToolkit.0.2.5\lib\net461\Xarial.XToolkit.dll</HintPath>
     </Reference>
-    <Reference Include="Xarial.XToolkit.Wpf, Version=0.2.11.0, Culture=neutral, PublicKeyToken=60dcaf351d4060db, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Xarial.XToolkit.Wpf.0.2.11\lib\net461\Xarial.XToolkit.Wpf.dll</HintPath>
+    <Reference Include="Xarial.XToolkit.Wpf, Version=0.2.13.0, Culture=neutral, PublicKeyToken=60dcaf351d4060db, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Xarial.XToolkit.Wpf.0.2.13\lib\net461\Xarial.XToolkit.Wpf.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Attributes\EnumDescriptionAttribute.cs" />
     <Compile Include="Attributes\EnumDisplayNameAttribute.cs" />
-    <Compile Include="Attributes\IconExAttribute.cs" />
     <Compile Include="ContainerBuilderExtension.cs" />
     <Compile Include="ContainerBuilderWrapper.cs" />
     <Compile Include="Controls\PathListBox.cs" />
     <Compile Include="Controls\TaskDashboard.cs" />
     <Compile Include="Exceptions\MacroRunnerResultError.cs" />
-    <Compile Include="Exceptions\UserException.cs" />
-    <Compile Include="ImageEx.cs" />
     <Compile Include="IServiceProviderExtension.cs" />
     <Compile Include="IXServiceCollectionExtension.cs" />
     <Compile Include="MixedApplication.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ServiceProvider.cs" />
-    <Compile Include="Services\AppLogger.cs" />
     <Compile Include="Services\CadAppMessageService.cs" />
     <Compile Include="Services\ConsoleProgressWriter.cs" />
     <Compile Include="Services\GenericMessageService.cs" />
@@ -117,6 +114,7 @@
     <Compile Include="Services\LogWirter.cs" />
     <Compile Include="Services\IMessageService.cs" />
     <Compile Include="Services\MacroRunnerExService.cs" />
+    <Compile Include="Services\PopupKiller.cs" />
     <Compile Include="Services\ProgressHandler.cs" />
   </ItemGroup>
   <ItemGroup>

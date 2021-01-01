@@ -37,18 +37,6 @@ namespace Xarial.CadPlus.CustomToolbar.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("xtoolbar.json")]
-        public string XToolbarSettingsFile {
-            get {
-                return ((string)(this["XToolbarSettingsFile"]));
-            }
-            set {
-                this["XToolbarSettingsFile"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute(@"using Xarial.CadPlus.CustomToolbar.Base;
 using Xarial.XCad;
 

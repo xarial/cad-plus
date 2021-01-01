@@ -19,7 +19,9 @@ using Xarial.CadPlus.CustomToolbar.Enums;
 using Xarial.CadPlus.CustomToolbar.Helpers;
 using Xarial.CadPlus.CustomToolbar.Properties;
 using Xarial.CadPlus.CustomToolbar.Structs;
+using Xarial.CadPlus.Plus;
 using Xarial.CadPlus.Plus.Modules;
+using Xarial.CadPlus.Plus.Services;
 using Xarial.XCad;
 using Xarial.XCad.Base;
 using Xarial.XCad.Exceptions;
@@ -30,7 +32,7 @@ namespace Xarial.CadPlus.CustomToolbar.Services
     public interface ICommandsManager : IDisposable
     {
         CustomToolbarInfo ToolbarInfo { get; }
-        void UpdatedToolbarConfiguration(ToolbarSettings toolbarSets, CustomToolbarInfo toolbarConf, bool isEditable);
+        void UpdateToolbarConfiguration(ToolbarSettings toolbarSets, CustomToolbarInfo toolbarConf, bool isEditable);
         bool RunMacroCommand(CommandMacroInfo cmd, out Exception err);
     }
 
@@ -94,7 +96,7 @@ namespace Xarial.CadPlus.CustomToolbar.Services
             }
         }
 
-        public void UpdatedToolbarConfiguration(ToolbarSettings toolbarSets, CustomToolbarInfo toolbarConf, bool isEditable)
+        public void UpdateToolbarConfiguration(ToolbarSettings toolbarSets, CustomToolbarInfo toolbarConf, bool isEditable)
         {
             bool isToolbarChanged;
 
@@ -223,11 +225,11 @@ namespace Xarial.CadPlus.CustomToolbar.Services
         {
             isToolbarChanged = false;
 
-            var oldToolbarSetts = m_SettsProvider.GetSettings();
+            var oldToolbarSetts = m_SettsProvider.ReadSettings<ToolbarSettings>();
 
             if (!DeepCompare(toolbarSets, oldToolbarSetts))
             {
-                m_SettsProvider.SaveSettings(toolbarSets);
+                m_SettsProvider.WriteSettings(toolbarSets);
             }
             
             bool isReadOnly;
@@ -301,7 +303,7 @@ namespace Xarial.CadPlus.CustomToolbar.Services
         {
             get
             {
-                return m_SettsProvider.GetSettings().SpecificationFile;
+                return m_SettsProvider.ReadSettings<ToolbarSettings>().SpecificationFile;
             }
         }
 
