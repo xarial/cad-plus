@@ -72,9 +72,9 @@ namespace Xarial.CadPlus.AddIn.Base
 
         private readonly IInitiator m_Initiator;
 
-        public AddInHost(ICadExtensionApplication app) 
+        public AddInHost(ICadExtensionApplication app, IInitiator initiator) 
         {
-            m_Initiator = new Initiator();
+            m_Initiator = initiator;
             m_Initiator.Init(this);
 
             Application = app;

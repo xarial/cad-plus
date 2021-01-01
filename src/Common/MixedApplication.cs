@@ -157,8 +157,7 @@ namespace Xarial.CadPlus.Common
                 ConsoleHandler.Attach();
 
                 SynchronizationContext.SetSynchronizationContext(new SynchronizationContext());
-                Host = new HostConsole(m_App, svc);
-                m_Initiator.Init(Host);
+                Host = new HostConsole(m_App, svc, m_Initiator);
 
                 var res = false;
 
@@ -187,8 +186,7 @@ namespace Xarial.CadPlus.Common
             }
             else
             {
-                Host = new HostWpf(m_App, this, svc);
-                m_Initiator.Init(Host);
+                Host = new HostWpf(m_App, this, svc, m_Initiator);
                 base.OnStartup(e);
             }
         }

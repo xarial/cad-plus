@@ -24,6 +24,7 @@ using Xarial.CadPlus.Common.Sw.Services;
 using Xarial.CadPlus.Common.Sw;
 using Autofac;
 using Xarial.CadPlus.Common;
+using Xarial.CadPlus.Init;
 
 namespace Xarial.CadPlus.AddIn.Sw
 {
@@ -60,7 +61,9 @@ namespace Xarial.CadPlus.AddIn.Sw
 
         public CadPlusSwAddIn()
         {
-            m_Host = new AddInHost(new CadExtensionApplication(this, Guid.Parse(Plus.Applications.Ids.SolidWorksAddIn)));
+            m_Host = new AddInHost(new CadExtensionApplication(this, 
+                Guid.Parse(Plus.Applications.Ids.SolidWorksAddIn)), 
+                new Initiator());
             m_Host.ConfigureServices += OnConfigureModuleServices;
         }
         
