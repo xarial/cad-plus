@@ -16,9 +16,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\src\Batch.Base\Batch.Base.csproj" />
+    <ProjectReference Include="..\..\src\Batch.StandAlone\Batch.StandAlone.csproj" />
     <ProjectReference Include="..\..\src\Common\Common.csproj" />
     <ProjectReference Include="..\..\src\MacroRunner\MacroRunner.csproj" />
-    <ProjectReference Include="..\..\src\XBatch.Base\XBatch.Base.csproj" />
   </ItemGroup>
 
   <Import Project="$(SolutionDir)common\common.tests.props" />

@@ -17,8 +17,6 @@ using Xarial.XCad.Documents;
 using Xarial.CadPlus.Common.Services;
 using Xarial.XToolkit.Reporting;
 using Xarial.XCad.Base;
-using Xarial.CadPlus.XBatch.Base.ViewModels;
-using Xarial.CadPlus.XBatch.Base.Controls;
 using Xarial.CadPlus.Batch.InApp.UI;
 using Xarial.CadPlus.Batch.InApp.Properties;
 using System.IO;
@@ -27,6 +25,7 @@ using Xarial.XCad.Documents.Enums;
 using Xarial.CadPlus.Common;
 using Xarial.CadPlus.Common.Attributes;
 using Xarial.CadPlus.Plus.Attributes;
+using Xarial.CadPlus.XBatch.Base.ViewModels;
 
 namespace Xarial.CadPlus.Batch.InApp
 {

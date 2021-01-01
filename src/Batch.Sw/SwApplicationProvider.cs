@@ -26,7 +26,7 @@ namespace Xarial.CadPlus.Batch.Sw
         private readonly IXLogger m_Logger;
 
         private readonly IXServiceCollection m_CustomServices;
-
+        
         public SwApplicationProvider(IXLogger logger)
         {
             InputFilesFilter = new FileTypeFilter[]
@@ -44,10 +44,6 @@ namespace Xarial.CadPlus.Batch.Sw
             m_CustomServices.AddOrReplace<IXLogger>(() => m_Logger);
 
             m_ForceDisabledAddIns = new Dictionary<Process, List<string>>();
-        }
-
-        public SwApplicationProvider()
-        {
         }
 
         public IEnumerable<IXVersion> GetInstalledVersions()

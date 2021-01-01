@@ -1,6 +1,7 @@
 using Moq;
 using NUnit.Framework;
 using System.Linq;
+using Xarial.CadPlus.Batch.Base.Models;
 using Xarial.CadPlus.Common.Services;
 using Xarial.CadPlus.Plus.Applications;
 using Xarial.CadPlus.XBatch.Base;
