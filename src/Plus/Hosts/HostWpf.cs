@@ -36,8 +36,12 @@ namespace Xarial.CadPlus.Plus.Hosts
 
         private readonly IModulesLoader m_ModulesLoader;
 
-        public HostWpf(IApplication app, Application wpfApp, IServiceProvider svcProvider)
+        private bool m_IsLoaded;
+
+        public HostWpf(IApplication app, Application wpfApp, IServiceProvider svcProvider, IInitiator initiator)
         {
+            initiator.Init(this);
+
             Application = app;
             m_WpfApp = wpfApp;
             Services = svcProvider;
@@ -45,12 +49,13 @@ namespace Xarial.CadPlus.Plus.Hosts
             m_WpfApp.Activated += OnAppActivated;
             m_WpfApp.Exit += OnAppExit;
 
+            m_IsLoaded = false;
+
             m_ModulesLoader = new ModulesLoader();
             m_ModulesLoader.Load(this);
             Initialized?.Invoke();
-            Connect?.Invoke();
         }
-
+        
         public IntPtr ParentWindow => m_WpfApp.MainWindow != null
             ? new WindowInteropHelper(m_WpfApp.MainWindow).Handle
             : IntPtr.Zero;
@@ -59,8 +64,17 @@ namespace Xarial.CadPlus.Plus.Hosts
 
         private void OnAppActivated(object sender, EventArgs e)
         {
-            m_WpfApp.Activated -= OnAppActivated;
-            Started?.Invoke();
+            if (!m_IsLoaded)
+            {
+                m_IsLoaded = true;
+                m_WpfApp.Activated -= OnAppActivated;
+                Connect?.Invoke();
+                Started?.Invoke();
+            }
+            else 
+            {
+                System.Diagnostics.Debug.Assert(false, "Event should be unsubscribed");
+            }
         }
 
         private void OnAppExit(object sender, ExitEventArgs e)

@@ -36,21 +36,24 @@ namespace Xarial.CadPlus.Plus.Hosts
 
         private readonly IModulesLoader m_ModulesLoader;
 
-        public HostConsole(IApplication app, IServiceProvider svcProvider)
+        public HostConsole(IApplication app, IServiceProvider svcProvider, IInitiator initiator)
         {
+            initiator.Init(this);
+
             Application = app;
             Services = svcProvider;
 
             m_ModulesLoader = new ModulesLoader();
             m_ModulesLoader.Load(this);
+            
             Initialized?.Invoke();
             Connect?.Invoke();
-
             Started?.Invoke();
         }
 
         public void Dispose()
         {
+            Disconnect?.Invoke();
         }
     }
 }
