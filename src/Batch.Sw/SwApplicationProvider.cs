@@ -7,8 +7,10 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Xarial.CadPlus.Common.Sw.Services;
 using Xarial.CadPlus.Plus.Applications;
 using Xarial.CadPlus.Plus.Data;
+using Xarial.CadPlus.Plus.Services;
 using Xarial.XCad;
 using Xarial.XCad.Base;
 using Xarial.XCad.Enums;
@@ -25,6 +27,10 @@ namespace Xarial.CadPlus.Batch.Sw
         public string DisplayName => "SOLIDWORKS";
         public string ApplicationId => "DsSolidWorks";
         public Image ApplicationIcon => null;
+
+        public IMacroFileFilterProvider MacroFileFiltersProvider => new SwMacroFileFilterProvider();
+
+        public IMacroRunnerExService MacroRunnerService => new SwMacroRunnerExService();
 
         private readonly Dictionary<Process, List<string>> m_ForceDisabledAddIns;
 

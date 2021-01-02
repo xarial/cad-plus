@@ -17,6 +17,7 @@ using Xarial.CadPlus.Common.Exceptions;
 using Xarial.CadPlus.Common.Services;
 using Xarial.CadPlus.Plus.Applications;
 using Xarial.CadPlus.Plus.Exceptions;
+using Xarial.CadPlus.Plus.Services;
 using Xarial.CadPlus.XBatch.Base.Exceptions;
 using Xarial.CadPlus.XBatch.Base.Services;
 using Xarial.XCad;
@@ -63,13 +64,12 @@ namespace Xarial.CadPlus.XBatch.Base.Core
         private readonly IPopupKiller m_PopupKiller;
 
         public BatchRunner(IApplicationProvider appProvider, 
-            IMacroRunnerExService macroRunnerSvc,
             TextWriter userLogger, IProgressHandler progressHandler, IJobManager jobMgr, IXLogger logger,
             Func<TimeSpan?, IResilientWorker<BatchJobContext>> workerFact, IPopupKiller popupKiller)
         {
             m_UserLogger = userLogger;
             m_ProgressHandler = progressHandler;
-            m_MacroRunnerSvc = macroRunnerSvc;
+            m_MacroRunnerSvc = appProvider.MacroRunnerService;
             m_AppProvider = appProvider;
             m_WorkerFact = workerFact;
 

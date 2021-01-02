@@ -20,6 +20,7 @@ using Xarial.CadPlus.Common.Exceptions;
 using Xarial.CadPlus.Common.Services;
 using Xarial.CadPlus.Plus.Applications;
 using Xarial.CadPlus.Plus.Exceptions;
+using Xarial.CadPlus.Plus.Services;
 using Xarial.CadPlus.XBatch.Base.Core;
 using Xarial.CadPlus.XBatch.Base.Exceptions;
 using Xarial.CadPlus.XBatch.Base.Models;
@@ -131,17 +132,17 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
         public event Action<BatchDocumentVM, BatchJob, string> Save;
 
         public BatchDocumentVM(FileInfo file, BatchJob job, IApplicationProvider appProvider, 
-            IMacroFileFilterProvider macroFilterProvider, IMessageService msgSvc,
+            IMessageService msgSvc,
             Func<BatchJob, IApplicationProvider, IBatchRunJobExecutor> execFact)
             : this(Path.GetFileNameWithoutExtension(file.FullName), job, appProvider, 
-                  macroFilterProvider, msgSvc, execFact)
+                  msgSvc, execFact)
         {
             m_FilePath = file.FullName;
             IsDirty = false;
         }
 
         public BatchDocumentVM(string name, BatchJob job,
-            IApplicationProvider appProvider, IMacroFileFilterProvider macroFilterProvider, 
+            IApplicationProvider appProvider,
             IMessageService msgSvc, Func<BatchJob, IApplicationProvider, IBatchRunJobExecutor> execFact)
         {
             m_ExecFact = execFact;
@@ -150,8 +151,8 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
             m_MsgSvc = msgSvc;
 
             InputFilesFilter = appProvider.InputFilesFilter?.Select(f => new FileFilter(f.Name, f.Extensions)).ToArray();
-            MacroFilesFilter = macroFilterProvider.GetSupportedMacros()
-                .Union(new FileFilter[] { FileFilter.AllFiles }).ToArray();
+            MacroFilesFilter = appProvider.MacroFileFiltersProvider.GetSupportedMacros()
+                .Select(f => new FileFilter(f.Name, f.Extensions)).Union(new FileFilter[] { FileFilter.AllFiles }).ToArray();
 
             IsDirty = true;
 

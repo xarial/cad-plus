@@ -28,16 +28,10 @@ namespace Xarial.CadPlus.Batch.Sw
 
             m_Host = host;
             m_Host.Connect += OnConnect;
-            m_Host.ConfigureServices += OnConfigureServices;
 
             m_App = (IBatchApplication)host.Application;
         }
-
-        private void OnConfigureServices(IContainerBuilder builder)
-        {
-            builder.UsingCommonSwServices();
-        }
-
+        
         private void OnConnect()
         {
             var logger = (IXLogger)m_Host.Services.GetService(typeof(IXLogger));

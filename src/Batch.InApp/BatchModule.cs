@@ -26,6 +26,7 @@ using Xarial.CadPlus.Common;
 using Xarial.CadPlus.Common.Attributes;
 using Xarial.CadPlus.Plus.Attributes;
 using Xarial.CadPlus.XBatch.Base.ViewModels;
+using Xarial.CadPlus.Plus.Services;
 
 namespace Xarial.CadPlus.Batch.InApp
 {

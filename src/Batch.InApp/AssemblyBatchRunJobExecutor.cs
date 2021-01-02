@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Xarial.CadPlus.Batch.Base.Models;
 using Xarial.CadPlus.Common.Services;
+using Xarial.CadPlus.Plus.Services;
 using Xarial.CadPlus.XBatch.Base.Core;
 using Xarial.XCad;
 using Xarial.XCad.Documents;

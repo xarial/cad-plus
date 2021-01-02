@@ -11,6 +11,7 @@ using System.Runtime.InteropServices;
 using Xarial.CadPlus.Common.Exceptions;
 using Xarial.CadPlus.MacroRunner;
 using Xarial.CadPlus.Plus.Exceptions;
+using Xarial.CadPlus.Plus.Services;
 using Xarial.XCad;
 using Xarial.XCad.Base;
 using Xarial.XCad.Documents;
@@ -20,12 +21,6 @@ using Xarial.XCad.Structures;
 
 namespace Xarial.CadPlus.Common.Services
 {
-    public interface IMacroRunnerExService
-    {
-        void RunMacro(IXApplication app, string macroPath, MacroEntryPoint entryPoint,
-            MacroRunOptions_e opts, string args, IXDocument doc);
-    }
-
     public abstract class MacroRunnerExService : IMacroRunnerExService, IDisposable
     {
         [DllImport("shell32.dll", SetLastError = true)]
