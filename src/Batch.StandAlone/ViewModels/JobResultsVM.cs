@@ -12,6 +12,8 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Xarial.CadPlus.Batch.Base.Models;
+using Xarial.CadPlus.Plus.Applications;
 using Xarial.CadPlus.XBatch.Base.Core;
 using Xarial.CadPlus.XBatch.Base.Models;
 using Xarial.XToolkit.Wpf.Extensions;
@@ -36,20 +38,25 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
 
         public ObservableCollection<JobResultVM> Items { get; }
 
-        private readonly IBatchRunnerModel m_Model;
         private readonly BatchJob m_Job;
 
-        public JobResultsVM(IBatchRunnerModel model, BatchJob job) 
-        {
-            m_Model = model;
-            m_Job = job;
+        private readonly Func<BatchJob, IApplicationProvider, IBatchRunJobExecutor> m_ExecFact;
 
+        private readonly IApplicationProvider m_AppProvider;
+
+        public JobResultsVM(BatchJob job, IApplicationProvider appProvider, 
+            Func<BatchJob, IApplicationProvider, IBatchRunJobExecutor> execFact) 
+        {
+            m_Job = job;
+            m_AppProvider = appProvider;
+
+            m_ExecFact = execFact;
             Items = new ObservableCollection<JobResultVM>();
         }
 
         public void StartNewJob()
         {
-            var newRes = new JobResultVM($"Job #{Items.Count + 1}", m_Model.CreateExecutor(m_Job));
+            var newRes = new JobResultVM($"Job #{Items.Count + 1}", m_ExecFact.Invoke(m_Job, m_AppProvider));
             Items.Add(newRes);
             Selected = newRes;
             newRes.RunBatchAsync();

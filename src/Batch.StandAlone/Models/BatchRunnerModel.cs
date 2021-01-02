@@ -28,61 +28,24 @@ namespace Xarial.CadPlus.XBatch.Base.Models
     public interface IBatchRunnerModel 
     {
         ObservableCollection<string> RecentFiles { get; }
-        IXVersion[] InstalledVersions { get; }
-
-        FileFilter[] InputFilesFilter { get; }
-        FileFilter[] MacroFilesFilter { get; }
-
+        
         void SaveJobToFile(BatchJob job, string filePath);
         BatchJob LoadJobFromFile(string filePath);
         BatchJob CreateNewJobDocument();
-
-        IXVersion ParseVersion(string id);
-
-        IBatchRunJobExecutor CreateExecutor(BatchJob job);
-
-        string GetVersionId(IXVersion value);
     }
 
     public class BatchRunnerModel : IBatchRunnerModel
     {
-        private readonly  IApplicationProvider m_AppProvider;
-
         private readonly IRecentFilesManager m_RecentFilesMgr;
 
         public ObservableCollection<string> RecentFiles { get; }
-
-        private readonly Func<BatchJob, IBatchRunJobExecutor> m_ExecFact;
-
-        public BatchRunnerModel(IApplicationProvider appProvider, IRecentFilesManager recentFilesMgr, 
-            IMacroFileFilterProvider macroFilterProvider, Func<BatchJob, IBatchRunJobExecutor> execFact) 
+        
+        public BatchRunnerModel(IRecentFilesManager recentFilesMgr)
         {
-            m_AppProvider = appProvider;
             m_RecentFilesMgr = recentFilesMgr;
             RecentFiles = new ObservableCollection<string>(m_RecentFilesMgr.RecentFiles);
-
-            InputFilesFilter = appProvider.InputFilesFilter?.Select(f => new FileFilter(f.Name, f.Extensions)).ToArray();
-            MacroFilesFilter = macroFilterProvider.GetSupportedMacros()
-                .Union(new FileFilter[] { FileFilter.AllFiles }).ToArray();
-
-            m_ExecFact = execFact;
-
-            InstalledVersions = m_AppProvider.GetInstalledVersions().ToArray();
-
-            if (!InstalledVersions.Any()) 
-            {
-                throw new UserException("Failed to detect any installed version of the host application");
-            }
         }
-
-        public FileFilter[] InputFilesFilter { get; }
-
-        public FileFilter[] MacroFilesFilter { get; }
-
-        public IXVersion[] InstalledVersions { get; }
-
-        public IBatchRunJobExecutor CreateExecutor(BatchJob job) => m_ExecFact.Invoke(job);
-
+        
         public BatchJob CreateNewJobDocument() => new BatchJob();
 
         public BatchJob LoadJobFromFile(string filePath)
@@ -102,9 +65,7 @@ namespace Xarial.CadPlus.XBatch.Base.Models
                 throw;
             }
         }
-
-        public IXVersion ParseVersion(string id) => m_AppProvider.ParseVersion(id);
-
+        
         public void SaveJobToFile(BatchJob job, string filePath)
         {
             var svc = new UserSettingsService();
@@ -129,7 +90,5 @@ namespace Xarial.CadPlus.XBatch.Base.Models
                 RecentFiles.Add(recFile);
             }
         }
-
-        public string GetVersionId(IXVersion value) => m_AppProvider.GetVersionId(value);
     }
 }

@@ -6,6 +6,7 @@
 //*********************************************************************
 
 using Autofac;
+using Autofac.Core;
 using CommandLine;
 using System;
 using System.Collections.Generic;
@@ -54,8 +55,15 @@ namespace Xarial.CadPlus.XBatch.Base
 
         private FileOptions m_StartupOptions;
 
-        public XBatchApp() : base(new BatchApplication())
+        private readonly BatchApplication m_BatchApp;
+
+        public XBatchApp() : this(new BatchApplication())
         {
+        }
+
+        public XBatchApp(BatchApplication batchApp) : base(batchApp)
+        {
+            m_BatchApp = batchApp;
         }
 
         protected override void OnAppStart()
@@ -100,7 +108,14 @@ namespace Xarial.CadPlus.XBatch.Base
                 .As<IResilientWorker<BatchJobContext>>()
                 .WithParameter(new TypedParameter(typeof(int), MAX_RETRIES));
             builder.RegisterType<PopupKiller>().As<IPopupKiller>();
+            builder.RegisterType<BatchDocumentVM>();
 
+            builder.RegisterInstance(m_BatchApp)
+                .AsSelf()
+                .As<IBatchApplication>();
+
+            builder.RegisterAdapter<IBatchApplication, IApplicationProvider[]>(x => x.ApplicationProviders);
+            
             builder.RegisterType<JobManager>().As<IJobManager>()
                 .SingleInstance()
                 .OnActivating(x =>

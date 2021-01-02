@@ -282,10 +282,10 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
 
         public IXVersion Version
         {
-            get => m_Model.ParseVersion(m_Job.VersionId);
+            get => m_AppProvider.ParseVersion(m_Job.VersionId);
             set
             {
-                m_Job.VersionId = m_Model.GetVersionId(value);
+                m_Job.VersionId = m_AppProvider.GetVersionId(value);
                 this.NotifyChanged();
                 Modified?.Invoke();
             }
@@ -298,23 +298,23 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
         private int m_CachedTimeout;
         private int m_CachedBatchSize;
         private readonly BatchJob m_Job;
-        private readonly IBatchRunnerModel m_Model;
+        private readonly IApplicationProvider m_AppProvider;
 
-        public BatchDocumentSettingsVM(BatchJob job, IBatchRunnerModel model) 
+        public BatchDocumentSettingsVM(BatchJob job, IApplicationProvider appProvider) 
         {
             m_Job = job;
             m_CachedTimeout = m_Job.Timeout;
             m_CachedBatchSize = m_Job.BatchSize;
 
-            m_Model = model;
-
-            InstalledVersions = m_Model.InstalledVersions;
+            m_AppProvider = appProvider;
+            
+            InstalledVersions = m_AppProvider.GetInstalledVersions().ToArray();
 
             if (!string.IsNullOrEmpty(m_Job.VersionId))
             {
                 try
                 {
-                    Version = m_Model.ParseVersion(m_Job.VersionId);
+                    Version = m_AppProvider.ParseVersion(m_Job.VersionId);
                 }
                 catch
                 {

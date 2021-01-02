@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -20,6 +21,10 @@ namespace Xarial.CadPlus.Batch.Sw
     public class SwApplicationProvider : IApplicationProvider
     {
         public FileTypeFilter[] InputFilesFilter { get; }
+
+        public string DisplayName => "SOLIDWORKS";
+        public string ApplicationId => "DsSolidWorks";
+        public Image ApplicationIcon => null;
 
         private readonly Dictionary<Process, List<string>> m_ForceDisabledAddIns;
 

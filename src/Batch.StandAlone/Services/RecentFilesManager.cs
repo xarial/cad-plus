@@ -25,7 +25,7 @@ namespace Xarial.CadPlus.XBatch.Base.Services
         private List<string> m_RecentFiles;
 
         private readonly string m_RecentFilesPath = Path.Combine
-            (Locations.AppDirectoryPath, "xbatchrecentfiles.txt");
+            (Locations.AppDirectoryPath, "batchplusrecentfiles.txt");
 
         public void PushFile(string filePath)
         {

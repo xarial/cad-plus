@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Xarial.CadPlus.Common.Sw;
 using Xarial.CadPlus.Plus;
 using Xarial.CadPlus.Plus.Applications;
 using Xarial.CadPlus.Plus.Attributes;
@@ -27,8 +28,14 @@ namespace Xarial.CadPlus.Batch.Sw
 
             m_Host = host;
             m_Host.Connect += OnConnect;
+            m_Host.ConfigureServices += OnConfigureServices;
 
             m_App = (IBatchApplication)host.Application;
+        }
+
+        private void OnConfigureServices(IContainerBuilder builder)
+        {
+            builder.UsingCommonSwServices();
         }
 
         private void OnConnect()

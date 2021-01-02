@@ -30,21 +30,24 @@ namespace Xarial.CadPlus.XBatch.Base
 {
     public partial class MainWindow
     {
-        private readonly BatchManagerVM m_BatchManager;
+        private BatchManagerVM m_BatchManager;
+
+        private readonly XBatchApp m_App;
 
         public MainWindow()
         {
             InitializeComponent();
 
             this.Closing += OnWindowClosing;
+            m_App = (XBatchApp)Application.Current;
+            m_App.Host.Started += OnHostStarted;
+        }
 
-            XBatchApp app = null;
-
+        private void OnHostStarted()
+        {
             try
             {
-                app = (XBatchApp)Application.Current;
-
-                m_BatchManager = app.Host.Services.GetService<BatchManagerVM>();
+                m_BatchManager = m_App.Host.Services.GetService<BatchManagerVM>();
 
                 this.DataContext = m_BatchManager;
 
@@ -56,14 +59,15 @@ namespace Xarial.CadPlus.XBatch.Base
 
                 try
                 {
-                    msgSvc = app.Host.Services.GetService<IMessageService>();
+                    msgSvc = m_App.Host.Services.GetService<IMessageService>();
                 }
-                catch 
+                catch
                 {
                     msgSvc = new GenericMessageService("Batch+");
                 }
 
                 msgSvc.ShowError(ex.ParseUserError(out _));
+                Environment.Exit(1);
             }
         }
 

@@ -16,7 +16,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using Xarial.CadPlus.Batch.Base.Models;
 using Xarial.CadPlus.Common.Services;
+using Xarial.CadPlus.Plus.Applications;
 using Xarial.CadPlus.StandAlone.Properties;
 using Xarial.CadPlus.XBatch.Base.Core;
 using Xarial.CadPlus.XBatch.Base.Models;
@@ -53,11 +55,22 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
         private readonly IBatchRunnerModel m_Model;
         private readonly IMessageService m_MsgSvc;
 
-        public BatchManagerVM(IBatchRunnerModel model, IMessageService msgSvc)
+        private readonly IApplicationProvider[] m_AppProviders;
+
+        private readonly Func<FileInfo, BatchJob, IApplicationProvider, BatchDocumentVM> m_OpenDocFunc;
+        private readonly Func<string, BatchJob, IApplicationProvider, BatchDocumentVM> m_NewDocFunc;
+
+        public BatchManagerVM(IApplicationProvider[] appProviders,
+            IBatchRunnerModel model, IMessageService msgSvc, 
+            Func<FileInfo, BatchJob, IApplicationProvider, BatchDocumentVM> openDocFunc,
+            Func<string, BatchJob, IApplicationProvider, BatchDocumentVM> newDocFunc)
         {
+            m_AppProviders = appProviders;
             m_Model = model;
             m_MsgSvc = msgSvc;
-            
+            m_OpenDocFunc = openDocFunc;
+            m_NewDocFunc = newDocFunc;
+
             NewDocumentCommand = new RelayCommand(NewDocument);
             OpenDocumentCommand = new RelayCommand<string>(OpenDocument);
             CloseDocumentCommand = new RelayCommand(CloseDocument, () => Document != null);
@@ -108,7 +121,8 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
                         if (Document == null)
                         {
                             var batchJob = m_Model.LoadJobFromFile(filePath);
-                            Document = new BatchDocumentVM(new FileInfo(filePath), batchJob, m_Model, m_MsgSvc);
+                            Document = m_OpenDocFunc.Invoke(new FileInfo(filePath), batchJob, GetApplicationProviderForJob(batchJob));
+                            Document.Save += OnSaveDocument;
                         }
                         else
                         {
@@ -132,13 +146,17 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
             }
         }
 
+        private void OnSaveDocument(BatchDocumentVM sender, BatchJob job, string filePath)
+                    => m_Model.SaveJobToFile(job, filePath);
+
         internal void NewDocument() 
         {
             if (Document == null)
             {
                 var job = m_Model.CreateNewJobDocument();
 
-                Document = new BatchDocumentVM("Batch+ Document", job, m_Model, m_MsgSvc);
+                Document = m_NewDocFunc.Invoke("Batch+ Document", job, GetApplicationProviderForJob(job));
+                Document.Save += OnSaveDocument;
             }
             else
             {
@@ -147,11 +165,21 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
             }
         }
 
+        private IApplicationProvider GetApplicationProviderForJob(BatchJob job) 
+        {
+            //TODO: find provider by id
+            return m_AppProviders.First();
+        }
+
         private void CloseDocument() 
         {
             if (CanClose()) 
             {
-                Document = null;
+                if (Document != null) 
+                {
+                    Document.Save -= OnSaveDocument;
+                    Document = null;
+                }
             }
         }
 

@@ -86,7 +86,7 @@ namespace Xarial.CadPlus.Common
 
         protected IContainer m_Container;
 
-        private readonly IApplication m_App;
+        protected readonly IApplication m_App;
         private readonly IInitiator m_Initiator;
 
         protected MixedApplication(IApplication app) 

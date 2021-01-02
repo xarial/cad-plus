@@ -15,8 +15,10 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Input;
+using Xarial.CadPlus.Batch.Base.Models;
 using Xarial.CadPlus.Common.Exceptions;
 using Xarial.CadPlus.Common.Services;
+using Xarial.CadPlus.Plus.Applications;
 using Xarial.CadPlus.Plus.Exceptions;
 using Xarial.CadPlus.XBatch.Base.Core;
 using Xarial.CadPlus.XBatch.Base.Exceptions;
@@ -94,9 +96,9 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
 
         public ObservableCollection<FilterVM> Filters { get; }
 
-        public FileFilter[] InputFilesFilter => m_Model.InputFilesFilter;
+        public FileFilter[] InputFilesFilter { get; }
 
-        public FileFilter[] MacroFilesFilter => m_Model.MacroFilesFilter;
+        public FileFilter[] MacroFilesFilter { get; }
 
         public ICommand RunJobCommand { get; }
 
@@ -115,7 +117,6 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
             }
         }
 
-        private readonly IBatchRunnerModel m_Model;
         private readonly BatchJob m_Job;
         private readonly IMessageService m_MsgSvc;
 
@@ -124,18 +125,33 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
 
         public string FilePath => m_FilePath;
 
-        public BatchDocumentVM(FileInfo file, BatchJob job, IBatchRunnerModel model, IMessageService msgSvc)
-            : this(Path.GetFileNameWithoutExtension(file.FullName), job, model, msgSvc)
+        private readonly Func<BatchJob, IApplicationProvider, IBatchRunJobExecutor> m_ExecFact;
+        private readonly IApplicationProvider m_AppProvider;
+
+        public event Action<BatchDocumentVM, BatchJob, string> Save;
+
+        public BatchDocumentVM(FileInfo file, BatchJob job, IApplicationProvider appProvider, 
+            IMacroFileFilterProvider macroFilterProvider, IMessageService msgSvc,
+            Func<BatchJob, IApplicationProvider, IBatchRunJobExecutor> execFact)
+            : this(Path.GetFileNameWithoutExtension(file.FullName), job, appProvider, 
+                  macroFilterProvider, msgSvc, execFact)
         {
             m_FilePath = file.FullName;
             IsDirty = false;
         }
 
-        public BatchDocumentVM(string name, BatchJob job, IBatchRunnerModel model, IMessageService msgSvc)
+        public BatchDocumentVM(string name, BatchJob job,
+            IApplicationProvider appProvider, IMacroFileFilterProvider macroFilterProvider, 
+            IMessageService msgSvc, Func<BatchJob, IApplicationProvider, IBatchRunJobExecutor> execFact)
         {
-            m_Model = model;
+            m_ExecFact = execFact;
+            m_AppProvider = appProvider;
             m_Job = job;
             m_MsgSvc = msgSvc;
+
+            InputFilesFilter = appProvider.InputFilesFilter?.Select(f => new FileFilter(f.Name, f.Extensions)).ToArray();
+            MacroFilesFilter = macroFilterProvider.GetSupportedMacros()
+                .Union(new FileFilter[] { FileFilter.AllFiles }).ToArray();
 
             IsDirty = true;
 
@@ -145,9 +161,9 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
             FilterEditEndingCommand = new RelayCommand<DataGridCellEditEndingEventArgs>(FilterEditEnding);
 
             Name = name;
-            Settings = new BatchDocumentSettingsVM(m_Job, model);
+            Settings = new BatchDocumentSettingsVM(m_Job, m_AppProvider);
             Settings.Modified += OnSettingsModified;
-            Results = new JobResultsVM(m_Model, m_Job);
+            Results = new JobResultsVM(m_Job, m_AppProvider, m_ExecFact);
 
             Filters = new ObservableCollection<FilterVM>((m_Job.Filters ?? Enumerable.Empty<string>()).Select(f => new FilterVM(f)));
             Filters.CollectionChanged += OnFiltersCollectionChanged;
@@ -208,7 +224,7 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
 
             try
             {
-                m_Model.SaveJobToFile(m_Job, m_FilePath);
+                Save?.Invoke(this, m_Job, m_FilePath);
                 IsDirty = false;
             }
             catch
