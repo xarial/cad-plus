@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Xarial.CadPlus.Plus.Data;
+using Xarial.CadPlus.Plus.Services;
 using Xarial.XCad;
 using Xarial.XCad.Base.Attributes;
 
@@ -34,6 +35,9 @@ namespace Xarial.CadPlus.Plus.Applications
         string DisplayName { get; }
         string ApplicationId { get; }
         Image ApplicationIcon { get; }
+
+        IMacroFileFilterProvider MacroFileFiltersProvider { get; }
+        IMacroRunnerExService MacroRunnerService { get; }
 
         IEnumerable<IXVersion> GetInstalledVersions();
         IXApplication StartApplication(IXVersion vers, StartupOptions_e opts,
