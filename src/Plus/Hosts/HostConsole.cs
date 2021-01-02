@@ -44,12 +44,13 @@ namespace Xarial.CadPlus.Plus.Hosts
             m_Initiator.Init(this);
 
             Application = app;
-            ConfigureServices?.Invoke(builder);
-            Services = builder.Build();
-
+            
             m_ModulesLoader = new ModulesLoader();
             m_ModulesLoader.Load(this);
             
+            ConfigureServices?.Invoke(builder);
+            Services = builder.Build();
+
             Initialized?.Invoke();
             Connect?.Invoke();
             Started?.Invoke();
