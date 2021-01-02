@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -30,6 +31,10 @@ namespace Xarial.CadPlus.Plus.Applications
 
     public interface IApplicationProvider : IDisposable
     {
+        string DisplayName { get; }
+        string ApplicationId { get; }
+        Image ApplicationIcon { get; }
+
         IEnumerable<IXVersion> GetInstalledVersions();
         IXApplication StartApplication(IXVersion vers, StartupOptions_e opts,
             CancellationToken cancellationToken);

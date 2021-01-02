@@ -47,9 +47,7 @@ namespace Xarial.CadPlus.Plus.Hosts
 
             Application = app;
             m_WpfApp = wpfApp;
-            ConfigureServices?.Invoke(builder);
-            Services = builder.Build();
-
+            
             m_WpfApp.Activated += OnAppActivated;
             m_WpfApp.Exit += OnAppExit;
 
@@ -57,6 +55,8 @@ namespace Xarial.CadPlus.Plus.Hosts
 
             m_ModulesLoader = new ModulesLoader();
             m_ModulesLoader.Load(this);
+            ConfigureServices?.Invoke(builder);
+            Services = builder.Build();
             Initialized?.Invoke();
         }
         
