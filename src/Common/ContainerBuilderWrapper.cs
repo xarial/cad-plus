@@ -26,5 +26,7 @@ namespace Xarial.CadPlus.Common
 
         public void Register<TImplementer, TService>() where TImplementer : TService
             => Builder.RegisterType<TImplementer>().As<TService>();
+
+        public IServiceProvider Build() => new ServiceProvider(Builder.Build());
     }
 }

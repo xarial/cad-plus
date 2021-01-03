@@ -48,7 +48,7 @@
     <Reference Include="System.Xml" />
     <Reference Include="WindowsBase" />
     <Reference Include="Xarial.CadPlusPlus, Version=0.2.0.0, Culture=neutral, PublicKeyToken=60dcaf351d4060db, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Xarial.CadPlusPlus.0.2.0-20210101.4\lib\net461\Xarial.CadPlusPlus.dll</HintPath>
+      <HintPath>..\..\packages\Xarial.CadPlusPlus.0.2.0-20210102.2\lib\net461\Xarial.CadPlusPlus.dll</HintPath>
     </Reference>
     <Reference Include="Xarial.XCad, Version=0.6.11.0, Culture=neutral, PublicKeyToken=60dcaf351d4060db, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Xarial.XCad.0.6.11-20201231.6\lib\net461\Xarial.XCad.dll</HintPath>
@@ -84,13 +84,13 @@
     <None Include="Resources\macros-vector.svg" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Batch.Base\Batch.Base.csproj">
+      <Project>{a5a5b83d-98eb-4705-a7f4-74ad649b89c8}</Project>
+      <Name>Batch.Base</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Common\Common.csproj">
       <Project>{cb753a98-59d1-4058-b486-e1dfd86fb5bb}</Project>
       <Name>Common</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\XBatch.Base\XBatch.Base.csproj">
-      <Project>{c64ae433-7bb9-4eda-a54f-d71f2bf1b015}</Project>
-      <Name>XBatch.Base</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
