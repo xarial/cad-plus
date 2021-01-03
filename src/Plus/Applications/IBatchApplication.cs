@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -17,16 +18,16 @@ namespace Xarial.CadPlus.Plus.Applications
     {
         Default = 0,
 
-        [Summary("Bypasses all settings")]
+        [Description("Bypasses all settings")]
         Safe = 1,
 
-        [Summary("Runs host application in background")]
+        [Description("Runs host application in background")]
         Background = 2,
 
-        [Summary("Suppresses all popup windows")]
+        [Description("Suppresses all popup windows")]
         Silent = 4,
 
-        [Summary("Hides the main window of the application")]
+        [Description("Hides the main window of the application")]
         Hidden = 8
     }
 
@@ -48,8 +49,12 @@ namespace Xarial.CadPlus.Plus.Applications
         string GetVersionId(IXVersion value);
     }
 
+    public delegate void ProcessInputDelegate(List<string> input);
+
     public interface IBatchApplication : IApplication
     {
+        event ProcessInputDelegate ProcessInput;
+
         IApplicationProvider[] ApplicationProviders { get; }
         void RegisterApplicationProvider(IApplicationProvider provider);
     }
