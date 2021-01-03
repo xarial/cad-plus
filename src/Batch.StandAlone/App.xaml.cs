@@ -84,7 +84,7 @@ namespace Xarial.CadPlus.XBatch.Base
 
                 if (m_StartupOptions.CreateNew)
                 {
-                    vm.NewDocument();
+                    vm.NewDocument(m_StartupOptions.ApplicationId);
                 }
             }
         }

@@ -24,6 +24,9 @@ namespace Xarial.CadPlus.XBatch.Base
 
         [Option('n', "new", Required = false, HelpText = "Starts application and creates new file")]
         public bool CreateNew { get; set; }
+
+        [Option('a', "appId", Required = false, HelpText = "Id of application if new document is created")]
+        public string ApplicationId { get; set; }
     }
 
     public interface IArguments 

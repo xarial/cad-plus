@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Xarial.CadPlus.Batch.Sw.Properties;
 using Xarial.CadPlus.Common.Sw.Services;
 using Xarial.CadPlus.Plus.Applications;
 using Xarial.CadPlus.Plus.Data;
@@ -26,7 +27,7 @@ namespace Xarial.CadPlus.Batch.Sw
 
         public string DisplayName => "SOLIDWORKS";
         public string ApplicationId => "DsSolidWorks";
-        public Image ApplicationIcon => null;
+        public Image ApplicationIcon => Resources.sw_application;
 
         public IMacroFileFilterProvider MacroFileFiltersProvider => new SwMacroFileFilterProvider();
 

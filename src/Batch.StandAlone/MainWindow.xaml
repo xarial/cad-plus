@@ -46,6 +46,7 @@
                     <xconv:BooleanUniversalConverter x:Key="boolToVisConv" 
                                                      TrueValue="{x:Static win:Visibility.Visible}"
                                                      FalseValue="{x:Static win:Visibility.Collapsed}"/>
+                    <xconv:ImageToImageSourceConverter x:Key="imgToSrcConv"/>
                 </ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
@@ -187,7 +188,8 @@
             </fluent:RibbonTabItem>
             <fluent:RibbonTabItem Header="Settings" DataContext="{Binding Path=Document.Settings}">
                 <fluent:RibbonGroupBox Header="Startup Options">
-                    <fluent:DropDownButton LargeIcon="/batchplus;component/Resources/app-version.png" Header="{Binding Path=Version.DisplayName}" 
+                    <fluent:DropDownButton LargeIcon="{Binding Path=AppProvider.ApplicationIcon, Converter={StaticResource imgToSrcConv}}"
+                                           Header="{Binding Path=Version.DisplayName}" 
                                            ItemsSource="{Binding Path=InstalledVersions}">
                         <fluent:DropDownButton.ItemTemplate>
                             <DataTemplate>

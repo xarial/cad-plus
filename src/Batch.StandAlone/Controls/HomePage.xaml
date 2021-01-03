@@ -4,9 +4,13 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Xarial.CadPlus.XBatch.Base.Controls"
+             xmlns:xconv="clr-namespace:Xarial.XToolkit.Wpf.Converters;assembly=Xarial.XToolkit.Wpf"
              xmlns:fluent="clr-namespace:Fluent;assembly=Fluent"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <xconv:ImageToImageSourceConverter x:Key="imgSrcConv"/>
+    </UserControl.Resources>
     <Grid Margin="10" MinWidth="500" MinHeight="500">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -25,26 +29,32 @@
         
         <TextBlock Text="New" Grid.Row="0" FontSize="20" FontWeight="Bold"/>
         <Separator Grid.Row="1"/>
-        <Grid Grid.Row="2" Margin="10">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
-            </Grid.ColumnDefinitions>
-            <Button Width="100" Height="100" Grid.Column="0"
-                Command="{Binding Path=NewDocumentCommand}">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="*"/>
-                        <RowDefinition Height="Auto"/>
-                    </Grid.RowDefinitions>
-                    <Image Source="/batchplus;component/Resources/app-version.png"/>
-                    <TextBlock Text="SOLIDWORKS Batch" Grid.Row="1" FontWeight="Normal" FontSize="12"
+        <ItemsControl ItemsSource="{Binding Path=AppProviders}" Margin="10" Grid.Row="2">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <StackPanel Orientation="Horizontal"/>
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <Button Width="100" Height="100"
+                            Command="{Binding Path=DataContext.NewDocumentCommand, RelativeSource={RelativeSource AncestorType={x:Type local:HomePage}}}" 
+                            CommandParameter="{Binding Path=ApplicationId}">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <Image Source="{Binding Path=ApplicationIcon, Converter={StaticResource imgSrcConv}}"/>
+                            <TextBlock Text="{Binding Path=DisplayName, StringFormat={}{0} Batch}"
+                                       Grid.Row="1" FontWeight="Normal" FontSize="12"
                            TextWrapping="Wrap" TextAlignment="Center"/>
-                </Grid>
-            </Button>
-        </Grid>
-        
+                        </Grid>
+                    </Button>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+                
         <TextBlock Text="Open" Grid.Row="4" FontSize="20" FontWeight="Bold"/>
         <Separator Grid.Row="5"/>
         <Grid Grid.Row="6" Margin="10">

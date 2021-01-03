@@ -253,9 +253,6 @@
     <Resource Include="Resources\safe-mode.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Resources\app-version.png" />
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="Resources\open.png" />
   </ItemGroup>
   <ItemGroup>

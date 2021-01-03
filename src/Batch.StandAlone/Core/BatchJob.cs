@@ -52,10 +52,17 @@ namespace Xarial.CadPlus.XBatch.Base.Core
 
                 return t;
             });
+
+            Add(new Version("1.1.0"), new Version("1.2.0"), t =>
+            {
+                (t as JObject).Add("ApplicationId", "DsSolidWorks");
+
+                return t;
+            });
         }
     }
 
-    [UserSettingVersion("1.1.0", typeof(BatchJobVersionTransformer))]
+    [UserSettingVersion("1.2.0", typeof(BatchJobVersionTransformer))]
     public class BatchJob
     {
         internal static BatchJob FromFile(string filePath) 
@@ -66,6 +73,8 @@ namespace Xarial.CadPlus.XBatch.Base.Core
 
             return batchJob;
         }
+
+        public string ApplicationId { get; set; }
 
         public string[] Input { get; set; }
         public string[] Filters { get; set; }

@@ -31,7 +31,7 @@ namespace Xarial.CadPlus.XBatch.Base.Models
         
         void SaveJobToFile(BatchJob job, string filePath);
         BatchJob LoadJobFromFile(string filePath);
-        BatchJob CreateNewJobDocument();
+        BatchJob CreateNewJobDocument(string appId);
     }
 
     public class BatchRunnerModel : IBatchRunnerModel
@@ -45,8 +45,12 @@ namespace Xarial.CadPlus.XBatch.Base.Models
             m_RecentFilesMgr = recentFilesMgr;
             RecentFiles = new ObservableCollection<string>(m_RecentFilesMgr.RecentFiles);
         }
-        
-        public BatchJob CreateNewJobDocument() => new BatchJob();
+
+        public BatchJob CreateNewJobDocument(string appId)
+            => new BatchJob()
+            {
+                ApplicationId = appId
+            };
 
         public BatchJob LoadJobFromFile(string filePath)
         {
