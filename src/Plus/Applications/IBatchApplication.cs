@@ -49,7 +49,7 @@ namespace Xarial.CadPlus.Plus.Applications
         string GetVersionId(IXVersion value);
     }
 
-    public delegate void ProcessInputDelegate(List<string> input);
+    public delegate void ProcessInputDelegate(IXApplication app, List<string> input);
 
     public interface IBatchApplication : IApplication
     {
