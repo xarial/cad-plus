@@ -57,6 +57,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Batch.Sw", "src\Batch.Sw\Ba
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Batch.Base", "src\Batch.Base\Batch.Base.csproj", "{A5A5B83D-98EB-4705-A7F4-74AD649B89C8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Batch.StandAlone.Modules", "src\Batch.StandAlone.Modules\Batch.StandAlone.Modules.csproj", "{0E69A315-6BB3-40F9-8FE3-4A9861349270}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -217,6 +219,14 @@ Global
 		{A5A5B83D-98EB-4705-A7F4-74AD649B89C8}.Release|Any CPU.Build.0 = Release|Any CPU
 		{A5A5B83D-98EB-4705-A7F4-74AD649B89C8}.Release|x64.ActiveCfg = Release|Any CPU
 		{A5A5B83D-98EB-4705-A7F4-74AD649B89C8}.Release|x64.Build.0 = Release|Any CPU
+		{0E69A315-6BB3-40F9-8FE3-4A9861349270}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0E69A315-6BB3-40F9-8FE3-4A9861349270}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0E69A315-6BB3-40F9-8FE3-4A9861349270}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{0E69A315-6BB3-40F9-8FE3-4A9861349270}.Debug|x64.Build.0 = Debug|Any CPU
+		{0E69A315-6BB3-40F9-8FE3-4A9861349270}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0E69A315-6BB3-40F9-8FE3-4A9861349270}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0E69A315-6BB3-40F9-8FE3-4A9861349270}.Release|x64.ActiveCfg = Release|Any CPU
+		{0E69A315-6BB3-40F9-8FE3-4A9861349270}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -240,6 +250,7 @@ Global
 		{DEEA0EFE-822A-489C-A264-5FFF122D5FC5} = {44577B98-DBC0-4368-BB5E-E118FCB7AA43}
 		{42039109-12CE-4FA7-9B42-DCF111BD0D0C} = {C4DA2E78-F55E-4E05-A888-177EE6270A8B}
 		{A5A5B83D-98EB-4705-A7F4-74AD649B89C8} = {FC8E97DF-3C24-4A03-9F66-A47EA88587FB}
+		{0E69A315-6BB3-40F9-8FE3-4A9861349270} = {C4DA2E78-F55E-4E05-A888-177EE6270A8B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {3C2BBB3C-6B3A-4CC2-BD49-20745320B11A}

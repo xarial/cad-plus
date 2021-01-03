@@ -63,8 +63,12 @@ namespace Xarial.CadPlus.XBatch.Base.Core
 
         private readonly IPopupKiller m_PopupKiller;
 
+        private readonly IBatchApplicationProxy m_BatchAppProxy;
+
         public BatchRunner(IApplicationProvider appProvider, 
-            TextWriter userLogger, IProgressHandler progressHandler, IJobManager jobMgr, IXLogger logger,
+            TextWriter userLogger, IProgressHandler progressHandler,
+            IBatchApplicationProxy batchAppProxy,
+            IJobManager jobMgr, IXLogger logger,
             Func<TimeSpan?, IResilientWorker<BatchJobContext>> workerFact, IPopupKiller popupKiller)
         {
             m_UserLogger = userLogger;
@@ -72,6 +76,7 @@ namespace Xarial.CadPlus.XBatch.Base.Core
             m_MacroRunnerSvc = appProvider.MacroRunnerService;
             m_AppProvider = appProvider;
             m_WorkerFact = workerFact;
+            m_BatchAppProxy = batchAppProxy;
 
             m_PopupKiller = popupKiller;
             m_PopupKiller.PopupNotClosed += OnPopupNotClosed;
@@ -93,17 +98,6 @@ namespace Xarial.CadPlus.XBatch.Base.Core
 
             var batchStartTime = DateTime.Now;
             
-            var allFiles = PrepareJobScope(opts.Input, opts.Filters, opts.Macros).ToArray();
-
-            m_UserLogger.WriteLine($"Running batch processing for {allFiles.Length} file(s)");
-
-            m_ProgressHandler.SetJobScope(allFiles, batchStartTime);
-
-            if (!allFiles.Any())
-            {
-                throw new UserException("Empty job. No files matching specified filter");
-            }
-
             TimeSpan? timeout = null;
 
             if (opts.Timeout > 0)
@@ -127,6 +121,21 @@ namespace Xarial.CadPlus.XBatch.Base.Core
             {
                 await Task.Run(() =>
                 {
+                    m_UserLogger.WriteLine($"Collecting files for processing");
+
+                    var app = EnsureApplication(context, cancellationToken);
+
+                    var allFiles = PrepareJobScope(app, opts.Input, opts.Filters, opts.Macros);
+
+                    m_UserLogger.WriteLine($"Running batch processing for {allFiles.Length} file(s)");
+
+                    m_ProgressHandler.SetJobScope(allFiles, batchStartTime);
+
+                    if (!allFiles.Any())
+                    {
+                        throw new UserException("Empty job. No files matching specified filter");
+                    }
+
                     var curBatchSize = 0;
 
                     for (int i = 0; i < allFiles.Length; i++)
@@ -220,9 +229,11 @@ namespace Xarial.CadPlus.XBatch.Base.Core
             }
         }
 
-        private IEnumerable<JobItemFile> PrepareJobScope(IEnumerable<string> inputs,  
-            string[] filters, IEnumerable<MacroData> macros) 
+        private JobItemFile[] PrepareJobScope(IXApplication app,
+            IEnumerable<string> inputs,  string[] filters, IEnumerable<MacroData> macros) 
         {
+            var inputFiles = new List<string>();
+
             foreach (var input in inputs)
             {
                 if (Directory.Exists(input))
@@ -233,7 +244,7 @@ namespace Xarial.CadPlus.XBatch.Base.Core
                         {
                             if (m_AppProvider.CanProcessFile(file))
                             {
-                                yield return new JobItemFile(file, macros.Select(m => new JobItemMacro(m)).ToArray());
+                                inputFiles.Add(file);
                             }
                             else 
                             {
@@ -244,13 +255,19 @@ namespace Xarial.CadPlus.XBatch.Base.Core
                 }
                 else if (File.Exists(input))
                 {
-                    yield return new JobItemFile(input, macros.Select(m => new JobItemMacro(m)).ToArray());
+                    inputFiles.Add(input);
                 }
                 else
                 {
                     throw new Exception("Specify input file or directory");
                 }
             }
+            
+            m_BatchAppProxy.ProcessInput(app, inputFiles);
+
+            return inputFiles
+                .Select(f => new JobItemFile(f, macros.Select(m => new JobItemMacro(m)).ToArray()))
+                .ToArray();
         }
 
         private void TryCloseDocument(IXDocument doc)
@@ -360,27 +377,17 @@ namespace Xarial.CadPlus.XBatch.Base.Core
             }
         }
 
-        private void RunMacro(BatchJobContext context, CancellationToken cancellationToken) 
+        private void RunMacro(BatchJobContext context, CancellationToken cancellationToken)
         {
-            if (context.CurrentApplication == null || !context.CurrentApplication.IsAlive) 
-            {
-                TryShutDownApplication(context.CurrentApplicationProcess);
+            EnsureApplication(context, cancellationToken);
 
-                var vers = m_AppProvider.ParseVersion(context.Job.VersionId);
-                
-                context.CurrentApplication = StartApplication(vers, context.Job.StartupOptions, 
-                    cancellationToken);
-
-                context.CurrentApplicationProcess = context.CurrentApplication.Process;
-            }
-
-            if (context.CurrentDocument == null || !context.CurrentDocument.IsAlive) 
+            if (context.CurrentDocument == null || !context.CurrentDocument.IsAlive)
             {
                 TryCloseDocument(context.CurrentDocument);
 
                 context.CurrentDocument = OpenDocument(context.CurrentApplication,
                     context.CurrentFile.FilePath, context.Job.OpenFileOptions, cancellationToken, out bool forbidSaving);
-                
+
                 context.ForbidSaving = forbidSaving;
             }
 
@@ -408,7 +415,7 @@ namespace Xarial.CadPlus.XBatch.Base.Core
                     throw new UserException($"Failed to run macro '{context.CurrentMacro.DisplayName}': {ex.Message}", ex);
                 }
             }
-            
+
             if (context.Job.Actions.HasFlag(Actions_e.AutoSaveDocuments))
             {
                 if (!context.ForbidSaving.Value)
@@ -421,6 +428,23 @@ namespace Xarial.CadPlus.XBatch.Base.Core
                     throw new SaveForbiddenException();
                 }
             }
+        }
+
+        private IXApplication EnsureApplication(BatchJobContext context, CancellationToken cancellationToken)
+        {
+            if (context.CurrentApplication == null || !context.CurrentApplication.IsAlive)
+            {
+                TryShutDownApplication(context.CurrentApplicationProcess);
+
+                var vers = m_AppProvider.ParseVersion(context.Job.VersionId);
+
+                context.CurrentApplication = StartApplication(vers, context.Job.StartupOptions,
+                    cancellationToken);
+
+                context.CurrentApplicationProcess = context.CurrentApplication.Process;
+            }
+
+            return context.CurrentApplication;
         }
 
         private IXApplication StartApplication(IXVersion versionInfo,

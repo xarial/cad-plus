@@ -150,7 +150,7 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
         private void OnSaveDocument(BatchDocumentVM sender, BatchJob job, string filePath)
                     => m_Model.SaveJobToFile(job, filePath);
 
-        internal void NewDocument(string appId) 
+        internal void NewDocument(string appId)
         {
             if (Document == null)
             {

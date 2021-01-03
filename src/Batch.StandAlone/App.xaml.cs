@@ -26,27 +26,49 @@ using Xarial.CadPlus.XBatch.Base.Core;
 using Xarial.CadPlus.XBatch.Base.Models;
 using Xarial.CadPlus.XBatch.Base.Services;
 using Xarial.CadPlus.XBatch.Base.ViewModels;
+using Xarial.XCad;
 using Xarial.XCad.Base;
 
 namespace Xarial.CadPlus.XBatch.Base
 {
-    public class BatchApplication : IBatchApplication
+    internal class BatchApplication : IBatchApplication
     {
+        public event ProcessInputDelegate ProcessInput;
+
         public Guid Id => Guid.Parse(ApplicationIds.BatchStandAlone);
 
         public IApplicationProvider[] ApplicationProviders => m_ApplicationProviders.ToArray();
 
         private readonly List<IApplicationProvider> m_ApplicationProviders;
 
-        internal BatchApplication() 
+        internal IBatchApplicationProxy Proxy { get; }
+
+        internal BatchApplication(IBatchApplicationProxy proxy) 
         {
+            Proxy = proxy;
+            Proxy.RequestProcessInput += OnRequestProcessInput;
             m_ApplicationProviders = new List<IApplicationProvider>();
         }
 
+        private void OnRequestProcessInput(IXApplication app, List<string> input) 
+            => ProcessInput?.Invoke(app, input);
+
         public void RegisterApplicationProvider(IApplicationProvider provider)
-        {
-            m_ApplicationProviders.Add(provider);
-        }
+            => m_ApplicationProviders.Add(provider);
+    }
+
+    public interface IBatchApplicationProxy 
+    {
+        event Action<IXApplication, List<string>> RequestProcessInput;
+        void ProcessInput(IXApplication app, List<string> input);
+    }
+
+    internal class BatchApplicationProxy : IBatchApplicationProxy
+    {
+        public event Action<IXApplication, List<string>> RequestProcessInput;
+
+        public void ProcessInput(IXApplication app, List<string> input) 
+            => RequestProcessInput?.Invoke(app, input);
     }
 
     public class XBatchApp : MixedApplication<IArguments>
@@ -55,15 +77,17 @@ namespace Xarial.CadPlus.XBatch.Base
 
         private FileOptions m_StartupOptions;
 
-        private readonly BatchApplication m_BatchApp;
+        private readonly IBatchApplication m_BatchApp;
+        private readonly IBatchApplicationProxy m_BatchAppProxy;
 
-        public XBatchApp() : this(new BatchApplication())
+        public XBatchApp() : this(new BatchApplication(new BatchApplicationProxy()))
         {
         }
 
-        public XBatchApp(BatchApplication batchApp) : base(batchApp)
+        private XBatchApp(BatchApplication batchApp) : base(batchApp)
         {
             m_BatchApp = batchApp;
+            m_BatchAppProxy = batchApp.Proxy;
         }
 
         protected override void OnAppStart()
@@ -110,9 +134,8 @@ namespace Xarial.CadPlus.XBatch.Base
             builder.RegisterType<PopupKiller>().As<IPopupKiller>();
             builder.RegisterType<BatchDocumentVM>();
 
-            builder.RegisterInstance(m_BatchApp)
-                .AsSelf()
-                .As<IBatchApplication>();
+            builder.RegisterInstance(m_BatchApp);
+            builder.RegisterInstance(m_BatchAppProxy);
 
             builder.RegisterAdapter<IBatchApplication, IApplicationProvider[]>(x => x.ApplicationProviders);
             
