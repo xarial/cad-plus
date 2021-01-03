@@ -27,7 +27,7 @@ namespace Xarial.CadPlus.Plus.Hosts
         public event Action<IContainerBuilder> ConfigureServices;
         public event Action Started;
 
-        private readonly Application m_WpfApp;
+        public Application WpfApplication { get; }
 
         public IServiceProvider Services { get; }
 
@@ -44,12 +44,12 @@ namespace Xarial.CadPlus.Plus.Hosts
         {
             m_Initiator = initiator;
             m_Initiator.Init(this);
-
-            Application = app;
-            m_WpfApp = wpfApp;
             
-            m_WpfApp.Activated += OnAppActivated;
-            m_WpfApp.Exit += OnAppExit;
+            Application = app;
+            WpfApplication = wpfApp;
+            
+            WpfApplication.Activated += OnAppActivated;
+            WpfApplication.Exit += OnAppExit;
 
             m_IsLoaded = false;
 
@@ -60,8 +60,8 @@ namespace Xarial.CadPlus.Plus.Hosts
             Initialized?.Invoke();
         }
         
-        public IntPtr ParentWindow => m_WpfApp.MainWindow != null
-            ? new WindowInteropHelper(m_WpfApp.MainWindow).Handle
+        public IntPtr ParentWindow => WpfApplication.MainWindow != null
+            ? new WindowInteropHelper(WpfApplication.MainWindow).Handle
             : IntPtr.Zero;
 
         public IApplication Application { get; }
@@ -71,7 +71,7 @@ namespace Xarial.CadPlus.Plus.Hosts
             if (!m_IsLoaded)
             {
                 m_IsLoaded = true;
-                m_WpfApp.Activated -= OnAppActivated;
+                WpfApplication.Activated -= OnAppActivated;
                 Connect?.Invoke();
                 Started?.Invoke();
             }
