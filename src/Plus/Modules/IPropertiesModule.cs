@@ -22,6 +22,6 @@ namespace Xarial.CadPlus.Plus.Modules
     {
         event PreLoadDocumentsDelegate PreLoadDocuments;
         event DisposeDocumentsCacheDelegate DisposeDocumentsCache;
-        event ApplyDocumentChangesDelegate ApplyDocumentsChanges;
+        event ApplyDocumentChangesDelegate ApplyDocumentChanges;
     }
 }

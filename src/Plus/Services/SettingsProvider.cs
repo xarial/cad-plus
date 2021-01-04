@@ -41,7 +41,7 @@ namespace Xarial.CadPlus.Plus.Services
         public T ReadSettings<T>() where T : new()
         {
             var settsFilePath = GetSettingsFilePath<T>(out string[] altSettsFilePaths);
-
+            
             if (File.Exists(settsFilePath))
             {
                 try
@@ -53,16 +53,19 @@ namespace Xarial.CadPlus.Plus.Services
                     throw new UserException($"Failed to read settings file at {settsFilePath}. Remove file to clear settings", ex);
                 }
             }
-            else if (altSettsFilePaths?.Any() == true)
+            else if (altSettsFilePaths?.Any(f => File.Exists(f)) == true)
             {
                 foreach (var altFilePath in altSettsFilePaths)
                 {
-                    try
+                    if (File.Exists(altFilePath))
                     {
-                        return m_UserSettsSrv.ReadSettings<T>(altFilePath);
-                    }
-                    catch
-                    {
+                        try
+                        {
+                            return m_UserSettsSrv.ReadSettings<T>(altFilePath);
+                        }
+                        catch
+                        {
+                        }
                     }
                 }
 
