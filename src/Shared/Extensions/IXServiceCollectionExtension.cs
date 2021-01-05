@@ -13,7 +13,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Xarial.XCad;
 
-namespace Xarial.CadPlus.Plus.Shared
+namespace Xarial.CadPlus.Plus.Shared.Extensions
 {
     public static class IXServiceCollectionExtension
     {
