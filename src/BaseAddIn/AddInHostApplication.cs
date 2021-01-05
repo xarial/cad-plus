@@ -103,9 +103,10 @@ namespace Xarial.CadPlus.AddIn.Base
                 
                 Initialized?.Invoke();
             }
-            catch 
+            catch (Exception ex)
             {
-                new GenericMessageService("CAD+").ShowError("Failed to init add-in");
+                new GenericMessageService("CAD+").ShowError(ex, "Failed to init add-in");
+                new AppLogger().Log(ex);
                 throw;
             }
         }
