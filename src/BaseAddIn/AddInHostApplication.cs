@@ -30,6 +30,9 @@ using Autofac.Core.Registration;
 using Xarial.CadPlus.Plus.Services;
 using Xarial.CadPlus.Plus.Applications;
 using Xarial.CadPlus.Init;
+using Xarial.CadPlus.Plus.Shared;
+using Xarial.CadPlus.Plus.Shared.Services;
+using Xarial.CadPlus.Plus.Shared.Extensions;
 
 namespace Xarial.CadPlus.AddIn.Base
 {
@@ -155,6 +158,8 @@ namespace Xarial.CadPlus.AddIn.Base
             builder.RegisterType<AppLogger>().As<IXLogger>();
             builder.RegisterType<CadAppMessageService>()
                 .As<IMessageService>();
+            builder.RegisterType<DefaultDocumentAdapter>()
+                .As<IDocumentAdapter>();
             builder.RegisterType<SettingsProvider>()
                 .As<ISettingsProvider>();
         }

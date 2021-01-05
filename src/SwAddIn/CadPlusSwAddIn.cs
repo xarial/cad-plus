@@ -26,6 +26,7 @@ using Autofac;
 using Xarial.CadPlus.Common;
 using Xarial.CadPlus.Init;
 using Xarial.CadPlus.Plus.Applications;
+using Xarial.CadPlus.Plus.Shared;
 
 namespace Xarial.CadPlus.AddIn.Sw
 {

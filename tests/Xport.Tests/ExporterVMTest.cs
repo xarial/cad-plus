@@ -13,6 +13,7 @@ using Xarial.CadPlus.Xport.ViewModels;
 using System.Linq;
 using System;
 using Xarial.CadPlus.Common.Services;
+using Xarial.CadPlus.Plus.Services;
 
 namespace Xport.Tests
 {

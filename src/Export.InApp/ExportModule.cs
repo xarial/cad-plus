@@ -16,6 +16,8 @@ using Xarial.CadPlus.Common;
 using Xarial.CadPlus.Export.InApp.Properties;
 using Xarial.CadPlus.Common.Attributes;
 using Xarial.CadPlus.Plus.Attributes;
+using Xarial.CadPlus.Plus.Services;
+using Xarial.CadPlus.Plus.Extensions;
 
 namespace Xarial.CadPlus.Export.InApp
 {

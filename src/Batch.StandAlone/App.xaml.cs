@@ -18,9 +18,12 @@ using System.Windows;
 using Xarial.CadPlus.Batch.Base.Models;
 using Xarial.CadPlus.Common;
 using Xarial.CadPlus.Common.Services;
+using Xarial.CadPlus.Init;
 using Xarial.CadPlus.Plus;
 using Xarial.CadPlus.Plus.Applications;
 using Xarial.CadPlus.Plus.Services;
+using Xarial.CadPlus.Plus.Shared;
+using Xarial.CadPlus.Plus.Shared.Services;
 using Xarial.CadPlus.XBatch.Base;
 using Xarial.CadPlus.XBatch.Base.Core;
 using Xarial.CadPlus.XBatch.Base.Models;
@@ -84,7 +87,7 @@ namespace Xarial.CadPlus.XBatch.Base
         {
         }
 
-        private XBatchApp(BatchApplication batchApp) : base(batchApp)
+        private XBatchApp(BatchApplication batchApp) : base(batchApp, new Initiator())
         {
             m_BatchApp = batchApp;
             m_BatchAppProxy = batchApp.Proxy;

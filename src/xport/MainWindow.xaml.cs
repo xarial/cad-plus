@@ -9,6 +9,7 @@ using MahApps.Metro.Controls;
 using System.Windows;
 using System.Windows.Interop;
 using Xarial.CadPlus.Common.Services;
+using Xarial.CadPlus.Plus.Shared.Services;
 using Xarial.CadPlus.Xport.Models;
 using Xarial.CadPlus.Xport.ViewModels;
 

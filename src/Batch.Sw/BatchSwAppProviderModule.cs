@@ -8,6 +8,7 @@ using Xarial.CadPlus.Plus;
 using Xarial.CadPlus.Plus.Applications;
 using Xarial.CadPlus.Plus.Attributes;
 using Xarial.XCad.Base;
+using Xarial.CadPlus.Plus.Extensions;
 
 namespace Xarial.CadPlus.Batch.Sw
 {
@@ -34,7 +35,7 @@ namespace Xarial.CadPlus.Batch.Sw
         
         private void OnConnect()
         {
-            var logger = (IXLogger)m_Host.Services.GetService(typeof(IXLogger));
+            var logger = m_Host.Services.GetService<IXLogger>();
             m_App.RegisterApplicationProvider(new SwApplicationProvider(logger));
         }
 

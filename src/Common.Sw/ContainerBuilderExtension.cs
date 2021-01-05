@@ -8,6 +8,7 @@ using Xarial.CadPlus.Common.Services;
 using Xarial.CadPlus.Common.Sw.Services;
 using Xarial.CadPlus.Plus;
 using Xarial.CadPlus.Plus.Services;
+using Xarial.CadPlus.Plus.Shared;
 using Xarial.XCad;
 using Xarial.XCad.SolidWorks;
 

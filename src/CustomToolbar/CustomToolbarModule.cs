@@ -28,6 +28,8 @@ using System.Collections.Generic;
 using Xarial.CadPlus.Common.Attributes;
 using Xarial.CadPlus.Plus.Attributes;
 using Xarial.CadPlus.Plus.Services;
+using Xarial.CadPlus.Plus.Shared;
+using Xarial.CadPlus.Plus.Shared.Extensions;
 
 namespace Xarial.CadPlus.CustomToolbar
 {
@@ -54,6 +56,7 @@ namespace Xarial.CadPlus.CustomToolbar
         private ICommandsManager m_CmdsMgr;
         private ITriggersManager m_TriggersMgr;
         private IMessageService m_Msg;
+        private IXLogger m_Logger;
 
         private List<IIconsProvider> m_IconsProviders;
 
@@ -80,6 +83,10 @@ namespace Xarial.CadPlus.CustomToolbar
         private void OnConnect()
         {
             CreateContainer();
+            
+            m_Msg = Resolve<IMessageService>();
+            m_Logger = Resolve<IXLogger>();
+
             LoadCommands();
         }
 
@@ -130,33 +137,40 @@ namespace Xarial.CadPlus.CustomToolbar
             
             m_CmdsMgr = Resolve<ICommandsManager>();
             m_TriggersMgr = Resolve<ITriggersManager>();
-            m_Msg = Resolve<IMessageService>();
         }
 
         private void OnCommandClick(Commands_e spec)
         {
-            switch (spec)
+            try
             {
-                case Commands_e.Configuration:
+                switch (spec)
+                {
+                    case Commands_e.Configuration:
 
-                    var vm = Resolve<CommandManagerVM>();
+                        var vm = Resolve<CommandManagerVM>();
 
-                    var popup = m_Host.Extension.CreatePopupWindow<CommandManagerForm>();
-                    popup.Control.DataContext = vm;
-                    popup.Control.WindowStartupLocation = System.Windows.WindowStartupLocation.CenterOwner;
+                        var popup = m_Host.Extension.CreatePopupWindow<CommandManagerForm>();
+                        popup.Control.DataContext = vm;
+                        popup.Control.WindowStartupLocation = System.Windows.WindowStartupLocation.CenterOwner;
 
-                    if (popup.ShowDialog() == true)
-                    {
-                        try
+                        if (popup.ShowDialog() == true)
                         {
-                            m_CmdsMgr.UpdateToolbarConfiguration(vm.Settings, vm.ToolbarInfo, vm.IsEditable);
+                            try
+                            {
+                                m_CmdsMgr.UpdateToolbarConfiguration(vm.Settings, vm.ToolbarInfo, vm.IsEditable);
+                            }
+                            catch (Exception ex)
+                            {
+                                m_Msg.ShowError(ex, "Failed to save toolbar specification");
+                            }
                         }
-                        catch (Exception ex)
-                        {
-                            m_Msg.ShowError(ex, "Failed to save toolbar specification");
-                        }
-                    }
-                    break;
+                        break;
+                }
+            }
+            catch (Exception ex)
+            {
+                m_Msg.ShowError(ex, "Unknown error");
+                m_Logger.Log(ex);
             }
         }
 
