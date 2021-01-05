@@ -28,5 +28,11 @@ namespace Xarial.CadPlus.Plus.Shared
             => Builder.RegisterType<TImplementer>().As<TService>();
 
         public IServiceProvider Build() => new ServiceProvider(Builder.Build());
+
+        public void RegisterInstance<TInstance>(TInstance inst)
+            where TInstance : class
+        { 
+            Builder.RegisterInstance(inst);
+        }
     }
 }
