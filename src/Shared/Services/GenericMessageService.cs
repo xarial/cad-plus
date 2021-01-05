@@ -6,6 +6,7 @@
 //*********************************************************************
 
 using System.Windows;
+using Xarial.CadPlus.Plus.Services;
 
 namespace Xarial.CadPlus.Plus.Shared.Services
 {
