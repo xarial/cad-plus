@@ -9,7 +9,7 @@ namespace Xarial.CadPlus.Plus.Applications
 {
     public interface IBomApplication : IApplication
     {
-        void OpenBom(string filePath);
+        void ViewBom(string filePath);
         IDocumentProvider[] DocumentProviders { get; }
         void RegisterDocumentProvider(IDocumentProvider provider);
     }
