@@ -8,8 +8,6 @@ trigger:
     - src/Shared/*
 
 stages:
-
-stages:
 - template: templates/common-pipeline.yml
   parameters:
     projectPath: src/Shared/Shared.csproj
