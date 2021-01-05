@@ -16,7 +16,11 @@ namespace Xarial.CadPlus.Plus
     public interface IContainerBuilder
     {
         IServiceProvider Build();
+        
         void Register<TImplementer, TService>()
             where TImplementer : TService;
+
+        void RegisterInstance<TInstance>(TInstance inst)
+            where TInstance : class;
     }
 }
