@@ -30,8 +30,7 @@ namespace Xarial.CadPlus.Plus.Shared
         public IServiceProvider Build() => new ServiceProvider(Builder.Build());
 
         public void RegisterInstance<TInstance, TService>(TInstance inst)
-            where TInstance : class
-            where TService : TInstance
+            where TInstance : class, TService
         { 
             Builder.RegisterInstance(inst)
                 .AsSelf()
