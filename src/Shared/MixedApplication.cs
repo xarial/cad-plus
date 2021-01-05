@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
 using Xarial.CadPlus.Plus.Hosts;
+using Xarial.CadPlus.Plus.Services;
 using Xarial.CadPlus.Plus.Shared.Services;
 
 namespace Xarial.CadPlus.Plus.Shared

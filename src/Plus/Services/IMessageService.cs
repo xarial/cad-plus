@@ -1,19 +1,11 @@
-﻿//*********************************************************************
-//CAD+ Toolset
-//Copyright(C) 2020 Xarial Pty Limited
-//Product URL: https://cadplus.xarial.com
-//License: https://cadplus.xarial.com/license/
-//*********************************************************************
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows;
 using Xarial.XToolkit.Reporting;
 
-namespace Xarial.CadPlus.Plus.Shared.Services
+namespace Xarial.CadPlus.Plus.Services
 {
     public interface IMessageService
     {
@@ -22,7 +14,7 @@ namespace Xarial.CadPlus.Plus.Shared.Services
         bool? ShowQuestion(string question);
     }
 
-    public static class IMessageServiceExtension 
+    public static class IMessageServiceExtension
     {
         public static void ShowError(this IMessageService msgSvc, Exception ex, string baseMsg)
         {
