@@ -20,7 +20,8 @@ namespace Xarial.CadPlus.Plus
         void Register<TImplementer, TService>()
             where TImplementer : TService;
 
-        void RegisterInstance<TInstance>(TInstance inst)
-            where TInstance : class;
+        void RegisterInstance<TInstance, TService>(TInstance inst)
+            where TInstance : class
+            where TService : TInstance;
     }
 }
