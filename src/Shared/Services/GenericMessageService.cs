@@ -32,6 +32,10 @@ namespace Xarial.CadPlus.Plus.Shared.Services
 
         private readonly string m_Title;
 
+        public GenericMessageService() : this("CAD+ Toolset")
+        {
+        }
+
         public GenericMessageService(string title) 
         {
             m_Title = title;

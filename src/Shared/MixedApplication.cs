@@ -13,6 +13,7 @@ using System.Windows.Threading;
 using Xarial.CadPlus.Plus.Hosts;
 using Xarial.CadPlus.Plus.Services;
 using Xarial.CadPlus.Plus.Shared.Services;
+using Xarial.XCad.Base;
 
 namespace Xarial.CadPlus.Plus.Shared
 {
@@ -80,8 +81,14 @@ namespace Xarial.CadPlus.Plus.Shared
         protected readonly IApplication m_App;
         private readonly IInitiator m_Initiator;
 
+        private readonly IXLogger m_Logger;
+        private readonly IMessageService m_MsgService;
+
         protected MixedApplication(IApplication app, IInitiator initiator)
         {
+            m_Logger = new AppLogger();
+            m_MsgService = new GenericMessageService();
+
             m_App = app;
             m_Initiator = initiator;
         }
@@ -221,12 +228,19 @@ namespace Xarial.CadPlus.Plus.Shared
 
         private void OnDomainUnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
-            //TODO: log
+            var ex = e.ExceptionObject as Exception ?? new Exception("");
+
+            m_Logger.Log("Unhandled domain exception");
+            m_Logger.Log(ex);
+            m_MsgService.ShowError(ex, "Unknown error");
         }
 
         private void OnDispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
         {
-            //TODO: log
+            m_Logger.Log("Unhandled dispatcher exception");
+            m_Logger.Log(e.Exception);
+            m_MsgService.ShowError(e.Exception, "Unknown error");
+
             e.Handled = true;
         }
 
