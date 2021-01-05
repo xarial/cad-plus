@@ -1,12 +1,12 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net461</TargetFramework>
-    <RootNamespace>Xarial.CadPlus.Plus</RootNamespace>
-    <AssemblyName>Xarial.CadPlusPlus</AssemblyName>
+    <RootNamespace>Xarial.CadPlus.Plus.Shared</RootNamespace>
+    <AssemblyName>Xarial.CadPlusPlus.Shared</AssemblyName>
     <SignAssembly>false</SignAssembly>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-    <PackageId>Xarial.CadPlusPlus</PackageId>
-    <VersionPrefix>0.2.0</VersionPrefix>
+    <PackageId>Xarial.CadPlusPlus.Shared</PackageId>
+    <VersionPrefix>0.1.0</VersionPrefix>
     <Authors>Xarial</Authors>
     <Product>CAD+</Product>
     <Copyright>© 2021 Xarial Pty Limited</Copyright>
@@ -15,7 +15,7 @@
     <Company>Xarial Pty Limited</Company>
     <RepositoryUrl>https://github.com/xarial/cad-plus</RepositoryUrl>
     <PackageTags>cad,solidworks,tools</PackageTags>
-    <Description>CAD+ Toolset API</Description>
+    <Description>CAD+ Toolset API Shared</Description>
     <RepositoryType>git</RepositoryType>
     <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
     <!--<PackageIcon>icon.png</PackageIcon>
@@ -28,26 +28,16 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Xarial.XCad" Version="0.6.11-20201230.2" />
-    <PackageReference Include="Xarial.XToolkit" Version="0.2.5" />
+    <PackageReference Include="Autofac" Version="6.0.0" />
+    <PackageReference Include="CommandLineParser" Version="2.8.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Plus\Plus.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="WindowsBase" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Update="Properties\Settings.Designer.cs">
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Settings.settings</DependentUpon>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <None Update="Properties\Settings.settings">
-      <Generator>SettingsSingleFileGenerator</Generator>
-      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
-    </None>
   </ItemGroup>
 </Project>
