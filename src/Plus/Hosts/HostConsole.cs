@@ -59,6 +59,11 @@ namespace Xarial.CadPlus.Plus.Hosts
         public void Dispose()
         {
             Disconnect?.Invoke();
+
+            if (Services is IDisposable)
+            {
+                (Services as IDisposable).Dispose();
+            }
         }
     }
 }
