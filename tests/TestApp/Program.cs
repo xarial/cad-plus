@@ -1,4 +1,5 @@
 ﻿using Autofac;
+using CommandLine;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -89,7 +90,7 @@ namespace TestApp
             }
         }
 
-        private static bool OnParseArguments(string[] input, ref MyAppArgs args, ref bool createConsole)
+        private static bool OnParseArguments(string[] input, Parser parser, ref MyAppArgs args, ref bool createConsole)
         {
             args = new MyAppArgs()
             {

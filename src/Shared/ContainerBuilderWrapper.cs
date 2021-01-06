@@ -17,6 +17,8 @@ namespace Xarial.CadPlus.Plus.Shared
 {
     public class ContainerBuilderWrapper : IContainerBuilder
     {
+        internal event Action<IContainer> ContainerBuild;
+
         public ContainerBuilder Builder { get; }
 
         public ContainerBuilderWrapper(ContainerBuilder builder) 
@@ -27,7 +29,12 @@ namespace Xarial.CadPlus.Plus.Shared
         public void Register<TImplementer, TService>() where TImplementer : TService
             => Builder.RegisterType<TImplementer>().As<TService>();
 
-        public IServiceProvider Build() => new ServiceProvider(Builder.Build());
+        public IServiceProvider Build()
+        {
+            var cont = Builder.Build();
+            ContainerBuild?.Invoke(cont);
+            return new ServiceProvider(cont);
+        }
 
         public void RegisterInstance<TInstance, TService>(TInstance inst)
             where TInstance : class, TService

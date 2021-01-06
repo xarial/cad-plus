@@ -70,7 +70,7 @@ namespace Xarial.CadPlus.Plus.Shared
         }
     }
 
-    public delegate bool ParseArgumentsDelegate<TCliArgs>(string[] input,
+    public delegate bool ParseArgumentsDelegate<TCliArgs>(string[] input, Parser parser,
             ref TCliArgs args, ref bool createConsole);
 
     public delegate void WindowCreatedDelegate<TWindow, TCliArgs>(TWindow window, TCliArgs args)
@@ -106,6 +106,8 @@ namespace Xarial.CadPlus.Plus.Shared
 
         private IHost m_Host;
         private Application m_WpfApp;
+
+        public IContainer Container { get; private set; }
 
         public ApplicationLauncher(IApplication app, IInitiator initiator)
         {
@@ -238,7 +240,7 @@ namespace Xarial.CadPlus.Plus.Shared
             {
                 try
                 {
-                    hasError = !ParseArguments.Invoke(input, ref args, ref createConsole);
+                    hasError = !ParseArguments.Invoke(input, parser, ref args, ref createConsole);
                 }
                 catch (Exception ex)
                 {
@@ -259,7 +261,15 @@ namespace Xarial.CadPlus.Plus.Shared
 
             ConfigureServices?.Invoke(builder, args);
 
-            return new ContainerBuilderWrapper(builder);
+            var contWrapper = new ContainerBuilderWrapper(builder);
+            contWrapper.ContainerBuild += OnContainerBuild;
+
+            return contWrapper;
+        }
+
+        private void OnContainerBuild(IContainer cont)
+        {
+            Container = cont;
         }
 
         private void OnDomainUnhandledException(object sender, UnhandledExceptionEventArgs e)
