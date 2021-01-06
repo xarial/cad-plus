@@ -73,13 +73,13 @@ namespace Xarial.CadPlus.Plus.Shared
     public delegate bool ParseArgumentsDelegate<TCliArgs>(string[] input,
             ref TCliArgs args, ref bool createConsole);
 
-    public delegate void WindowCreatedDelegate<TWindow>(TWindow window)
+    public delegate void WindowCreatedDelegate<TWindow, TCliArgs>(TWindow window, TCliArgs args)
         where TWindow : Window, new();
 
     public delegate Task RunConsoleAsyncDelegate<TCliArgs>(TCliArgs args);
     public delegate void RunConsoleDelegate<TCliArgs>(TCliArgs args);
 
-    public delegate void ConfigureServicesDelegate(ContainerBuilder builder);
+    public delegate void ConfigureServicesDelegate<TCliArgs>(ContainerBuilder builder, TCliArgs args);
 
     /// <summary>
     /// This service allows to run application in mixed mode (either console or WPF)
@@ -91,10 +91,10 @@ namespace Xarial.CadPlus.Plus.Shared
         where TWindow : Window, new()
     {
         public event ParseArgumentsDelegate<TCliArgs> ParseArguments;
-        public event WindowCreatedDelegate<TWindow> WindowCreated;
+        public event WindowCreatedDelegate<TWindow, TCliArgs> WindowCreated;
         public event RunConsoleAsyncDelegate<TCliArgs> RunConsoleAsync;
         public event RunConsoleDelegate<TCliArgs> RunConsole;
-        public event ConfigureServicesDelegate ConfigureServices;
+        public event ConfigureServicesDelegate<TCliArgs> ConfigureServices;
 
         private readonly IApplication m_App;
         private readonly IInitiator m_Initiator;
@@ -145,10 +145,10 @@ namespace Xarial.CadPlus.Plus.Shared
                         p.IgnoreUnknownArguments = false;
                     });
 
-                    TryParseArguments(parser, args, out cliArgs, out createConsole, out hasError);
+                    TryParseArguments(parser, args, outputWriter, out cliArgs, out createConsole, out hasError);
                 }
 
-                var svc = CreateContainerBuilder();
+                var svc = CreateContainerBuilder(cliArgs);
 
                 if (createConsole)
                 {
@@ -202,7 +202,7 @@ namespace Xarial.CadPlus.Plus.Shared
                     m_Host = new HostWpf(m_App, m_WpfApp, svc, m_Initiator, m_Logger);
 
                     var wnd = new TWindow();
-                    WindowCreated?.Invoke(wnd);
+                    WindowCreated?.Invoke(wnd, cliArgs);
                     m_WpfApp.Run(wnd);
                 }
             }
@@ -213,6 +213,7 @@ namespace Xarial.CadPlus.Plus.Shared
         }
 
         private void TryParseArguments(Parser parser, string[] input,
+            TextWriter errorWriter,
             out TCliArgs args, out bool createConsole, out bool hasError)
         {
             args = default;
@@ -235,11 +236,20 @@ namespace Xarial.CadPlus.Plus.Shared
 
             if (ParseArguments != null)
             {
-                hasError = !ParseArguments.Invoke(input, ref args, ref createConsole);
+                try
+                {
+                    hasError = !ParseArguments.Invoke(input, ref args, ref createConsole);
+                }
+                catch (Exception ex)
+                {
+                    //TODO: parse user message error
+                    errorWriter.WriteLine(ex.Message);
+                    hasError = true;
+                }
             }
         }
         
-        private IContainerBuilder CreateContainerBuilder()
+        private IContainerBuilder CreateContainerBuilder(TCliArgs args)
         {
             var builder = new ContainerBuilder();
 
@@ -247,7 +257,7 @@ namespace Xarial.CadPlus.Plus.Shared
                 .As<IMessageService>()
                 .WithParameter(new TypedParameter(typeof(string), "CAD+"));
 
-            ConfigureServices?.Invoke(builder);
+            ConfigureServices?.Invoke(builder, args);
 
             return new ContainerBuilderWrapper(builder);
         }
