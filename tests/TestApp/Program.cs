@@ -13,6 +13,7 @@ namespace TestApp
 {
     public class MyAppArgs 
     {
+        public string[] Arguments { get; set; }
     }
 
     public class MyApp : IApplication
@@ -47,7 +48,7 @@ namespace TestApp
             => m_Logger.Log("4 - Host initiated");
 
         private void OnHostConnect()
-            => m_Logger.Log("6 - Host connect");
+            => m_Logger.Log("5 - Host connect");
 
         private void OnHostConfigureServices(IContainerBuilder obj)
             => m_Logger.Log("3 - Host configure services");
@@ -69,12 +70,17 @@ namespace TestApp
             appLauncher.Start(args);
         }
 
-        private static void OnWindowCreated(MyWindow window)
-            => m_Logger.Log("5 - Window created");
+        private static void OnWindowCreated(MyWindow window, MyAppArgs args)
+            => m_Logger.Log("6 - Window created");
 
         private static void OnRunConsole(MyAppArgs args)
         {
             m_Logger.Log("8 - Run Console");
+
+            if (args.Arguments.Any(a => string.Equals(a, "err", StringComparison.CurrentCultureIgnoreCase))) 
+            {
+                throw new Exception("Some error");
+            }
 
             for (int i = 0; i < 10; i++)
             {
@@ -85,11 +91,16 @@ namespace TestApp
 
         private static bool OnParseArguments(string[] input, ref MyAppArgs args, ref bool createConsole)
         {
+            args = new MyAppArgs()
+            {
+                Arguments = input
+            };
+
             m_Logger.Log("1 - Parse Arguments");
             return true;
         }
 
-        private static void OnConfigureServices(ContainerBuilder builder)
+        private static void OnConfigureServices(ContainerBuilder builder, MyAppArgs args)
             => m_Logger.Log("2 - Configure Services");
     }
 }

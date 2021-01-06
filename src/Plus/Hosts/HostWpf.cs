@@ -59,6 +59,7 @@ namespace Xarial.CadPlus.Plus.Hosts
             ConfigureServices?.Invoke(builder);
             Services = builder.Build();
             Initialized?.Invoke();
+            Connect?.Invoke();
 
             WpfApplication.Activated += OnAppActivated;
             WpfApplication.Exit += OnAppExit;
@@ -78,7 +79,6 @@ namespace Xarial.CadPlus.Plus.Hosts
 
                 m_IsLoaded = true;
                 WpfApplication.Activated -= OnAppActivated;
-                Connect?.Invoke();
                 Started?.Invoke();
             }
             else 
