@@ -9,7 +9,14 @@
         xmlns:views="clr-namespace:Xarial.CadPlus.Xport.Views"
         Title="eXport+" Height="450" Width="800" Icon="Resources/xport.png">
     <metro:MetroWindow.Resources>
-        <ResourceDictionary Source="pack://application:,,,/Fluent;Component/Themes/Generic.xaml" />
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Themes/Light.Blue.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/Fluent;Component/Themes/Generic.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
     </metro:MetroWindow.Resources>
     <metro:MetroWindow.RightWindowCommands>
         <metro:WindowCommands>

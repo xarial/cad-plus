@@ -20,14 +20,6 @@ namespace Xarial.CadPlus.Xport
         public MainWindow()
         {
             InitializeComponent();
-
-            var vm = new ExporterVM(
-                new ExporterModel(),
-                new GenericMessageService("eXport+"));
-
-            vm.ParentWindowHandle = new WindowInteropHelper(this).EnsureHandle();
-
-            this.DataContext = vm;
         }
     }
 }

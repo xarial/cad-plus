@@ -114,10 +114,10 @@
     <Reference Include="PresentationFramework" />
     <Reference Include="WindowsFormsIntegration" />
     <Reference Include="Xarial.CadPlusPlus, Version=0.2.0.0, Culture=neutral, PublicKeyToken=60dcaf351d4060db, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Xarial.CadPlusPlus.0.2.0-20210105.12\lib\net461\Xarial.CadPlusPlus.dll</HintPath>
+      <HintPath>..\..\packages\Xarial.CadPlusPlus.0.2.0-20210106.3\lib\net461\Xarial.CadPlusPlus.dll</HintPath>
     </Reference>
     <Reference Include="Xarial.CadPlusPlus.Shared, Version=0.1.0.0, Culture=neutral, PublicKeyToken=60dcaf351d4060db, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Xarial.CadPlusPlus.Shared.0.1.0-20210105.7\lib\net461\Xarial.CadPlusPlus.Shared.dll</HintPath>
+      <HintPath>..\..\packages\Xarial.CadPlusPlus.Shared.0.1.0-20210106.3\lib\net461\Xarial.CadPlusPlus.Shared.dll</HintPath>
     </Reference>
     <Reference Include="Xarial.XCad, Version=0.6.11.0, Culture=neutral, PublicKeyToken=60dcaf351d4060db, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Xarial.XCad.0.6.11-20210105.2\lib\net461\Xarial.XCad.dll</HintPath>
@@ -130,11 +130,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <ApplicationDefinition Include="App.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </ApplicationDefinition>
     <Compile Include="Models\ExporterModel.cs" />
+    <Compile Include="Program.cs" />
     <Compile Include="ViewModels\EDrawingAppVersion_e.cs" />
     <Compile Include="ViewModels\ExporterVM.cs" />
     <Compile Include="ViewModels\FormatExtensionAttribute.cs" />
@@ -146,10 +143,6 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Compile Include="App.xaml.cs">
-      <DependentUpon>App.xaml</DependentUpon>
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="Arguments.cs" />
     <Compile Include="Core\Exporter.cs" />
     <Compile Include="Core\ExportOptions.cs" />

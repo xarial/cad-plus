@@ -34,50 +34,9 @@ namespace Xarial.CadPlus.XBatch.Base
 {
     public partial class MainWindow
     {
-        private BatchManagerVM m_BatchManager;
-
-        private readonly XBatchApp m_App;
-
         public MainWindow()
         {
             InitializeComponent();
-
-            this.Closing += OnWindowClosing;
-            m_App = (XBatchApp)Application.Current;
-            m_App.Host.Started += OnHostStarted;
-        }
-
-        private void OnHostStarted()
-        {
-            try
-            {
-                m_BatchManager = m_App.Host.Services.GetService<BatchManagerVM>();
-
-                this.DataContext = m_BatchManager;
-
-                m_BatchManager.ParentWindowHandle = new WindowInteropHelper(this).EnsureHandle();
-            }
-            catch (Exception ex)
-            {
-                IMessageService msgSvc;
-
-                try
-                {
-                    msgSvc = m_App.Host.Services.GetService<IMessageService>();
-                }
-                catch
-                {
-                    msgSvc = new GenericMessageService("Batch+");
-                }
-
-                msgSvc.ShowError(ex.ParseUserError(out _));
-                Environment.Exit(1);
-            }
-        }
-
-        private void OnWindowClosing(object sender, System.ComponentModel.CancelEventArgs e)
-        {
-            e.Cancel = !m_BatchManager.CanClose();
         }
     }
 }
