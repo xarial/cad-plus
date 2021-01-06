@@ -14,6 +14,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Interop;
 using Xarial.CadPlus.Plus.Services;
+using Xarial.XCad.Base;
 
 namespace Xarial.CadPlus.Plus.Hosts
 {
@@ -39,8 +40,10 @@ namespace Xarial.CadPlus.Plus.Hosts
         private bool m_IsLoaded;
 
         private readonly IInitiator m_Initiator;
+        private readonly IXLogger m_Logger;
 
-        public HostWpf(IApplication app, Application wpfApp, IContainerBuilder builder, IInitiator initiator)
+        public HostWpf(IApplication app, Application wpfApp, 
+            IContainerBuilder builder, IInitiator initiator, IXLogger logger)
         {
             m_Initiator = initiator;
             m_Initiator.Init(this);
@@ -48,28 +51,31 @@ namespace Xarial.CadPlus.Plus.Hosts
             Application = app;
             WpfApplication = wpfApp;
             
-            WpfApplication.Activated += OnAppActivated;
-            WpfApplication.Exit += OnAppExit;
-
             m_IsLoaded = false;
+            m_Logger = logger;
 
             m_ModulesLoader = new ModulesLoader();
             m_ModulesLoader.Load(this);
             ConfigureServices?.Invoke(builder);
             Services = builder.Build();
             Initialized?.Invoke();
+
+            WpfApplication.Activated += OnAppActivated;
+            WpfApplication.Exit += OnAppExit;
         }
         
         public IntPtr ParentWindow => WpfApplication.MainWindow != null
             ? new WindowInteropHelper(WpfApplication.MainWindow).Handle
             : IntPtr.Zero;
 
-        public IApplication Application { get; }
+        public virtual IApplication Application { get; }
 
         private void OnAppActivated(object sender, EventArgs e)
         {
             if (!m_IsLoaded)
             {
+                m_Logger.Log("AppActivated event called");
+
                 m_IsLoaded = true;
                 WpfApplication.Activated -= OnAppActivated;
                 Connect?.Invoke();
@@ -83,11 +89,17 @@ namespace Xarial.CadPlus.Plus.Hosts
 
         private void OnAppExit(object sender, ExitEventArgs e)
         {
-            Disconnect?.Invoke();
+            Dispose();
         }
 
         public virtual void Dispose()
         {
+            Disconnect?.Invoke();
+
+            if (Services is IDisposable) 
+            {
+                (Services as IDisposable).Dispose();
+            }
         }
     }
 }

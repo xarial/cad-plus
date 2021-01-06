@@ -84,11 +84,18 @@ namespace Xarial.CadPlus.Plus.Services
 
             foreach (var path in paths)
             {
-                catalog.Catalogs.Add(new DirectoryCatalog(path, searchPattern));
-
-                foreach (var subDir in Directory.GetDirectories(path, "*.*", SearchOption.AllDirectories))
+                if (Directory.Exists(path))
                 {
-                    catalog.Catalogs.Add(new DirectoryCatalog(subDir, searchPattern));
+                    catalog.Catalogs.Add(new DirectoryCatalog(path, searchPattern));
+
+                    foreach (var subDir in Directory.GetDirectories(path, "*.*", SearchOption.AllDirectories))
+                    {
+                        catalog.Catalogs.Add(new DirectoryCatalog(subDir, searchPattern));
+                    }
+                }
+                else 
+                {
+                    throw new Exception($"Specified directory '{path}' with modules does not exist");
                 }
             }
 
