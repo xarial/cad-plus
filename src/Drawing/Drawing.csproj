@@ -32,6 +32,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="EPDM.Interop.epdm, Version=5.24.0.0, Culture=neutral, PublicKeyToken=0625a0c4bb5de148, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Xarial.XCad.SolidWorks.Pdm.Interops.0.1.0\lib\net40\EPDM.Interop.epdm.dll</HintPath>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Newtonsoft.Json.12.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
@@ -83,6 +87,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Data\Dock_e.cs" />
+    <Compile Include="Data\DrawingSettings.cs" />
     <Compile Include="Data\Source_e.cs" />
     <Compile Include="DrawingModule.cs" />
     <Compile Include="InsertQrCodeData.cs" />

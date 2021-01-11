@@ -1,17 +1,31 @@
-﻿using System;
+﻿using EPDM.Interop.epdm;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Xarial.CadPlus.Drawing.Data;
 using Xarial.CadPlus.Plus.Exceptions;
+using Xarial.XCad;
 using Xarial.XCad.Data;
 using Xarial.XCad.Documents;
+using Xarial.XCad.SolidWorks;
+using Xarial.XCad.SolidWorks.Documents;
 
 namespace Xarial.CadPlus.Drawing.Services
 {
     public class QrDataProvider
     {
+        private readonly DrawingSettings m_Setts;
+        private readonly IXApplication m_App;
+
+        public QrDataProvider(IXApplication app, DrawingSettings setts) 
+        {
+            m_Setts = setts;
+            m_App = app;
+        }
+
         public string GetData(IXDrawing drw, Source_e src, string arg, bool refDoc) 
         {
             IXDocument doc = drw;
@@ -20,10 +34,27 @@ namespace Xarial.CadPlus.Drawing.Services
 
             if (refDoc) 
             {
-                doc = drw.Dependencies.First();
-                //drw.Sheets.Active.DrawingViews.First().
-                //TODO: find the view refernced configuration
+                var view = drw.Sheets.Active.DrawingViews.FirstOrDefault();
+
+                if (view == null) 
+                {
+                    throw new UserException("No drawing views in this document");
+                }
+
+                var drwView = (view as ISwDrawingView).DrawingView;
+                
+                if (drwView.ReferencedDocument == null) 
+                {
+                    throw new UserException("View does not have a loded document");
+                }
+
+                doc = (m_App as ISwApplication).Documents[drwView.ReferencedDocument];
+
+                conf = ((IXDocument3D)doc).Configurations[drwView.ReferencedConfiguration];
             }
+
+            IEdmVault5 vault = null;
+            string vaultRelPath = "";
 
             switch (src) 
             {
@@ -57,13 +88,47 @@ namespace Xarial.CadPlus.Drawing.Services
                     }
 
                 case Source_e.PdmVaultLink:
-                    throw new NotImplementedException();
+                    const string CONISIO_URL_ACTION = "explore";
+                    FindRelativeVaultPath(doc.Path, out vault);
+                    var file = vault.GetFileFromPath(doc.Path, out IEdmFolder5 folder);
+                    return $"conisio://{vault.Name}/{CONISIO_URL_ACTION}?projectid={folder.ID}&documentid={file.ID}&objecttype={(int)file.ObjectType}";
 
                 case Source_e.PdmWeb2Url:
-                    throw new NotImplementedException();
+                    if (string.IsNullOrEmpty(m_Setts.PdmWeb2Server)) 
+                    {
+                        throw new UserException("Url of Web2 server is not specified");
+                    }
+
+                    vaultRelPath = FindRelativeVaultPath(doc.Path, out vault);
+                    return $"{m_Setts.PdmWeb2Server}/{vault.Name}/{Path.GetDirectoryName(vaultRelPath).Replace('\\', '/')}?view=bom&file={Path.GetFileName(vaultRelPath)}";
 
                 default:
                     throw new NotSupportedException();
+            }
+        }
+
+        private string FindRelativeVaultPath(string filePath, out IEdmVault5 vault) 
+        {
+            vault = new EdmVault5Class();
+            
+            var vaultName = vault.GetVaultNameFromPath(filePath);
+
+            if (string.IsNullOrEmpty(vaultName)) 
+            {
+                throw new UserException("This file is not a part of any vault");
+            }
+
+            vault.LoginAuto(vaultName, m_App.WindowHandle.ToInt32());
+
+            if (vault.IsLoggedIn)
+            {
+                var rootFolderPath = vault.RootFolderPath;
+
+                return filePath.Substring(rootFolderPath.Length + 1, filePath.Length - rootFolderPath.Length - 1);
+            }
+            else 
+            {
+                throw new UserException($"Failed to login to '{vaultName}' vault");
             }
         }
     }

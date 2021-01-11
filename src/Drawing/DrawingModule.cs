@@ -8,6 +8,7 @@ using Xarial.CadPlus.Plus;
 using Xarial.CadPlus.Plus.Applications;
 using Xarial.CadPlus.Plus.Attributes;
 using Xarial.CadPlus.Plus.Exceptions;
+using Xarial.CadPlus.Plus.Services;
 using Xarial.XCad.Base.Attributes;
 using Xarial.XCad.Documents;
 using Xarial.XCad.SolidWorks;
@@ -18,6 +19,8 @@ using Xarial.XCad.UI.PropertyPage;
 using Xarial.XCad.UI.PropertyPage.Enums;
 using Xarial.XCad.UI.PropertyPage.Structures;
 using Xarial.XToolkit.Reporting;
+using Xarial.CadPlus.Plus.Extensions;
+using Xarial.CadPlus.Drawing.Data;
 
 namespace Xarial.CadPlus.Drawing
 {
@@ -46,6 +49,7 @@ namespace Xarial.CadPlus.Drawing
         private QrCodePreviewer m_CurPreviewer;
         private IXDrawing m_CurDrawing;
         private string m_CurQrCodeData;
+        private ISettingsProvider m_SettsProvider;
 
         public void Init(IHost host)
         {
@@ -58,7 +62,12 @@ namespace Xarial.CadPlus.Drawing
             m_Host.RegisterCommands<Commands_e>(OnCommandClick);
             m_Page = m_Host.CreatePage<InsertQrCodeData>();
             m_CurPageData = new InsertQrCodeData();
-            m_QrDataProvider = new QrDataProvider();
+
+            m_SettsProvider = m_Host.Services.GetService<ISettingsProvider>();
+
+            m_QrDataProvider = new QrDataProvider(m_Host.Extension.Application,
+                m_SettsProvider.ReadSettings<DrawingSettings>());
+
             m_Page.DataChanged += OnPageDataChanged;
             m_Page.Closed += OnPageClosed;
             m_Page.Closing += OnPageClosing;
@@ -72,6 +81,11 @@ namespace Xarial.CadPlus.Drawing
                 {
                     m_CurQrCodeData = m_QrDataProvider.GetData(m_CurDrawing, m_CurPageData.Source.Source,
                         m_CurPageData.Source.CustomPropertyName, m_CurPageData.Source.ReferencedDocument);
+
+                    if (string.IsNullOrEmpty(m_CurQrCodeData)) 
+                    {
+                        throw new UserException("Data for QR code is empty");
+                    }
                 }
                 catch (Exception ex)
                 {
