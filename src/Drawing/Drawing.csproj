@@ -88,11 +88,46 @@
     <Compile Include="InsertQrCodeData.cs" />
     <Compile Include="OpenGL.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
     <Compile Include="Services\QrCodePreviewer.cs" />
     <Compile Include="Services\QrDataProvider.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <None Include="Resources\dock-vector.svg" />
+    <None Include="Resources\offsetx-vector.svg" />
+    <None Include="Resources\offsety-vector.svg" />
+    <None Include="Resources\qrcode-vector.svg" />
+    <None Include="Resources\size-vector.svg" />
+    <None Include="Resources\source-vector.svg" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\dock-icon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\offsetx-icon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\offsety-icon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\qrcode-icon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\size-icon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\source-icon.png" />
   </ItemGroup>
   <Import Project="$(SolutionDir)common\common.module.props" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

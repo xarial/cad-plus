@@ -59,7 +59,7 @@ namespace Xarial.CadPlus.Drawing.Services
                 case Source_e.PdmVaultLink:
                     throw new NotImplementedException();
 
-                case Source_e.Web2Link:
+                case Source_e.PdmWeb2Url:
                     throw new NotImplementedException();
 
                 default:

@@ -2,6 +2,7 @@
 using System;
 using System.Drawing;
 using System.IO;
+using Xarial.CadPlus.Drawing.Properties;
 using Xarial.CadPlus.Drawing.Services;
 using Xarial.CadPlus.Plus;
 using Xarial.CadPlus.Plus.Applications;
@@ -24,6 +25,8 @@ namespace Xarial.CadPlus.Drawing
     public enum Commands_e 
     {
         [CommandItemInfo(WorkspaceTypes_e.Drawing)]
+        [IconEx(typeof(Resources), nameof(Resources.qrcode_vector), nameof(Resources.qrcode_icon))]
+        [Title("Inser QR Code")]
         InsertQrCode
     }
 
@@ -67,8 +70,8 @@ namespace Xarial.CadPlus.Drawing
             {
                 try
                 {
-                    m_CurQrCodeData = m_QrDataProvider.GetData(m_CurDrawing, m_CurPageData.Source.Source, 
-                        "", m_CurPageData.Source.ReferencedDocument);
+                    m_CurQrCodeData = m_QrDataProvider.GetData(m_CurDrawing, m_CurPageData.Source.Source,
+                        m_CurPageData.Source.CustomPropertyName, m_CurPageData.Source.ReferencedDocument);
                 }
                 catch (Exception ex)
                 {

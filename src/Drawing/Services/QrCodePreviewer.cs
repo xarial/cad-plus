@@ -67,33 +67,44 @@ namespace Xarial.CadPlus.Drawing.Services
             double x = 0;
             double y = 0;
 
+            double offsetXDir = 1;
+            double offsetYDir = 1;
+
             switch (dock) 
             {
                 case Dock_e.BottomLeft:
                     x = size / 2;
                     y = size / 2;
+                    offsetXDir = 1;
+                    offsetYDir = 1;
                     break;
 
                 case Dock_e.TopLeft:
                     x = size / 2;
                     y = sheetHeight - size / 2;
+                    offsetXDir = 1;
+                    offsetYDir = -1;
                     break;
 
                 case Dock_e.TopRight:
                     x = sheetWidth - size / 2;
                     y = sheetHeight - size / 2;
+                    offsetXDir = -1;
+                    offsetYDir = -1;
                     break;
 
                 case Dock_e.BottomRight:
                     x = sheetWidth - size / 2;
                     y = size / 2;
+                    offsetXDir = -1;
+                    offsetYDir = 1;
                     break;
 
                 default:
                     throw new NotSupportedException();
             }
 
-            centerPt = new Point(x + offsetX * scale, y + offsetY * scale, 0);
+            centerPt = new Point(x + offsetX * offsetXDir * scale, y + offsetY * offsetYDir * scale, 0);
         }
 
         private void RenderQrCodeTemplate(Point centerPt, double size)
