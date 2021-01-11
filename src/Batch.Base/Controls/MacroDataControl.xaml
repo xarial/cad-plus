@@ -24,7 +24,7 @@
                 </MultiBinding>
             </TextBlock.Text>
         </TextBlock>
-        <Image Grid.Column="1" Width="20" VerticalAlignment="Center" Source="/XBatch.Base;component/Resources/arguments-icon.png"/>
+        <Image Grid.Column="1" Width="20" VerticalAlignment="Center" Source="/Batch.Base;component/Resources/arguments-icon.png"/>
         <TextBox Text="{Binding Path=Arguments, UpdateSourceTrigger=PropertyChanged}" Grid.Column="2" HorizontalAlignment="Stretch"/>
     </Grid>
 </UserControl>
