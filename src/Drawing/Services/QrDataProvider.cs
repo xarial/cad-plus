@@ -1,4 +1,11 @@
-﻿using EPDM.Interop.epdm;
+﻿//*********************************************************************
+//CAD+ Toolset
+//Copyright(C) 2020 Xarial Pty Limited
+//Product URL: https://cadplus.xarial.com
+//License: https://cadplus.xarial.com/license/
+//*********************************************************************
+
+using EPDM.Interop.epdm;
 using System;
 using System.Collections.Generic;
 using System.IO;

@@ -1,4 +1,11 @@
-﻿using QRCoder;
+﻿//*********************************************************************
+//CAD+ Toolset
+//Copyright(C) 2020 Xarial Pty Limited
+//Product URL: https://cadplus.xarial.com
+//License: https://cadplus.xarial.com/license/
+//*********************************************************************
+
+using QRCoder;
 using System;
 using System.Drawing;
 using System.IO;
