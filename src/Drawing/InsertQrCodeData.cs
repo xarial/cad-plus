@@ -31,11 +31,19 @@ namespace Xarial.CadPlus.Drawing
         }
     }
 
-    public class CustomPrpNameDependencyHandler : IDependencyHandler
+    public class CustomPropertyNameDependencyHandler : IDependencyHandler
     {
         public void UpdateState(IXApplication app, IControl source, IControl[] dependencies)
         {
             source.Visible = (Source_e)dependencies.First()?.GetValue() == Source_e.CustomProperty;
+        }
+    }
+
+    public class CustomValueDependencyHandler : IDependencyHandler
+    {
+        public void UpdateState(IXApplication app, IControl source, IControl[] dependencies)
+        {
+            source.Visible = (Source_e)dependencies.First()?.GetValue() == Source_e.Custom;
         }
     }
 
@@ -45,10 +53,15 @@ namespace Xarial.CadPlus.Drawing
         [ControlTag(nameof(Source))]
         public Source_e Source { get; set; }
 
-        [DependentOn(typeof(CustomPrpNameDependencyHandler), nameof(Source))]
+        [DependentOn(typeof(CustomPropertyNameDependencyHandler), nameof(Source))]
         [ControlOptions(align: ControlLeftAlign_e.Indent)]
         [Description("Custom property name")]
         public string CustomPropertyName { get; set; }
+
+        [DependentOn(typeof(CustomValueDependencyHandler), nameof(Source))]
+        [ControlOptions(align: ControlLeftAlign_e.Indent)]
+        [Description("Custom value")]
+        public string CustomValue { get; set; }
 
         [Title("Refereced Document")]
         [ControlOptions(align: ControlLeftAlign_e.Indent)]

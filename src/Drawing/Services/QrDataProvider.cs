@@ -26,13 +26,15 @@ namespace Xarial.CadPlus.Drawing.Services
             m_App = app;
         }
 
-        public string GetData(IXDrawing drw, Source_e src, string arg, bool refDoc) 
+        public string GetData(IXDrawing drw, SourceData srcData) 
         {
+            Source_e src = srcData.Source;
+
             IXDocument doc = drw;
 
             IXConfiguration conf = null;
 
-            if (refDoc) 
+            if (srcData.ReferencedDocument) 
             {
                 var view = drw.Sheets.Active.DrawingViews.FirstOrDefault();
 
@@ -73,10 +75,10 @@ namespace Xarial.CadPlus.Drawing.Services
 
                     if (conf != null)
                     {
-                        conf.Properties.TryGet(arg, out prp);
+                        conf.Properties.TryGet(srcData.CustomPropertyName, out prp);
                      }
 
-                    doc.Properties.TryGet(arg, out prp);
+                    doc.Properties.TryGet(srcData.CustomPropertyName, out prp);
 
                     if (prp != null)
                     {
@@ -101,6 +103,9 @@ namespace Xarial.CadPlus.Drawing.Services
 
                     vaultRelPath = FindRelativeVaultPath(doc.Path, out vault);
                     return $"{m_Setts.PdmWeb2Server}/{vault.Name}/{Path.GetDirectoryName(vaultRelPath).Replace('\\', '/')}?view=bom&file={Path.GetFileName(vaultRelPath)}";
+
+                case Source_e.Custom:
+                    return srcData.CustomValue;
 
                 default:
                     throw new NotSupportedException();

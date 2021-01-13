@@ -22,6 +22,8 @@ namespace Xarial.CadPlus.Drawing.Data
         PdmVaultLink,
 
         [Title("PDM Web2 Url")]
-        PdmWeb2Url
+        PdmWeb2Url,
+
+        Custom
     }
 }

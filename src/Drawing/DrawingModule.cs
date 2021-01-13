@@ -21,6 +21,7 @@ using Xarial.XCad.UI.PropertyPage.Structures;
 using Xarial.XToolkit.Reporting;
 using Xarial.CadPlus.Plus.Extensions;
 using Xarial.CadPlus.Drawing.Data;
+using System.ComponentModel;
 
 namespace Xarial.CadPlus.Drawing
 {
@@ -29,7 +30,8 @@ namespace Xarial.CadPlus.Drawing
     {
         [CommandItemInfo(WorkspaceTypes_e.Drawing)]
         [IconEx(typeof(Resources), nameof(Resources.qrcode_vector), nameof(Resources.qrcode_icon))]
-        [Title("Inser QR Code")]
+        [Title("Insert QR Code")]
+        [Description("Inserts QR code based on custom data source into the current drawing")]
         InsertQrCode
     }
 
@@ -79,8 +81,7 @@ namespace Xarial.CadPlus.Drawing
             {
                 try
                 {
-                    m_CurQrCodeData = m_QrDataProvider.GetData(m_CurDrawing, m_CurPageData.Source.Source,
-                        m_CurPageData.Source.CustomPropertyName, m_CurPageData.Source.ReferencedDocument);
+                    m_CurQrCodeData = m_QrDataProvider.GetData(m_CurDrawing, m_CurPageData.Source);
 
                     if (string.IsNullOrEmpty(m_CurQrCodeData)) 
                     {
