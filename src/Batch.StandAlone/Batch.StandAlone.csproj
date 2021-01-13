@@ -294,9 +294,6 @@
     <Resource Include="Resources\filter.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Resources\arguments-icon.png" />
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="Resources\invisible-mode.png" />
   </ItemGroup>
   <ItemGroup>

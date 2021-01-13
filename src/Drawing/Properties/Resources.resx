@@ -118,25 +118,40 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="arguments_icon" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\arguments-icon.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="dock_icon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\dock-icon.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="status_awaiting" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\status-awaiting.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="dock_vector" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\dock-vector.svg;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="status_cancelled" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\status-cancelled.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="offsetx_icon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\offsetx-icon.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="status_failed" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\status-failed.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="offsetx_vector" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\offsetx-vector.svg;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="status_in_progress" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\status-in-progress.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="offsety_icon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\offsety-icon.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="status_succeeded" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\status-succeeded.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="offsety_vector" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\offsety-vector.svg;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="status_warning" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\status-warning.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="qrcode_icon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\qrcode-icon.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="qrcode_vector" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\qrcode-vector.svg;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="size_icon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\size-icon.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="size_vector" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\size-vector.svg;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="source_icon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\source-icon.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="source_vector" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\source-vector.svg;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
 </root>

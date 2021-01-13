@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Xarial.CadPlus.Batch.Base.Properties {
+namespace Xarial.CadPlus.Drawing.Properties {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace Xarial.CadPlus.Batch.Base.Properties {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Xarial.CadPlus.Batch.Base.Properties.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Xarial.CadPlus.Drawing.Properties.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -63,70 +63,120 @@ namespace Xarial.CadPlus.Batch.Base.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap arguments_icon {
+        internal static System.Drawing.Bitmap dock_icon {
             get {
-                object obj = ResourceManager.GetObject("arguments_icon", resourceCulture);
+                object obj = ResourceManager.GetObject("dock_icon", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] dock_vector {
+            get {
+                object obj = ResourceManager.GetObject("dock_vector", resourceCulture);
+                return ((byte[])(obj));
             }
         }
         
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap status_awaiting {
+        internal static System.Drawing.Bitmap offsetx_icon {
             get {
-                object obj = ResourceManager.GetObject("status_awaiting", resourceCulture);
+                object obj = ResourceManager.GetObject("offsetx_icon", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] offsetx_vector {
+            get {
+                object obj = ResourceManager.GetObject("offsetx_vector", resourceCulture);
+                return ((byte[])(obj));
             }
         }
         
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap status_cancelled {
+        internal static System.Drawing.Bitmap offsety_icon {
             get {
-                object obj = ResourceManager.GetObject("status_cancelled", resourceCulture);
+                object obj = ResourceManager.GetObject("offsety_icon", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] offsety_vector {
+            get {
+                object obj = ResourceManager.GetObject("offsety_vector", resourceCulture);
+                return ((byte[])(obj));
             }
         }
         
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap status_failed {
+        internal static System.Drawing.Bitmap qrcode_icon {
             get {
-                object obj = ResourceManager.GetObject("status_failed", resourceCulture);
+                object obj = ResourceManager.GetObject("qrcode_icon", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] qrcode_vector {
+            get {
+                object obj = ResourceManager.GetObject("qrcode_vector", resourceCulture);
+                return ((byte[])(obj));
             }
         }
         
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap status_in_progress {
+        internal static System.Drawing.Bitmap size_icon {
             get {
-                object obj = ResourceManager.GetObject("status_in_progress", resourceCulture);
+                object obj = ResourceManager.GetObject("size_icon", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] size_vector {
+            get {
+                object obj = ResourceManager.GetObject("size_vector", resourceCulture);
+                return ((byte[])(obj));
             }
         }
         
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap status_succeeded {
+        internal static System.Drawing.Bitmap source_icon {
             get {
-                object obj = ResourceManager.GetObject("status_succeeded", resourceCulture);
+                object obj = ResourceManager.GetObject("source_icon", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
         
         /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
-        internal static System.Drawing.Bitmap status_warning {
+        internal static byte[] source_vector {
             get {
-                object obj = ResourceManager.GetObject("status_warning", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
+                object obj = ResourceManager.GetObject("source_vector", resourceCulture);
+                return ((byte[])(obj));
             }
         }
     }
