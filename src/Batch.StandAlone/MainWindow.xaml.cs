@@ -29,7 +29,7 @@ using Xarial.CadPlus.Plus.Shared.Services;
 using Xarial.CadPlus.Plus.Shared;
 using Xarial.CadPlus.Plus.Services;
 using Xarial.CadPlus.Plus.Extensions;
-using Xarial.CadPlus.Common.Extensions;
+using Xarial.CadPlus.Plus.Shared.Styles;
 
 namespace Xarial.CadPlus.XBatch.Base
 {
@@ -37,7 +37,7 @@ namespace Xarial.CadPlus.XBatch.Base
     {
         public MainWindow()
         {
-            Application.Current.WithMetroStyles();
+            Application.Current.UsingMetroStyles();
 
             InitializeComponent();
         }

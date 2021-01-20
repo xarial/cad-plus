@@ -129,8 +129,9 @@ namespace Xarial.CadPlus.AddIn.Base
 
                 Connect?.Invoke();
             }
-            catch 
+            catch (Exception ex)
             {
+                new AppLogger().Log(ex);
                 new GenericMessageService("CAD+").ShowError("Failed to connect add-in");
                 throw;
             }
