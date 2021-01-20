@@ -7,6 +7,7 @@
 
 using System;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using Xarial.CadPlus.Plus;
 using Xarial.XToolkit.Reflection;
