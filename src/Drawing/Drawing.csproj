@@ -70,10 +70,10 @@
     <Reference Include="WindowsBase" />
     <Reference Include="WindowsFormsIntegration" />
     <Reference Include="Xarial.CadPlusPlus, Version=0.2.0.0, Culture=neutral, PublicKeyToken=60dcaf351d4060db, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Xarial.CadPlusPlus.0.2.0-20210106.4\lib\net461\Xarial.CadPlusPlus.dll</HintPath>
+      <HintPath>..\..\packages\Xarial.CadPlusPlus.0.2.0-20210120.1\lib\net461\Xarial.CadPlusPlus.dll</HintPath>
     </Reference>
     <Reference Include="Xarial.XCad, Version=0.6.11.0, Culture=neutral, PublicKeyToken=60dcaf351d4060db, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Xarial.XCad.0.6.11-20210106.1\lib\net461\Xarial.XCad.dll</HintPath>
+      <HintPath>..\..\packages\Xarial.XCad.0.6.11-20210107.1\lib\net461\Xarial.XCad.dll</HintPath>
     </Reference>
     <Reference Include="Xarial.XCad.SolidWorks, Version=0.6.11.0, Culture=neutral, PublicKeyToken=60dcaf351d4060db, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Xarial.XCad.SolidWorks.0.6.11-20210106.1\lib\net461\Xarial.XCad.SolidWorks.dll</HintPath>
