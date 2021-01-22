@@ -24,6 +24,9 @@
     <PackageIconUrl>https://cadplus.xarial.com/icon.png</PackageIconUrl>-->
   </PropertyGroup>
   <ItemGroup>
+    <None Remove="Styles\SharedStyles.xaml" />
+  </ItemGroup>
+  <ItemGroup>
     <None Include="..\..\LICENSE.md">
       <Pack>True</Pack>
       <PackagePath></PackagePath>
@@ -34,6 +37,11 @@
     <PackageReference Include="CommandLineParser" Version="2.8.0" />
   </ItemGroup>
   <ItemGroup>
+    <Page Include="Styles\SharedStyles.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\Plus\Plus.csproj" />
   </ItemGroup>
   <ItemGroup>
@@ -42,10 +50,5 @@
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Xaml" />
     <Reference Include="WindowsBase" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Update="Styles\SharedStyles.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </None>
   </ItemGroup>
 </Project>
