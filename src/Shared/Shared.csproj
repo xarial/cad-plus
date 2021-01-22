@@ -37,9 +37,9 @@
     <PackageReference Include="CommandLineParser" Version="2.8.0" />
   </ItemGroup>
   <ItemGroup>
-    <Page Include="Styles\SharedStyles.xaml">
+    <Resource Include="Styles\SharedStyles.xaml">
       <Generator>MSBuild:Compile</Generator>
-    </Page>
+    </Resource>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Plus\Plus.csproj" />

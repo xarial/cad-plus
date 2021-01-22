@@ -43,11 +43,11 @@ namespace Xarial.CadPlus.Plus.Shared.Styles
                     Source = new Uri("pack://application:,,,/Fluent;Component/Themes/Generic.xaml")
                 });
 
-            app.Resources.MergedDictionaries.Add(
-                new ResourceDictionary()
-                {
-                    Source = new Uri("pack://application:,,,/Xarial.CadPlusPlus.Shared;component/Styles/SharedStyles.xaml")
-                });
+            //app.Resources.MergedDictionaries.Add(
+            //    new ResourceDictionary()
+            //    {
+            //        Source = new Uri("pack://application:,,,/Xarial.CadPlusPlus.Shared;component/Styles/SharedStyles.xaml")
+            //    });
         }
     }
 }
