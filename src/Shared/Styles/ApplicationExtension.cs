@@ -8,6 +8,11 @@
 using System;
 using System.Windows;
 
+[assembly: ThemeInfo(
+        ResourceDictionaryLocation.None,
+        ResourceDictionaryLocation.SourceAssembly
+    )]
+
 namespace Xarial.CadPlus.Plus.Shared.Styles
 {
     public static class ApplicationExtension
@@ -36,6 +41,12 @@ namespace Xarial.CadPlus.Plus.Shared.Styles
                 new ResourceDictionary()
                 {
                     Source = new Uri("pack://application:,,,/Fluent;Component/Themes/Generic.xaml")
+                });
+
+            app.Resources.MergedDictionaries.Add(
+                new ResourceDictionary()
+                {
+                    Source = new Uri("pack://application:,,,/Xarial.CadPlusPlus.Shared;component/Styles/SharedStyles.xaml")
                 });
         }
     }
