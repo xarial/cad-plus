@@ -19,7 +19,7 @@ using Xarial.CadPlus.Plus.Applications;
 using Xarial.CadPlus.Plus.Exceptions;
 using Xarial.CadPlus.Plus.Services;
 using Xarial.CadPlus.Plus.Shared.Services;
-using Xarial.CadPlus.StandAlone;
+using Xarial.CadPlus.Batch.StandAlone;
 using Xarial.CadPlus.XBatch.Base.Exceptions;
 using Xarial.CadPlus.XBatch.Base.Services;
 using Xarial.XCad;

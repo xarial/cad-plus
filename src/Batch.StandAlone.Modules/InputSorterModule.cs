@@ -79,7 +79,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.Modules
             var vm = new InputsSorterVM(items);
 
             input.Clear();
-
+            
             m_Host.WpfApplication.Dispatcher.Invoke(() => 
             {
                 var wnd = new InputsSorterWindow();

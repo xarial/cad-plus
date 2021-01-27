@@ -7,7 +7,7 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{C64AE433-7BB9-4EDA-A54F-D71F2BF1B015}</ProjectGuid>
     <OutputType>WinExe</OutputType>
-    <RootNamespace>Xarial.CadPlus.StandAlone</RootNamespace>
+    <RootNamespace>Xarial.CadPlus.Batch.StandAlone</RootNamespace>
     <AssemblyName>batchplus</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
@@ -115,16 +115,16 @@
     <Reference Include="PresentationFramework" />
     <Reference Include="WindowsFormsIntegration" />
     <Reference Include="Xarial.CadPlusPlus, Version=0.2.0.0, Culture=neutral, PublicKeyToken=60dcaf351d4060db, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Xarial.CadPlusPlus.0.2.0-20210122.6\lib\net461\Xarial.CadPlusPlus.dll</HintPath>
+      <HintPath>..\..\packages\Xarial.CadPlusPlus.0.2.0-20210125.1\lib\net461\Xarial.CadPlusPlus.dll</HintPath>
     </Reference>
     <Reference Include="Xarial.CadPlusPlus.Shared, Version=0.1.0.0, Culture=neutral, PublicKeyToken=60dcaf351d4060db, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Xarial.CadPlusPlus.Shared.0.1.0-20210122.6\lib\net461\Xarial.CadPlusPlus.Shared.dll</HintPath>
     </Reference>
     <Reference Include="Xarial.XCad, Version=0.6.11.0, Culture=neutral, PublicKeyToken=60dcaf351d4060db, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Xarial.XCad.0.6.11-20210122.1\lib\net461\Xarial.XCad.dll</HintPath>
+      <HintPath>..\..\packages\Xarial.XCad.0.6.11-20210125.1\lib\net461\Xarial.XCad.dll</HintPath>
     </Reference>
     <Reference Include="Xarial.XCad.Toolkit, Version=0.6.11.0, Culture=neutral, PublicKeyToken=60dcaf351d4060db, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Xarial.XCad.Toolkit.0.6.11-20210122.1\lib\net461\Xarial.XCad.Toolkit.dll</HintPath>
+      <HintPath>..\..\packages\Xarial.XCad.Toolkit.0.6.11-20210125.1\lib\net461\Xarial.XCad.Toolkit.dll</HintPath>
     </Reference>
     <Reference Include="Xarial.XToolkit, Version=0.2.7.0, Culture=neutral, PublicKeyToken=60dcaf351d4060db, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Xarial.XToolkit.0.2.7\lib\net461\Xarial.XToolkit.dll</HintPath>
@@ -138,6 +138,12 @@
     <Compile Include="BatchApplication.cs" />
     <Compile Include="Controls\HomePage.xaml.cs">
       <DependentUpon>HomePage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\JobSelectorControl.xaml.cs">
+      <DependentUpon>JobSelectorControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\NewDocumentWindow.xaml.cs">
+      <DependentUpon>NewDocumentWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Converters\DocumentTitleConverter.cs" />
     <Compile Include="Converters\CommandEnabledConverter.cs" />
@@ -204,6 +210,14 @@
   </ItemGroup>
   <ItemGroup>
     <Page Include="Controls\HomePage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\JobSelectorControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\NewDocumentWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

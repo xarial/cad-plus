@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Xarial.CadPlus.StandAlone.Properties {
+namespace Xarial.CadPlus.Batch.StandAlone.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]

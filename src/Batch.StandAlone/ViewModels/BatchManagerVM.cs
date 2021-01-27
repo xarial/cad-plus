@@ -22,7 +22,7 @@ using Xarial.CadPlus.Plus.Applications;
 using Xarial.CadPlus.Plus.Exceptions;
 using Xarial.CadPlus.Plus.Services;
 using Xarial.CadPlus.Plus.Shared.Services;
-using Xarial.CadPlus.StandAlone.Properties;
+using Xarial.CadPlus.Batch.StandAlone.Properties;
 using Xarial.CadPlus.XBatch.Base.Core;
 using Xarial.CadPlus.XBatch.Base.Models;
 using Xarial.XToolkit.Services.UserSettings;
@@ -30,6 +30,9 @@ using Xarial.XToolkit.Wpf;
 using Xarial.XToolkit.Wpf.Dialogs;
 using Xarial.XToolkit.Wpf.Extensions;
 using Xarial.XToolkit.Wpf.Utils;
+using Xarial.CadPlus.Batch.StandAlone.Controls;
+using System.Windows;
+using System.Windows.Interop;
 
 namespace Xarial.CadPlus.XBatch.Base.ViewModels
 {
@@ -49,6 +52,7 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
 
         private BatchDocumentVM m_Document;
 
+        public ICommand CreateDocumentCommand { get; }
         public ICommand NewDocumentCommand { get; }
         public ICommand OpenDocumentCommand { get; }
         public ICommand CloseDocumentCommand { get; }
@@ -74,16 +78,26 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
             m_OpenDocFunc = openDocFunc;
             m_NewDocFunc = newDocFunc;
 
-            NewDocumentCommand = new RelayCommand<string>(NewDocument);
+            CreateDocumentCommand = new RelayCommand<string>(CreateDocument);
+            NewDocumentCommand = new RelayCommand(NewDocument);
+
             OpenDocumentCommand = new RelayCommand<string>(OpenDocument);
             CloseDocumentCommand = new RelayCommand(CloseDocument, () => Document != null);
             AboutCommand = new RelayCommand(ShowAbout);
             HelpCommand = new RelayCommand(OpenHelp);
         }
 
+        private void NewDocument()
+        {
+            var newDocWnd = new NewDocumentWindow();
+            newDocWnd.Owner = ParentWindow;
+            newDocWnd.DataContext = this;
+            newDocWnd.ShowDialog();
+        }
+
         public ObservableCollection<string> RecentFiles => m_Model.RecentFiles;
 
-        internal IntPtr ParentWindowHandle { get; set; }
+        internal Window ParentWindow { get; set; }
 
         internal bool CanClose()
         {
@@ -152,7 +166,7 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
         private void OnSaveDocument(BatchDocumentVM sender, BatchJob job, string filePath)
                     => m_Model.SaveJobToFile(job, filePath);
 
-        internal void NewDocument(string appId)
+        internal void CreateDocument(string appId)
         {
             if (Document == null)
             {
@@ -202,7 +216,7 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
         private void ShowAbout() 
         {
             AboutDialog.Show(this.GetType().Assembly, Resources.batch_plus_icon,
-                        ParentWindowHandle);
+                         new WindowInteropHelper(ParentWindow).Handle);
         }
 
         private void OpenHelp() 

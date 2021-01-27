@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 using Xarial.CadPlus.Plus.Applications;
 using Xarial.XCad;
 
-namespace Xarial.CadPlus.StandAlone
+namespace Xarial.CadPlus.Batch.StandAlone
 {
     internal class BatchApplication : IBatchApplication
     {
