@@ -350,6 +350,15 @@ namespace Xarial.CadPlus.XBatch.Base.Core
                 {
                     ProcessError(ex, context);
 
+                    if (context.CurrentDocument == null)
+                    {
+                        context.CurrentFile.Error = ex;
+                    }
+                    else 
+                    {
+                        context.CurrentMacro.Error = ex;
+                    }
+
                     m_UserLogger.WriteLine(ex.ParseUserError(out _));
                     m_Logger.Log(ex);
                 }

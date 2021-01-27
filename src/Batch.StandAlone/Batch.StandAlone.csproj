@@ -328,5 +328,8 @@
   <ItemGroup>
     <Resource Include="Resources\auto-save-docs.png" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\add-from-file.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

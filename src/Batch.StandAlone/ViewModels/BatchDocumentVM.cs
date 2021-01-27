@@ -107,6 +107,8 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
         public ICommand SaveDocumentCommand { get; }
         public ICommand SaveAsDocumentCommand { get; }
 
+        public ICommand AddFromFileCommand { get; }
+
         public ICommand FilterEditEndingCommand { get; }
 
         public bool IsDirty
@@ -161,6 +163,7 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
             SaveDocumentCommand = new RelayCommand(SaveDocument, () => IsDirty);
             SaveAsDocumentCommand = new RelayCommand(SaveAsDocument);
             FilterEditEndingCommand = new RelayCommand<DataGridCellEditEndingEventArgs>(FilterEditEnding);
+            AddFromFileCommand = new RelayCommand(AddFromFile);
 
             Name = name;
             Settings = new BatchDocumentSettingsVM(m_Job, m_AppProvider);
@@ -260,6 +263,25 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
             for (int i = 0; i < Filters.Count; i++) 
             {
                 Filters[i].SetBinding(m_Job.Filters, i);
+            }
+        }
+
+        private void AddFromFile()
+        {
+            if (FileSystemBrowser.BrowseFileOpen(out string path, "Select text file",
+                FileSystemBrowser.BuildFilterString(new FileFilter("Text Files", "*.txt", "*.csv"), FileFilter.AllFiles))) 
+            {
+                if (File.Exists(path))
+                {
+                    foreach (var input in File.ReadAllLines(path)) 
+                    {
+                        Input.Add(input);
+                    }
+                }
+                else 
+                {
+                    m_MsgSvc.ShowError("File does not exist");
+                }
             }
         }
 

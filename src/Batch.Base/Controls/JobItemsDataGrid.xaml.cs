@@ -49,6 +49,8 @@ namespace Xarial.CadPlus.XBatch.Base.Controls
 			grd.LoadItems(e.NewValue as IEnumerable<JobItemFileVM>);
 		}
 
+		//TODO: replace with XDataGrid with dynamic columns
+
 		private DataGridColumn CreateStatusColumn(string header, Binding binding) 
 		{	
 			var elemFact = new FrameworkElementFactory(typeof(Image));

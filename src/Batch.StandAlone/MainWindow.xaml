@@ -120,6 +120,10 @@
                                    Command="{Binding Path=AddFoldersCommand, ElementName=lstInputs}"
                                    Icon="/batchplus;component/Resources/add-folder.png"
                                    LargeIcon="/batchplus;component/Resources/add-folder.png" />
+                    <fluent:Button Header="Add From File..."
+                                   Command="{Binding Path=AddFromFileCommand}"
+                                   Icon="/batchplus;component/Resources/add-from-file.png"
+                                   LargeIcon="/batchplus;component/Resources/add-from-file.png" />
                     <fluent:Button Header="Remove Files And Folders"
                                    Command="{Binding Path=DeleteSelectedCommand, ElementName=lstInputs}"
                                    Icon="/batchplus;component/Resources/remove-file-folder.png"

@@ -64,6 +64,9 @@
     <Compile Include="Controls\JobItemsDataGrid.xaml.cs">
       <DependentUpon>JobItemsDataGrid.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Controls\JobItemStatusControl.xaml.cs">
+      <DependentUpon>JobItemStatusControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Controls\MacroDataControl.xaml.cs">
       <DependentUpon>MacroDataControl.xaml</DependentUpon>
     </Compile>
@@ -86,6 +89,7 @@
     </Compile>
     <Compile Include="ViewModels\JobItemFileVM.cs" />
     <Compile Include="ViewModels\JobItemMacroVM.cs" />
+    <Compile Include="ViewModels\JobItemVM.cs" />
     <Compile Include="ViewModels\JobResultLogVM.cs" />
     <Compile Include="ViewModels\JobResultSummaryVM.cs" />
     <Compile Include="ViewModels\JobResultVM.cs" />
@@ -94,6 +98,10 @@
     <Page Include="Controls\JobItemsDataGrid.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Controls\JobItemStatusControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Controls\MacroDataControl.xaml">
       <Generator>MSBuild:Compile</Generator>
