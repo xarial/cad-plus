@@ -11,8 +11,8 @@
     <PackageReference Include="nunit" Version="3.12.0" />
     <PackageReference Include="NUnit3TestAdapter" Version="3.15.1" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.2.0" />
-    <PackageReference Include="Xarial.CadPlusPlus" Version="0.2.0-20210103.3" />
-    <PackageReference Include="Xarial.XCad.SolidWorks" Version="0.6.11-20201231.6" />
+    <PackageReference Include="Xarial.CadPlusPlus" Version="0.2.0-20210122.6" />
+    <PackageReference Include="Xarial.XCad.SolidWorks" Version="0.6.11-20210122.1" />
   </ItemGroup>
 
   <ItemGroup>

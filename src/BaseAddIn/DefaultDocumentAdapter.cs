@@ -5,27 +5,27 @@
 //License: https://cadplus.xarial.com/license/
 //*********************************************************************
 
-using Autofac;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Xarial.CadPlus.Plus.Services;
+using Xarial.XCad.Documents;
 
-namespace Xarial.CadPlus.Common
+namespace Xarial.CadPlus.AddIn.Base
 {
-    public class ServiceProvider : IServiceProvider, IDisposable
+    public class DefaultDocumentAdapter : IDocumentAdapter
     {
-        public IContainer Container { get; }
-
-        public ServiceProvider(IContainer container) 
+        public void ApplyChanged(IXDocument doc)
         {
-            Container = container;
         }
 
-        public object GetService(Type serviceType)
-            => Container.Resolve(serviceType);
+        public void DisposeDocument(IXDocument doc)
+        {
+        }
 
-        public void Dispose() => Container.Dispose();
+        public IXDocument GetAdapter(IXDocument doc, bool allowReadOnly)
+            => doc;
     }
 }

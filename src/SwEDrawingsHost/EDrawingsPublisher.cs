@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using Xarial.CadPlus.Common.Services;
 using Xarial.CadPlus.Plus.Services;
+using Xarial.CadPlus.Plus.Shared.Services;
 using Xarial.CadPlus.Xport.SwEDrawingsHost;
 
 namespace Xarial.CadPlus.Xport.EDrawingsHost

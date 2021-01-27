@@ -10,12 +10,27 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Xarial.XCad.Extensions;
+using Xarial.XCad.Base.Attributes;
 
-namespace Xarial.CadPlus.ExtensionModule
+namespace Xarial.CadPlus.Drawing.Data
 {
-    public interface IExtensionModule : IDisposable
+    public enum Source_e
     {
-        void Load(IXExtension ext);
+        [Title("Custom Property")]
+        CustomProperty,
+
+        [Title("File Path")]
+        FilePath,
+
+        [Title("Part Number")]
+        PartNumber,
+
+        [Title("PDM Vault Link")]
+        PdmVaultLink,
+
+        [Title("PDM Web2 Url")]
+        PdmWeb2Url,
+
+        Custom
     }
 }

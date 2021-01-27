@@ -9,7 +9,7 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-[assembly: AssemblyTitle("ExtensionModule")]
+[assembly: AssemblyTitle("Drawing")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyTrademark("")]
@@ -17,4 +17,4 @@ using System.Runtime.InteropServices;
 
 [assembly: ComVisible(false)]
 
-[assembly: Guid("6bf97f84-c902-470f-874f-4ad839cb16b9")]
+[assembly: Guid("d3cf2344-ff9e-499a-9519-1e00c33f8457")]

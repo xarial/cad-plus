@@ -30,6 +30,9 @@ using Autofac.Core.Registration;
 using Xarial.CadPlus.Plus.Services;
 using Xarial.CadPlus.Plus.Applications;
 using Xarial.CadPlus.Init;
+using Xarial.CadPlus.Plus.Shared;
+using Xarial.CadPlus.Plus.Shared.Services;
+using Xarial.CadPlus.Plus.Shared.Extensions;
 
 namespace Xarial.CadPlus.AddIn.Base
 {
@@ -100,9 +103,10 @@ namespace Xarial.CadPlus.AddIn.Base
                 
                 Initialized?.Invoke();
             }
-            catch 
+            catch (Exception ex)
             {
-                new GenericMessageService("CAD+").ShowError("Failed to init add-in");
+                new GenericMessageService("CAD+").ShowError(ex, "Failed to init add-in");
+                new AppLogger().Log(ex);
                 throw;
             }
         }
@@ -125,8 +129,9 @@ namespace Xarial.CadPlus.AddIn.Base
 
                 Connect?.Invoke();
             }
-            catch 
+            catch (Exception ex)
             {
+                new AppLogger().Log(ex);
                 new GenericMessageService("CAD+").ShowError("Failed to connect add-in");
                 throw;
             }
@@ -155,6 +160,8 @@ namespace Xarial.CadPlus.AddIn.Base
             builder.RegisterType<AppLogger>().As<IXLogger>();
             builder.RegisterType<CadAppMessageService>()
                 .As<IMessageService>();
+            builder.RegisterType<DefaultDocumentAdapter>()
+                .As<IDocumentAdapter>();
             builder.RegisterType<SettingsProvider>()
                 .As<ISettingsProvider>();
         }

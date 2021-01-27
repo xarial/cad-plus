@@ -5,18 +5,27 @@
 //License: https://cadplus.xarial.com/license/
 //*********************************************************************
 
-using Autofac;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Xarial.XCad.Base.Attributes;
 
-namespace Xarial.CadPlus.Common
+namespace Xarial.CadPlus.Drawing.Data
 {
-    public static class IServiceProviderExtension
+    public enum Dock_e
     {
-        public static TSvc GetService<TSvc>(this IServiceProvider svcProv) 
-            => (TSvc)svcProv.GetService(typeof(TSvc));
+        [Title("Bottom Left")]
+        BottomLeft,
+
+        [Title("Top Left")]
+        TopLeft,
+
+        [Title("Top Right")]
+        TopRight,
+
+        [Title("Bottom Right")]
+        BottomRight
     }
 }

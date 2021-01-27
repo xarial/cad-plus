@@ -18,38 +18,28 @@
         mc:Ignorable="d" WindowState="Maximized" TitleCharacterCasing="Normal" WindowTransitionsEnabled="False"
         Height="450" Width="800">
     <metro:MetroWindow.Resources>
-        <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Themes/Light.Blue.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/Fluent;Component/Themes/Generic.xaml" />
-                <ResourceDictionary>
-                    <conv:CommandEnabledConverter x:Key="cmdEnabledConv"/>
-                    <conv:SelectedVersionConverter x:Key="selVersConv"/>
-                    <conv:DocumentTitleConverter x:Key="docTitleConv"/>
-                    <conv:JobStatusToImageConverter x:Key="jobStatusToImgConv"/>
-                    <conv:JobTitleConverter x:Key="jobTitleConv"/>
-                    <conv:FilterTextConverter x:Key="filterTxtConv"/>
-                    <xconv:MatchValueUniversalConverter x:Key="statusToVisConv" 
+        <conv:CommandEnabledConverter x:Key="cmdEnabledConv"/>
+        <conv:SelectedVersionConverter x:Key="selVersConv"/>
+        <conv:DocumentTitleConverter x:Key="docTitleConv"/>
+        <conv:JobStatusToImageConverter x:Key="jobStatusToImgConv"/>
+        <conv:JobTitleConverter x:Key="jobTitleConv"/>
+        <conv:FilterTextConverter x:Key="filterTxtConv"/>
+        <xconv:MatchValueUniversalConverter x:Key="statusToVisConv" 
                                                         TargetValue="{x:Static vmbase:JobState_e.InProgress}"
                                                         TrueValue="{x:Static win:Visibility.Visible}"
                                                         FalseValue="{x:Static win:Visibility.Collapsed}"/>
 
-                    <xconv:ObjectIsNotNullUniversalConverter x:Key="objIsNotNullToVisConv" 
+        <xconv:ObjectIsNotNullUniversalConverter x:Key="objIsNotNullToVisConv" 
                                                              TrueValue="{x:Static win:Visibility.Visible}"
                                                              FalseValue="{x:Static win:Visibility.Collapsed}"/>
-                    <xconv:ObjectIsNotNullUniversalConverter x:Key="objIsNullToVisConv" 
+        <xconv:ObjectIsNotNullUniversalConverter x:Key="objIsNullToVisConv" 
                                                              TrueValue="{x:Static win:Visibility.Collapsed}"
                                                              FalseValue="{x:Static win:Visibility.Visible}"/>
-                    <xconv:ObjectIsNotNullUniversalConverter x:Key="objIsNotNullConv"/>
-                    <xconv:BooleanUniversalConverter x:Key="boolToVisConv" 
+        <xconv:ObjectIsNotNullUniversalConverter x:Key="objIsNotNullConv"/>
+        <xconv:BooleanUniversalConverter x:Key="boolToVisConv" 
                                                      TrueValue="{x:Static win:Visibility.Visible}"
                                                      FalseValue="{x:Static win:Visibility.Collapsed}"/>
-                    <xconv:ImageToImageSourceConverter x:Key="imgToSrcConv"/>
-                </ResourceDictionary>
-            </ResourceDictionary.MergedDictionaries>
-        </ResourceDictionary>
+        <xconv:ImageToImageSourceConverter x:Key="imgToSrcConv"/>
     </metro:MetroWindow.Resources>
     <metro:MetroWindow.TitleTemplate>
         <DataTemplate>

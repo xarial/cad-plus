@@ -115,26 +115,27 @@
     <Reference Include="PresentationFramework" />
     <Reference Include="WindowsFormsIntegration" />
     <Reference Include="Xarial.CadPlusPlus, Version=0.2.0.0, Culture=neutral, PublicKeyToken=60dcaf351d4060db, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Xarial.CadPlusPlus.0.2.0-20210103.3\lib\net461\Xarial.CadPlusPlus.dll</HintPath>
+      <HintPath>..\..\packages\Xarial.CadPlusPlus.0.2.0-20210122.6\lib\net461\Xarial.CadPlusPlus.dll</HintPath>
+    </Reference>
+    <Reference Include="Xarial.CadPlusPlus.Shared, Version=0.1.0.0, Culture=neutral, PublicKeyToken=60dcaf351d4060db, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Xarial.CadPlusPlus.Shared.0.1.0-20210122.6\lib\net461\Xarial.CadPlusPlus.Shared.dll</HintPath>
     </Reference>
     <Reference Include="Xarial.XCad, Version=0.6.11.0, Culture=neutral, PublicKeyToken=60dcaf351d4060db, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Xarial.XCad.0.6.11-20201231.6\lib\net461\Xarial.XCad.dll</HintPath>
+      <HintPath>..\..\packages\Xarial.XCad.0.6.11-20210122.1\lib\net461\Xarial.XCad.dll</HintPath>
     </Reference>
     <Reference Include="Xarial.XCad.Toolkit, Version=0.6.11.0, Culture=neutral, PublicKeyToken=60dcaf351d4060db, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Xarial.XCad.Toolkit.0.6.11-20201231.6\lib\net461\Xarial.XCad.Toolkit.dll</HintPath>
+      <HintPath>..\..\packages\Xarial.XCad.Toolkit.0.6.11-20210122.1\lib\net461\Xarial.XCad.Toolkit.dll</HintPath>
     </Reference>
-    <Reference Include="Xarial.XToolkit, Version=0.2.5.0, Culture=neutral, PublicKeyToken=60dcaf351d4060db, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Xarial.XToolkit.0.2.5\lib\net461\Xarial.XToolkit.dll</HintPath>
+    <Reference Include="Xarial.XToolkit, Version=0.2.7.0, Culture=neutral, PublicKeyToken=60dcaf351d4060db, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Xarial.XToolkit.0.2.7\lib\net461\Xarial.XToolkit.dll</HintPath>
     </Reference>
-    <Reference Include="Xarial.XToolkit.Wpf, Version=0.2.13.0, Culture=neutral, PublicKeyToken=60dcaf351d4060db, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Xarial.XToolkit.Wpf.0.2.13\lib\net461\Xarial.XToolkit.Wpf.dll</HintPath>
+    <Reference Include="Xarial.XToolkit.Wpf, Version=0.2.15.0, Culture=neutral, PublicKeyToken=60dcaf351d4060db, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Xarial.XToolkit.Wpf.0.2.15\lib\net461\Xarial.XToolkit.Wpf.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="App.xaml.cs">
-      <DependentUpon>App.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Arguments.cs" />
+    <Compile Include="BatchApplication.cs" />
     <Compile Include="Controls\HomePage.xaml.cs">
       <DependentUpon>HomePage.xaml</DependentUpon>
     </Compile>
@@ -155,6 +156,7 @@
     </Compile>
     <Compile Include="Models\BatchRunJobExecutor.cs" />
     <Compile Include="Models\BatchRunnerModel.cs" />
+    <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -195,12 +197,12 @@
       <Project>{cb753a98-59d1-4058-b486-e1dfd86fb5bb}</Project>
       <Name>Common</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Init\Init.csproj">
+      <Project>{C5008247-53FB-410D-B8E4-1E44312CBEDC}</Project>
+      <Name>Init</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ApplicationDefinition Include="App.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </ApplicationDefinition>
     <Page Include="Controls\HomePage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -290,9 +292,6 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\filter.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Resources\arguments-icon.png" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\invisible-mode.png" />

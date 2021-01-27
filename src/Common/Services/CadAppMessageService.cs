@@ -8,6 +8,8 @@
 using System;
 using System.Diagnostics;
 using Xarial.CadPlus.Common.Services;
+using Xarial.CadPlus.Plus.Services;
+using Xarial.CadPlus.Plus.Shared.Services;
 using Xarial.XCad;
 using Xarial.XCad.Base.Enums;
 

@@ -29,64 +29,61 @@ namespace Xarial.CadPlus.XBatch.Base
         public string ApplicationId { get; set; }
     }
 
-    public interface IArguments 
+    public class BatchArguments 
     {
+        public BatchJob Job { get; protected set; }
     }
 
     [Verb("job", HelpText = "Accessing job files")]
-    public class JobOptions : IArguments
+    public class JobOptions : BatchArguments
     {
-        private BatchJob m_Options;
-
         [Option('r', "run", Required = true, HelpText = "Full path to *.batchplus file to run")]
         public string JobFilePath 
         {
             set 
             {
-                m_Options = BatchJob.FromFile(value);
+                Job = BatchJob.FromFile(value);
             }
         }
     }
 
     [Verb("run", isDefault: true, HelpText = "Runs jobs by specifying parameters")]
-    public class RunOptions : IArguments
+    public class RunOptions : BatchArguments
     {
-        private BatchJob m_Options;
-               
         public RunOptions() 
         {
-            m_Options = new BatchJob();
+            Job = new BatchJob();
         }
         
         [Option('i', "input", Required = true, HelpText = "List of input directories or file paths to process")]
         public IEnumerable<string> Input 
         {
-            set => m_Options.Input = value?.ToArray();
+            set => Job.Input = value?.ToArray();
         }
 
         [Option('f', "filters", Required = false, HelpText = "Filters to extract input files, if input parameter contains directories. Default (all files): *.*")]
         public string[] Filters
         {
-            set => m_Options.Filters = value;
+            set => Job.Filters = value;
         }
 
         [Option('m', "macros", Required = true, HelpText = "List of macros to run")]
         public IEnumerable<string> Macros 
         {
             //TODO: add support for args
-            set => m_Options.Macros = value.Select(m => new MacroData() { FilePath = m })?.ToArray();
+            set => Job.Macros = value.Select(m => new MacroData() { FilePath = m })?.ToArray();
         }
 
         [Option('e', "error", Required = false, HelpText = "If this option is used execution will continue if any of the macros failed to process, otherwise the process will terminate. Default: true")]
         public bool ContinueOnError 
         {
-            set => m_Options.ContinueOnError = value;
+            set => Job.ContinueOnError = value;
         }
 
         [Option('t', "timeout", Required = false, HelpText = "Timeout in seconds for processing a single item (e.g. running macro on a single file). Default: 600 seconds")]
         public int Timeout
         {
-            set => m_Options.Timeout = value;
+            set => Job.Timeout = value;
         }
         
         [Option('s', "startup", Required = false, HelpText = "Specifies the startup options (silent, background, safe, hidden) for the host application. Defaul: silent and safe")]
@@ -96,7 +93,7 @@ namespace Xarial.CadPlus.XBatch.Base
             {
                 if (value?.Any() == true)
                 {
-                    m_Options.StartupOptions = value.Aggregate((StartupOptions_e)0, (o, c) => o | c);
+                    Job.StartupOptions = value.Aggregate((StartupOptions_e)0, (o, c) => o | c);
                 }
             }
         }
@@ -104,7 +101,7 @@ namespace Xarial.CadPlus.XBatch.Base
         [Option('v', "hostversion", Required = false, HelpText = "Version of host application. Default: oldest")]
         public string Version
         {
-            set => m_Options.VersionId = value;
+            set => Job.VersionId = value;
         }
 
         [Option('o', "open", Required = false, HelpText = "Specifies options (silent, readonly, rapid, invisible, forbidupgrade) for the file opening. Default: silent")]
@@ -114,7 +111,7 @@ namespace Xarial.CadPlus.XBatch.Base
             {
                 if (value?.Any() == true)
                 {
-                    m_Options.OpenFileOptions = value.Aggregate((OpenFileOptions_e)0, (o, c) => o | c);
+                    Job.OpenFileOptions = value.Aggregate((OpenFileOptions_e)0, (o, c) => o | c);
                 }
             }
         }
@@ -126,7 +123,7 @@ namespace Xarial.CadPlus.XBatch.Base
             {
                 if (value?.Any() == true)
                 {
-                    m_Options.Actions = value.Aggregate((Actions_e)0, (o, c) => o | c);
+                    Job.Actions = value.Aggregate((Actions_e)0, (o, c) => o | c);
                 }
             }
         }
@@ -134,7 +131,7 @@ namespace Xarial.CadPlus.XBatch.Base
         [Option('b', "batch", Required = false, HelpText = "maximum number of files to process in the single session of CAD application before restarting. Default: 25")]
         public int BatchSize
         {
-            set => m_Options.BatchSize = value;
+            set => Job.BatchSize = value;
         }
     }
 }

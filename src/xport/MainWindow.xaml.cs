@@ -6,9 +6,12 @@
 //*********************************************************************
 
 using MahApps.Metro.Controls;
+using System;
 using System.Windows;
 using System.Windows.Interop;
 using Xarial.CadPlus.Common.Services;
+using Xarial.CadPlus.Plus.Shared.Services;
+using Xarial.CadPlus.Plus.Shared.Styles;
 using Xarial.CadPlus.Xport.Models;
 using Xarial.CadPlus.Xport.ViewModels;
 
@@ -18,15 +21,9 @@ namespace Xarial.CadPlus.Xport
     {
         public MainWindow()
         {
+            Application.Current.UsingMetroStyles();
+
             InitializeComponent();
-
-            var vm = new ExporterVM(
-                new ExporterModel(),
-                new GenericMessageService("eXport+"));
-
-            vm.ParentWindowHandle = new WindowInteropHelper(this).EnsureHandle();
-
-            this.DataContext = vm;
         }
     }
 }

@@ -25,55 +25,21 @@ using Xarial.CadPlus.XBatch.Base.ViewModels;
 using Xarial.XToolkit.Reporting;
 using Xarial.CadPlus.Common;
 using System.Windows.Interop;
+using Xarial.CadPlus.Plus.Shared.Services;
+using Xarial.CadPlus.Plus.Shared;
+using Xarial.CadPlus.Plus.Services;
+using Xarial.CadPlus.Plus.Extensions;
+using Xarial.CadPlus.Plus.Shared.Styles;
 
 namespace Xarial.CadPlus.XBatch.Base
 {
     public partial class MainWindow
     {
-        private BatchManagerVM m_BatchManager;
-
-        private readonly XBatchApp m_App;
-
         public MainWindow()
         {
+            Application.Current.UsingMetroStyles();
+
             InitializeComponent();
-
-            this.Closing += OnWindowClosing;
-            m_App = (XBatchApp)Application.Current;
-            m_App.Host.Started += OnHostStarted;
-        }
-
-        private void OnHostStarted()
-        {
-            try
-            {
-                m_BatchManager = m_App.Host.Services.GetService<BatchManagerVM>();
-
-                this.DataContext = m_BatchManager;
-
-                m_BatchManager.ParentWindowHandle = new WindowInteropHelper(this).EnsureHandle();
-            }
-            catch (Exception ex)
-            {
-                IMessageService msgSvc;
-
-                try
-                {
-                    msgSvc = m_App.Host.Services.GetService<IMessageService>();
-                }
-                catch
-                {
-                    msgSvc = new GenericMessageService("Batch+");
-                }
-
-                msgSvc.ShowError(ex.ParseUserError(out _));
-                Environment.Exit(1);
-            }
-        }
-
-        private void OnWindowClosing(object sender, System.ComponentModel.CancelEventArgs e)
-        {
-            e.Cancel = !m_BatchManager.CanClose();
         }
     }
 }
