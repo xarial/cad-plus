@@ -20,7 +20,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using Xarial.CadPlus.XBatch.Base.Converters;
+using Xarial.CadPlus.Batch.Base.Controls;
 using Xarial.CadPlus.XBatch.Base.ViewModels;
 
 namespace Xarial.CadPlus.XBatch.Base.Controls
@@ -53,11 +53,11 @@ namespace Xarial.CadPlus.XBatch.Base.Controls
 
 		private DataGridColumn CreateStatusColumn(string header, Binding binding) 
 		{	
-			var elemFact = new FrameworkElementFactory(typeof(Image));
+			var elemFact = new FrameworkElementFactory(typeof(JobItemStatusControl));
 			
-			elemFact.SetValue(Image.SourceProperty, binding);
-			elemFact.SetValue(Image.WidthProperty, 16d);
-			elemFact.SetValue(Image.HeightProperty, 16d);
+			elemFact.SetValue(JobItemStatusControl.DataContextProperty, binding);
+			//elemFact.SetValue(Image.WidthProperty, 16d);
+			//elemFact.SetValue(Image.HeightProperty, 16d);
 
 			var cellTemplate = new DataTemplate()
 			{
@@ -70,7 +70,7 @@ namespace Xarial.CadPlus.XBatch.Base.Controls
 				Header = header,
 				CellTemplate = cellTemplate,
 				Width = DataGridLength.SizeToHeader,
-				SortMemberPath = binding.Path.Path
+				SortMemberPath = "Status"
 			};
 
 			return statusCol;
@@ -82,9 +82,8 @@ namespace Xarial.CadPlus.XBatch.Base.Controls
 
 			if (items?.Any() == true)
 			{
-				var fileStatusCol = CreateStatusColumn("Status", new Binding("Status")
+				var fileStatusCol = CreateStatusColumn("Status", new Binding()
 				{
-					Converter = new JobItemStatusToImageConverter(),
 					Mode = BindingMode.OneWay
 				});
 
@@ -106,9 +105,8 @@ namespace Xarial.CadPlus.XBatch.Base.Controls
 
 					var macroCol = CreateStatusColumn(
 						macro.Name,
-						new Binding(string.Format("Macros[{0}].Status", i)) 
+						new Binding(string.Format("Macros[{0}]", i)) 
 						{
-							Converter = new JobItemStatusToImageConverter(),
 							Mode = BindingMode.OneWay
 						});
 

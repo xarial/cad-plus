@@ -15,14 +15,16 @@ using System.Windows.Shapes;
 
 namespace Xarial.CadPlus.Batch.Base.Controls
 {
-    /// <summary>
-    /// Interaction logic for JobItemStatusControl.xaml
-    /// </summary>
     public partial class JobItemStatusControl : UserControl
     {
         public JobItemStatusControl()
         {
             InitializeComponent();
+        }
+
+        private void OnShowErrorClick(object sender, RoutedEventArgs e)
+        {
+            popupError.IsOpen = true;
         }
     }
 }

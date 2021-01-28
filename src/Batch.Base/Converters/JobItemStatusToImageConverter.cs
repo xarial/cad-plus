@@ -17,7 +17,7 @@ using Xarial.CadPlus.Batch.Base.Properties;
 using Xarial.CadPlus.Common.Services;
 using Xarial.XToolkit.Wpf.Extensions;
 
-namespace Xarial.CadPlus.XBatch.Base.Converters
+namespace Xarial.CadPlus.Batch.Base.Converters
 {
     public class JobItemStatusToImageConverter : IValueConverter
     {

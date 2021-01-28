@@ -17,7 +17,7 @@ namespace Xarial.CadPlus.XBatch.Base.Exceptions
 {
     public class SaveForbiddenException : UserException
     {
-        public SaveForbiddenException() : base("Saving is forbidden")
+        public SaveForbiddenException() : base("Saving is forbidden for the older version of the files")
         {
         }
     }

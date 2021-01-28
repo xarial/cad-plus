@@ -155,6 +155,7 @@
     <Compile Include="Core\BatchRunner.cs" />
     <Compile Include="Core\BatchJob.cs" />
     <Compile Include="Core\OpenFileOptions_e.cs" />
+    <Compile Include="Exceptions\CriticalErrorException.cs" />
     <Compile Include="Exceptions\SaveForbiddenException.cs" />
     <Compile Include="Extensions\DataGridExtension.cs" />
     <Compile Include="MainWindow.xaml.cs">

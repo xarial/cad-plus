@@ -14,7 +14,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Data;
 
-namespace Xarial.CadPlus.XBatch.Base.Converters
+namespace Xarial.CadPlus.Batch.Base.Converters
 {
     public class FilePathConverter : IMultiValueConverter
     {

@@ -30,6 +30,7 @@ using Xarial.XCad.Documents.Exceptions;
 using Xarial.XCad.Documents.Structures;
 using Xarial.XCad.Exceptions;
 using Xarial.XToolkit.Reporting;
+using Xarial.CadPlus.Batch.StandAlone.Exceptions;
 
 namespace Xarial.CadPlus.XBatch.Base.Core
 {
@@ -417,9 +418,11 @@ namespace Xarial.CadPlus.XBatch.Base.Core
             }
             catch (MacroRunFailedException ex)
             {
+                context.CurrentMacro.Status = JobItemStatus_e.Failed;
+
                 if (ex is ICriticalException)
                 {
-                    throw;
+                    throw new CriticalErrorException(ex);
                 }
                 else
                 {
@@ -569,7 +572,7 @@ namespace Xarial.CadPlus.XBatch.Base.Core
                 }
                 catch (Exception ex)
                 {
-                    throw new UserException("Failed to extract version of the file", ex);
+                    throw new UserException("Failed to extract version of the file. This can indicate that the file is corrupted", ex);
                 }
             }
 

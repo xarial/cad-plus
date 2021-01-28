@@ -73,6 +73,7 @@
     <Compile Include="Controls\ResultsControl.xaml.cs">
       <DependentUpon>ResultsControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Converters\ExceptionToErrorConverter.cs" />
     <Compile Include="Converters\FilePathConverter.cs" />
     <Compile Include="Converters\JobItemStatusToImageConverter.cs" />
     <Compile Include="Core\JobItem.cs" />
@@ -148,6 +149,9 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\arguments-icon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\error.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

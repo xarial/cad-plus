@@ -4,13 +4,48 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Xarial.CadPlus.Batch.Base.Controls"
+             xmlns:xconv="clr-namespace:Xarial.XToolkit.Wpf.Converters;assembly=Xarial.XToolkit.Wpf"
+             xmlns:conv="clr-namespace:Xarial.CadPlus.Batch.Base.Converters"
+             xmlns:win="clr-namespace:System.Windows;assembly=PresentationCore"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
-    <Grid>
+             d:DesignHeight="450" d:DesignWidth="800" Width="30" Height="20">
+    <UserControl.Resources>
+        <conv:JobItemStatusToImageConverter x:Key="statusToImgConv"/>
+        <xconv:ObjectIsNotNullUniversalConverter x:Key="objIsNotNullToVisConv" 
+                                                 TrueValue="{x:Static win:Visibility.Visible}"
+                                                 FalseValue="{x:Static win:Visibility.Collapsed}"/>
+        <conv:ExceptionToErrorConverter x:Key="exToErrConv"/>
+    </UserControl.Resources>
+    <Grid HorizontalAlignment="Center">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto"/>
             <ColumnDefinition Width="Auto"/>
         </Grid.ColumnDefinitions>
-        <Image Width="16" Height="16" Grid.Column="0"/>
+        <Image Width="16" Height="16" Grid.Column="0"
+               Source="{Binding Path=Status, Converter={StaticResource statusToImgConv}}"/>
+        <TextBlock x:Name="txtWhatsWrong" Visibility="{Binding Path=Error, Converter={StaticResource objIsNotNullToVisConv}}"
+                   Grid.Column="1" Margin="2" ToolTip="What's Wrong" FontSize="14" VerticalAlignment="Center">
+            <Hyperlink Click="OnShowErrorClick">?</Hyperlink>
+        </TextBlock>
+
+        <Popup x:Name="popupError" Placement="Bottom" MaxWidth="500"
+               StaysOpen="False" AllowsTransparency="True" PopupAnimation="Scroll"
+               PlacementTarget="{Binding ElementName=txtWhatsWrong}">
+            <Grid Margin="5" Background="White">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.Effect>
+                    <DropShadowEffect BlurRadius="2" Opacity="0.5" />
+                </Grid.Effect>
+                <Image Source="/Batch.Base;component/Resources/error.png" Width="12" Height="12" Margin="2"
+                       Grid.Column="0" VerticalAlignment="Center" />
+                <TextBlock VerticalAlignment="Center" Text="{Binding Path=Error, Converter={StaticResource exToErrConv}}"
+                           Foreground="Black"
+                           Margin="5" TextWrapping="Wrap"
+                           Grid.Column="1"/>
+            </Grid>
+        </Popup>
     </Grid>
 </UserControl>
