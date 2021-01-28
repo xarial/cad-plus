@@ -25,8 +25,8 @@
         <conv:JobTitleConverter x:Key="jobTitleConv"/>
         <conv:FilterTextConverter x:Key="filterTxtConv"/>
         <conv:RibbonButtonCommandToCommandConverter x:Key="ribbonBtnToCmdConv"/>
-        <conv:RibbonToggleButtonToContextConverter x:Key="ribbonToggleToContextConv"/>
-        
+        <conv:CommandGroupSelector x:Key="grpSelectorConv"/>
+
         <xconv:MatchValueUniversalConverter x:Key="statusToVisConv" 
                                                         TargetValue="{x:Static vmbase:JobState_e.InProgress}"
                                                         TrueValue="{x:Static win:Visibility.Visible}"
@@ -40,8 +40,8 @@
                                                              FalseValue="{x:Static win:Visibility.Visible}"/>
         <xconv:ObjectIsNotNullUniversalConverter x:Key="objIsNotNullConv"/>
         <xconv:BooleanUniversalConverter x:Key="boolToVisConv" 
-                                                     TrueValue="{x:Static win:Visibility.Visible}"
-                                                     FalseValue="{x:Static win:Visibility.Collapsed}"/>
+                                         TrueValue="{x:Static win:Visibility.Visible}"
+                                         FalseValue="{x:Static win:Visibility.Collapsed}"/>
         <xconv:ImageToImageSourceConverter x:Key="imgToSrcConv"/>
         <vm:RibbonCommandTemplateSelector x:Key="ribbonGrpCmdTemplateSelector">
             <vm:RibbonCommandTemplateSelector.Button>
@@ -55,11 +55,10 @@
             </vm:RibbonCommandTemplateSelector.Button>
             <vm:RibbonCommandTemplateSelector.Toggle>
                 <DataTemplate>
-                    <fluent:ToggleButton Tag="{Binding Converter={StaticResource ribbonToggleToContextConv}}"
-                                         Icon="{Binding Path=Icon, Converter={StaticResource imgToSrcConv}}" 
+                    <fluent:ToggleButton Icon="{Binding Path=Icon, Converter={StaticResource imgToSrcConv}}" 
                                          LargeIcon="{Binding Path=Icon, Converter={StaticResource imgToSrcConv}}"
                                          Header="{Binding Path=Title}"
-                                         IsChecked="{Binding Path=Tag.Value, RelativeSource={RelativeSource Mode=Self}}"/>
+                                         IsChecked="{Binding Path=Value}"/>
                 </DataTemplate>
             </vm:RibbonCommandTemplateSelector.Toggle>
         </vm:RibbonCommandTemplateSelector>
@@ -316,8 +315,9 @@
                 </fluent:RibbonGroupBox>
             </fluent:RibbonTabItem>
             <fluent:RibbonTabItem Header="Job" DataContext="{Binding Path=Document}" >
-                <fluent:RibbonGroupBox Header="Execution"
-                                       ItemsSource="{Binding Path=CommandManager.ExecutionGroup}"
+                <fluent:RibbonGroupBox DataContext="{Binding Path=CommandManager, Converter={StaticResource grpSelectorConv}}"
+                                       Header="{Binding Path=Title}"
+                                       ItemsSource="{Binding Path=Commands}"
                                        ItemTemplateSelector="{StaticResource ribbonGrpCmdTemplateSelector}"/>
 
             </fluent:RibbonTabItem>

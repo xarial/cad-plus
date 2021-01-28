@@ -5,18 +5,17 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Xarial.CadPlus.Batch.StandAlone.Properties;
+using Xarial.CadPlus.Plus.UI;
 
 namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
 {
-    public class RibbonCommandManager
+    public class RibbonCommandManager : IRibbonCommandManager
     {
-        public ObservableCollection<RibbonCommand> ExecutionGroup { get; }
-        public ObservableCollection<RibbonCommand> FileOpenOptionsGroup { get; }
+        public ObservableCollection<IRibbonTab> Tabs { get; }
 
-        public RibbonCommandManager() 
+        public RibbonCommandManager()
         {
-            ExecutionGroup = new ObservableCollection<RibbonCommand>();
-            FileOpenOptionsGroup = new ObservableCollection<RibbonCommand>();
+            Tabs = new ObservableCollection<IRibbonTab>();
         }
     }
 }

@@ -5,20 +5,18 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Data;
-using Xarial.CadPlus.Batch.StandAlone.ViewModels;
 using Xarial.CadPlus.Plus.UI;
-using Xarial.XToolkit.Wpf;
 
 namespace Xarial.CadPlus.Batch.StandAlone.Converters
 {
-    public class RibbonButtonCommandToCommandConverter : IValueConverter
+    public class CommandGroupSelector : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value is IRibbonButtonCommand) 
+            //TODO: this is temp only - select from the tab, not groups by parameter (name)
+            if (value is IRibbonCommandManager) 
             {
-                return new RelayCommand((value as IRibbonButtonCommand).Handler,
-                    (value as IRibbonButtonCommand).CanExecuteHandler);
+                return (value as IRibbonCommandManager).Tabs.First().Groups.First();
             }
 
             return null;

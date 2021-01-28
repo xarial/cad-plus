@@ -24,6 +24,7 @@ using Xarial.CadPlus.Plus.Applications;
 using Xarial.CadPlus.Plus.Exceptions;
 using Xarial.CadPlus.Plus.Services;
 using Xarial.CadPlus.Plus.Shared.Services;
+using Xarial.CadPlus.Plus.UI;
 using Xarial.CadPlus.XBatch.Base.Core;
 using Xarial.CadPlus.XBatch.Base.Exceptions;
 using Xarial.CadPlus.XBatch.Base.Models;
@@ -138,11 +139,14 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
 
         public event Action<BatchDocumentVM, BatchJob, string> Save;
 
+        private readonly IBatchApplicationProxy m_BatchAppProxy;
+
         public BatchDocumentVM(FileInfo file, BatchJob job, IApplicationProvider appProvider, 
             IMessageService msgSvc,
-            Func<BatchJob, IApplicationProvider, IBatchRunJobExecutor> execFact)
+            Func<BatchJob, IApplicationProvider, IBatchRunJobExecutor> execFact,
+            IBatchApplicationProxy batchAppProxy)
             : this(Path.GetFileNameWithoutExtension(file.FullName), job, appProvider, 
-                  msgSvc, execFact)
+                  msgSvc, execFact, batchAppProxy)
         {
             m_FilePath = file.FullName;
             IsDirty = false;
@@ -150,12 +154,14 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
 
         public BatchDocumentVM(string name, BatchJob job,
             IApplicationProvider appProvider,
-            IMessageService msgSvc, Func<BatchJob, IApplicationProvider, IBatchRunJobExecutor> execFact)
+            IMessageService msgSvc, Func<BatchJob, IApplicationProvider, IBatchRunJobExecutor> execFact,
+            IBatchApplicationProxy batchAppProxy)
         {
             m_ExecFact = execFact;
             m_AppProvider = appProvider;
             m_Job = job;
             m_MsgSvc = msgSvc;
+            m_BatchAppProxy = batchAppProxy;
 
             CommandManager = LoadRibbonCommands();
 
@@ -190,9 +196,13 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
         private RibbonCommandManager LoadRibbonCommands()
         {
             var cmdMgr = new RibbonCommandManager();
+            var jobTab = new RibbonTab(BatchApplicationCommandManager.JobTab.Name, "Job");
+            cmdMgr.Tabs.Add(jobTab);
+            var execGroup = new RibbonGroup(BatchApplicationCommandManager.JobTab.ExecutionGroupName, "Execution");
+            jobTab.Groups.Add(execGroup);
 
-            cmdMgr.ExecutionGroup.Add(new RibbonButtonCommand("Run Job", Resources.run_job, RunJob, () => CanRunJob));
-            cmdMgr.ExecutionGroup.Add(new RibbonButtonCommand("Cancel Job", Resources.cancel_job,
+            execGroup.Commands.Add(new RibbonButtonCommand("Run Job", Resources.run_job, RunJob, () => CanRunJob));
+            execGroup.Commands.Add(new RibbonButtonCommand("Cancel Job", Resources.cancel_job,
                 ()=>
                 {
                     if (Results?.Selected != null) 
@@ -212,6 +222,8 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
                     }
                     
                 }));
+
+            m_BatchAppProxy.CreateCommandManager(cmdMgr);
 
             return cmdMgr;
         }
