@@ -10,7 +10,7 @@
         xmlns:xconv="clr-namespace:Xarial.XToolkit.Wpf.Converters;assembly=Xarial.XToolkit.Wpf"
         xmlns:fluent="clr-namespace:Fluent;assembly=Fluent"
         xmlns:win="clr-namespace:System.Windows;assembly=PresentationCore"
-        xmlns:vm="clr-namespace:Xarial.CadPlus.XBatch.Base.ViewModels"
+        xmlns:vm="clr-namespace:Xarial.CadPlus.Batch.StandAlone.ViewModels"
         xmlns:vmbase="clr-namespace:Xarial.CadPlus.XBatch.Base.ViewModels;assembly=Batch.Base"
         xmlns:ext="clr-namespace:Xarial.CadPlus.XBatch.Base.Extensions"
         xmlns:metro="http://metro.mahapps.com/winfx/xaml/controls"
@@ -24,6 +24,9 @@
         <conv:JobStatusToImageConverter x:Key="jobStatusToImgConv"/>
         <conv:JobTitleConverter x:Key="jobTitleConv"/>
         <conv:FilterTextConverter x:Key="filterTxtConv"/>
+        <conv:RibbonButtonCommandToCommandConverter x:Key="ribbonBtnToCmdConv"/>
+        <conv:RibbonToggleButtonToContextConverter x:Key="ribbonToggleToContextConv"/>
+        
         <xconv:MatchValueUniversalConverter x:Key="statusToVisConv" 
                                                         TargetValue="{x:Static vmbase:JobState_e.InProgress}"
                                                         TrueValue="{x:Static win:Visibility.Visible}"
@@ -40,6 +43,26 @@
                                                      TrueValue="{x:Static win:Visibility.Visible}"
                                                      FalseValue="{x:Static win:Visibility.Collapsed}"/>
         <xconv:ImageToImageSourceConverter x:Key="imgToSrcConv"/>
+        <vm:RibbonCommandTemplateSelector x:Key="ribbonGrpCmdTemplateSelector">
+            <vm:RibbonCommandTemplateSelector.Button>
+                <DataTemplate>
+                    <fluent:Button Header="{Binding Path=Title}"
+                                   Icon="{Binding Path=Icon, Converter={StaticResource imgToSrcConv}}"
+                                   LargeIcon="{Binding Path=Icon, Converter={StaticResource imgToSrcConv}}" 
+                                   Command="{Binding Converter={StaticResource ribbonBtnToCmdConv}}" 
+                                   IsEnabled="{Binding Path=Command, RelativeSource={RelativeSource Mode=Self}, Converter={StaticResource cmdEnabledConv}}"/>
+                </DataTemplate>
+            </vm:RibbonCommandTemplateSelector.Button>
+            <vm:RibbonCommandTemplateSelector.Toggle>
+                <DataTemplate>
+                    <fluent:ToggleButton Tag="{Binding Converter={StaticResource ribbonToggleToContextConv}}"
+                                         Icon="{Binding Path=Icon, Converter={StaticResource imgToSrcConv}}" 
+                                         LargeIcon="{Binding Path=Icon, Converter={StaticResource imgToSrcConv}}"
+                                         Header="{Binding Path=Title}"
+                                         IsChecked="{Binding Path=Tag.Value, RelativeSource={RelativeSource Mode=Self}}"/>
+                </DataTemplate>
+            </vm:RibbonCommandTemplateSelector.Toggle>
+        </vm:RibbonCommandTemplateSelector>
     </metro:MetroWindow.Resources>
     <metro:MetroWindow.TitleTemplate>
         <DataTemplate>
@@ -293,18 +316,10 @@
                 </fluent:RibbonGroupBox>
             </fluent:RibbonTabItem>
             <fluent:RibbonTabItem Header="Job" DataContext="{Binding Path=Document}" >
-                <fluent:RibbonGroupBox Header="Execution">
-                    <fluent:Button Header="Run Job"
-                                   Icon="/batchplus;component/Resources/run-job.png"
-                                   LargeIcon="/batchplus;component/Resources/run-job.png" 
-                                   Command="{Binding Path=RunJobCommand}" 
-                                   IsEnabled="{Binding Path=Command, RelativeSource={RelativeSource Mode=Self}, Converter={StaticResource cmdEnabledConv}}"/>
-                    <fluent:Button Header="Cancel Job"
-                                   Icon="/batchplus;component/Resources/cancel-job.png"
-                                   LargeIcon="/batchplus;component/Resources/cancel-job.png" 
-                                   Command="{Binding Path=Results.Selected.CancelJobCommand}" 
-                                   IsEnabled="{Binding Path=Command, RelativeSource={RelativeSource Mode=Self}, Converter={StaticResource cmdEnabledConv}}"/>
-                </fluent:RibbonGroupBox>
+                <fluent:RibbonGroupBox Header="Execution"
+                                       ItemsSource="{Binding Path=CommandManager.ExecutionGroup}"
+                                       ItemTemplateSelector="{StaticResource ribbonGrpCmdTemplateSelector}"/>
+
             </fluent:RibbonTabItem>
         </fluent:Ribbon>
         <Grid Grid.Row="1" DataContext="{Binding Path=Document}" Visibility="{Binding Converter={StaticResource objIsNotNullToVisConv}}">

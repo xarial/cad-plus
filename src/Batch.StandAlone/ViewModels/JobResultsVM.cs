@@ -16,9 +16,10 @@ using Xarial.CadPlus.Batch.Base.Models;
 using Xarial.CadPlus.Plus.Applications;
 using Xarial.CadPlus.XBatch.Base.Core;
 using Xarial.CadPlus.XBatch.Base.Models;
+using Xarial.CadPlus.XBatch.Base.ViewModels;
 using Xarial.XToolkit.Wpf.Extensions;
 
-namespace Xarial.CadPlus.XBatch.Base.ViewModels
+namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
 {
     public class JobResultsVM : INotifyPropertyChanged
     {

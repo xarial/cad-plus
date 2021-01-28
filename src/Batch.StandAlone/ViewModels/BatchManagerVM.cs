@@ -11,7 +11,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -33,8 +32,9 @@ using Xarial.XToolkit.Wpf.Utils;
 using Xarial.CadPlus.Batch.StandAlone.Controls;
 using System.Windows;
 using System.Windows.Interop;
+using Xarial.CadPlus.XBatch.Base;
 
-namespace Xarial.CadPlus.XBatch.Base.ViewModels
+namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
 {
     public class BatchManagerVM : INotifyPropertyChanged
     {
@@ -64,12 +64,12 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
 
         public IApplicationProvider[] AppProviders { get; }
 
-        private readonly Func<FileInfo, BatchJob, IApplicationProvider, BatchDocumentVM> m_OpenDocFunc;
+        private readonly Func<System.IO.FileInfo, BatchJob, IApplicationProvider, BatchDocumentVM> m_OpenDocFunc;
         private readonly Func<string, BatchJob, IApplicationProvider, BatchDocumentVM> m_NewDocFunc;
 
         public BatchManagerVM(IApplicationProvider[] appProviders,
             IBatchRunnerModel model, IMessageService msgSvc, 
-            Func<FileInfo, BatchJob, IApplicationProvider, BatchDocumentVM> openDocFunc,
+            Func<System.IO.FileInfo, BatchJob, IApplicationProvider, BatchDocumentVM> openDocFunc,
             Func<string, BatchJob, IApplicationProvider, BatchDocumentVM> newDocFunc)
         {
             AppProviders = appProviders;
@@ -138,7 +138,7 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
                         if (Document == null)
                         {
                             var batchJob = m_Model.LoadJobFromFile(filePath);
-                            Document = m_OpenDocFunc.Invoke(new FileInfo(filePath), batchJob, GetApplicationProviderForJob(batchJob));
+                            Document = m_OpenDocFunc.Invoke(new System.IO.FileInfo(filePath), batchJob, GetApplicationProviderForJob(batchJob));
                             Document.Save += OnSaveDocument;
                         }
                         else

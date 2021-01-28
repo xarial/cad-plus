@@ -10,8 +10,8 @@
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
         <xconv:ObjectIsNotNullUniversalConverter x:Key="objIsNotNullToVisConv" 
-                                                             TrueValue="{x:Static win:Visibility.Visible}"
-                                                             FalseValue="{x:Static win:Visibility.Collapsed}"/>
+                                                 TrueValue="{x:Static win:Visibility.Visible}"
+                                                 FalseValue="{x:Static win:Visibility.Collapsed}"/>
     </UserControl.Resources>
     <TabControl Style="{x:Null}">
         <TabItem Header="Summary">

@@ -150,6 +150,8 @@
     <Compile Include="Converters\FilterTextConverter.cs" />
     <Compile Include="Converters\JobStatusToImageConverter.cs" />
     <Compile Include="Converters\JobTitleConverter.cs" />
+    <Compile Include="Converters\RibbonButtonCommandToCommandConverter.cs" />
+    <Compile Include="Converters\RibbonToggleButtonToContextConverter.cs" />
     <Compile Include="Converters\SelectedVersionConverter.cs" />
     <Compile Include="Core\Actions_e.cs" />
     <Compile Include="Core\BatchRunner.cs" />
@@ -184,6 +186,9 @@
     <Compile Include="ViewModels\BatchDocumentSettingsVM.cs" />
     <Compile Include="ViewModels\BatchManagerVM.cs" />
     <Compile Include="ViewModels\JobResultsVM.cs" />
+    <Compile Include="ViewModels\RibbonCommandManager.cs" />
+    <Compile Include="ViewModels\RibbonCommandTemplateSelector.cs" />
+    <Compile Include="ViewModels\RibbonCommandVM.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>

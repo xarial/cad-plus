@@ -16,6 +16,8 @@ using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Input;
 using Xarial.CadPlus.Batch.Base.Models;
+using Xarial.CadPlus.Batch.StandAlone.Properties;
+using Xarial.CadPlus.Batch.StandAlone.ViewModels;
 using Xarial.CadPlus.Common.Exceptions;
 using Xarial.CadPlus.Common.Services;
 using Xarial.CadPlus.Plus.Applications;
@@ -30,7 +32,7 @@ using Xarial.XToolkit.Wpf;
 using Xarial.XToolkit.Wpf.Extensions;
 using Xarial.XToolkit.Wpf.Utils;
 
-namespace Xarial.CadPlus.XBatch.Base.ViewModels
+namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
 {
     public class FilterVM : INotifyPropertyChanged
     {
@@ -121,6 +123,8 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
             }
         }
 
+        public RibbonCommandManager CommandManager { get; }
+
         private readonly BatchJob m_Job;
         private readonly IMessageService m_MsgSvc;
 
@@ -153,6 +157,8 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
             m_Job = job;
             m_MsgSvc = msgSvc;
 
+            CommandManager = LoadRibbonCommands();
+
             InputFilesFilter = appProvider.InputFilesFilter?.Select(f => new FileFilter(f.Name, f.Extensions)).ToArray();
             MacroFilesFilter = appProvider.MacroFileFiltersProvider.GetSupportedMacros()
                 .Select(f => new FileFilter(f.Name, f.Extensions)).Union(new FileFilter[] { FileFilter.AllFiles }).ToArray();
@@ -179,6 +185,35 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
 
             Macros = new ObservableCollection<MacroData>(m_Job.Macros ?? Enumerable.Empty<MacroData>());
             Macros.CollectionChanged += OnMacrosCollectionChanged;
+        }
+
+        private RibbonCommandManager LoadRibbonCommands()
+        {
+            var cmdMgr = new RibbonCommandManager();
+
+            cmdMgr.ExecutionGroup.Add(new RibbonButtonCommand("Run Job", Resources.run_job, RunJob, () => CanRunJob));
+            cmdMgr.ExecutionGroup.Add(new RibbonButtonCommand("Cancel Job", Resources.cancel_job,
+                ()=>
+                {
+                    if (Results?.Selected != null) 
+                    {
+                        Results.Selected.CancelJob();
+                    }
+                },
+                () => 
+                {
+                    if (Results?.Selected != null)
+                    {
+                        return Results.Selected.IsBatchInProgress;
+                    }
+                    else 
+                    {
+                        return false;
+                    }
+                    
+                }));
+
+            return cmdMgr;
         }
 
         public Func<string, object> PathToMacroDataConverter { get; }

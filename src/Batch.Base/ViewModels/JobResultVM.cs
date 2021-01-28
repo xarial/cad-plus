@@ -76,10 +76,8 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
             Log = new JobResultLogVM(m_Executor);
         }
 
-        private void CancelJob()
-        {
-            m_Executor.Cancel();
-        }
+        public void CancelJob()
+            => m_Executor.Cancel();
 
         public async void RunBatchAsync()
         {

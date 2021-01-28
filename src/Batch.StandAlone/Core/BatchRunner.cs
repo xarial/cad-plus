@@ -233,7 +233,7 @@ namespace Xarial.CadPlus.XBatch.Base.Core
         }
 
         private JobItemFile[] PrepareJobScope(IXApplication app,
-            IEnumerable<string> inputs,  string[] filters, IEnumerable<MacroData> macros) 
+            IEnumerable<string> inputs, string[] filters, IEnumerable<MacroData> macros) 
         {
             var inputFiles = new List<string>();
 

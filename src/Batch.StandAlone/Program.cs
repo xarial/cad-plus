@@ -25,7 +25,7 @@ using Xarial.CadPlus.XBatch.Base;
 using Xarial.CadPlus.XBatch.Base.Core;
 using Xarial.CadPlus.XBatch.Base.Models;
 using Xarial.CadPlus.XBatch.Base.Services;
-using Xarial.CadPlus.XBatch.Base.ViewModels;
+using Xarial.CadPlus.Batch.StandAlone.ViewModels;
 using Xarial.XCad.Base;
 using Xarial.XToolkit.Reporting;
 
