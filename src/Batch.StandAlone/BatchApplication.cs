@@ -11,13 +11,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Xarial.CadPlus.Plus.Applications;
+using Xarial.CadPlus.Plus.UI;
 using Xarial.XCad;
 
-namespace Xarial.CadPlus.StandAlone
+namespace Xarial.CadPlus.Batch.StandAlone
 {
     internal class BatchApplication : IBatchApplication
     {
         public event ProcessInputDelegate ProcessInput;
+        public event CreateCommandManagerDelegate CreateCommandManager;
 
         public Guid Id => Guid.Parse(ApplicationIds.BatchStandAlone);
 
@@ -25,14 +27,18 @@ namespace Xarial.CadPlus.StandAlone
 
         private readonly List<IApplicationProvider> m_ApplicationProviders;
 
-        internal IBatchApplicationProxy Proxy { get; }
+        private readonly IBatchApplicationProxy m_Proxy;
 
         internal BatchApplication(IBatchApplicationProxy proxy)
         {
-            Proxy = proxy;
-            Proxy.RequestProcessInput += OnRequestProcessInput;
+            m_Proxy = proxy;
+            m_Proxy.RequestProcessInput += OnRequestProcessInput;
+            m_Proxy.RequestCreateCommandManager += OnRequestCreateCommandManager;
             m_ApplicationProviders = new List<IApplicationProvider>();
         }
+
+        private void OnRequestCreateCommandManager(IRibbonCommandManager cmdMgr)
+            => CreateCommandManager?.Invoke(cmdMgr);
 
         private void OnRequestProcessInput(IXApplication app, List<string> input)
             => ProcessInput?.Invoke(app, input);
@@ -44,12 +50,19 @@ namespace Xarial.CadPlus.StandAlone
     public interface IBatchApplicationProxy
     {
         event Action<IXApplication, List<string>> RequestProcessInput;
+        event Action<IRibbonCommandManager> RequestCreateCommandManager;
+
         void ProcessInput(IXApplication app, List<string> input);
+        void CreateCommandManager(IRibbonCommandManager cmdMgr);
     }
 
     internal class BatchApplicationProxy : IBatchApplicationProxy
     {
         public event Action<IXApplication, List<string>> RequestProcessInput;
+        public event Action<IRibbonCommandManager> RequestCreateCommandManager;
+
+        public void CreateCommandManager(IRibbonCommandManager cmdMgr)
+            => RequestCreateCommandManager?.Invoke(cmdMgr);
 
         public void ProcessInput(IXApplication app, List<string> input)
             => RequestProcessInput?.Invoke(app, input);

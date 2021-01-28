@@ -14,11 +14,12 @@ using System.Threading.Tasks;
 using System.Windows.Data;
 using System.Windows.Media.Imaging;
 using Xarial.CadPlus.Common.Services;
-using Xarial.CadPlus.StandAlone.Properties;
-using Xarial.CadPlus.XBatch.Base.ViewModels;
+using Xarial.CadPlus.Batch.StandAlone.Properties;
+using Xarial.CadPlus.Batch.StandAlone.ViewModels;
 using Xarial.XToolkit.Wpf.Extensions;
+using Xarial.CadPlus.XBatch.Base.ViewModels;
 
-namespace Xarial.CadPlus.XBatch.Base.Converters
+namespace Xarial.CadPlus.Batch.StandAlone.Converters
 {
     public class JobStatusToImageConverter : IValueConverter
     {

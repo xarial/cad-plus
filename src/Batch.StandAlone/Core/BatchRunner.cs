@@ -19,7 +19,7 @@ using Xarial.CadPlus.Plus.Applications;
 using Xarial.CadPlus.Plus.Exceptions;
 using Xarial.CadPlus.Plus.Services;
 using Xarial.CadPlus.Plus.Shared.Services;
-using Xarial.CadPlus.StandAlone;
+using Xarial.CadPlus.Batch.StandAlone;
 using Xarial.CadPlus.XBatch.Base.Exceptions;
 using Xarial.CadPlus.XBatch.Base.Services;
 using Xarial.XCad;
@@ -30,6 +30,7 @@ using Xarial.XCad.Documents.Exceptions;
 using Xarial.XCad.Documents.Structures;
 using Xarial.XCad.Exceptions;
 using Xarial.XToolkit.Reporting;
+using Xarial.CadPlus.Batch.StandAlone.Exceptions;
 
 namespace Xarial.CadPlus.XBatch.Base.Core
 {
@@ -232,7 +233,7 @@ namespace Xarial.CadPlus.XBatch.Base.Core
         }
 
         private JobItemFile[] PrepareJobScope(IXApplication app,
-            IEnumerable<string> inputs,  string[] filters, IEnumerable<MacroData> macros) 
+            IEnumerable<string> inputs, string[] filters, IEnumerable<MacroData> macros) 
         {
             var inputFiles = new List<string>();
 
@@ -350,6 +351,15 @@ namespace Xarial.CadPlus.XBatch.Base.Core
                 {
                     ProcessError(ex, context);
 
+                    if (context.CurrentDocument == null)
+                    {
+                        context.CurrentFile.Error = ex;
+                    }
+                    else 
+                    {
+                        context.CurrentMacro.Error = ex;
+                    }
+
                     m_UserLogger.WriteLine(ex.ParseUserError(out _));
                     m_Logger.Log(ex);
                 }
@@ -408,9 +418,11 @@ namespace Xarial.CadPlus.XBatch.Base.Core
             }
             catch (MacroRunFailedException ex)
             {
+                context.CurrentMacro.Status = JobItemStatus_e.Failed;
+
                 if (ex is ICriticalException)
                 {
-                    throw;
+                    throw new CriticalErrorException(ex);
                 }
                 else
                 {
@@ -560,7 +572,7 @@ namespace Xarial.CadPlus.XBatch.Base.Core
                 }
                 catch (Exception ex)
                 {
-                    throw new UserException("Failed to extract version of the file", ex);
+                    throw new UserException("Failed to extract version of the file. This can indicate that the file is corrupted", ex);
                 }
             }
 

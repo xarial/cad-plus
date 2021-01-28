@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Xarial.CadPlus.StandAlone.Properties {
+namespace Xarial.CadPlus.Batch.StandAlone.Properties {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace Xarial.CadPlus.StandAlone.Properties {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Xarial.CadPlus.StandAlone.Properties.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Xarial.CadPlus.Batch.StandAlone.Properties.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -86,6 +86,16 @@ namespace Xarial.CadPlus.StandAlone.Properties {
         internal static System.Drawing.Bitmap add_folder {
             get {
                 object obj = ResourceManager.GetObject("add_folder", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap add_from_file {
+            get {
+                object obj = ResourceManager.GetObject("add_from_file", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

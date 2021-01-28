@@ -10,6 +10,8 @@ using NUnit.Framework;
 using System;
 using System.Linq;
 using Xarial.CadPlus.Batch.Base.Models;
+using Xarial.CadPlus.Batch.StandAlone;
+using Xarial.CadPlus.Batch.StandAlone.ViewModels;
 using Xarial.CadPlus.Common.Services;
 using Xarial.CadPlus.Plus.Applications;
 using Xarial.CadPlus.Plus.Data;
@@ -111,7 +113,7 @@ namespace Xbatch.Tests
                 {
                     opts = j;
                     return new Mock<IBatchRunJobExecutor>().Object;
-                });
+                }, new Mock<IBatchApplicationProxy>().Object);
 
             action.Invoke(docVm);
 

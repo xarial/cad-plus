@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 using System.Windows.Data;
 using Xarial.XCad;
 
-namespace Xarial.CadPlus.XBatch.Base.Converters
+namespace Xarial.CadPlus.Batch.StandAlone.Converters
 {
     public class SelectedVersionConverter : IMultiValueConverter
     {

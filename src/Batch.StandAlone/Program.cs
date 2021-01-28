@@ -25,11 +25,11 @@ using Xarial.CadPlus.XBatch.Base;
 using Xarial.CadPlus.XBatch.Base.Core;
 using Xarial.CadPlus.XBatch.Base.Models;
 using Xarial.CadPlus.XBatch.Base.Services;
-using Xarial.CadPlus.XBatch.Base.ViewModels;
+using Xarial.CadPlus.Batch.StandAlone.ViewModels;
 using Xarial.XCad.Base;
 using Xarial.XToolkit.Reporting;
 
-namespace Xarial.CadPlus.StandAlone
+namespace Xarial.CadPlus.Batch.StandAlone
 {
     class Program
     {
@@ -119,7 +119,7 @@ namespace Xarial.CadPlus.StandAlone
                 window.Closing += OnWindowClosing;
                 window.DataContext = m_BatchManager;
 
-                m_BatchManager.ParentWindowHandle = new WindowInteropHelper(window).EnsureHandle();
+                m_BatchManager.ParentWindow = window;
 
                 if (m_StartupOptions != null)
                 {
@@ -130,7 +130,7 @@ namespace Xarial.CadPlus.StandAlone
 
                     if (m_StartupOptions.CreateNew)
                     {
-                        m_BatchManager.NewDocument(m_StartupOptions.ApplicationId);
+                        m_BatchManager.CreateDocument(m_StartupOptions.ApplicationId);
                     }
                 }
             }

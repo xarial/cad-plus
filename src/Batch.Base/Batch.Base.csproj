@@ -48,21 +48,24 @@
     <Reference Include="System.Xml" />
     <Reference Include="WindowsBase" />
     <Reference Include="Xarial.CadPlusPlus, Version=0.2.0.0, Culture=neutral, PublicKeyToken=60dcaf351d4060db, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Xarial.CadPlusPlus.0.2.0-20210122.6\lib\net461\Xarial.CadPlusPlus.dll</HintPath>
+      <HintPath>..\..\packages\Xarial.CadPlusPlus.0.2.0-20210128.1\lib\net461\Xarial.CadPlusPlus.dll</HintPath>
     </Reference>
     <Reference Include="Xarial.XCad, Version=0.6.11.0, Culture=neutral, PublicKeyToken=60dcaf351d4060db, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Xarial.XCad.0.6.11-20210122.1\lib\net461\Xarial.XCad.dll</HintPath>
+      <HintPath>..\..\packages\Xarial.XCad.0.6.11-20210125.1\lib\net461\Xarial.XCad.dll</HintPath>
     </Reference>
-    <Reference Include="Xarial.XToolkit, Version=0.2.7.0, Culture=neutral, PublicKeyToken=60dcaf351d4060db, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Xarial.XToolkit.0.2.7\lib\net461\Xarial.XToolkit.dll</HintPath>
+    <Reference Include="Xarial.XToolkit, Version=0.2.8.0, Culture=neutral, PublicKeyToken=60dcaf351d4060db, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Xarial.XToolkit.0.2.8\lib\net461\Xarial.XToolkit.dll</HintPath>
     </Reference>
-    <Reference Include="Xarial.XToolkit.Wpf, Version=0.2.15.0, Culture=neutral, PublicKeyToken=60dcaf351d4060db, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Xarial.XToolkit.Wpf.0.2.15\lib\net461\Xarial.XToolkit.Wpf.dll</HintPath>
+    <Reference Include="Xarial.XToolkit.Wpf, Version=0.2.16.0, Culture=neutral, PublicKeyToken=60dcaf351d4060db, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Xarial.XToolkit.Wpf.0.2.16\lib\net461\Xarial.XToolkit.Wpf.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Controls\JobItemsDataGrid.xaml.cs">
       <DependentUpon>JobItemsDataGrid.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\JobItemStatusControl.xaml.cs">
+      <DependentUpon>JobItemStatusControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="Controls\MacroDataControl.xaml.cs">
       <DependentUpon>MacroDataControl.xaml</DependentUpon>
@@ -70,6 +73,7 @@
     <Compile Include="Controls\ResultsControl.xaml.cs">
       <DependentUpon>ResultsControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Converters\ExceptionToErrorConverter.cs" />
     <Compile Include="Converters\FilePathConverter.cs" />
     <Compile Include="Converters\JobItemStatusToImageConverter.cs" />
     <Compile Include="Core\JobItem.cs" />
@@ -86,6 +90,7 @@
     </Compile>
     <Compile Include="ViewModels\JobItemFileVM.cs" />
     <Compile Include="ViewModels\JobItemMacroVM.cs" />
+    <Compile Include="ViewModels\JobItemVM.cs" />
     <Compile Include="ViewModels\JobResultLogVM.cs" />
     <Compile Include="ViewModels\JobResultSummaryVM.cs" />
     <Compile Include="ViewModels\JobResultVM.cs" />
@@ -94,6 +99,10 @@
     <Page Include="Controls\JobItemsDataGrid.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Controls\JobItemStatusControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Controls\MacroDataControl.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -140,6 +149,9 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\arguments-icon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\error.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -20,11 +20,8 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Xarial.CadPlus.XBatch.Base.Controls
+namespace Xarial.CadPlus.Batch.StandAlone.Controls
 {
-    /// <summary>
-    /// Interaction logic for HomePage.xaml
-    /// </summary>
     public partial class HomePage : UserControl
     {
         public HomePage()

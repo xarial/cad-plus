@@ -11,29 +11,19 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Xarial.CadPlus.Batch.Base.ViewModels;
 using Xarial.CadPlus.Common.Services;
 using Xarial.XToolkit.Wpf.Extensions;
 
 namespace Xarial.CadPlus.XBatch.Base.ViewModels
 {
-    public class JobItemMacroVM : INotifyPropertyChanged
+    public class JobItemMacroVM : JobItemVM
     {
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        public string Name => m_JobItemMacro.DisplayName;
-        public JobItemStatus_e Status => m_JobItemMacro.Status;
-
         private readonly IJobItemOperation m_JobItemMacro;
 
-        public JobItemMacroVM(IJobItemOperation jobItemMacro)
+        public JobItemMacroVM(IJobItemOperation jobItemMacro) : base(jobItemMacro)
         {
             m_JobItemMacro = jobItemMacro;
-            m_JobItemMacro.StatusChanged += OnJobItemMacroStatusChanged;
-        }
-
-        private void OnJobItemMacroStatusChanged(IJobItem item, JobItemStatus_e newStatus)
-        {
-            this.NotifyChanged(nameof(Status));
         }
     }
 }

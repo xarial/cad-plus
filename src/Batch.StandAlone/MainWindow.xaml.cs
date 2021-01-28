@@ -21,7 +21,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Xarial.CadPlus.Common.Services;
 using Xarial.CadPlus.XBatch.Base.Services;
-using Xarial.CadPlus.XBatch.Base.ViewModels;
+using Xarial.CadPlus.Batch.StandAlone.ViewModels;
 using Xarial.XToolkit.Reporting;
 using Xarial.CadPlus.Common;
 using System.Windows.Interop;

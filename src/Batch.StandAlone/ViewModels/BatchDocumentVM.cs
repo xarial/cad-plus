@@ -16,12 +16,15 @@ using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Input;
 using Xarial.CadPlus.Batch.Base.Models;
+using Xarial.CadPlus.Batch.StandAlone.Properties;
+using Xarial.CadPlus.Batch.StandAlone.ViewModels;
 using Xarial.CadPlus.Common.Exceptions;
 using Xarial.CadPlus.Common.Services;
 using Xarial.CadPlus.Plus.Applications;
 using Xarial.CadPlus.Plus.Exceptions;
 using Xarial.CadPlus.Plus.Services;
 using Xarial.CadPlus.Plus.Shared.Services;
+using Xarial.CadPlus.Plus.UI;
 using Xarial.CadPlus.XBatch.Base.Core;
 using Xarial.CadPlus.XBatch.Base.Exceptions;
 using Xarial.CadPlus.XBatch.Base.Models;
@@ -30,7 +33,7 @@ using Xarial.XToolkit.Wpf;
 using Xarial.XToolkit.Wpf.Extensions;
 using Xarial.XToolkit.Wpf.Utils;
 
-namespace Xarial.CadPlus.XBatch.Base.ViewModels
+namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
 {
     public class FilterVM : INotifyPropertyChanged
     {
@@ -107,6 +110,8 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
         public ICommand SaveDocumentCommand { get; }
         public ICommand SaveAsDocumentCommand { get; }
 
+        public ICommand AddFromFileCommand { get; }
+
         public ICommand FilterEditEndingCommand { get; }
 
         public bool IsDirty
@@ -118,6 +123,8 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
                 this.NotifyChanged();
             }
         }
+
+        public RibbonCommandManager CommandManager { get; }
 
         private readonly BatchJob m_Job;
         private readonly IMessageService m_MsgSvc;
@@ -132,11 +139,14 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
 
         public event Action<BatchDocumentVM, BatchJob, string> Save;
 
+        private readonly IBatchApplicationProxy m_BatchAppProxy;
+
         public BatchDocumentVM(FileInfo file, BatchJob job, IApplicationProvider appProvider, 
             IMessageService msgSvc,
-            Func<BatchJob, IApplicationProvider, IBatchRunJobExecutor> execFact)
+            Func<BatchJob, IApplicationProvider, IBatchRunJobExecutor> execFact,
+            IBatchApplicationProxy batchAppProxy)
             : this(Path.GetFileNameWithoutExtension(file.FullName), job, appProvider, 
-                  msgSvc, execFact)
+                  msgSvc, execFact, batchAppProxy)
         {
             m_FilePath = file.FullName;
             IsDirty = false;
@@ -144,12 +154,16 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
 
         public BatchDocumentVM(string name, BatchJob job,
             IApplicationProvider appProvider,
-            IMessageService msgSvc, Func<BatchJob, IApplicationProvider, IBatchRunJobExecutor> execFact)
+            IMessageService msgSvc, Func<BatchJob, IApplicationProvider, IBatchRunJobExecutor> execFact,
+            IBatchApplicationProxy batchAppProxy)
         {
             m_ExecFact = execFact;
             m_AppProvider = appProvider;
             m_Job = job;
             m_MsgSvc = msgSvc;
+            m_BatchAppProxy = batchAppProxy;
+
+            CommandManager = LoadRibbonCommands();
 
             InputFilesFilter = appProvider.InputFilesFilter?.Select(f => new FileFilter(f.Name, f.Extensions)).ToArray();
             MacroFilesFilter = appProvider.MacroFileFiltersProvider.GetSupportedMacros()
@@ -161,6 +175,7 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
             SaveDocumentCommand = new RelayCommand(SaveDocument, () => IsDirty);
             SaveAsDocumentCommand = new RelayCommand(SaveAsDocument);
             FilterEditEndingCommand = new RelayCommand<DataGridCellEditEndingEventArgs>(FilterEditEnding);
+            AddFromFileCommand = new RelayCommand(AddFromFile);
 
             Name = name;
             Settings = new BatchDocumentSettingsVM(m_Job, m_AppProvider);
@@ -176,6 +191,41 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
 
             Macros = new ObservableCollection<MacroData>(m_Job.Macros ?? Enumerable.Empty<MacroData>());
             Macros.CollectionChanged += OnMacrosCollectionChanged;
+        }
+
+        private RibbonCommandManager LoadRibbonCommands()
+        {
+            var cmdMgr = new RibbonCommandManager();
+            var jobTab = new RibbonTab(BatchApplicationCommandManager.JobTab.Name, "Job");
+            cmdMgr.Tabs.Add(jobTab);
+            var execGroup = new RibbonGroup(BatchApplicationCommandManager.JobTab.ExecutionGroupName, "Execution");
+            jobTab.Groups.Add(execGroup);
+
+            execGroup.Commands.Add(new RibbonButtonCommand("Run Job", Resources.run_job, RunJob, () => CanRunJob));
+            execGroup.Commands.Add(new RibbonButtonCommand("Cancel Job", Resources.cancel_job,
+                ()=>
+                {
+                    if (Results?.Selected != null) 
+                    {
+                        Results.Selected.CancelJob();
+                    }
+                },
+                () => 
+                {
+                    if (Results?.Selected != null)
+                    {
+                        return Results.Selected.IsBatchInProgress;
+                    }
+                    else 
+                    {
+                        return false;
+                    }
+                    
+                }));
+
+            m_BatchAppProxy.CreateCommandManager(cmdMgr);
+
+            return cmdMgr;
         }
 
         public Func<string, object> PathToMacroDataConverter { get; }
@@ -260,6 +310,25 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
             for (int i = 0; i < Filters.Count; i++) 
             {
                 Filters[i].SetBinding(m_Job.Filters, i);
+            }
+        }
+
+        private void AddFromFile()
+        {
+            if (FileSystemBrowser.BrowseFileOpen(out string path, "Select text file",
+                FileSystemBrowser.BuildFilterString(new FileFilter("Text Files", "*.txt", "*.csv"), FileFilter.AllFiles))) 
+            {
+                if (File.Exists(path))
+                {
+                    foreach (var input in File.ReadAllLines(path)) 
+                    {
+                        Input.Add(input);
+                    }
+                }
+                else 
+                {
+                    m_MsgSvc.ShowError("File does not exist");
+                }
             }
         }
 

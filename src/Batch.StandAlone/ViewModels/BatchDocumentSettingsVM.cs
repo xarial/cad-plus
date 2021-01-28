@@ -19,7 +19,7 @@ using Xarial.XCad;
 using Xarial.XToolkit.Wpf;
 using Xarial.XToolkit.Wpf.Extensions;
 
-namespace Xarial.CadPlus.XBatch.Base.ViewModels
+namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
 {
     public class BatchDocumentSettingsVM : INotifyPropertyChanged
     {

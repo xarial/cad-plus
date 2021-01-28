@@ -14,6 +14,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Data;
 using Xarial.XCad.Base.Attributes;
+using Xarial.XToolkit.Wpf.Extensions;
 
 namespace Xarial.CadPlus.Batch.StandAlone.Modules.ViewModels
 {
@@ -35,9 +36,21 @@ namespace Xarial.CadPlus.Batch.StandAlone.Modules.ViewModels
         public string FilePath { get; set; }
     }
 
-    public class InputsSorterVM
+    public class InputsSorterVM : INotifyPropertyChanged
     {
-        public ICollectionView InputView { get; }
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        private ICollectionView m_InputView;
+
+        public ICollectionView InputView 
+        {
+            get => m_InputView;
+            set
+            {
+                m_InputView = value;
+                this.NotifyChanged();
+            }
+        }
 
         private SortType_e m_SortType;
 
@@ -63,12 +76,42 @@ namespace Xarial.CadPlus.Batch.StandAlone.Modules.ViewModels
             }
         }
 
-        public InputsSorterVM(List<ItemVM> input) 
+        private bool m_IsInitializing;
+        private double m_Progress;
+
+        public bool IsInitializing 
+        {
+            get => m_IsInitializing;
+            private set 
+            {
+                m_IsInitializing = value;
+                this.NotifyChanged();
+            }
+        }
+
+        public double Progress 
+        {
+            get => m_Progress;
+            set 
+            {
+                m_Progress = value;
+                this.NotifyChanged();
+            }
+        }
+
+        public InputsSorterVM() 
+        {
+            IsInitializing = true;
+        }
+
+        internal void LoadItems(List<ItemVM> input) 
         {
             InputView = CollectionViewSource.GetDefaultView(input);
             InputView.GroupDescriptions.Add(new ItemLevelGroupDescription());
             InputView.Filter = Filter;
             SortType = SortType_e.ChildrenToParents;
+
+            IsInitializing = false;
         }
 
         private bool Filter(object item)
