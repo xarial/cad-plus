@@ -15,6 +15,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Xarial.CadPlus.Plus.Data;
 using Xarial.CadPlus.Plus.Services;
+using Xarial.CadPlus.Plus.UI;
 using Xarial.XCad;
 using Xarial.XCad.Base.Attributes;
 
@@ -57,10 +58,23 @@ namespace Xarial.CadPlus.Plus.Applications
     }
 
     public delegate void ProcessInputDelegate(IXApplication app, List<string> input);
+    public delegate void CreateCommandManagerDelegate(IRibbonCommandManager cmdMgr);
+
+    //TODO: fill all other standard tabs
+    public class BatchApplicationCommandManager 
+    {
+        public static class JobTab 
+        {
+            public const string Name = "Job";
+
+            public const string ExecutionGroupName = "Execution";
+        }
+    }
 
     public interface IBatchApplication : IApplication
     {
         event ProcessInputDelegate ProcessInput;
+        event CreateCommandManagerDelegate CreateCommandManager;
 
         IApplicationProvider[] ApplicationProviders { get; }
         void RegisterApplicationProvider(IApplicationProvider provider);
