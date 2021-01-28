@@ -19,6 +19,7 @@ namespace Xarial.CadPlus.Xport.Core
     internal class JobItem : IJobItem
     {
         public event Action<IJobItem, JobItemStatus_e> StatusChanged;
+        public event Action<IJobItem, Exception> ErrorReported;
 
         public string DisplayName { get; protected set; }
 
@@ -34,7 +35,18 @@ namespace Xarial.CadPlus.Xport.Core
             }
         }
 
+        public Exception Error 
+        {
+            get => m_Error;
+            set 
+            {
+                m_Error = value;
+                ErrorReported?.Invoke(this, value);
+            }
+        }
+
         private JobItemStatus_e m_Status;
+        private Exception m_Error;
 
         internal JobItem(string filePath)
         {

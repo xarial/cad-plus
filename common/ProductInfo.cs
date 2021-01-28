@@ -2,4 +2,4 @@
 
 [assembly: AssemblyCompany("Xarial Pty Limited")]
 [assembly: AssemblyProduct("CAD+ Toolset")]
-[assembly: AssemblyCopyright("Copyright © Xarial Pty Limited 2020")]
+[assembly: AssemblyCopyright("Copyright © Xarial Pty Limited 2021")]

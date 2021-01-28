@@ -13,13 +13,14 @@ using System.Text;
 using System.Threading.Tasks;
 using Xarial.CadPlus.AddIn.Base.Properties;
 using Xarial.CadPlus.Common.Attributes;
+using Xarial.CadPlus.Plus.Attributes;
 using Xarial.XCad.Base.Attributes;
 using Xarial.XCad.UI.Commands.Attributes;
 using Xarial.XCad.UI.Commands.Enums;
 
 namespace Xarial.CadPlus.AddIn.Base
 {
-    [CommandGroupInfo(AddInHostApplication.ROOT_GROUP_ID)]
+    [CommandGroupInfo(AddInHost.ROOT_GROUP_ID)]
     [Title("CAD+")]
     [Description("CAD+ Toolset features and options")]
     public enum CadPlusCommands_e

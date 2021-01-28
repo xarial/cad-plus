@@ -1,22 +1,31 @@
-﻿using System;
+﻿//*********************************************************************
+//CAD+ Toolset
+//Copyright(C) 2020 Xarial Pty Limited
+//Product URL: https://cadplus.xarial.com
+//License: https://cadplus.xarial.com/license/
+//*********************************************************************
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Xarial.CadPlus.Common.Services;
+using Xarial.CadPlus.Plus.Data;
+using Xarial.CadPlus.Plus.Services;
 using Xarial.XToolkit.Wpf.Utils;
 
 namespace Xarial.CadPlus.Common.Sw.Services
 {
     public class SwMacroFileFilterProvider : IMacroFileFilterProvider
     {
-        public FileFilter[] GetSupportedMacros()
-            => new FileFilter[]
+        public FileTypeFilter[] GetSupportedMacros()
+            => new FileTypeFilter[]
             {
-                new FileFilter("VBA Macros", "*.swp"),
-                new FileFilter("SWBasic Macros", "*.swb"),
-                new FileFilter("VSTA Macros", "*.dll"),
-                new FileFilter("All Macros", "*.swp", "*.swb", "*.dll")
+                new FileTypeFilter("VBA Macros", "*.swp"),
+                new FileTypeFilter("SWBasic Macros", "*.swb"),
+                new FileTypeFilter("VSTA Macros", "*.dll"),
+                new FileTypeFilter("All Macros", "*.swp", "*.swb", "*.dll")
             };
     }
 }

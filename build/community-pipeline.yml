@@ -33,6 +33,8 @@ stages:
       displayName: 'NuGet restore'
       inputs:
         restoreSolution: 'cad-plus.sln'
+        feedsToUse: config
+        nugetConfigPath: 'nuget.config'
 
     - task: VSBuild@1
       displayName: 'Build source code and unit tests'

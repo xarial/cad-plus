@@ -12,9 +12,11 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using Xarial.XCad;
+using Xarial.XCad.Base;
 using Xarial.XCad.Enums;
 using Xarial.XCad.Structures;
 using Xarial.XCad.Toolkit.Windows;
+using Xarial.XCad.Utils.Diagnostics;
 
 namespace Xarial.CadPlus.MacroRunner
 {
@@ -26,10 +28,12 @@ namespace Xarial.CadPlus.MacroRunner
         private const string MACRO_RUNNER_MONIKER_NAME = "_Xarial_CadPlus_MacroRunner_";
 
         private RotRegister m_Register;
-        
-        public void Dispose()
+
+        private readonly IXLogger m_Logger;
+
+        public MacroRunnerBase() 
         {
-            m_Register?.Dispose();
+            m_Logger = new TraceLogger("CAD+ Macro Runner");
         }
 
         public IMacroParameter PopParameter(object appDisp)
@@ -38,10 +42,16 @@ namespace Xarial.CadPlus.MacroRunner
 
             GetMacroParametersManager(false, out _, out IMacroParameterManager macroParamsMgr);
 
-            var sessionId = GetCurrentMacroSessionId(app);
-            var param = macroParamsMgr.PopParameter(sessionId);
-
-            return param;
+            if (macroParamsMgr != null)
+            {
+                var sessionId = GetCurrentMacroSessionId(app);
+                var param = macroParamsMgr.PopParameter(sessionId);
+                return param;
+            }
+            else
+            {
+                throw new Exception("Failed to retrieve the macro parameters manager");
+            }
         }
 
         public IMacroResult Run(object appDisp, string macroPath, string moduleName, 
@@ -50,7 +60,7 @@ namespace Xarial.CadPlus.MacroRunner
             var app = CastApplication(appDisp);
 
             var macro = app.OpenMacro(macroPath);
-            
+
             GetMacroParametersManager(true, out RotRegister newReg, out IMacroParameterManager macroParamsMgr);
 
             if (newReg != null)
@@ -76,12 +86,19 @@ namespace Xarial.CadPlus.MacroRunner
             {
                 var sessionId = CreateMacroSessionId(app, macro);
                 macroParamsMgr.PushParameter(sessionId, param);
-                macro.Run(new MacroEntryPoint(moduleName, subName), (MacroRunOptions_e)opts);
-                macroParamsMgr.TryRemoveParameter(sessionId, param);
+
+                try
+                {
+                    macro.Run(new MacroEntryPoint(moduleName, subName), (MacroRunOptions_e)opts);
+                }
+                finally
+                {
+                    macroParamsMgr.TryRemoveParameter(sessionId, param);
+                }
             }
-            finally 
+            finally
             {
-                if (newReg != null && !cacheReg) 
+                if (newReg != null && !cacheReg)
                 {
                     newReg.Dispose();
                 }
@@ -96,14 +113,15 @@ namespace Xarial.CadPlus.MacroRunner
 
         private void GetMacroParametersManager(bool createIfNotExist, out RotRegister newRegister, out IMacroParameterManager macroParamsMgr) 
         {
-            macroParamsMgr = RotHelper.TryGetComObjectByMonikerName<IMacroParameterManager>(MACRO_RUNNER_MONIKER_NAME);
+            macroParamsMgr = RotHelper.TryGetComObjectByMonikerName<IMacroParameterManager>(
+                MACRO_RUNNER_MONIKER_NAME, m_Logger);
 
             if (macroParamsMgr == null)
             {
                 if (createIfNotExist)
                 {
                     macroParamsMgr = new MacroParameterManager();
-                    newRegister = new RotRegister(macroParamsMgr, MACRO_RUNNER_MONIKER_NAME);
+                    newRegister = new RotRegister(macroParamsMgr, MACRO_RUNNER_MONIKER_NAME, m_Logger);
                 }
                 else
                 {
@@ -114,6 +132,11 @@ namespace Xarial.CadPlus.MacroRunner
             {
                 newRegister = null;
             }
+        }
+
+        public void Dispose()
+        {
+            m_Register?.Dispose();
         }
     }
 }

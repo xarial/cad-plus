@@ -1,10 +1,18 @@
-﻿using System;
+﻿//*********************************************************************
+//CAD+ Toolset
+//Copyright(C) 2020 Xarial Pty Limited
+//Product URL: https://cadplus.xarial.com
+//License: https://cadplus.xarial.com/license/
+//*********************************************************************
+
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Xarial.CadPlus.Common.Services;
+using Xarial.CadPlus.Plus.Services;
 using Xarial.CadPlus.XBatch.Base.Core;
 using Xarial.XToolkit.Wpf.Utils;
 
@@ -28,6 +36,7 @@ namespace Xarial.CadPlus.Batch.InApp.ViewModels
         {
             Macros = new ObservableCollection<MacroData>();
             MacroFilesFilter = fileFilterProvider.GetSupportedMacros()
+                .Select(f => new FileFilter(f.Name, f.Extensions))
                 .Union(new FileFilter[] { FileFilter.AllFiles }).ToArray();
         }
 

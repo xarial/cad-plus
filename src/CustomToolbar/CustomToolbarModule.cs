@@ -26,10 +26,14 @@ using Xarial.CadPlus.Common;
 using Xarial.CadPlus.Plus.Modules;
 using System.Collections.Generic;
 using Xarial.CadPlus.Common.Attributes;
+using Xarial.CadPlus.Plus.Attributes;
+using Xarial.CadPlus.Plus.Services;
+using Xarial.CadPlus.Plus.Shared;
+using Xarial.CadPlus.Plus.Shared.Extensions;
 
 namespace Xarial.CadPlus.CustomToolbar
 {
-    [Export(typeof(IExtensionModule))]
+    [Module(typeof(IHostExtension))]
     public class CustomToolbarModule : IToolbarModule
     {
         [Title("Toolbar+")]
@@ -45,15 +49,18 @@ namespace Xarial.CadPlus.CustomToolbar
 
         protected static Autofac.IContainer m_Container;
 
-        public static TService Resolve<TService>() 
+        public static TService Resolve<TService>()
             => m_Container.Resolve<TService>();
 
-        private IHostExtensionApplication m_Host;
+        private IHostExtension m_Host;
         private ICommandsManager m_CmdsMgr;
         private ITriggersManager m_TriggersMgr;
         private IMessageService m_Msg;
+        private IXLogger m_Logger;
 
         private List<IIconsProvider> m_IconsProviders;
+
+        public Guid Id => Guid.Parse("A4C69B9C-3DA4-4D1B-B533-A2FF66E13457");
 
         public CustomToolbarModule() 
         {
@@ -62,20 +69,24 @@ namespace Xarial.CadPlus.CustomToolbar
             RegisterIconsProvider(new ImageIconsProvider());
         }
 
-        public void Init(IHostApplication host)
+        public void Init(IHost host)
         {
-            if (!(host is IHostExtensionApplication))
+            if (!(host is IHostExtension))
             {
                 throw new InvalidCastException("This module is only availabel for extensions");
             }
 
-            m_Host = (IHostExtensionApplication)host;
+            m_Host = (IHostExtension)host;
             m_Host.Connect += OnConnect;
         }
 
         private void OnConnect()
         {
             CreateContainer();
+            
+            m_Msg = Resolve<IMessageService>();
+            m_Logger = Resolve<IXLogger>();
+
             LoadCommands();
         }
 
@@ -98,10 +109,7 @@ namespace Xarial.CadPlus.CustomToolbar
 
             builder.RegisterType<ToolbarConfigurationProvider>()
                 .As<IToolbarConfigurationProvider>();
-
-            builder.RegisterType<SettingsProvider>()
-                .As<ISettingsProvider>();
-
+            
             builder.RegisterType<CommandManagerVM>()
                 .SingleInstance();
 
@@ -116,6 +124,7 @@ namespace Xarial.CadPlus.CustomToolbar
             builder.RegisterFromServiceProvider<IMacroRunnerExService>(m_Host.Services);
             builder.RegisterFromServiceProvider<IMessageService>(m_Host.Services);
             builder.RegisterFromServiceProvider<IMacroFileFilterProvider>(m_Host.Services);
+            builder.RegisterFromServiceProvider<ISettingsProvider>(m_Host.Services);
 
             builder.RegisterInstance(m_IconsProviders.ToArray());
 
@@ -128,33 +137,40 @@ namespace Xarial.CadPlus.CustomToolbar
             
             m_CmdsMgr = Resolve<ICommandsManager>();
             m_TriggersMgr = Resolve<ITriggersManager>();
-            m_Msg = Resolve<IMessageService>();
         }
 
         private void OnCommandClick(Commands_e spec)
         {
-            switch (spec)
+            try
             {
-                case Commands_e.Configuration:
+                switch (spec)
+                {
+                    case Commands_e.Configuration:
 
-                    var vm = Resolve<CommandManagerVM>();
+                        var vm = Resolve<CommandManagerVM>();
 
-                    var popup = m_Host.Extension.CreatePopupWindow<CommandManagerForm>();
-                    popup.Control.DataContext = vm;
-                    popup.Control.WindowStartupLocation = System.Windows.WindowStartupLocation.CenterOwner;
+                        var popup = m_Host.Extension.CreatePopupWindow<CommandManagerForm>();
+                        popup.Control.DataContext = vm;
+                        popup.Control.WindowStartupLocation = System.Windows.WindowStartupLocation.CenterOwner;
 
-                    if (popup.ShowDialog() == true)
-                    {
-                        try
+                        if (popup.ShowDialog() == true)
                         {
-                            m_CmdsMgr.UpdateToolbarConfiguration(vm.Settings, vm.ToolbarInfo, vm.IsEditable);
+                            try
+                            {
+                                m_CmdsMgr.UpdateToolbarConfiguration(vm.Settings, vm.ToolbarInfo, vm.IsEditable);
+                            }
+                            catch (Exception ex)
+                            {
+                                m_Msg.ShowError(ex, "Failed to save toolbar specification");
+                            }
                         }
-                        catch (Exception ex)
-                        {
-                            m_Msg.ShowError(ex, "Failed to save toolbar specification");
-                        }
-                    }
-                    break;
+                        break;
+                }
+            }
+            catch (Exception ex)
+            {
+                m_Msg.ShowError(ex, "Unknown error");
+                m_Logger.Log(ex);
             }
         }
 

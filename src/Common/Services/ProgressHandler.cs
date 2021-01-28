@@ -34,6 +34,9 @@ namespace Xarial.CadPlus.Common.Services
     public interface IJobItem
     {
         event Action<IJobItem, JobItemStatus_e> StatusChanged;
+        event Action<IJobItem, Exception> ErrorReported;
+
+        Exception Error { get; }
         JobItemStatus_e Status { get; }
         string DisplayName { get; }
     }

@@ -24,6 +24,9 @@ using Xarial.CadPlus.Common.Sw.Services;
 using Xarial.CadPlus.Common.Sw;
 using Autofac;
 using Xarial.CadPlus.Common;
+using Xarial.CadPlus.Init;
+using Xarial.CadPlus.Plus.Applications;
+using Xarial.CadPlus.Plus.Shared;
 
 namespace Xarial.CadPlus.AddIn.Sw
 {
@@ -56,11 +59,13 @@ namespace Xarial.CadPlus.AddIn.Sw
             AppDomain.CurrentDomain.ResolveBindingRedirects(new LocalAppConfigBindingRedirectReferenceResolver());
         }
 
-        private readonly AddInHostApplication m_Host;
+        private readonly AddInHost m_Host;
 
         public CadPlusSwAddIn()
         {
-            m_Host = new AddInHostApplication(this);
+            m_Host = new AddInHost(new CadExtensionApplication(this, 
+                Guid.Parse(ApplicationIds.SolidWorksAddIn)), 
+                new Initiator());
             m_Host.ConfigureServices += OnConfigureModuleServices;
         }
         

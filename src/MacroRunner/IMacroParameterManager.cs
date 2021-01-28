@@ -15,7 +15,6 @@ namespace Xarial.CadPlus.MacroRunner
 {
     [ComVisible(true)]
     [Guid("1D7EB548-2651-4656-B205-31F258D81AF1")]
-    [InterfaceType(ComInterfaceType.InterfaceIsIDispatch)]
     public interface IMacroParameterManager
     {
         IMacroParameter PopParameter(string sessionId);
@@ -26,7 +25,6 @@ namespace Xarial.CadPlus.MacroRunner
     }
 
     [ComVisible(true)]
-    [ClassInterface(ClassInterfaceType.None)]
     [Guid("CF4B61BF-7598-4189-9D5B-D96B7E2587D0")]
     [ProgId("CadPlus.MacroRunner.MacroParameterManager")]
     public class MacroParameterManager : IMacroParameterManager

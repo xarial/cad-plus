@@ -1,4 +1,11 @@
-﻿using System;
+﻿//*********************************************************************
+//CAD+ Toolset
+//Copyright(C) 2020 Xarial Pty Limited
+//Product URL: https://cadplus.xarial.com
+//License: https://cadplus.xarial.com/license/
+//*********************************************************************
+
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -18,6 +25,8 @@ using Xarial.CadPlus.Common.Services;
 using Xarial.XToolkit.Wpf.Utils;
 using Xarial.CadPlus.Batch.InApp.ViewModels;
 using Xarial.CadPlus.Common.Attributes;
+using Xarial.CadPlus.Plus.Attributes;
+using Xarial.CadPlus.Plus.Services;
 
 namespace Xarial.CadPlus.Batch.InApp
 {

@@ -1,4 +1,11 @@
-﻿using System;
+﻿//*********************************************************************
+//CAD+ Toolset
+//Copyright(C) 2020 Xarial Pty Limited
+//Product URL: https://cadplus.xarial.com
+//License: https://cadplus.xarial.com/license/
+//*********************************************************************
+
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
@@ -6,6 +13,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Xarial.CadPlus.CustomToolbar.Base;
+using Xarial.CadPlus.Plus.Data;
 using Xarial.CadPlus.Plus.Modules;
 using Xarial.XCad.UI;
 using Xarial.XToolkit.Wpf.Utils;
@@ -22,8 +30,8 @@ namespace Xarial.CadPlus.CustomToolbar.Services
                 .Select(e => Path.GetExtension(e)).ToArray();
         }
 
-        public IconFilter Filter 
-            => new IconFilter(FileFilter.ImageFiles.Name, FileFilter.ImageFiles.Extensions);
+        public FileTypeFilter Filter 
+            => new FileTypeFilter(FileFilter.ImageFiles.Name, FileFilter.ImageFiles.Extensions);
 
         public IXImage GetIcon(string filePath) => new ImageIcon(Image.FromFile(filePath));
 

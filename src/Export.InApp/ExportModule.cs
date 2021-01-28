@@ -1,4 +1,11 @@
-﻿using System;
+﻿//*********************************************************************
+//CAD+ Toolset
+//Copyright(C) 2020 Xarial Pty Limited
+//Product URL: https://cadplus.xarial.com
+//License: https://cadplus.xarial.com/license/
+//*********************************************************************
+
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
@@ -15,11 +22,14 @@ using Xarial.XCad.UI.Commands.Enums;
 using Xarial.CadPlus.Common;
 using Xarial.CadPlus.Export.InApp.Properties;
 using Xarial.CadPlus.Common.Attributes;
+using Xarial.CadPlus.Plus.Attributes;
+using Xarial.CadPlus.Plus.Services;
+using Xarial.CadPlus.Plus.Extensions;
 
 namespace Xarial.CadPlus.Export.InApp
 {
-    [Export(typeof(IExtensionModule))]
-    public class ExportModule : IExtensionModule
+    [Module(typeof(IHostExtension))]
+    public class ExportModule : IModule
     {
         [Title("eXport+")]
         [Description("Commands to export files in a batch mode")]
@@ -33,19 +43,21 @@ namespace Xarial.CadPlus.Export.InApp
             RunStandAlone,
         }
 
-        private IHostExtensionApplication m_Host;
+        public Guid Id => Guid.Parse("961248D6-FB9B-442C-B7ED-16C113E48AEF");
+
+        private IHostExtension m_Host;
 
         private IMessageService m_Msg;
         private IXLogger m_Logger;
 
-        public void Init(IHostApplication host)
+        public void Init(IHost host)
         {
-            if (!(host is IHostExtensionApplication))
+            if (!(host is IHostExtension))
             {
                 throw new InvalidCastException("Only extension host is supported for this module");
             }
 
-            m_Host = (IHostExtensionApplication)host;
+            m_Host = (IHostExtension)host;
             m_Host.Connect += OnConnect;
         }
 

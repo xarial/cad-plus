@@ -1,4 +1,11 @@
-﻿using System;
+﻿//*********************************************************************
+//CAD+ Toolset
+//Copyright(C) 2020 Xarial Pty Limited
+//Product URL: https://cadplus.xarial.com
+//License: https://cadplus.xarial.com/license/
+//*********************************************************************
+
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -19,7 +26,7 @@ namespace Xarial.CadPlus.CustomToolbar.UI.ValidationRules
                 {
                     return new ValidationResult(false, "No enry points in the macro");
                 }
-                else 
+                else
                 {
                     return ValidationResult.ValidResult;
                 }

@@ -1,0 +1,81 @@
+﻿<Window x:Class="Xarial.CadPlus.Batch.StandAlone.Modules.UI.InputsSorterWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+        xmlns:local="clr-namespace:Xarial.CadPlus.Batch.StandAlone.Modules.UI"
+        xmlns:xctrls="clr-namespace:Xarial.XToolkit.Wpf.Controls;assembly=Xarial.XToolkit.Wpf"
+        xmlns:win="clr-namespace:System.Windows;assembly=PresentationCore"
+        xmlns:sys="clr-namespace:System;assembly=mscorlib"
+        xmlns:xconv="clr-namespace:Xarial.XToolkit.Wpf.Converters;assembly=Xarial.XToolkit.Wpf"
+        mc:Ignorable="d" Title="Batch Order"
+        d:DesignHeight="450" d:DesignWidth="800">
+    <Window.Resources>
+        <xconv:BooleanUniversalConverter x:Key="boolToVisConv" 
+                                         TrueValue="{x:Static win:Visibility.Visible}"
+                                         FalseValue="{x:Static win:Visibility.Collapsed}"/>
+        <xconv:BooleanUniversalConverter x:Key="boolToVisRevConv" 
+                                         TrueValue="{x:Static win:Visibility.Collapsed}"
+                                         FalseValue="{x:Static win:Visibility.Visible}"/>
+        <xconv:BooleanUniversalConverter x:Key="boolRevConv">
+            <xconv:BooleanUniversalConverter.TrueValue>
+                <sys:Boolean>False</sys:Boolean>
+            </xconv:BooleanUniversalConverter.TrueValue>
+            <xconv:BooleanUniversalConverter.FalseValue>
+                <sys:Boolean>True</sys:Boolean>
+            </xconv:BooleanUniversalConverter.FalseValue>
+        </xconv:BooleanUniversalConverter>
+    </Window.Resources>
+    <Grid Margin="5">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Grid Visibility="{Binding Path=IsInitializing, Converter={StaticResource boolToVisRevConv}}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <xctrls:EnumComboBox Grid.Row="0" Margin="5" Width="150" HorizontalAlignment="Left" Value="{Binding Path=SortType}"/>
+            <ListView ItemsSource="{Binding Path=InputView}" Grid.Row="1" Margin="5">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Path=FilePath}"/>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+                <ListView.GroupStyle>
+                    <GroupStyle>
+                        <GroupStyle.HeaderTemplate>
+                            <DataTemplate>
+                                <TextBlock FontWeight="Bold" Text="{Binding Name}"/>
+                            </DataTemplate>
+                        </GroupStyle.HeaderTemplate>
+                    </GroupStyle>
+                </ListView.GroupStyle>
+            </ListView>
+        </Grid>
+        <Grid Visibility="{Binding Path=IsInitializing, Converter={StaticResource boolToVisConv}}"
+              VerticalAlignment="Center">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <TextBlock Text="Building dependency tree..." TextWrapping="Wrap" FontSize="18"
+                       VerticalAlignment="Center" TextAlignment="Center"/>
+            <ProgressBar Value="{Binding Path=Progress}" Minimum="0" Maximum="1" Grid.Row="1" Height="20"/>
+        </Grid>
+        <Grid Grid.Row="1" HorizontalAlignment="Right">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <Button Grid.Column="0" Margin="10" Width="100" Click="OnOkClick"
+                    IsEnabled="{Binding Path=IsInitializing, Converter={StaticResource boolRevConv}}">
+                <TextBlock Text="OK" Margin="10"/>
+            </Button>
+            <Button Grid.Column="1" Margin="10" Width="100" Click="OnCancelClick">
+                <TextBlock Text="Cancel" Margin="10"/>
+            </Button>
+        </Grid>
+    </Grid>
+</Window>

@@ -5,9 +5,6 @@
     <Setting Name="ToolbarsSpecFile" Type="System.String" Scope="User">
       <Value Profile="(Default)">toolbars.setts</Value>
     </Setting>
-    <Setting Name="XToolbarSettingsFile" Type="System.String" Scope="User">
-      <Value Profile="(Default)">xtoolbar.json</Value>
-    </Setting>
     <Setting Name="ToggleButtonResolverCSharp" Type="System.String" Scope="User">
       <Value Profile="(Default)">using Xarial.CadPlus.CustomToolbar.Base;
 using Xarial.XCad;

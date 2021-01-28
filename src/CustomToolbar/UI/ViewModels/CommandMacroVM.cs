@@ -13,6 +13,7 @@ using Xarial.CadPlus.Common.Services;
 using Xarial.CadPlus.CustomToolbar.Enums;
 using Xarial.CadPlus.CustomToolbar.Structs;
 using Xarial.CadPlus.Plus.Modules;
+using Xarial.CadPlus.Plus.Services;
 using Xarial.XToolkit.Wpf;
 using Xarial.XToolkit.Wpf.Extensions;
 using Xarial.XToolkit.Wpf.Utils;
@@ -62,6 +63,7 @@ namespace Xarial.CadPlus.CustomToolbar.UI.ViewModels
                     m_BrowseMacroPathCommand = new RelayCommand(() =>
                     {
                         var filters = m_FilterProvider.GetSupportedMacros()
+                                    .Select(f=>new FileFilter(f.Name, f.Extensions))
                                     .Union(new FileFilter[] { FileFilter.AllFiles }).ToArray();
 
                         if (FileSystemBrowser.BrowseFileOpen(out string macroFile, 

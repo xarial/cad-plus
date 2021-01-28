@@ -1,4 +1,11 @@
-﻿using System;
+﻿//*********************************************************************
+//CAD+ Toolset
+//Copyright(C) 2020 Xarial Pty Limited
+//Product URL: https://cadplus.xarial.com
+//License: https://cadplus.xarial.com/license/
+//*********************************************************************
+
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
@@ -17,8 +24,6 @@ using Xarial.XCad.Documents;
 using Xarial.CadPlus.Common.Services;
 using Xarial.XToolkit.Reporting;
 using Xarial.XCad.Base;
-using Xarial.CadPlus.XBatch.Base.ViewModels;
-using Xarial.CadPlus.XBatch.Base.Controls;
 using Xarial.CadPlus.Batch.InApp.UI;
 using Xarial.CadPlus.Batch.InApp.Properties;
 using System.IO;
@@ -26,18 +31,32 @@ using Xarial.XCad.UI.PropertyPage.Structures;
 using Xarial.XCad.Documents.Enums;
 using Xarial.CadPlus.Common;
 using Xarial.CadPlus.Common.Attributes;
+using Xarial.CadPlus.Plus.Attributes;
+using Xarial.CadPlus.XBatch.Base.ViewModels;
+using Xarial.CadPlus.Plus.Services;
+using Xarial.CadPlus.Plus.Extensions;
 
 namespace Xarial.CadPlus.Batch.InApp
 {
-    internal class DocumentEqualityComparer : IEqualityComparer<IXDocument>
+    internal class ComponentDocumentSafeEqualityComparer : IEqualityComparer<IXComponent>
     {
-        public bool Equals(IXDocument x, IXDocument y) 
-            => string.Equals(x.Path, y.Path, StringComparison.CurrentCultureIgnoreCase);
-        public int GetHashCode(IXDocument obj) => 0;
+        public bool Equals(IXComponent x, IXComponent y)
+        {
+            try
+            {
+                return string.Equals(x.Path, y.Path, StringComparison.CurrentCultureIgnoreCase);
+            }
+            catch 
+            {
+                return false;
+            }
+        }
+
+        public int GetHashCode(IXComponent obj) => 0;
     }
 
-    [Export(typeof(IExtensionModule))]
-    public class BatchModule : IExtensionModule
+    [Module(typeof(IHostExtension))]
+    public class BatchModule : IModule
     {
         [Title("Batch+")]
         [Description("Commands to batch run macros")]
@@ -57,7 +76,9 @@ namespace Xarial.CadPlus.Batch.InApp
             RunInApp
         }
 
-        private IHostExtensionApplication m_Host;
+        public Guid Id => Guid.Parse("EBB21DBD-5310-42ED-9301-229847676459");
+
+        private IHostExtension m_Host;
 
         private IXPropertyPage<AssemblyBatchData> m_Page;
         private AssemblyBatchData m_Data;
@@ -66,14 +87,14 @@ namespace Xarial.CadPlus.Batch.InApp
         private IMessageService m_Msg;
         private IXLogger m_Logger;
 
-        public void Init(IHostApplication host)
+        public void Init(IHost host)
         {
-            if (!(host is IHostExtensionApplication))
+            if (!(host is IHostExtension))
             {
                 throw new InvalidCastException("Only extension host is supported for this module");
             }
 
-            m_Host = (IHostExtensionApplication)host;
+            m_Host = (IHostExtension)host;
             m_Host.Connect += OnConnect;
         }
 
@@ -123,8 +144,9 @@ namespace Xarial.CadPlus.Batch.InApp
                     }
                     else
                     {
-                        docs = m_Data.Components.Select(c => c.Document)
-                            .Distinct(new DocumentEqualityComparer()).ToArray();
+                        docs = m_Data.Components
+                            .Distinct(new ComponentDocumentSafeEqualityComparer())
+                            .Select(c => c.Document).ToArray();
                     }
 
                     var exec = new AssemblyBatchRunJobExecutor(m_Host.Extension.Application, m_MacroRunnerSvc,
