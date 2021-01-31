@@ -27,4 +27,16 @@ namespace Xarial.CadPlus.Plus.UI
             Groups = new List<IRibbonGroup>();
         }
     }
+
+    public static class RibbonTabExtension
+    {
+        public static bool TryGetGroup(this IRibbonTab tab, string name, out IRibbonGroup group)
+        {
+            group = tab.Groups?.FirstOrDefault(g => string.Equals(g.Name,
+                name,
+                StringComparison.CurrentCultureIgnoreCase));
+
+            return group != null;
+        }
+    }
 }
