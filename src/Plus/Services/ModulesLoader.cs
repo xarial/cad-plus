@@ -15,7 +15,10 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using Xarial.CadPlus.Plus.Atributes;
 using Xarial.CadPlus.Plus.Attributes;
+using Xarial.CadPlus.Plus.Exceptions;
+using Xarial.XToolkit.Reflection;
 
 namespace Xarial.CadPlus.Plus.Services
 {
@@ -66,6 +69,9 @@ namespace Xarial.CadPlus.Plus.Services
             {
                 throw new Exception("Cannot find the modules import field");
             }
+
+            var sorter = new ModulesSorter();
+            modules = sorter.Sort(modules);
 
             field.SetValue(host, modules);
 

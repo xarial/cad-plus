@@ -12,6 +12,7 @@ namespace Xarial.CadPlus.Plus.Atributes
         After
     }
 
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Interface, AllowMultiple = false)]
     public class ModuleOrderAttribute : Attribute
     {
         public int? Order { get; }
