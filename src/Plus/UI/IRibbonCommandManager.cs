@@ -11,4 +11,16 @@ namespace Xarial.CadPlus.Plus.UI
     {
         ObservableCollection<IRibbonTab> Tabs { get; }
     }
+
+    public static class RibbonCommandManagerExtension 
+    {
+        public static bool TryGetTab(this IRibbonCommandManager cmdMgr, string name, out IRibbonTab tab) 
+        {
+            tab = cmdMgr.Tabs?.FirstOrDefault(t => string.Equals(t.Name, 
+                name,
+                StringComparison.CurrentCultureIgnoreCase));
+
+            return tab != null;
+        }
+    }
 }
