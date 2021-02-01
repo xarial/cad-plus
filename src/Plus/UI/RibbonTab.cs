@@ -11,20 +11,20 @@ namespace Xarial.CadPlus.Plus.UI
     {
         string Name { get; }
         string Title { get; }
-        List<IRibbonGroup> Groups { get; }
+        IList<IRibbonGroup> Groups { get; }
     }
 
     public class RibbonTab : IRibbonTab
     {
         public string Name { get; }
         public string Title { get; }
-        public List<IRibbonGroup> Groups { get; }
+        public IList<IRibbonGroup> Groups { get; }
 
-        public RibbonTab(string name, string title) 
+        public RibbonTab(string name, string title, params IRibbonGroup[] groups) 
         {
             Name = name;
             Title = title;
-            Groups = new List<IRibbonGroup>();
+            Groups = new List<IRibbonGroup>(groups ?? new IRibbonGroup[0]);
         }
     }
 

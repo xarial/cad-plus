@@ -60,9 +60,28 @@ namespace Xarial.CadPlus.Plus.Applications
     public delegate void ProcessInputDelegate(IXApplication app, List<string> input);
     public delegate void CreateCommandManagerDelegate(IRibbonCommandManager cmdMgr);
 
-    //TODO: fill all other standard tabs
     public class BatchApplicationCommandManager 
     {
+        public static class InputTab
+        {
+            public const string Name = "Input";
+
+            public const string FilesGroupName = "Files";
+            public const string FolderFiltersGroupName = "FolderFilters";
+            public const string MacrosGroupName = "Macros";
+        }
+
+        public static class SettingsTab
+        {
+            public const string Name = "Settings";
+
+            public const string StartupOptionsGroupName = "StartupOptions";
+            public const string FileOpenOptionsGroupName = "FileOpenOptions";
+            public const string ProtectionGroupName = "Protection";
+            public const string ActionsGroupName = "Actions";
+            public const string ResilienceGroupName = "Resilience";
+        }
+
         public static class JobTab 
         {
             public const string Name = "Job";

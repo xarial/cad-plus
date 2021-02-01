@@ -14,8 +14,8 @@ namespace Xarial.CadPlus.Plus.UI
         public Action Handler { get; }
         public Func<bool> CanExecuteHandler { get; }
 
-        public RibbonButtonCommand(string title, Image icon, Action handler, Func<bool> canExecute)
-            : base(title, icon)
+        public RibbonButtonCommand(string title, Image icon, string description, Action handler, Func<bool> canExecute)
+            : base(title, icon, description)
         {
             Handler = handler;
             CanExecuteHandler = canExecute;
