@@ -11,7 +11,7 @@ namespace Xarial.CadPlus.Plus.UI
 
     public class RibbonToggleCommand : RibbonCommand, IRibbonToggleCommand, INotifyPropertyChanged
     {
-        public virtual event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler PropertyChanged;
 
         public bool Value 
         {
@@ -19,7 +19,7 @@ namespace Xarial.CadPlus.Plus.UI
             set
             {
                 m_Setter.Invoke(value);
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Value)));
+                RaisePropertyChanged(nameof(Value));
             }
         }
 
@@ -31,6 +31,11 @@ namespace Xarial.CadPlus.Plus.UI
         {
             m_Getter = getter;
             m_Setter = setter;
+        }
+
+        protected void RaisePropertyChanged(string prpName)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(prpName));
         }
     }
 }

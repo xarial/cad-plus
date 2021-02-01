@@ -33,15 +33,13 @@ namespace Xarial.CadPlus.Plus.UI
 
     public class RibbonNumericSwitchCommand : RibbonSwitchCommand, IRibbonNumericSwitchCommand
     {
-        public override event PropertyChangedEventHandler PropertyChanged;
-
         public double NumericValue
         {
             get => m_NumericGetter.Invoke();
             set
             {
                 m_NumericSetter.Invoke(value);
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(NumericValue)));
+                RaisePropertyChanged(nameof(NumericValue));
             }
         }
 
