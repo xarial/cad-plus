@@ -29,6 +29,7 @@ using Xarial.XToolkit.Reporting;
 using Xarial.CadPlus.Plus.Extensions;
 using Xarial.CadPlus.Drawing.Data;
 using System.ComponentModel;
+using Xarial.CadPlus.Plus.Modules;
 
 namespace Xarial.CadPlus.Drawing
 {
@@ -46,7 +47,7 @@ namespace Xarial.CadPlus.Drawing
     [Module(typeof(IHostExtension), ApplicationIds.SolidWorksAddIn)]
     public class DrawingModule : IModule
     {
-        public Guid Id => Guid.Parse("83F7DE7C-8E7E-46C8-AAC0-966B45159E68");
+        public Guid Id => Guid.Parse(ModuleIds.Drawing);
 
         private IHostExtension m_Host;
 

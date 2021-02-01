@@ -17,6 +17,7 @@ using Xarial.CadPlus.Batch.StandAlone.Modules.ViewModels;
 using Xarial.CadPlus.Plus;
 using Xarial.CadPlus.Plus.Applications;
 using Xarial.CadPlus.Plus.Attributes;
+using Xarial.CadPlus.Plus.Modules;
 using Xarial.CadPlus.Plus.UI;
 using Xarial.XCad;
 using Xarial.XCad.Documents;
@@ -26,7 +27,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.Modules
     [Module(typeof(IHostWpf), ApplicationIds.BatchStandAlone)]
     public class InputSorterModule : IModule
     {
-        public Guid Id => Guid.Parse("FBC79A8D-79F9-4939-9058-86DD5015A370");
+        public Guid Id => Guid.Parse(ModuleIds.BatchInputSorter);
 
         private IHostWpf m_Host;
         private IBatchApplication m_App;
@@ -48,11 +49,20 @@ namespace Xarial.CadPlus.Batch.StandAlone.Modules
 
         private void OnCreateCommandManager(IRibbonCommandManager cmdMgr)
         {
-            var execGroup = cmdMgr.Tabs.First(t => string.Equals(t.Name, BatchApplicationCommandManager.JobTab.Name))
-                .Groups.First(g => string.Equals(g.Name, BatchApplicationCommandManager.JobTab.ExecutionGroupName));
+            if (!cmdMgr.TryGetTab(BatchApplicationCommandManager.InputTab.Name, out IRibbonTab inputTab)) 
+            {
+                inputTab = new RibbonTab(BatchApplicationCommandManager.InputTab.Name, "Input");
+                cmdMgr.Tabs.Add(inputTab);
+            }
 
-            execGroup.Commands.Add(new RibbonToggleCommand("Order By Dependencies",
-                Resources.order_dependencies,
+            if (!inputTab.TryGetGroup("References", out IRibbonGroup group))
+            {
+                group = new RibbonGroup("References", "References");
+                inputTab.Groups.Add(group);
+            }
+
+            group.Commands.Add(new RibbonToggleCommand("Order By Dependencies",
+                Resources.order_dependencies, "",
                 () => m_EnableOrdering,
                 x => m_EnableOrdering = x));
         }

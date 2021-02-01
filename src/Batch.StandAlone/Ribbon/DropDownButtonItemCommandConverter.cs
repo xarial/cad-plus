@@ -6,20 +6,24 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Data;
 using Xarial.CadPlus.Plus.UI;
+using Xarial.XToolkit.Wpf;
 
-namespace Xarial.CadPlus.Batch.StandAlone.Converters
+namespace Xarial.CadPlus.Plus.Shared.UI
 {
-    public class CommandGroupSelector : IValueConverter
+    public class DropDownButtonItemCommandConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            //TODO: this is temp only - select from the tab, not groups by parameter (name)
-            if (value is IRibbonCommandManager) 
-            {
-                return (value as IRibbonCommandManager).Tabs.First().Groups.First();
-            }
+            var btn = value as IRibbonDropDownButton;
 
-            return null;
+            if (btn != null)
+            {
+                return new RelayCommand<object>(x => btn.Value = x);
+            }
+            else 
+            {
+                return null;
+            }
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

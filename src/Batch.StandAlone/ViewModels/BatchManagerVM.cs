@@ -64,13 +64,13 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
 
         public IApplicationProvider[] AppProviders { get; }
 
-        private readonly Func<System.IO.FileInfo, BatchJob, IApplicationProvider, BatchDocumentVM> m_OpenDocFunc;
-        private readonly Func<string, BatchJob, IApplicationProvider, BatchDocumentVM> m_NewDocFunc;
+        private readonly Func<System.IO.FileInfo, BatchJob, IApplicationProvider, MainWindow, BatchDocumentVM> m_OpenDocFunc;
+        private readonly Func<string, BatchJob, IApplicationProvider, MainWindow, BatchDocumentVM> m_NewDocFunc;
 
         public BatchManagerVM(IApplicationProvider[] appProviders,
             IBatchRunnerModel model, IMessageService msgSvc, 
-            Func<System.IO.FileInfo, BatchJob, IApplicationProvider, BatchDocumentVM> openDocFunc,
-            Func<string, BatchJob, IApplicationProvider, BatchDocumentVM> newDocFunc)
+            Func<System.IO.FileInfo, BatchJob, IApplicationProvider, MainWindow, BatchDocumentVM> openDocFunc,
+            Func<string, BatchJob, IApplicationProvider, MainWindow, BatchDocumentVM> newDocFunc)
         {
             AppProviders = appProviders;
             m_Model = model;
@@ -97,7 +97,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
 
         public ObservableCollection<string> RecentFiles => m_Model.RecentFiles;
 
-        internal Window ParentWindow { get; set; }
+        internal MainWindow ParentWindow { get; set; }
 
         internal bool CanClose()
         {
@@ -138,7 +138,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
                         if (Document == null)
                         {
                             var batchJob = m_Model.LoadJobFromFile(filePath);
-                            Document = m_OpenDocFunc.Invoke(new System.IO.FileInfo(filePath), batchJob, GetApplicationProviderForJob(batchJob));
+                            Document = m_OpenDocFunc.Invoke(new System.IO.FileInfo(filePath), batchJob, GetApplicationProviderForJob(batchJob), ParentWindow);
                             Document.Save += OnSaveDocument;
                         }
                         else
@@ -173,7 +173,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
                 var job = m_Model.CreateNewJobDocument(appId);
 
                 var provider = GetApplicationProviderForJob(job);
-                Document = m_NewDocFunc.Invoke($"{provider.DisplayName} Batch+ Document", job, provider);
+                Document = m_NewDocFunc.Invoke($"{provider.DisplayName} Batch+ Document", job, provider, ParentWindow);
                 Document.Save += OnSaveDocument;
             }
             else

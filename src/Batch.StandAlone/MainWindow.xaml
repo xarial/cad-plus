@@ -13,19 +13,21 @@
         xmlns:vm="clr-namespace:Xarial.CadPlus.Batch.StandAlone.ViewModels"
         xmlns:vmbase="clr-namespace:Xarial.CadPlus.XBatch.Base.ViewModels;assembly=Batch.Base"
         xmlns:ext="clr-namespace:Xarial.CadPlus.XBatch.Base.Extensions"
+        xmlns:sharedui="clr-namespace:Xarial.CadPlus.Plus.Shared.UI"
         xmlns:metro="http://metro.mahapps.com/winfx/xaml/controls"
         Title="Batch+" Icon="Resources/xbatch.png"
         mc:Ignorable="d" WindowState="Maximized" TitleCharacterCasing="Normal" WindowTransitionsEnabled="False"
         Height="450" Width="800">
     <metro:MetroWindow.Resources>
         <conv:CommandEnabledConverter x:Key="cmdEnabledConv"/>
-        <conv:SelectedVersionConverter x:Key="selVersConv"/>
+        <!--<conv:SelectedVersionConverter x:Key="selVersConv"/>-->
         <conv:DocumentTitleConverter x:Key="docTitleConv"/>
         <conv:JobStatusToImageConverter x:Key="jobStatusToImgConv"/>
         <conv:JobTitleConverter x:Key="jobTitleConv"/>
         <conv:FilterTextConverter x:Key="filterTxtConv"/>
-        <conv:RibbonButtonCommandToCommandConverter x:Key="ribbonBtnToCmdConv"/>
+        <!--<conv:RibbonButtonCommandToCommandConverter x:Key="ribbonBtnToCmdConv"/>
         <conv:CommandGroupSelector x:Key="grpSelectorConv"/>
+        <conv:DropDownButtonItemCommandConverter x:Key="dropDownBtnItemCmdConv"/>-->
 
         <xconv:MatchValueUniversalConverter x:Key="statusToVisConv" 
                                                         TargetValue="{x:Static vmbase:JobState_e.InProgress}"
@@ -43,7 +45,47 @@
                                          TrueValue="{x:Static win:Visibility.Visible}"
                                          FalseValue="{x:Static win:Visibility.Collapsed}"/>
         <xconv:ImageToImageSourceConverter x:Key="imgToSrcConv"/>
-        <vm:RibbonCommandTemplateSelector x:Key="ribbonGrpCmdTemplateSelector">
+        <DataTemplate x:Key="folderFilterGridTemplate">
+            <DataGrid ItemsSource="{Binding Path=Filters}" AutoGenerateColumns="False" Width="100"
+                              HeadersVisibility="None" ColumnWidth="*" CanUserAddRows="True"
+                              GridLinesVisibility="Horizontal" 
+                              ext:DataGridExtension.CellEditEndingCommand="{Binding Path=FilterEditEndingCommand}">
+                <DataGrid.Columns>
+                    <DataGridTemplateColumn>
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal">
+                                    <Image Width="16" Margin="2" Source="Resources/filter.png"/>
+                                    <TextBlock>
+                                        <TextBlock.Text>
+                                            <MultiBinding Converter="{StaticResource filterTxtConv}">
+                                                <Binding/>
+                                                <Binding Path="Value"/>
+                                            </MultiBinding>
+                                        </TextBlock.Text>
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding DataContext, RelativeSource={RelativeSource AncestorType=DataGridRow}}" Value="{x:Static CollectionView.NewItemPlaceholder}">
+                                                        <Setter Property="Foreground" Value="Gray"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+                                </StackPanel>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                        <DataGridTemplateColumn.CellEditingTemplate>
+                            <DataTemplate>
+                                <TextBox Text="{Binding Path=Value, UpdateSourceTrigger=PropertyChanged}"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellEditingTemplate>
+                    </DataGridTemplateColumn>
+                </DataGrid.Columns>
+            </DataGrid>
+        </DataTemplate>
+        <!--<vm:RibbonCommandTemplateSelector x:Key="ribbonGrpCmdTemplateSelector">
             <vm:RibbonCommandTemplateSelector.Button>
                 <DataTemplate>
                     <fluent:Button Header="{Binding Path=Title}"
@@ -61,7 +103,69 @@
                                          IsChecked="{Binding Path=Value}"/>
                 </DataTemplate>
             </vm:RibbonCommandTemplateSelector.Toggle>
-        </vm:RibbonCommandTemplateSelector>
+            <vm:RibbonCommandTemplateSelector.NumericSwitch>
+                <DataTemplate>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <metro:ToggleSwitch Grid.Column="0" VerticalAlignment="Center" 
+                                            OnContent="{Binding Path=Title, StringFormat={}{0} On}" 
+                                            OffContent="{Binding Path=Title, StringFormat={}{0} Off}"
+                                            IsOn="{Binding Path=Value}">
+                            <metro:ToggleSwitch.ToolTip>
+                                <fluent:ScreenTip Title="{Binding Path=Title}"
+                                          Text="{Binding Path=Description}"
+                                          Width="190"
+                                          IsRibbonAligned="True" />
+                            </metro:ToggleSwitch.ToolTip>
+                        </metro:ToggleSwitch>
+                        <fluent:Spinner Value="{Binding Path=NumericValue}" Grid.Column="1"
+                                        Minimum="0" Maximum="3600"
+                                        Format="0" Width="75" Margin="-20 0 0 0"
+                                        Header="" IsEnabled="{Binding Path=Value}"/>
+                    </Grid>
+                </DataTemplate>
+            </vm:RibbonCommandTemplateSelector.NumericSwitch>
+            <vm:RibbonCommandTemplateSelector.Switch>
+                <DataTemplate>
+                    <metro:ToggleSwitch VerticalAlignment="Center"
+                                        OnContent="{Binding Path=Title, StringFormat={}{0} On}" 
+                                        OffContent="{Binding Path=Title, StringFormat={}{0} Off}"
+                                        IsOn="{Binding Path=Value}">
+                        <metro:ToggleSwitch.ToolTip>
+                            <fluent:ScreenTip Title="{Binding Path=Title}"
+                                          Text="{Binding Path=Description}"
+                                          Width="190"
+                                          IsRibbonAligned="True" />
+                        </metro:ToggleSwitch.ToolTip>
+                    </metro:ToggleSwitch>
+                </DataTemplate>
+            </vm:RibbonCommandTemplateSelector.Switch>
+            <vm:RibbonCommandTemplateSelector.DropDownButton>
+                <DataTemplate>
+                    <fluent:DropDownButton LargeIcon="{Binding Path=Icon, Converter={StaticResource imgToSrcConv}}"
+                                           Header="{Binding Path=Title}" 
+                                           ItemsSource="{Binding Path=ItemsSource}">
+                        <fluent:DropDownButton.ItemTemplate>
+                            <DataTemplate>
+                                <fluent:RadioButton Header="{Binding}" 
+                                                    Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type fluent:DropDownButton}}, Converter={StaticResource dropDownBtnItemCmdConv}}" 
+                                                    CommandParameter="{Binding}">
+                                    <fluent:RadioButton.IsChecked>
+                                        <MultiBinding Mode="OneWay" Converter="{StaticResource selVersConv}">
+                                            <Binding/>
+                                            <Binding Path="Value" RelativeSource="{RelativeSource AncestorType={x:Type fluent:DropDownButton}}"/>
+                                        </MultiBinding>
+                                    </fluent:RadioButton.IsChecked>
+                                </fluent:RadioButton>
+                            </DataTemplate>
+                        </fluent:DropDownButton.ItemTemplate>
+                    </fluent:DropDownButton>
+                </DataTemplate>
+            </vm:RibbonCommandTemplateSelector.DropDownButton>
+        </vm:RibbonCommandTemplateSelector>-->
     </metro:MetroWindow.Resources>
     <metro:MetroWindow.TitleTemplate>
         <DataTemplate>
@@ -100,7 +204,11 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        <fluent:Ribbon Grid.Row="0" Visibility="{Binding Path=Document, Converter={StaticResource objIsNotNullToVisConv}}">
+        <sharedui:RibbonControl Grid.Row="0"
+                                Visibility="{Binding Path=Document, Converter={StaticResource objIsNotNullToVisConv}}"
+                                CommandManager="{Binding Path=Document.CommandManager}"/>
+        <!--<fluent:Ribbon Grid.Row="0"
+                       Visibility="{Binding Path=Document, Converter={StaticResource objIsNotNullToVisConv}}">
             <fluent:Ribbon.Menu>
                 <fluent:Backstage>
                     <fluent:BackstageTabControl>
@@ -132,7 +240,7 @@
                     </fluent:BackstageTabControl>
                 </fluent:Backstage>
             </fluent:Ribbon.Menu>
-            <fluent:RibbonTabItem Header="Input" DataContext="{Binding Path=Document}">
+            --><!--<fluent:RibbonTabItem Header="Input" DataContext="{Binding Path=Document}">
                 <fluent:RibbonGroupBox Header="Files">
                     <fluent:Button Header="Add Files..." 
                                    Command="{Binding Path=AddFilesCommand, ElementName=lstInputs}"
@@ -320,8 +428,8 @@
                                        ItemsSource="{Binding Path=Commands}"
                                        ItemTemplateSelector="{StaticResource ribbonGrpCmdTemplateSelector}"/>
 
-            </fluent:RibbonTabItem>
-        </fluent:Ribbon>
+            </fluent:RibbonTabItem>--><!--
+        </fluent:Ribbon>-->
         <Grid Grid.Row="1" DataContext="{Binding Path=Document}" Visibility="{Binding Converter={StaticResource objIsNotNullToVisConv}}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>

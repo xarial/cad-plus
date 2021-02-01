@@ -14,13 +14,13 @@ using System.Threading.Tasks;
 using System.Windows.Data;
 using Xarial.XCad;
 
-namespace Xarial.CadPlus.Batch.StandAlone.Converters
+namespace Xarial.CadPlus.Plus.Shared.UI
 {
-    public class SelectedVersionConverter : IMultiValueConverter
+    public class DropDownButtonIsItemSelectedConverter : IMultiValueConverter
     {
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {
-            return IXVersion.Equals(values[0], values[1]);
+            return object.Equals(values[0], values[1]);
         }
 
         public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)

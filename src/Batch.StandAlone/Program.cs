@@ -118,7 +118,7 @@ namespace Xarial.CadPlus.Batch.StandAlone
                 m_BatchManager = m_AppLauncher.Container.Resolve<BatchManagerVM>();
                 window.Closing += OnWindowClosing;
                 window.DataContext = m_BatchManager;
-
+                
                 m_BatchManager.ParentWindow = window;
 
                 if (m_StartupOptions != null)

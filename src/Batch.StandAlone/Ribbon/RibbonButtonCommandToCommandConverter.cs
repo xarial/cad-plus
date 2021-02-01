@@ -9,7 +9,7 @@ using Xarial.CadPlus.Batch.StandAlone.ViewModels;
 using Xarial.CadPlus.Plus.UI;
 using Xarial.XToolkit.Wpf;
 
-namespace Xarial.CadPlus.Batch.StandAlone.Converters
+namespace Xarial.CadPlus.Plus.Shared.UI
 {
     public class RibbonButtonCommandToCommandConverter : IValueConverter
     {
