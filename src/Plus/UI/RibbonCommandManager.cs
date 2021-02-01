@@ -9,7 +9,20 @@ namespace Xarial.CadPlus.Plus.UI
 {
     public interface IRibbonCommandManager
     {
-        ObservableCollection<IRibbonTab> Tabs { get; }
+        IList<IRibbonButtonCommand> Backstage { get; }
+        IList<IRibbonTab> Tabs { get; }
+    }
+
+    public class RibbonCommandManager : IRibbonCommandManager
+    {
+        public IList<IRibbonTab> Tabs { get; }
+        public IList<IRibbonButtonCommand> Backstage { get; }
+
+        public RibbonCommandManager(IRibbonButtonCommand[] backstage, params IRibbonTab[] tabs)
+        {
+            Tabs = new ObservableCollection<IRibbonTab>(tabs ?? new IRibbonTab[0]);
+            Backstage = new List<IRibbonButtonCommand>(backstage ?? new IRibbonButtonCommand[0]);
+        }
     }
 
     public static class RibbonCommandManagerExtension 

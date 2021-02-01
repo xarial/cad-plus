@@ -24,9 +24,10 @@ namespace Xarial.CadPlus.Plus.UI
         private readonly Action<double> m_NumericSetter;
 
         public RibbonNumericSwitchCommand(string title, Image icon,
+            string description, string onText, string offText,
             Func<bool> getter, Action<bool> setter,
             Func<double> numGetter, Action<double> numSetter)
-            : base(title, icon, getter, setter)
+            : base(title, icon, description, onText, offText, getter, setter)
         {
             m_NumericGetter = numGetter;
             m_NumericSetter = numSetter;
