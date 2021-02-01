@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -14,12 +15,18 @@ namespace Xarial.CadPlus.Plus.UI
         IEnumerable<object> ItemsSource { get; }
     }
 
-    public class RibbonDropDownButton : RibbonCommand, IRibbonDropDownButton
+    public class RibbonDropDownButton : RibbonCommand, IRibbonDropDownButton, INotifyPropertyChanged
     {
+        public event PropertyChangedEventHandler PropertyChanged;
+
         public object Value 
         {
             get => m_ValueGetter.Invoke();
-            set => m_ValueSetter.Invoke(value);
+            set
+            {
+                m_ValueSetter.Invoke(value);
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Value)));
+            }
         }
 
         public IEnumerable<object> ItemsSource { get; }

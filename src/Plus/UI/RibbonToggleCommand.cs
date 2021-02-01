@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Drawing;
 
 namespace Xarial.CadPlus.Plus.UI
@@ -8,12 +9,18 @@ namespace Xarial.CadPlus.Plus.UI
         bool Value { get; set; }
     }
 
-    public class RibbonToggleCommand : RibbonCommand, IRibbonToggleCommand
+    public class RibbonToggleCommand : RibbonCommand, IRibbonToggleCommand, INotifyPropertyChanged
     {
+        public virtual event PropertyChangedEventHandler PropertyChanged;
+
         public bool Value 
         {
             get => m_Getter.Invoke();
-            set => m_Setter.Invoke(value);
+            set
+            {
+                m_Setter.Invoke(value);
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Value)));
+            }
         }
 
         private readonly Func<bool> m_Getter;
