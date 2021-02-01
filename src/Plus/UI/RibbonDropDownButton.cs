@@ -1,19 +1,20 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Xarial.CadPlus.Plus.UI
 {
-    public interface IRibbonDropDownButton 
+    public interface IRibbonDropDownButton : IRibbonCommand
     {
         object Value { get; set; }
         IEnumerable<object> ItemsSource { get; }
     }
 
-    public class RibbonDropDownButton : IRibbonDropDownButton
+    public class RibbonDropDownButton : RibbonCommand, IRibbonDropDownButton
     {
         public object Value 
         {
@@ -26,8 +27,9 @@ namespace Xarial.CadPlus.Plus.UI
         private readonly Func<object> m_ValueGetter;
         private readonly Action<object> m_ValueSetter;
 
-        public RibbonDropDownButton(Func<object> valueGetter, Action<object> valueSetter,
-            IEnumerable<object> itemsSource) 
+        public RibbonDropDownButton(string title, Image icon, string description,
+            Func<object> valueGetter, Action<object> valueSetter, IEnumerable<object> itemsSource) 
+            : base(title, icon, description)
         {
             m_ValueGetter = valueGetter;
             m_ValueSetter = valueSetter;
