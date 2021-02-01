@@ -22,7 +22,7 @@ namespace Xarial.CadPlus.Plus.UI
 
         public string Format { get; }
 
-        public RibbonNumericSwitchCommandOptions(int min, int max, bool hideOnUnchecked, string format) 
+        public RibbonNumericSwitchCommandOptions(double min, double max, bool hideOnUnchecked, string format) 
         {
             Minimum = min;
             Maximum = max;
