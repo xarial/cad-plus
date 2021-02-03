@@ -61,6 +61,8 @@ namespace Xarial.CadPlus.Plus.Services
                 .Where(e => MatchesHostType(e.Metadata.TargetHostType) && MatchesAppId(e.Metadata.TargetApplicationIds))
                 .Select(e => e.Value).ToArray();
 
+            CheckDuplicates(modules);
+
             var field = host.GetType().GetFields(BindingFlags.Public | BindingFlags.Instance | BindingFlags.NonPublic)
                 .First(f => f.FieldType == typeof(IModule[])
                 && f.GetCustomAttributes<ImportManyAttribute>(true).Any());
@@ -81,6 +83,16 @@ namespace Xarial.CadPlus.Plus.Services
                 {
                     module.Init(host);
                 }
+            }
+        }
+
+        private void CheckDuplicates(IModule[] modules)
+        {
+            var dupModuleIds = modules.GroupBy(m => m.Id).Where(x => x.Count() > 1).Select(m => m.Key).ToArray();
+
+            if (dupModuleIds.Any())
+            {
+                throw new UserException($"Duplicate modules detected: {string.Join(", ", dupModuleIds)}");
             }
         }
 
