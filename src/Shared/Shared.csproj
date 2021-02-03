@@ -24,17 +24,10 @@
     <PackageIconUrl>https://cadplus.xarial.com/icon.png</PackageIconUrl>-->
   </PropertyGroup>
   <ItemGroup>
-    <Compile Remove="UI\Ribbon\RibbonControl.xaml.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Remove="Styles\SharedStyles.xaml" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="..\..\LICENSE.md">
       <Pack>True</Pack>
       <PackagePath></PackagePath>
     </None>
-    <None Include="UI\Ribbon\RibbonControl.xaml.cs" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Autofac" Version="6.0.0" />
@@ -42,16 +35,6 @@
     <PackageReference Include="Fluent.Ribbon" Version="8.0.0" />
     <PackageReference Include="MahApps.Metro" Version="2.2.0" />
     <PackageReference Include="Xarial.XToolkit.Wpf" Version="0.2.16" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="UI\Ribbon\RibbonControl.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Styles\SharedStyles.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Resource>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Plus\Plus.csproj" />
