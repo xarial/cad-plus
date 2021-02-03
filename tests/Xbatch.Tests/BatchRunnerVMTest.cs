@@ -113,7 +113,7 @@ namespace Xbatch.Tests
                 {
                     opts = j;
                     return new Mock<IBatchRunJobExecutor>().Object;
-                }, new Mock<IBatchApplicationProxy>().Object);
+                }, new Mock<IBatchApplicationProxy>().Object, null, null);
 
             action.Invoke(docVm);
 

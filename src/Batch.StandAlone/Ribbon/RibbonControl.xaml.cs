@@ -14,6 +14,8 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Xarial.CadPlus.Plus.UI;
+using Xarial.XToolkit.Wpf;
+using Xarial.XToolkit.Wpf.Extensions;
 
 namespace Xarial.CadPlus.Plus.Shared.UI
 {
@@ -44,6 +46,34 @@ namespace Xarial.CadPlus.Plus.Shared.UI
 
 		private void LoadCommandManager(IRibbonCommandManager cmdMgr)
 		{
+			ctrlRibbon.Menu = null;
+
+			if (cmdMgr?.Backstage?.Any() == true) 
+			{
+				var backstageCtrl = new BackstageTabControl();
+				ctrlRibbon.Menu = new Backstage() 
+				{
+					Content = backstageCtrl 
+				};
+
+				foreach (var btn in cmdMgr.Backstage) 
+				{
+					if (btn != null)
+					{
+						backstageCtrl.Items.Add(new Fluent.Button()
+						{
+							Header = btn.Title,
+							Command = new RelayCommand(btn.Handler, btn.CanExecuteHandler),
+							Icon = btn.Icon?.ToBitmapImage()
+						});
+					}
+					else 
+					{
+						backstageCtrl.Items.Add(new SeparatorTabItem());
+					}
+				}
+			}
+
 			ctrlRibbon.Tabs.Clear();
 
 			if (cmdMgr?.Tabs != null) 

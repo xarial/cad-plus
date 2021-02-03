@@ -178,7 +178,7 @@ namespace Xarial.CadPlus.Batch.StandAlone
                 createConsole = createConsoleLocal;
             }
 
-            return hasError;
+            return !hasError;
         }
     }
 }

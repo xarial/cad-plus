@@ -110,7 +110,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
         public ICommand RunJobCommand { get; }
 
         public ICommand SaveDocumentCommand { get; }
-        public ICommand SaveAsDocumentCommand { get; }
+        //public ICommand SaveAsDocumentCommand { get; }
 
         //public ICommand AddFromFileCommand { get; }
 
@@ -148,9 +148,9 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
         public BatchDocumentVM(FileInfo file, BatchJob job, IApplicationProvider appProvider, 
             IMessageService msgSvc,
             Func<BatchJob, IApplicationProvider, IBatchRunJobExecutor> execFact,
-            IBatchApplicationProxy batchAppProxy, MainWindow parentWnd)
+            IBatchApplicationProxy batchAppProxy, MainWindow parentWnd, IRibbonButtonCommand[] backstageCmds)
             : this(Path.GetFileNameWithoutExtension(file.FullName), job, appProvider, 
-                  msgSvc, execFact, batchAppProxy, parentWnd)
+                  msgSvc, execFact, batchAppProxy, parentWnd, backstageCmds)
         {
             m_FilePath = file.FullName;
             IsDirty = false;
@@ -159,7 +159,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
         public BatchDocumentVM(string name, BatchJob job,
             IApplicationProvider appProvider,
             IMessageService msgSvc, Func<BatchJob, IApplicationProvider, IBatchRunJobExecutor> execFact,
-            IBatchApplicationProxy batchAppProxy, MainWindow parentWnd)
+            IBatchApplicationProxy batchAppProxy, MainWindow parentWnd, IRibbonButtonCommand[] backstageCmds)
         {
             m_ExecFact = execFact;
             m_AppProvider = appProvider;
@@ -168,7 +168,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
             m_BatchAppProxy = batchAppProxy;
             m_ParentWnd = parentWnd;
 
-            CommandManager = LoadRibbonCommands();
+            CommandManager = LoadRibbonCommands(backstageCmds);
 
             InputFilesFilter = appProvider.InputFilesFilter?.Select(f => new FileFilter(f.Name, f.Extensions)).ToArray();
             MacroFilesFilter = appProvider.MacroFileFiltersProvider.GetSupportedMacros()
@@ -178,7 +178,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
 
             RunJobCommand = new RelayCommand(RunJob, () => CanRunJob);
             SaveDocumentCommand = new RelayCommand(SaveDocument, () => IsDirty);
-            SaveAsDocumentCommand = new RelayCommand(SaveAsDocument);
+            //SaveAsDocumentCommand = new RelayCommand(SaveAsDocument);
             FilterEditEndingCommand = new RelayCommand<DataGridCellEditEndingEventArgs>(FilterEditEnding);
             //AddFromFileCommand = new RelayCommand(AddFromFile);
 
@@ -198,13 +198,9 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
             Macros.CollectionChanged += OnMacrosCollectionChanged;
         }
 
-        private RibbonCommandManager LoadRibbonCommands()
+        private RibbonCommandManager LoadRibbonCommands(IRibbonButtonCommand[] backstageCmds)
         {
-            var backstage = new IRibbonButtonCommand[] 
-            {
-            };
-
-            var cmdMgr = new RibbonCommandManager(backstage,
+            var cmdMgr = new RibbonCommandManager(backstageCmds,
                 new RibbonTab(BatchApplicationCommandManager.InputTab.Name, "Input",
                     new RibbonGroup(BatchApplicationCommandManager.InputTab.FilesGroupName, "Files",
                         new RibbonButtonCommand("Add Files...", Resources.add_file, "",
@@ -338,7 +334,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
             IsDirty = true;
         }
 
-        private void SaveAsDocument()
+        internal void SaveAsDocument()
         {
             if (FileSystemBrowser.BrowseFileSave(out m_FilePath, 
                 "Select file path",
