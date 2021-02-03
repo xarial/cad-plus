@@ -14,7 +14,8 @@ namespace TestApp
 {
     public class MyAppArgs 
     {
-        public string[] Arguments { get; set; }
+        [Option('a', "args", HelpText = "Arguments")]
+        public IEnumerable<string> Arguments { get; set; }
     }
 
     public class MyApp : IApplication
@@ -92,11 +93,6 @@ namespace TestApp
 
         private static bool OnParseArguments(string[] input, Parser parser, ref MyAppArgs args, ref bool createConsole)
         {
-            args = new MyAppArgs()
-            {
-                Arguments = input
-            };
-
             m_Logger.Log("1 - Parse Arguments");
             return true;
         }

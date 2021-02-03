@@ -7,6 +7,7 @@
 
 using Autofac;
 using CommandLine;
+using CommandLine.Text;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -21,6 +22,7 @@ using Xarial.CadPlus.Plus.Hosts;
 using Xarial.CadPlus.Plus.Services;
 using Xarial.CadPlus.Plus.Shared.Services;
 using Xarial.XCad.Base;
+using Xarial.XToolkit.Reporting;
 
 namespace Xarial.CadPlus.Plus.Shared
 {
@@ -128,7 +130,7 @@ namespace Xarial.CadPlus.Plus.Shared
 
             m_IsStarted = false;
         }
-
+    
         public void Start(string[] args) 
         {
             if (!m_IsStarted)
@@ -154,6 +156,14 @@ namespace Xarial.CadPlus.Plus.Shared
                         p.IgnoreUnknownArguments = false;
                     });
 
+                    if (IsHelpRequest(args)) 
+                    {
+                        ConsoleHandler.Attach();
+                        parser.ParseArguments<TCliArgs>(new string[] { "--help" });
+                        Console.Write(parserOutput.ToString());
+                        Environment.Exit(0);
+                    }
+
                     TryParseArguments(parser, args, outputWriter, out cliArgs, out createConsole, out hasError);
                 }
 
@@ -163,13 +173,13 @@ namespace Xarial.CadPlus.Plus.Shared
                 {
                     ConsoleHandler.Attach();
 
-                    SynchronizationContext.SetSynchronizationContext(new SynchronizationContext());
-                    m_Host = new HostConsole(m_App, svc, m_Initiator);
-
                     var res = false;
 
                     if (!hasError)
                     {
+                        SynchronizationContext.SetSynchronizationContext(new SynchronizationContext());
+                        m_Host = new HostConsole(m_App, svc, m_Initiator);
+
                         try
                         {
                             if (RunConsoleAsync != null)
@@ -221,6 +231,20 @@ namespace Xarial.CadPlus.Plus.Shared
             }
         }
 
+        private bool IsHelpRequest(string[] args)
+        {
+            var helpArgs = new string[]
+            {
+                "--help",
+                "/?",
+                "\\?",
+                "-?",
+                "--?"
+            };
+
+            return args?.Any(a => helpArgs.Contains(a, StringComparer.CurrentCultureIgnoreCase)) == true;
+        }
+
         private void TryParseArguments(Parser parser, string[] input,
             TextWriter errorWriter,
             out TCliArgs args, out bool createConsole, out bool hasError)
@@ -251,8 +275,8 @@ namespace Xarial.CadPlus.Plus.Shared
                 }
                 catch (Exception ex)
                 {
-                    //TODO: parse user message error
-                    errorWriter.WriteLine(ex.Message);
+                    m_Logger.Log(ex);
+                    errorWriter.WriteLine(ex.ParseUserError(out _));
                     hasError = true;
                 }
             }

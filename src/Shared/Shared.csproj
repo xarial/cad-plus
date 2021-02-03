@@ -25,6 +25,7 @@
   </PropertyGroup>
   <ItemGroup>
     <None Remove="Styles\SharedStyles.xaml" />
+    <None Remove="UI\Ribbon\RibbonControl.xaml" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\LICENSE.md">
@@ -35,6 +36,14 @@
   <ItemGroup>
     <PackageReference Include="Autofac" Version="6.0.0" />
     <PackageReference Include="CommandLineParser" Version="2.8.0" />
+    <PackageReference Include="Fluent.Ribbon" Version="8.0.0" />
+    <PackageReference Include="MahApps.Metro" Version="2.2.0" />
+    <PackageReference Include="Xarial.XToolkit.Wpf" Version="0.2.16" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="UI\Ribbon\RibbonControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Styles\SharedStyles.xaml">
