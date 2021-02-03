@@ -5,14 +5,16 @@
                     xmlns:metro="http://metro.mahapps.com/winfx/xaml/controls"
                     xmlns:local="clr-namespace:Xarial.CadPlus.Plus.Shared.Styles">
     <Style TargetType="metro:MetroWindow" x:Key="MetroWindowStyle">
-        <Setter Property="TitleTemplate">
+        <Setter Property="TitleCharacterCasing" Value="Normal"/>
+        <Setter Property="WindowTransitionsEnabled" Value="False"/>
+        <Setter Property="IconTemplate">
             <Setter.Value>
                 <DataTemplate>
                     <Image Source="{Binding}" RenderOptions.BitmapScalingMode="Fant" Margin="2"/>
                 </DataTemplate>
             </Setter.Value>
         </Setter>
-        <Setter Property="IconTemplate">
+        <Setter Property="TitleTemplate">
             <Setter.Value>
                 <DataTemplate>
                     <TextBlock Text="{Binding}" VerticalAlignment="Center" Margin="10 0 10 0"
