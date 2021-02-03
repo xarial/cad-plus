@@ -50,6 +50,8 @@ namespace Xarial.CadPlus.Plus.Services
                 modulePaths.AddRange(hostSettings.AdditionalModuleFolders);
             }
 
+            RemoveDuplicateAndNestedFolders(modulePaths);
+
             var catalog = CreateDirectoryCatalog(modulePaths.ToArray(), "*.Module.dll");
 
             var container = new CompositionContainer(catalog);
@@ -82,6 +84,37 @@ namespace Xarial.CadPlus.Plus.Services
                 foreach (var module in modules)
                 {
                     module.Init(host);
+                }
+            }
+        }
+
+        private void RemoveDuplicateAndNestedFolders(List<string> modulePaths)
+        {
+            string NormilizePath(string path) => path.TrimEnd('\\') + "\\";
+
+            bool IsInDirectory(string thisDir, string parentDir)
+                => NormilizePath(thisDir).StartsWith(NormilizePath(parentDir),
+                    StringComparison.CurrentCultureIgnoreCase);
+
+            for (int i = modulePaths.Count - 1; i >= 0; i--)
+            {
+                var existingDirIndex = -1;
+
+                for (int j = 0; j < modulePaths.Count; j++)
+                {
+                    if (i != j)
+                    {
+                        if (IsInDirectory(modulePaths[i], modulePaths[j]))
+                        {
+                            existingDirIndex = j;
+                            break;
+                        }
+                    }
+                }
+
+                if (existingDirIndex != -1)
+                {
+                    modulePaths.RemoveAt(i);
                 }
             }
         }

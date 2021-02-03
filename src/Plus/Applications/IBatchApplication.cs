@@ -14,6 +14,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Xarial.CadPlus.Plus.Data;
+using Xarial.CadPlus.Plus.Delegates;
 using Xarial.CadPlus.Plus.Services;
 using Xarial.CadPlus.Plus.UI;
 using Xarial.XCad;
@@ -58,8 +59,7 @@ namespace Xarial.CadPlus.Plus.Applications
     }
 
     public delegate void ProcessInputDelegate(IXApplication app, List<string> input);
-    public delegate void CreateCommandManagerDelegate(IRibbonCommandManager cmdMgr);
-
+    
     public class BatchApplicationCommandManager 
     {
         public static class InputTab

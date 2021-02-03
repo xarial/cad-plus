@@ -10,12 +10,26 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Xarial.CadPlus.Plus.Delegates;
 using Xarial.CadPlus.Plus.Services;
 
 namespace Xarial.CadPlus.Plus.Applications
 {
+    public class BomApplicationCommandManager 
+    {
+        public static class ViewTab
+        {
+            public const string Name = "View";
+
+            public const string DataGroupName = "Data";
+            public const string DisplayGroupName = "Display";
+        }
+    }
+
     public interface IBomApplication : IApplication
     {
+        event CreateCommandManagerDelegate CreateCommandManager;
+
         void ViewBom(string filePath);
         IDocumentProvider[] DocumentProviders { get; }
         void RegisterDocumentProvider(IDocumentProvider provider);
