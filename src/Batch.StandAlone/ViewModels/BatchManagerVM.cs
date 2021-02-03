@@ -54,11 +54,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
         private BatchDocumentVM m_Document;
 
         public ICommand CreateDocumentCommand { get; }
-        //public ICommand NewDocumentCommand { get; }
         public ICommand OpenDocumentCommand { get; }
-        //public ICommand CloseDocumentCommand { get; }
-        //public ICommand AboutCommand { get; }
-        //public ICommand HelpCommand { get; }
 
         private readonly IBatchRunnerModel m_Model;
         private readonly IMessageService m_MsgSvc;
@@ -80,12 +76,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
             m_NewDocFunc = newDocFunc;
 
             CreateDocumentCommand = new RelayCommand<string>(CreateDocument);
-            //NewDocumentCommand = new RelayCommand(NewDocument);
-
             OpenDocumentCommand = new RelayCommand<string>(OpenDocument);
-            //CloseDocumentCommand = new RelayCommand(CloseDocument, () => Document != null);
-            //AboutCommand = new RelayCommand(ShowAbout);
-            //HelpCommand = new RelayCommand(OpenHelp);
         }
 
         private void NewDocument()

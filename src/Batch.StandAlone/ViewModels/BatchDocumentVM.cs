@@ -110,9 +110,6 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
         public ICommand RunJobCommand { get; }
 
         public ICommand SaveDocumentCommand { get; }
-        //public ICommand SaveAsDocumentCommand { get; }
-
-        //public ICommand AddFromFileCommand { get; }
 
         public ICommand FilterEditEndingCommand { get; }
 
@@ -178,9 +175,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
 
             RunJobCommand = new RelayCommand(RunJob, () => CanRunJob);
             SaveDocumentCommand = new RelayCommand(SaveDocument, () => IsDirty);
-            //SaveAsDocumentCommand = new RelayCommand(SaveAsDocument);
             FilterEditEndingCommand = new RelayCommand<DataGridCellEditEndingEventArgs>(FilterEditEnding);
-            //AddFromFileCommand = new RelayCommand(AddFromFile);
 
             Name = name;
             Settings = new BatchDocumentSettingsVM(m_Job, m_AppProvider);
