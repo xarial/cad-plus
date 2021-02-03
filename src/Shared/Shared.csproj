@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
   <PropertyGroup>
     <UseWpf>true</UseWpf>
     <TargetFramework>net461</TargetFramework>
@@ -24,14 +24,17 @@
     <PackageIconUrl>https://cadplus.xarial.com/icon.png</PackageIconUrl>-->
   </PropertyGroup>
   <ItemGroup>
+    <Compile Remove="UI\Ribbon\RibbonControl.xaml.cs" />
+  </ItemGroup>
+  <ItemGroup>
     <None Remove="Styles\SharedStyles.xaml" />
-    <None Remove="UI\Ribbon\RibbonControl.xaml" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\LICENSE.md">
       <Pack>True</Pack>
       <PackagePath></PackagePath>
     </None>
+    <None Include="UI\Ribbon\RibbonControl.xaml.cs" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Autofac" Version="6.0.0" />
@@ -41,9 +44,9 @@
     <PackageReference Include="Xarial.XToolkit.Wpf" Version="0.2.16" />
   </ItemGroup>
   <ItemGroup>
-    <Page Include="UI\Ribbon\RibbonControl.xaml">
+    <None Include="UI\Ribbon\RibbonControl.xaml">
       <Generator>MSBuild:Compile</Generator>
-    </Page>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Styles\SharedStyles.xaml">
