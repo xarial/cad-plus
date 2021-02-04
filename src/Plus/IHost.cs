@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Windows;
 using Xarial.XCad;
 
 namespace Xarial.CadPlus.Plus
@@ -62,5 +63,12 @@ namespace Xarial.CadPlus.Plus
         /// Parent window of this application
         /// </summary>
         IntPtr ParentWindow { get; }
+
+        /// <summary>
+        /// Displays the popup dialog in the current host
+        /// </summary>
+        /// <typeparam name="TWindow">Window to show in popup</typeparam>
+        void ShowPopup<TWindow>(TWindow wnd)
+            where TWindow : Window;
     }
 }

@@ -11,6 +11,7 @@ using System.ComponentModel.Composition;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using Xarial.CadPlus.Plus.Services;
 
 namespace Xarial.CadPlus.Plus.Hosts
@@ -65,5 +66,8 @@ namespace Xarial.CadPlus.Plus.Hosts
                 (Services as IDisposable).Dispose();
             }
         }
+
+        public void ShowPopup<TWindow>(TWindow wnd) where TWindow : Window
+            => wnd.ShowDialog();
     }
 }
