@@ -101,5 +101,12 @@ namespace Xarial.CadPlus.Plus.Hosts
                 (Services as IDisposable).Dispose();
             }
         }
+
+        public void ShowPopup<TWindow>(TWindow wnd) 
+            where TWindow : Window
+        {
+            wnd.Owner = WpfApplication.MainWindow;
+            wnd.ShowDialog();
+        }
     }
 }

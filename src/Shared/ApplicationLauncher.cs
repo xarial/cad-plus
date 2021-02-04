@@ -113,7 +113,7 @@ namespace Xarial.CadPlus.Plus.Shared
 
         private bool m_IsStarted;
 
-        private IHost m_Host;
+        public IHost Host { get; private set; }
         private Application m_WpfApp;
 
         public IContainer Container { get; private set; }
@@ -178,7 +178,7 @@ namespace Xarial.CadPlus.Plus.Shared
                     if (!hasError)
                     {
                         SynchronizationContext.SetSynchronizationContext(new SynchronizationContext());
-                        m_Host = new HostConsole(m_App, svc, m_Initiator);
+                        Host = new HostConsole(m_App, svc, m_Initiator);
 
                         try
                         {
@@ -218,7 +218,7 @@ namespace Xarial.CadPlus.Plus.Shared
                     m_WpfApp = new Application();
                     m_WpfApp.DispatcherUnhandledException += OnDispatcherUnhandledException;
 
-                    m_Host = new HostWpf(m_App, m_WpfApp, svc, m_Initiator, m_Logger);
+                    Host = new HostWpf(m_App, m_WpfApp, svc, m_Initiator, m_Logger);
 
                     var wnd = new TWindow();
                     WindowCreated?.Invoke(wnd, cliArgs);
