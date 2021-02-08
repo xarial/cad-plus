@@ -90,6 +90,8 @@ namespace Xarial.CadPlus.Plus.Shared
 
     public delegate void ConfigureServicesDelegate<TCliArgs>(ContainerBuilder builder, TCliArgs args);
 
+    public delegate void WriteHelpDelegate(Parser parser);
+
     /// <summary>
     /// This service allows to run application in mixed mode (either console or WPF)
     /// </summary>
@@ -99,6 +101,7 @@ namespace Xarial.CadPlus.Plus.Shared
     public class ApplicationLauncher<TCliArgs, TWindow>
         where TWindow : Window, new()
     {
+        public event WriteHelpDelegate WriteHelp;
         public event ParseArgumentsDelegate<TCliArgs> ParseArguments;
         public event WindowCreatedDelegate<TWindow, TCliArgs> WindowCreated;
         public event RunConsoleAsyncDelegate<TCliArgs> RunConsoleAsync;
@@ -159,7 +162,16 @@ namespace Xarial.CadPlus.Plus.Shared
                     if (IsHelpRequest(args)) 
                     {
                         ConsoleHandler.Attach();
-                        parser.ParseArguments<TCliArgs>(new string[] { "--help" });
+
+                        if (WriteHelp != null)
+                        {
+                            WriteHelp.Invoke(parser);
+                        }
+                        else 
+                        {
+                            parser.ParseArguments<TCliArgs>(new string[] { "--help" });
+                        }
+                        
                         Console.Write(parserOutput.ToString());
                         Environment.Exit(0);
                     }
@@ -230,7 +242,7 @@ namespace Xarial.CadPlus.Plus.Shared
                 throw new Exception("Application already started");
             }
         }
-
+        
         private bool IsHelpRequest(string[] args)
         {
             var helpArgs = new string[]
