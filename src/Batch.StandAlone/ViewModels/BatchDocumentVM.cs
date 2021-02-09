@@ -193,7 +193,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
             Macros.CollectionChanged += OnMacrosCollectionChanged;
         }
 
-        private RibbonCommandManager LoadRibbonCommands(IRibbonButtonCommand[] backstageCmds)
+        protected virtual RibbonCommandManager LoadRibbonCommands(IRibbonButtonCommand[] backstageCmds)
         {
             var cmdMgr = new RibbonCommandManager(backstageCmds,
                 new RibbonTab(BatchApplicationCommandManager.InputTab.Name, "Input",
