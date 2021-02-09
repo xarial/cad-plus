@@ -18,6 +18,13 @@ namespace TestApp
         public IEnumerable<string> Arguments { get; set; }
     }
 
+    [Verb("x", HelpText = "Additional verb")]
+    public class MyVerb 
+    {
+        [Option('n', "number", HelpText = "Some Number")]
+        public int Number { get; set; }
+    }
+
     public class MyApp : IApplication
     {
         public Guid Id => Guid.Parse("A0A1C488-96E1-4A06-BF7E-2F3EB034F676");
@@ -65,11 +72,17 @@ namespace TestApp
         {
             m_Logger = new AppLogger();
             var appLauncher = new ApplicationLauncher<MyAppArgs, MyWindow>(new MyApp(), new MyInitiator());
+            appLauncher.WriteHelp += OnWriteHelp;
             appLauncher.ConfigureServices += OnConfigureServices;
             appLauncher.ParseArguments += OnParseArguments;
             appLauncher.RunConsole += OnRunConsole;
             appLauncher.WindowCreated += OnWindowCreated;
             appLauncher.Start(args);
+        }
+
+        private static void OnWriteHelp(Parser parser, string[] args)
+        {
+            parser.ParseArguments<MyAppArgs, MyVerb>(args);
         }
 
         private static void OnWindowCreated(MyWindow window, MyAppArgs args)

@@ -90,7 +90,7 @@ namespace Xarial.CadPlus.Plus.Shared
 
     public delegate void ConfigureServicesDelegate<TCliArgs>(ContainerBuilder builder, TCliArgs args);
 
-    public delegate void WriteHelpDelegate(Parser parser);
+    public delegate void WriteHelpDelegate(Parser parser, string[] args);
 
     /// <summary>
     /// This service allows to run application in mixed mode (either console or WPF)
@@ -159,17 +159,17 @@ namespace Xarial.CadPlus.Plus.Shared
                         p.IgnoreUnknownArguments = false;
                     });
 
-                    if (IsHelpRequest(args)) 
+                    if (IsHelpRequest(args, out string[] normArgs)) 
                     {
                         ConsoleHandler.Attach();
 
                         if (WriteHelp != null)
                         {
-                            WriteHelp.Invoke(parser);
+                            WriteHelp.Invoke(parser, normArgs);
                         }
                         else 
                         {
-                            parser.ParseArguments<TCliArgs>(new string[] { "--help" });
+                            parser.ParseArguments<TCliArgs>(normArgs);
                         }
                         
                         Console.Write(parserOutput.ToString());
@@ -243,18 +243,51 @@ namespace Xarial.CadPlus.Plus.Shared
             }
         }
         
-        private bool IsHelpRequest(string[] args)
+        private bool IsHelpRequest(string[] args, out string[] normArgs)
         {
+            const string HELP_SWITCH = "--help";
+
             var helpArgs = new string[]
             {
-                "--help",
+                HELP_SWITCH,
                 "/?",
                 "\\?",
                 "-?",
                 "--?"
             };
 
-            return args?.Any(a => helpArgs.Contains(a, StringComparer.CurrentCultureIgnoreCase)) == true;
+            var normArgsList = new List<string>();
+
+            var isHelp = false;
+
+            if (args != null)
+            {
+                foreach (var arg in args) 
+                {
+                    if (helpArgs.Contains(arg, StringComparer.CurrentCultureIgnoreCase))
+                    {
+                        isHelp = true;
+                    }
+                    else 
+                    {
+                        normArgsList.Add(arg);
+                    }
+                }
+            }
+            else 
+            {
+                normArgs = null;
+                return false;
+            }
+
+            if (isHelp) 
+            {
+                normArgsList.Add(HELP_SWITCH);
+            }
+
+            normArgs = normArgsList.ToArray();
+
+            return isHelp;
         }
 
         private void TryParseArguments(Parser parser, string[] input,
