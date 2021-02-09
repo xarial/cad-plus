@@ -316,11 +316,11 @@ namespace Xarial.CadPlus.XBatch.Base.Core
             }
         }
 
-        private void TryAddProcessToJob(IXApplication app)
+        private void TryAddProcessToJob(Process prc)
         {
             try
             {
-                m_JobMgr.AddProcess(app.Process);
+                m_JobMgr.AddProcess(prc);
             }
             catch (Exception ex)
             {
@@ -475,7 +475,7 @@ namespace Xarial.CadPlus.XBatch.Base.Core
             try
             {
                 app = m_AppProvider.StartApplication(versionInfo,
-                    opts, cancellationToken);
+                    opts, p => TryAddProcessToJob(p), cancellationToken);
 
                 if (opts.HasFlag(StartupOptions_e.Silent)) 
                 {
@@ -486,8 +486,6 @@ namespace Xarial.CadPlus.XBatch.Base.Core
             {
                 throw new UserException("Failed to start host application", ex);
             }
-
-            TryAddProcessToJob(app);
 
             return app;
         }

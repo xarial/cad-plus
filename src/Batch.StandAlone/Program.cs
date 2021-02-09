@@ -100,18 +100,7 @@ namespace Xarial.CadPlus.Batch.StandAlone
 
             builder.RegisterType<JobManager>().As<IJobManager>()
                 .SingleInstance()
-                .OnActivating(x =>
-                {
-                    try
-                    {
-                        x.Instance.Init();
-                    }
-                    catch (Exception ex)
-                    {
-                        var logger = x.Context.Resolve<IXLogger>();
-                        logger.Log(ex);
-                    }
-                });
+                .OnActivating(x => x.Instance.Init());
         }
 
         private static void OnWindowCreated(MainWindow window, BatchArguments args)
