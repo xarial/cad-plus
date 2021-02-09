@@ -28,6 +28,7 @@ using Xarial.CadPlus.XBatch.Base.Services;
 using Xarial.CadPlus.Batch.StandAlone.ViewModels;
 using Xarial.XCad.Base;
 using Xarial.XToolkit.Reporting;
+using Xarial.CadPlus.Plus.Exceptions;
 
 namespace Xarial.CadPlus.Batch.StandAlone
 {
@@ -67,11 +68,12 @@ namespace Xarial.CadPlus.Batch.StandAlone
             using (var batchRunner = m_AppLauncher.Container.Resolve<BatchRunner>(
                 new TypedParameter[]
                 {
+                    new TypedParameter(typeof(BatchJob), args.Job),
                     new TypedParameter(typeof(TextWriter), Console.Out),
                     new TypedParameter(typeof(IProgressHandler), new ConsoleProgressWriter())
                 }))
             {
-                await batchRunner.BatchRun(args.Job).ConfigureAwait(false);
+                await batchRunner.BatchRunAsync().ConfigureAwait(false);
             }
         }
 

@@ -133,7 +133,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
 
         public string FilePath => m_FilePath;
 
-        private readonly Func<BatchJob, IApplicationProvider, IBatchRunJobExecutor> m_ExecFact;
+        private readonly Func<BatchJob, IBatchRunJobExecutor> m_ExecFact;
         private readonly IApplicationProvider m_AppProvider;
 
         public event Action<BatchDocumentVM, BatchJob, string> Save;
@@ -142,11 +142,11 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
 
         private readonly MainWindow m_ParentWnd;
 
-        public BatchDocumentVM(FileInfo file, BatchJob job, IApplicationProvider appProvider, 
+        public BatchDocumentVM(FileInfo file, BatchJob job, IApplicationProvider[] appProviders, 
             IMessageService msgSvc,
-            Func<BatchJob, IApplicationProvider, IBatchRunJobExecutor> execFact,
+            Func<BatchJob, IBatchRunJobExecutor> execFact,
             IBatchApplicationProxy batchAppProxy, MainWindow parentWnd, IRibbonButtonCommand[] backstageCmds)
-            : this(Path.GetFileNameWithoutExtension(file.FullName), job, appProvider, 
+            : this(Path.GetFileNameWithoutExtension(file.FullName), job, appProviders, 
                   msgSvc, execFact, batchAppProxy, parentWnd, backstageCmds)
         {
             m_FilePath = file.FullName;
@@ -154,12 +154,12 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
         }
 
         public BatchDocumentVM(string name, BatchJob job,
-            IApplicationProvider appProvider,
-            IMessageService msgSvc, Func<BatchJob, IApplicationProvider, IBatchRunJobExecutor> execFact,
+            IApplicationProvider[] appProviders,
+            IMessageService msgSvc, Func<BatchJob, IBatchRunJobExecutor> execFact,
             IBatchApplicationProxy batchAppProxy, MainWindow parentWnd, IRibbonButtonCommand[] backstageCmds)
         {
             m_ExecFact = execFact;
-            m_AppProvider = appProvider;
+            m_AppProvider = job.FindApplicationProvider(appProviders);
             m_Job = job;
             m_MsgSvc = msgSvc;
             m_BatchAppProxy = batchAppProxy;
@@ -167,8 +167,8 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
 
             CommandManager = LoadRibbonCommands(backstageCmds);
 
-            InputFilesFilter = appProvider.InputFilesFilter?.Select(f => new FileFilter(f.Name, f.Extensions)).ToArray();
-            MacroFilesFilter = appProvider.MacroFileFiltersProvider.GetSupportedMacros()
+            InputFilesFilter = m_AppProvider.InputFilesFilter?.Select(f => new FileFilter(f.Name, f.Extensions)).ToArray();
+            MacroFilesFilter = m_AppProvider.MacroFileFiltersProvider.GetSupportedMacros()
                 .Select(f => new FileFilter(f.Name, f.Extensions)).Union(new FileFilter[] { FileFilter.AllFiles }).ToArray();
 
             IsDirty = true;
@@ -180,7 +180,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
             Name = name;
             Settings = new BatchDocumentSettingsVM(m_Job, m_AppProvider);
             Settings.Modified += OnSettingsModified;
-            Results = new JobResultsVM(m_Job, m_AppProvider, m_ExecFact);
+            Results = new JobResultsVM(m_Job, m_ExecFact);
 
             Filters = new ObservableCollection<FilterVM>((m_Job.Filters ?? Enumerable.Empty<string>()).Select(f => new FilterVM(f)));
             Filters.CollectionChanged += OnFiltersCollectionChanged;
