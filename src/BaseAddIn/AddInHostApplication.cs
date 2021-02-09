@@ -33,6 +33,8 @@ using Xarial.CadPlus.Init;
 using Xarial.CadPlus.Plus.Shared;
 using Xarial.CadPlus.Plus.Shared.Services;
 using Xarial.CadPlus.Plus.Shared.Extensions;
+using System.Windows;
+using System.Windows.Interop;
 
 namespace Xarial.CadPlus.AddIn.Base
 {
@@ -212,8 +214,10 @@ namespace Xarial.CadPlus.AddIn.Base
                     break;
 
                 case CadPlusCommands_e.About:
-                    AboutDialog.Show(this.GetType().Assembly, Resources.logo,
-                        Extension.Application.WindowHandle);
+                    ShowPopup(new AboutDialog(
+                        new AboutDialogSpec(this.GetType().Assembly,
+                        Resources.logo,
+                        Licenses.ThirdParty)));
                     break;
             }
         }
@@ -229,6 +233,13 @@ namespace Xarial.CadPlus.AddIn.Base
                     module.Dispose();
                 }
             }
+        }
+
+        public void ShowPopup<TWindow>(TWindow wnd) where TWindow : Window
+        {
+            var interopHelper = new WindowInteropHelper(wnd);
+            interopHelper.Owner = ParentWindow;
+            wnd.ShowDialog();
         }
     }
 }

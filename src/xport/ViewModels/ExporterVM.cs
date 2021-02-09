@@ -19,6 +19,7 @@ using System.Windows.Input;
 using WK.Libraries.BetterFolderBrowserNS;
 using Xarial.CadPlus.Common.Services;
 using Xarial.CadPlus.Plus.Services;
+using Xarial.CadPlus.Plus.Shared;
 using Xarial.CadPlus.Xport.Core;
 using Xarial.CadPlus.Xport.Models;
 using Xarial.CadPlus.Xport.Properties;
@@ -126,7 +127,7 @@ namespace Xarial.CadPlus.Xport.ViewModels
             }
         }
 
-        internal IntPtr ParentWindowHandle { get; set; }
+        internal MainWindow ParentWindow { get; set; }
 
         private readonly IExporterModel m_Model;
         private readonly IMessageService m_MsgSvc;
@@ -223,8 +224,13 @@ namespace Xarial.CadPlus.Xport.ViewModels
 
         private void ShowAbout()
         {
-            AboutDialog.Show(this.GetType().Assembly, Resources.export_plus_icon,
-                        ParentWindowHandle);
+            var aboutDlg = new AboutDialog(
+                new AboutDialogSpec(this.GetType().Assembly,
+                Resources.export_plus_icon,
+                Licenses.ThirdParty));
+
+            aboutDlg.Owner = ParentWindow;
+            aboutDlg.ShowDialog();
         }
 
         private void OpenHelp()

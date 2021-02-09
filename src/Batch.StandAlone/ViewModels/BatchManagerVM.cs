@@ -34,6 +34,7 @@ using System.Windows;
 using System.Windows.Interop;
 using Xarial.CadPlus.XBatch.Base;
 using Xarial.CadPlus.Plus.UI;
+using Xarial.CadPlus.Plus.Shared;
 
 namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
 {
@@ -210,8 +211,13 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
 
         private void ShowAbout() 
         {
-            AboutDialog.Show(this.GetType().Assembly, Resources.batch_plus_icon,
-                         new WindowInteropHelper(ParentWindow).Handle);
+            var aboutDlg = new AboutDialog(
+                new AboutDialogSpec(this.GetType().Assembly,
+                Resources.batch_plus_icon,
+                Licenses.ThirdParty));
+
+            aboutDlg.Owner = ParentWindow;
+            aboutDlg.ShowDialog();
         }
 
         private void OpenHelp() 

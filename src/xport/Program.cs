@@ -40,7 +40,7 @@ namespace Xarial.CadPlus.Xport
                 new ExporterModel(),
                 new GenericMessageService("eXport+"));
 
-            vm.ParentWindowHandle = new WindowInteropHelper(window).EnsureHandle();
+            vm.ParentWindow = window;
 
             window.DataContext = vm;
         }

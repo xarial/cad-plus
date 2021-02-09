@@ -53,6 +53,7 @@ namespace Xarial.CadPlus.Batch.StandAlone
             m_AppLauncher = new ApplicationLauncher<BatchArguments, MainWindow>(m_BatchApp, new Initiator());
             m_AppLauncher.ConfigureServices += OnConfigureServices;
             m_AppLauncher.ParseArguments += OnParseArguments;
+            m_AppLauncher.WriteHelp += OnWriteHelp;
             m_AppLauncher.WindowCreated += OnWindowCreated;
             m_AppLauncher.RunConsoleAsync += OnRunConsoleAsync;
             m_AppLauncher.Start(args);
@@ -168,7 +169,7 @@ namespace Xarial.CadPlus.Batch.StandAlone
                 BatchArguments argsLocal = default;
                 bool createConsoleLocal = false;
 
-                parser.ParseArguments<XBatch.Base.FileOptions, RunOptions, JobOptions>(input)
+                CreateParserResult(parser, input)
                     .WithParsed<RunOptions>(a => { argsLocal = a; createConsoleLocal = true; })
                     .WithParsed<JobOptions>(a => { argsLocal = a; createConsoleLocal = true; })
                     .WithParsed<XBatch.Base.FileOptions>(a => m_StartupOptions = a)
@@ -180,5 +181,13 @@ namespace Xarial.CadPlus.Batch.StandAlone
 
             return !hasError;
         }
+
+        private static void OnWriteHelp(Parser parser, string[] args)
+        {
+            CreateParserResult(parser, args);
+        }
+
+        private static ParserResult<object> CreateParserResult(Parser parser, string[] args)
+            => parser.ParseArguments<XBatch.Base.FileOptions, RunOptions, JobOptions>(args);
     }
 }

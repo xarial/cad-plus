@@ -11,6 +11,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Xarial.CadPlus.Plus.Applications;
+using Xarial.CadPlus.Plus.Delegates;
 using Xarial.CadPlus.Plus.UI;
 using Xarial.XCad;
 
