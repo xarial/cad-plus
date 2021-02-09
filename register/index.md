@@ -12,7 +12,7 @@ Please do not hesitate to contact us via [e-mail](mailto:info@xarial.com) for an
 
 Please fill the form below to register your free copy of CAD+ Toolset Community Edition. Our team will review your request and contact you within 48 business hours
 
-<iframe src="https://docs.google.com/forms/d/e/1FAIpQLScZO5Vg3p_Dw1RH-ihI4MjGUobnOki4WQ9AB93pNk1m1XtcSA/viewform?embedded=true" width="640" height="1711" frameborder="0" marginheight="0" marginwidth="0">Loading…</iframe>
+<iframe src="https://docs.google.com/forms/d/e/1FAIpQLScZO5Vg3p_Dw1RH-ihI4MjGUobnOki4WQ9AB93pNk1m1XtcSA/viewform?embedded=true" width="640" height="2650" frameborder="0" marginheight="0" marginwidth="0">Loading…</iframe>
 
 ## FAQ
 
