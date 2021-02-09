@@ -48,7 +48,7 @@ namespace Xarial.CadPlus.Plus.Shared
 
         internal static void Attach()
         {
-            //need to call before AttachConsoel so the output can be redirected
+            //need to call before AttachConsole so the output can be redirected
             var outHandle = GetStdHandle(STD_OUTPUT_HANDLE);
 
             if (IsOutputRedirected(outHandle))
