@@ -100,9 +100,11 @@ namespace Xarial.CadPlus.Batch.Sw
         }
 
         public IXApplication StartApplication(IXVersion vers, StartupOptions_e opts,
-            CancellationToken cancellationToken)
+            Action<Process> startingHandler, CancellationToken cancellationToken)
         {
             var app = SwApplicationFactory.PreCreate();
+            app.Starting += (s, p) => startingHandler.Invoke(p);
+
             app.State = ApplicationState_e.Default;
             app.Version = (ISwVersion)vers;
 
@@ -153,6 +155,11 @@ namespace Xarial.CadPlus.Batch.Sw
             m_ForceDisabledAddIns.Add(prc, forceDisabledAddIns);
 
             return app;
+        }
+
+        private void App_Starting(IXApplication sender, Process process)
+        {
+            throw new NotImplementedException();
         }
 
         private void OnProcessExited(object sender, EventArgs e)

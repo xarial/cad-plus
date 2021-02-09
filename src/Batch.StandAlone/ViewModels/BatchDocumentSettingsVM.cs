@@ -293,7 +293,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
 
         public IXVersion[] InstalledVersions { get; set; }
 
-        public ICommand SelectVersionCommand { get; }
+        //public ICommand SelectVersionCommand { get; }
 
         private int m_CachedTimeout;
         private int m_CachedBatchSize;
@@ -325,12 +325,12 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
                 Version = InstalledVersions.FirstOrDefault();
             }
 
-            SelectVersionCommand = new RelayCommand<IXVersion>(SelectVersion);
+            //SelectVersionCommand = new RelayCommand<IXVersion>(SelectVersion);
         }
 
-        private void SelectVersion(IXVersion versInfo) 
-        {
-            Version = versInfo;
-        }
+        //private void SelectVersion(IXVersion versInfo) 
+        //{
+        //    Version = versInfo;
+        //}
     }
 }

@@ -68,16 +68,20 @@ namespace Xarial.CadPlus.XBatch.Base.Core
 
         private readonly IBatchApplicationProxy m_BatchAppProxy;
 
-        public BatchRunner(IApplicationProvider appProvider, 
+        private readonly BatchJob m_Job;
+
+        public BatchRunner(BatchJob job, IApplicationProvider[] appProviders, 
             TextWriter userLogger, IProgressHandler progressHandler,
             IBatchApplicationProxy batchAppProxy,
             IJobManager jobMgr, IXLogger logger,
             Func<TimeSpan?, IResilientWorker<BatchJobContext>> workerFact, IPopupKiller popupKiller)
         {
+            m_Job = job;
             m_UserLogger = userLogger;
             m_ProgressHandler = progressHandler;
-            m_MacroRunnerSvc = appProvider.MacroRunnerService;
-            m_AppProvider = appProvider;
+            m_AppProvider = job.FindApplicationProvider(appProviders);
+            m_MacroRunnerSvc = m_AppProvider.MacroRunnerService;
+            
             m_WorkerFact = workerFact;
             m_BatchAppProxy = batchAppProxy;
 
@@ -95,7 +99,7 @@ namespace Xarial.CadPlus.XBatch.Base.Core
             TryShutDownApplication(prc);
         }
 
-        public async Task<bool> BatchRun(BatchJob opts, CancellationToken cancellationToken = default)
+        public async Task<bool> BatchRunAsync(CancellationToken cancellationToken = default)
         {
             m_UserLogger.WriteLine($"Batch macro running started");
 
@@ -103,9 +107,9 @@ namespace Xarial.CadPlus.XBatch.Base.Core
             
             TimeSpan? timeout = null;
 
-            if (opts.Timeout > 0)
+            if (m_Job.Timeout > 0)
             {
-                timeout = TimeSpan.FromSeconds(opts.Timeout);
+                timeout = TimeSpan.FromSeconds(m_Job.Timeout);
             }
 
             var worker = m_WorkerFact.Invoke(timeout);
@@ -115,7 +119,7 @@ namespace Xarial.CadPlus.XBatch.Base.Core
             
             var context = new BatchJobContext()
             {
-                Job = opts
+                Job = m_Job
             };
 
             var jobResult = false;
@@ -128,7 +132,7 @@ namespace Xarial.CadPlus.XBatch.Base.Core
 
                     var app = EnsureApplication(context, cancellationToken);
 
-                    var allFiles = PrepareJobScope(app, opts.Input, opts.Filters, opts.Macros);
+                    var allFiles = PrepareJobScope(app, m_Job.Input, m_Job.Filters, m_Job.Macros);
 
                     m_UserLogger.WriteLine($"Running batch processing for {allFiles.Length} file(s)");
 
@@ -154,7 +158,7 @@ namespace Xarial.CadPlus.XBatch.Base.Core
 
                         m_ProgressHandler?.ReportProgress(context.CurrentFile, res);
 
-                        if (!res && !opts.ContinueOnError)
+                        if (!res && !m_Job.ContinueOnError)
                         {
                             throw new UserException("Cancelling the job. Set 'Continue On Error' option to continue job if file failed");
                         }
@@ -168,7 +172,7 @@ namespace Xarial.CadPlus.XBatch.Base.Core
                             curBatchSize++;
                         }
 
-                        if (opts.BatchSize > 0 && curBatchSize >= opts.BatchSize) 
+                        if (m_Job.BatchSize > 0 && curBatchSize >= m_Job.BatchSize) 
                         {
                             m_UserLogger.WriteLine("Closing application as batch size reached the limit");
                             TryShutDownApplication(context.CurrentApplicationProcess);
@@ -312,11 +316,11 @@ namespace Xarial.CadPlus.XBatch.Base.Core
             }
         }
 
-        private void TryAddProcessToJob(IXApplication app)
+        private void TryAddProcessToJob(Process prc)
         {
             try
             {
-                m_JobMgr.AddProcess(app.Process);
+                m_JobMgr.AddProcess(prc);
             }
             catch (Exception ex)
             {
@@ -471,7 +475,7 @@ namespace Xarial.CadPlus.XBatch.Base.Core
             try
             {
                 app = m_AppProvider.StartApplication(versionInfo,
-                    opts, cancellationToken);
+                    opts, p => TryAddProcessToJob(p), cancellationToken);
 
                 if (opts.HasFlag(StartupOptions_e.Silent)) 
                 {
@@ -482,8 +486,6 @@ namespace Xarial.CadPlus.XBatch.Base.Core
             {
                 throw new UserException("Failed to start host application", ex);
             }
-
-            TryAddProcessToJob(app);
 
             return app;
         }

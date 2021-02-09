@@ -108,12 +108,12 @@ namespace Xbatch.Tests
             var modelMock = mock.Object;
             var msgSvcMock = new Mock<IMessageService>().Object;
             
-            var docVm = new BatchDocumentVM("", new BatchJob(), appProviderMock.Object, msgSvcMock,
-                (j, p) =>
+            var docVm = new BatchDocumentVM("", new BatchJob(), new IApplicationProvider[] { appProviderMock.Object }, msgSvcMock,
+                j =>
                 {
                     opts = j;
                     return new Mock<IBatchRunJobExecutor>().Object;
-                }, new Mock<IBatchApplicationProxy>().Object);
+                }, new Mock<IBatchApplicationProxy>().Object, null, null);
 
             action.Invoke(docVm);
 

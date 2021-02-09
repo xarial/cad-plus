@@ -12,6 +12,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using Xarial.XCad.Base;
 
 namespace Xarial.CadPlus.XBatch.Base.Services
 {
@@ -98,45 +99,57 @@ namespace Xarial.CadPlus.XBatch.Base.Services
 
         private bool m_IsInit;
 
-        public JobManager() 
+        private readonly IXLogger m_Logger;
+
+        public JobManager(IXLogger logger) 
         {
+            m_Logger = logger;
             m_IsInit = false;
         }
 
         public void Init()
         {
-            if (!m_IsInit)
+            try
             {
-                m_JobHandle = CreateJobObject(IntPtr.Zero, null);
-
-                if (m_JobHandle == IntPtr.Zero)
+                if (!m_IsInit)
                 {
-                    throw new Exception("Failed to create job handle");
-                }
+                    m_JobHandle = CreateJobObject(IntPtr.Zero, null);
 
-                var extendedInfo = new JOBOBJECT_EXTENDED_LIMIT_INFORMATION()
-                {
-                    BasicLimitInformation = new JOBOBJECT_BASIC_LIMIT_INFORMATION()
+                    if (m_JobHandle == IntPtr.Zero)
                     {
-                        LimitFlags = 0x2000
+                        throw new Exception("Failed to create job handle");
                     }
-                };
 
-                var length = Marshal.SizeOf(typeof(JOBOBJECT_EXTENDED_LIMIT_INFORMATION));
-                var extendedInfoPtr = Marshal.AllocHGlobal(length);
+                    var extendedInfo = new JOBOBJECT_EXTENDED_LIMIT_INFORMATION()
+                    {
+                        BasicLimitInformation = new JOBOBJECT_BASIC_LIMIT_INFORMATION()
+                        {
+                            LimitFlags = 0x2000
+                        }
+                    };
 
-                Marshal.StructureToPtr(extendedInfo, extendedInfoPtr, false);
+                    var length = Marshal.SizeOf(typeof(JOBOBJECT_EXTENDED_LIMIT_INFORMATION));
+                    var extendedInfoPtr = Marshal.AllocHGlobal(length);
 
-                if (!SetInformationJobObject(m_JobHandle, JobObjectInfoType.ExtendedLimitInformation, extendedInfoPtr, (uint)length))
-                {
-                    throw new Exception(string.Format("Unable to set information.  Error: {0}", Marshal.GetLastWin32Error()));
+                    Marshal.StructureToPtr(extendedInfo, extendedInfoPtr, false);
+
+                    if (!SetInformationJobObject(m_JobHandle, JobObjectInfoType.ExtendedLimitInformation, extendedInfoPtr, (uint)length))
+                    {
+                        throw new Exception(string.Format("Unable to set information.  Error: {0}", Marshal.GetLastWin32Error()));
+                    }
+
+                    m_Logger.Log($"Job initiated: {m_JobHandle}");
+                    m_IsInit = true;
                 }
-
-                m_IsInit = true;
+                else
+                {
+                    throw new Exception("Job is already initialized");
+                }
             }
-            else 
+            catch (Exception ex)
             {
-                throw new Exception("Job is already initialized");
+                m_Logger.Log(ex);
+                throw;
             }
         }
 
@@ -146,8 +159,10 @@ namespace Xarial.CadPlus.XBatch.Base.Services
             {
                 if (!AssignProcessToJobObject(m_JobHandle, process.Handle))
                 {
-                    throw new Exception("Failed to assign process to job");
+                    throw new Exception($"Failed to assign process to job: {process.Id}");
                 }
+
+                m_Logger.Log($"Added process to job: {process.Id}");
             }
             else 
             {
@@ -157,6 +172,8 @@ namespace Xarial.CadPlus.XBatch.Base.Services
 
         public void Dispose()
         {
+            m_Logger.Log("Disposing job manager");
+
             CloseHandle(m_JobHandle);
             m_JobHandle = IntPtr.Zero;
 

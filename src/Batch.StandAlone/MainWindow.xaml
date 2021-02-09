@@ -13,19 +13,17 @@
         xmlns:vm="clr-namespace:Xarial.CadPlus.Batch.StandAlone.ViewModels"
         xmlns:vmbase="clr-namespace:Xarial.CadPlus.XBatch.Base.ViewModels;assembly=Batch.Base"
         xmlns:ext="clr-namespace:Xarial.CadPlus.XBatch.Base.Extensions"
+        xmlns:sharedui="clr-namespace:Xarial.CadPlus.Plus.Shared.UI;assembly=Xarial.CadPlusPlus.Shared"
         xmlns:metro="http://metro.mahapps.com/winfx/xaml/controls"
-        Title="Batch+" Icon="Resources/xbatch.png"
-        mc:Ignorable="d" WindowState="Maximized" TitleCharacterCasing="Normal" WindowTransitionsEnabled="False"
+        Title="Batch+" Icon="Resources/xbatch.png" Style="{StaticResource MetroWindowStyle}"
+        mc:Ignorable="d" WindowState="Maximized"
         Height="450" Width="800">
     <metro:MetroWindow.Resources>
         <conv:CommandEnabledConverter x:Key="cmdEnabledConv"/>
-        <conv:SelectedVersionConverter x:Key="selVersConv"/>
         <conv:DocumentTitleConverter x:Key="docTitleConv"/>
         <conv:JobStatusToImageConverter x:Key="jobStatusToImgConv"/>
         <conv:JobTitleConverter x:Key="jobTitleConv"/>
         <conv:FilterTextConverter x:Key="filterTxtConv"/>
-        <conv:RibbonButtonCommandToCommandConverter x:Key="ribbonBtnToCmdConv"/>
-        <conv:CommandGroupSelector x:Key="grpSelectorConv"/>
 
         <xconv:MatchValueUniversalConverter x:Key="statusToVisConv" 
                                                         TargetValue="{x:Static vmbase:JobState_e.InProgress}"
@@ -43,25 +41,46 @@
                                          TrueValue="{x:Static win:Visibility.Visible}"
                                          FalseValue="{x:Static win:Visibility.Collapsed}"/>
         <xconv:ImageToImageSourceConverter x:Key="imgToSrcConv"/>
-        <vm:RibbonCommandTemplateSelector x:Key="ribbonGrpCmdTemplateSelector">
-            <vm:RibbonCommandTemplateSelector.Button>
-                <DataTemplate>
-                    <fluent:Button Header="{Binding Path=Title}"
-                                   Icon="{Binding Path=Icon, Converter={StaticResource imgToSrcConv}}"
-                                   LargeIcon="{Binding Path=Icon, Converter={StaticResource imgToSrcConv}}" 
-                                   Command="{Binding Converter={StaticResource ribbonBtnToCmdConv}}" 
-                                   IsEnabled="{Binding Path=Command, RelativeSource={RelativeSource Mode=Self}, Converter={StaticResource cmdEnabledConv}}"/>
-                </DataTemplate>
-            </vm:RibbonCommandTemplateSelector.Button>
-            <vm:RibbonCommandTemplateSelector.Toggle>
-                <DataTemplate>
-                    <fluent:ToggleButton Icon="{Binding Path=Icon, Converter={StaticResource imgToSrcConv}}" 
-                                         LargeIcon="{Binding Path=Icon, Converter={StaticResource imgToSrcConv}}"
-                                         Header="{Binding Path=Title}"
-                                         IsChecked="{Binding Path=Value}"/>
-                </DataTemplate>
-            </vm:RibbonCommandTemplateSelector.Toggle>
-        </vm:RibbonCommandTemplateSelector>
+        <DataTemplate x:Key="folderFilterGridTemplate">
+            <DataGrid ItemsSource="{Binding Path=Filters}" AutoGenerateColumns="False" Width="100"
+                              HeadersVisibility="None" ColumnWidth="*" CanUserAddRows="True"
+                              GridLinesVisibility="Horizontal" 
+                              ext:DataGridExtension.CellEditEndingCommand="{Binding Path=FilterEditEndingCommand}">
+                <DataGrid.Columns>
+                    <DataGridTemplateColumn>
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal">
+                                    <Image Width="16" Margin="2" Source="Resources/filter.png"/>
+                                    <TextBlock>
+                                        <TextBlock.Text>
+                                            <MultiBinding Converter="{StaticResource filterTxtConv}">
+                                                <Binding/>
+                                                <Binding Path="Value"/>
+                                            </MultiBinding>
+                                        </TextBlock.Text>
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding DataContext, RelativeSource={RelativeSource AncestorType=DataGridRow}}" Value="{x:Static CollectionView.NewItemPlaceholder}">
+                                                        <Setter Property="Foreground" Value="Gray"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+                                </StackPanel>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                        <DataGridTemplateColumn.CellEditingTemplate>
+                            <DataTemplate>
+                                <TextBox Text="{Binding Path=Value, UpdateSourceTrigger=PropertyChanged}"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellEditingTemplate>
+                    </DataGridTemplateColumn>
+                </DataGrid.Columns>
+            </DataGrid>
+        </DataTemplate>
     </metro:MetroWindow.Resources>
     <metro:MetroWindow.TitleTemplate>
         <DataTemplate>
@@ -100,228 +119,9 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        <fluent:Ribbon Grid.Row="0" Visibility="{Binding Path=Document, Converter={StaticResource objIsNotNullToVisConv}}">
-            <fluent:Ribbon.Menu>
-                <fluent:Backstage>
-                    <fluent:BackstageTabControl>
-                        <fluent:Button Header="New" Icon="/batchplus;component/Resources/new.png" 
-                                       LargeIcon="/batchplus;component/Resources/new.png"
-                                       Command="{Binding Path=NewDocumentCommand}" />
-                        <fluent:Button Header="Open" Icon="/batchplus;component/Resources/open.png" 
-                                       LargeIcon="/batchplus;component/Resources/open.png" 
-                                       Command="{Binding Path=OpenDocumentCommand}" />
-                        <fluent:SeparatorTabItem/>
-                        <fluent:Button Header="Save" Icon="/batchplus;component/Resources/save.png" 
-                                       LargeIcon="/batchplus;component/Resources/save.png" 
-                                       Command="{Binding Path=Document.SaveDocumentCommand}" 
-                                       IsEnabled="{Binding Path=Command, RelativeSource={RelativeSource Mode=Self}, Converter={StaticResource cmdEnabledConv}}"/>
-                        <fluent:Button Header="Save As..." 
-                                       Command="{Binding Path=Document.SaveAsDocumentCommand}" 
-                                       IsEnabled="{Binding Path=Command, RelativeSource={RelativeSource Mode=Self}, Converter={StaticResource cmdEnabledConv}}"/>
-                        <fluent:SeparatorTabItem/>
-                        <fluent:Button Header="Close" Command="{Binding Path=CloseDocumentCommand}" />
-                        <fluent:SeparatorTabItem/>
-                        <fluent:Button Header="Help..." Icon="/batchplus;component/Resources/help-icon.png" 
-                                       LargeIcon="/batchplus;component/Resources/help-icon.png"
-                                       Command="{Binding Path=HelpCommand}" 
-                                       IsEnabled="{Binding Path=Command, RelativeSource={RelativeSource Mode=Self}, Converter={StaticResource cmdEnabledConv}}"/>
-                        <fluent:Button Header="About..." Icon="/batchplus;component/Resources/about-icon.png" 
-                                       LargeIcon="/batchplus;component/Resources/about-icon.png"
-                                       Command="{Binding Path=AboutCommand}" 
-                                       IsEnabled="{Binding Path=Command, RelativeSource={RelativeSource Mode=Self}, Converter={StaticResource cmdEnabledConv}}"/>
-                    </fluent:BackstageTabControl>
-                </fluent:Backstage>
-            </fluent:Ribbon.Menu>
-            <fluent:RibbonTabItem Header="Input" DataContext="{Binding Path=Document}">
-                <fluent:RibbonGroupBox Header="Files">
-                    <fluent:Button Header="Add Files..." 
-                                   Command="{Binding Path=AddFilesCommand, ElementName=lstInputs}"
-                                   Icon="/batchplus;component/Resources/add-file.png"
-                                   LargeIcon="/batchplus;component/Resources/add-file.png" />
-                    <fluent:Button Header="Add Folders..."
-                                   Command="{Binding Path=AddFoldersCommand, ElementName=lstInputs}"
-                                   Icon="/batchplus;component/Resources/add-folder.png"
-                                   LargeIcon="/batchplus;component/Resources/add-folder.png" />
-                    <fluent:Button Header="Add From File..."
-                                   Command="{Binding Path=AddFromFileCommand}"
-                                   Icon="/batchplus;component/Resources/add-from-file.png"
-                                   LargeIcon="/batchplus;component/Resources/add-from-file.png" />
-                    <fluent:Button Header="Remove Files And Folders"
-                                   Command="{Binding Path=DeleteSelectedCommand, ElementName=lstInputs}"
-                                   Icon="/batchplus;component/Resources/remove-file-folder.png"
-                                   LargeIcon="/batchplus;component/Resources/remove-file-folder.png" />
-                </fluent:RibbonGroupBox>
-                <fluent:RibbonGroupBox Header="Folder Filters">
-                    <DataGrid ItemsSource="{Binding Path=Filters}" AutoGenerateColumns="False" Width="100"
-                              HeadersVisibility="None" ColumnWidth="*" CanUserAddRows="True"
-                              GridLinesVisibility="Horizontal" 
-                              ext:DataGridExtension.CellEditEndingCommand="{Binding Path=FilterEditEndingCommand}">
-                        <DataGrid.Columns>
-                            <DataGridTemplateColumn>
-                                <DataGridTemplateColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <StackPanel Orientation="Horizontal">
-                                            <Image Width="16" Margin="2" Source="Resources/filter.png"/>
-                                            <TextBlock>
-                                                <TextBlock.Text>
-                                                    <MultiBinding Converter="{StaticResource filterTxtConv}">
-                                                        <Binding/>
-                                                        <Binding Path="Value"/>
-                                                    </MultiBinding>
-                                                </TextBlock.Text>
-                                                <TextBlock.Style>
-                                                    <Style TargetType="TextBlock">
-                                                        <Style.Triggers>
-                                                            <DataTrigger Binding="{Binding DataContext, RelativeSource={RelativeSource AncestorType=DataGridRow}}" Value="{x:Static CollectionView.NewItemPlaceholder}">
-                                                                <Setter Property="Foreground" Value="Gray"/>
-                                                            </DataTrigger>
-                                                        </Style.Triggers>
-                                                    </Style>
-                                                </TextBlock.Style>
-                                            </TextBlock>
-                                        </StackPanel>
-                                    </DataTemplate>
-                                </DataGridTemplateColumn.CellTemplate>
-                                <DataGridTemplateColumn.CellEditingTemplate>
-                                    <DataTemplate>
-                                        <TextBox Text="{Binding Path=Value, UpdateSourceTrigger=PropertyChanged}"/>
-                                    </DataTemplate>
-                                </DataGridTemplateColumn.CellEditingTemplate>
-                            </DataGridTemplateColumn>
-                        </DataGrid.Columns>
-                    </DataGrid>
-                </fluent:RibbonGroupBox>
-                <fluent:RibbonGroupBox Header="Macros">
-                    <fluent:Button Header="Add Macros..." Size="Large"
-                                   Command="{Binding Path=AddFilesCommand, ElementName=lstMacros}"
-                                   Icon="/batchplus;component/Resources/add-macro.png"
-                                   LargeIcon="/batchplus;component/Resources/add-macro.png" />
-                    <fluent:Button Header="Remove Macros"
-                                   Command="{Binding Path=DeleteSelectedCommand, ElementName=lstMacros}"
-                                   Icon="/batchplus;component/Resources/remove-macro.png"
-                                   LargeIcon="/batchplus;component/Resources/remove-macro.png" />
-                </fluent:RibbonGroupBox>
-            </fluent:RibbonTabItem>
-            <fluent:RibbonTabItem Header="Settings" DataContext="{Binding Path=Document.Settings}">
-                <fluent:RibbonGroupBox Header="Startup Options">
-                    <fluent:DropDownButton LargeIcon="{Binding Path=AppProvider.ApplicationIcon, Converter={StaticResource imgToSrcConv}}"
-                                           Header="{Binding Path=Version.DisplayName}" 
-                                           ItemsSource="{Binding Path=InstalledVersions}">
-                        <fluent:DropDownButton.ItemTemplate>
-                            <DataTemplate>
-                                <fluent:RadioButton Header="{Binding Path=DisplayName}" 
-                                                    Command="{Binding Path=DataContext.SelectVersionCommand, RelativeSource={RelativeSource AncestorType={x:Type fluent:DropDownButton}}}" 
-                                                    CommandParameter="{Binding}">
-                                    <fluent:RadioButton.IsChecked>
-                                        <MultiBinding Mode="OneWay" Converter="{StaticResource selVersConv}">
-                                            <Binding/>
-                                            <Binding Path="DataContext.Version" RelativeSource="{RelativeSource AncestorType={x:Type fluent:DropDownButton}}"/>
-                                        </MultiBinding>
-                                    </fluent:RadioButton.IsChecked>
-                                </fluent:RadioButton>
-                            </DataTemplate>
-                        </fluent:DropDownButton.ItemTemplate>
-                    </fluent:DropDownButton>
-                    <fluent:ToggleButton Size="Large" Icon="/batchplus;component/Resources/safe-mode.png" 
-                                         IsChecked="{Binding Path=StartupOptionSafe}"
-                                         LargeIcon="/batchplus;component/Resources/safe-mode.png" Header="Safe">
-                        <fluent:ToggleButton.ToolTip>
-                            <fluent:ScreenTip Title="Safe Mode"
-                                          Text="Opens application skipping all the settings"
-                                          Image="/batchplus;component/Resources/safe-mode.png"
-                                          Width="190"
-                                          IsRibbonAligned="True" />
-                        </fluent:ToggleButton.ToolTip>
-                    </fluent:ToggleButton>
-                    <fluent:ToggleButton Size="Large" Icon="/batchplus;component/Resources/background-mode.png" 
-                                         LargeIcon="/batchplus;component/Resources/background-mode.png" Header="Background"
-                                         IsChecked="{Binding Path=StartupOptionBackground}"/>
-                    <fluent:ToggleButton Size="Large" Icon="/batchplus;component/Resources/no-popup-mode.png" 
-                                         LargeIcon="/batchplus;component/Resources/no-popup-mode.png" Header="Silent"
-                                         IsChecked="{Binding Path=StartupOptionSilent}"/>
-                    <fluent:ToggleButton Size="Large" Icon="/batchplus;component/Resources/hidden-application.png" 
-                                         LargeIcon="/batchplus;component/Resources/hidden-application.png" Header="Hidden"
-                                         IsChecked="{Binding Path=StartupOptionHidden}"/>
-                </fluent:RibbonGroupBox>
-                <fluent:RibbonGroupBox Header="File Open Options">
-                    <fluent:ToggleButton Icon="/batchplus;component/Resources/silent-mode.png" 
-                                         LargeIcon="/batchplus;component/Resources/silent-mode.png" Header="Silent"
-                                         IsChecked="{Binding Path=OpenFileOptionSilent}"/>
-                    <fluent:ToggleButton Icon="/batchplus;component/Resources/rapid-mode.png"
-                                         LargeIcon="/batchplus;component/Resources/rapid-mode.png" Header="Rapid"
-                                         IsChecked="{Binding Path=OpenFileOptionRapid}"/>
-                    <fluent:ToggleButton Icon="/batchplus;component/Resources/invisible-mode.png" 
-                                         LargeIcon="/batchplus;component/Resources/invisible-mode.png" Header="Invisible"
-                                         IsChecked="{Binding Path=OpenFileOptionInvisible}"/>
-                </fluent:RibbonGroupBox>
-                <fluent:RibbonGroupBox Header="Protection">
-                    <fluent:ToggleButton Icon="/batchplus;component/Resources/read-only-mode.png" 
-                                         LargeIcon="/batchplus;component/Resources/read-only-mode.png" Header="Read Only"
-                                         IsChecked="{Binding Path=OpenFileOptionReadOnly}"/>
-                    <fluent:ToggleButton Icon="/batchplus;component/Resources/forbid-upgrade.png" 
-                                         LargeIcon="/batchplus;component/Resources/forbid-upgrade.png" Header="Forbid Files Upgrade"
-                                         IsChecked="{Binding Path=ForbidUpgrade}"/>
-                </fluent:RibbonGroupBox>
-                <fluent:RibbonGroupBox Header="Actions">
-                    <fluent:ToggleButton Icon="/batchplus;component/Resources/auto-save-docs.png" 
-                                         LargeIcon="/batchplus;component/Resources/auto-save-docs.png" Header="Automatically Save Documents"
-                                         IsChecked="{Binding Path=AutoSaveDocuments}"/>
-                </fluent:RibbonGroupBox>
-
-                <fluent:RibbonGroupBox Header="Execution">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-                        <metro:ToggleSwitch Grid.Column="0" VerticalAlignment="Center" 
-                                            OnContent="Timeout On" 
-                                            OffContent="Timeout Off"
-                                            IsOn="{Binding Path=IsTimeoutEnabled}">
-                            <metro:ToggleSwitch.ToolTip>
-                                <fluent:ScreenTip Title="Timeout"
-                                          Text="Sets the maximum processing time in seconds for a single file. Use this option to eliminate hanging of the host application"
-                                          Width="190"
-                                          IsRibbonAligned="True" />
-                            </metro:ToggleSwitch.ToolTip>
-                        </metro:ToggleSwitch>
-                        <fluent:Spinner Value="{Binding Path=Timeout}" Grid.Column="1"
-                                        Minimum="0" Maximum="3600"
-                                        Format="0" Width="75" Margin="-20 0 0 0"
-                                        Header="" IsEnabled="{Binding Path=IsTimeoutEnabled}"/>
-                    </Grid>
-                    <metro:ToggleSwitch Grid.Column="0" VerticalAlignment="Center" OnContent="Continue on error" OffContent="Stop on error" IsOn="{Binding Path=ContinueOnError}">
-                        <metro:ToggleSwitch.ToolTip>
-                            <fluent:ScreenTip Title="Continue On Error"
-                                          Text="Allows to continue execution if the error is encountered, such as failure to open the file or run the macro"
-                                          Width="190"
-                                          IsRibbonAligned="True" />
-                        </metro:ToggleSwitch.ToolTip>
-                    </metro:ToggleSwitch>
-                    <Grid Margin="20 0 0 0">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="Auto"/>
-                            </Grid.ColumnDefinitions>
-                            <metro:ToggleSwitch Grid.Column="0" VerticalAlignment="Center" 
-                                            OnContent="Limit Batch Size" 
-                                            OffContent="Unlimited Batch Size"
-                                            IsOn="{Binding Path=IsBatchSizeLimited}"/>
-                            <fluent:Spinner Value="{Binding Path=BatchSize}" Grid.Column="1"
-                                        Minimum="1"
-                                        Format="0" Width="75" Margin="-20 0 0 0"
-                                        Header="" Visibility="{Binding Path=IsBatchSizeLimited, Converter={StaticResource boolToVisConv}}"/>
-                        </Grid>
-                </fluent:RibbonGroupBox>
-            </fluent:RibbonTabItem>
-            <fluent:RibbonTabItem Header="Job" DataContext="{Binding Path=Document}" >
-                <fluent:RibbonGroupBox DataContext="{Binding Path=CommandManager, Converter={StaticResource grpSelectorConv}}"
-                                       Header="{Binding Path=Title}"
-                                       ItemsSource="{Binding Path=Commands}"
-                                       ItemTemplateSelector="{StaticResource ribbonGrpCmdTemplateSelector}"/>
-
-            </fluent:RibbonTabItem>
-        </fluent:Ribbon>
+        <sharedui:RibbonControl Grid.Row="0"
+                                Visibility="{Binding Path=Document, Converter={StaticResource objIsNotNullToVisConv}}"
+                                CommandManager="{Binding Path=Document.CommandManager}"/>
         <Grid Grid.Row="1" DataContext="{Binding Path=Document}" Visibility="{Binding Converter={StaticResource objIsNotNullToVisConv}}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>

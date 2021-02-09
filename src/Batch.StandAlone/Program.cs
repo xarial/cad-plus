@@ -28,6 +28,7 @@ using Xarial.CadPlus.XBatch.Base.Services;
 using Xarial.CadPlus.Batch.StandAlone.ViewModels;
 using Xarial.XCad.Base;
 using Xarial.XToolkit.Reporting;
+using Xarial.CadPlus.Plus.Exceptions;
 
 namespace Xarial.CadPlus.Batch.StandAlone
 {
@@ -53,6 +54,7 @@ namespace Xarial.CadPlus.Batch.StandAlone
             m_AppLauncher = new ApplicationLauncher<BatchArguments, MainWindow>(m_BatchApp, new Initiator());
             m_AppLauncher.ConfigureServices += OnConfigureServices;
             m_AppLauncher.ParseArguments += OnParseArguments;
+            m_AppLauncher.WriteHelp += OnWriteHelp;
             m_AppLauncher.WindowCreated += OnWindowCreated;
             m_AppLauncher.RunConsoleAsync += OnRunConsoleAsync;
             m_AppLauncher.Start(args);
@@ -66,11 +68,12 @@ namespace Xarial.CadPlus.Batch.StandAlone
             using (var batchRunner = m_AppLauncher.Container.Resolve<BatchRunner>(
                 new TypedParameter[]
                 {
+                    new TypedParameter(typeof(BatchJob), args.Job),
                     new TypedParameter(typeof(TextWriter), Console.Out),
                     new TypedParameter(typeof(IProgressHandler), new ConsoleProgressWriter())
                 }))
             {
-                await batchRunner.BatchRun(args.Job).ConfigureAwait(false);
+                await batchRunner.BatchRunAsync().ConfigureAwait(false);
             }
         }
 
@@ -97,18 +100,7 @@ namespace Xarial.CadPlus.Batch.StandAlone
 
             builder.RegisterType<JobManager>().As<IJobManager>()
                 .SingleInstance()
-                .OnActivating(x =>
-                {
-                    try
-                    {
-                        x.Instance.Init();
-                    }
-                    catch (Exception ex)
-                    {
-                        var logger = x.Context.Resolve<IXLogger>();
-                        logger.Log(ex);
-                    }
-                });
+                .OnActivating(x => x.Instance.Init());
         }
 
         private static void OnWindowCreated(MainWindow window, BatchArguments args)
@@ -118,7 +110,7 @@ namespace Xarial.CadPlus.Batch.StandAlone
                 m_BatchManager = m_AppLauncher.Container.Resolve<BatchManagerVM>();
                 window.Closing += OnWindowClosing;
                 window.DataContext = m_BatchManager;
-
+                
                 m_BatchManager.ParentWindow = window;
 
                 if (m_StartupOptions != null)
@@ -168,7 +160,7 @@ namespace Xarial.CadPlus.Batch.StandAlone
                 BatchArguments argsLocal = default;
                 bool createConsoleLocal = false;
 
-                parser.ParseArguments<XBatch.Base.FileOptions, RunOptions, JobOptions>(input)
+                CreateParserResult(parser, input)
                     .WithParsed<RunOptions>(a => { argsLocal = a; createConsoleLocal = true; })
                     .WithParsed<JobOptions>(a => { argsLocal = a; createConsoleLocal = true; })
                     .WithParsed<XBatch.Base.FileOptions>(a => m_StartupOptions = a)
@@ -178,7 +170,15 @@ namespace Xarial.CadPlus.Batch.StandAlone
                 createConsole = createConsoleLocal;
             }
 
-            return hasError;
+            return !hasError;
         }
+
+        private static void OnWriteHelp(Parser parser, string[] args)
+        {
+            CreateParserResult(parser, args);
+        }
+
+        private static ParserResult<object> CreateParserResult(Parser parser, string[] args)
+            => parser.ParseArguments<XBatch.Base.FileOptions, RunOptions, JobOptions>(args);
     }
 }

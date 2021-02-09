@@ -128,7 +128,7 @@ namespace Xarial.CadPlus.XBatch.Base
             }
         }
 
-        [Option('b', "batch", Required = false, HelpText = "maximum number of files to process in the single session of CAD application before restarting. Default: 25")]
+        [Option('b', "batch", Required = false, HelpText = "Maximum number of files to process in the single session of CAD application before restarting. Default: 25")]
         public int BatchSize
         {
             set => Job.BatchSize = value;
