@@ -8,7 +8,7 @@ using Xarial.CadPlus.Plus.UI;
 
 namespace Xarial.CadPlus.Plus.Modules
 {
-    public interface IBatchInAppModule
+    public interface IBatchInAppModule : IModule
     {
         event ProcessBatchInputDelegate ProcessInput;
         void AddCommands(params IRibbonCommand[] cmd);
