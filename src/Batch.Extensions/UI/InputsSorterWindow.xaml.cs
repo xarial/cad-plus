@@ -20,7 +20,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Xarial.CadPlus.Batch.StandAlone.Modules.UI
+namespace Xarial.CadPlus.Batch.Extensions.UI
 {
     public partial class InputsSorterWindow : Window
     {

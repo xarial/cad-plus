@@ -11,9 +11,9 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Xarial.CadPlus.Batch.StandAlone.Modules.Properties;
-using Xarial.CadPlus.Batch.StandAlone.Modules.UI;
-using Xarial.CadPlus.Batch.StandAlone.Modules.ViewModels;
+using Xarial.CadPlus.Batch.Extensions.Properties;
+using Xarial.CadPlus.Batch.Extensions.UI;
+using Xarial.CadPlus.Batch.Extensions.ViewModels;
 using Xarial.CadPlus.Plus;
 using Xarial.CadPlus.Plus.Applications;
 using Xarial.CadPlus.Plus.Attributes;
@@ -22,8 +22,17 @@ using Xarial.CadPlus.Plus.UI;
 using Xarial.XCad;
 using Xarial.XCad.Documents;
 
-namespace Xarial.CadPlus.Batch.StandAlone.Modules
+namespace Xarial.CadPlus.Batch.Extensions
 {
+    internal class DocumentComparer : IEqualityComparer<IXDocument>
+    {
+        public bool Equals(IXDocument x, IXDocument y)
+            => string.Equals(x.Path, y.Path, StringComparison.CurrentCultureIgnoreCase);
+
+        public int GetHashCode(IXDocument obj)
+            => 0;
+    }
+
     [Module(typeof(IHostWpf), ApplicationIds.BatchStandAlone)]
     public class InputSorterModule : IModule
     {
@@ -67,7 +76,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.Modules
                 x => m_EnableOrdering = x));
         }
 
-        private void OnProcessInput(IXApplication app, List<string> input)
+        private void OnProcessInput(IXApplication app, List<IXDocument> input)
         {
             if (m_EnableOrdering)
             {
@@ -90,20 +99,17 @@ namespace Xarial.CadPlus.Batch.StandAlone.Modules
                         {
                             var itemsList = await Task.Run(() =>
                             {
-                                var groups = GroupTopological(src, filePath =>
+                                var groups = GroupTopological(src, doc =>
                                 {
-                                    var doc = app.Documents.PreCreate<IXDocument>();
-                                    doc.Path = filePath;
-
                                     try
                                     {
-                                        return doc.Dependencies.Select(d => d.Path);
+                                        return doc.Dependencies;
                                     }
                                     catch
                                     {
                                         return null;
                                     }
-                                }, StringComparer.CurrentCultureIgnoreCase,
+                                }, new DocumentComparer(),
                                 p => vm.Progress = p,
                                 cancellationToken);
 
@@ -119,9 +125,9 @@ namespace Xarial.CadPlus.Batch.StandAlone.Modules
 
                                 for (int i = 0; i < groups.Count; i++)
                                 {
-                                    items.AddRange(groups[i].Select(f => new ItemVM()
+                                    items.AddRange(groups[i].Select(doc => new ItemVM()
                                     {
-                                        FilePath = f,
+                                        Document = doc,
                                         Level = groups.Count - i - 1
                                     }));
                                 }
@@ -142,7 +148,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.Modules
                     {
                         foreach (ItemVM item in vm.InputView)
                         {
-                            input.Add(item.FilePath);
+                            input.Add(item.Document);
                         }
                     }
                     else 

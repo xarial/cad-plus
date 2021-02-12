@@ -57,7 +57,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Batch.Sw", "src\Batch.Sw\Ba
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Batch.Base", "src\Batch.Base\Batch.Base.csproj", "{A5A5B83D-98EB-4705-A7F4-74AD649B89C8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Batch.StandAlone.Modules", "src\Batch.StandAlone.Modules\Batch.StandAlone.Modules.csproj", "{0E69A315-6BB3-40F9-8FE3-4A9861349270}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Batch.Extensions", "src\Batch.Extensions\Batch.Extensions.csproj", "{0E69A315-6BB3-40F9-8FE3-4A9861349270}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Drawing", "src\Drawing\Drawing.csproj", "{D3CF2344-FF9E-499A-9519-1E00C33F8457}"
 EndProject

@@ -35,6 +35,9 @@ using Xarial.CadPlus.Plus.Attributes;
 using Xarial.CadPlus.XBatch.Base.ViewModels;
 using Xarial.CadPlus.Plus.Services;
 using Xarial.CadPlus.Plus.Extensions;
+using Xarial.CadPlus.Plus.Modules;
+using Xarial.CadPlus.Plus.Delegates;
+using Xarial.CadPlus.Plus.UI;
 
 namespace Xarial.CadPlus.Batch.InApp
 {
@@ -56,8 +59,10 @@ namespace Xarial.CadPlus.Batch.InApp
     }
 
     [Module(typeof(IHostExtension))]
-    public class BatchModule : IModule
+    public class BatchModule : IBatchInAppModule
     {
+        public event ProcessBatchInputDelegate ProcessInput;
+
         [Title("Batch+")]
         [Description("Commands to batch run macros")]
         [IconEx(typeof(Resources), nameof(Resources.batch_plus_vector), nameof(Resources.batch_plus_icon))]
@@ -76,7 +81,7 @@ namespace Xarial.CadPlus.Batch.InApp
             RunInApp
         }
 
-        public Guid Id => Guid.Parse("EBB21DBD-5310-42ED-9301-229847676459");
+        public Guid Id => Guid.Parse(ModuleIds.BatchInApp);
 
         private IHostExtension m_Host;
 
@@ -200,6 +205,10 @@ namespace Xarial.CadPlus.Batch.InApp
                     m_Page.Show(m_Data);
                     break;
             }
+        }
+
+        public void AddCommands(params IRibbonCommand[] cmd)
+        {
         }
 
         public void Dispose()

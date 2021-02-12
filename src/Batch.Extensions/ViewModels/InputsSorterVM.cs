@@ -14,9 +14,10 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Data;
 using Xarial.XCad.Base.Attributes;
+using Xarial.XCad.Documents;
 using Xarial.XToolkit.Wpf.Extensions;
 
-namespace Xarial.CadPlus.Batch.StandAlone.Modules.ViewModels
+namespace Xarial.CadPlus.Batch.Extensions.ViewModels
 {
     public enum SortType_e 
     {
@@ -33,7 +34,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.Modules.ViewModels
     public class ItemVM 
     {
         public int Level { get; set; }
-        public string FilePath { get; set; }
+        public IXDocument Document { get; set; }
     }
 
     public class InputsSorterVM : INotifyPropertyChanged

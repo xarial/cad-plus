@@ -56,8 +56,6 @@ namespace Xarial.CadPlus.XBatch.Base.Controls
 			var elemFact = new FrameworkElementFactory(typeof(JobItemStatusControl));
 			
 			elemFact.SetValue(JobItemStatusControl.DataContextProperty, binding);
-			//elemFact.SetValue(Image.WidthProperty, 16d);
-			//elemFact.SetValue(Image.HeightProperty, 16d);
 
 			var cellTemplate = new DataTemplate()
 			{

@@ -8,18 +8,22 @@
 using System.Collections.Generic;
 using System.IO;
 using Xarial.CadPlus.Common.Services;
+using Xarial.XCad.Documents;
 
 namespace Xarial.CadPlus.XBatch.Base.Core
 {
-    public class JobItemFile : JobItem, IJobItemFile
+    public class JobItemDocument : JobItem, IJobItemDocument
     {
-        public JobItemFile(string filePath, JobItemMacro[] macros) : base(filePath)
+        public IXDocument Document { get; }
+
+        public JobItemDocument(IXDocument doc, JobItemMacro[] macros) : base(doc.Path)
         {
-            DisplayName = Path.GetFileName(filePath);
+            Document = doc;
+            DisplayName = Path.GetFileName(doc.Path);
             Macros = macros;
         }
 
-        IEnumerable<IJobItemOperation> IJobItemFile.Operations => Macros;
+        public IEnumerable<IJobItemOperation> Operations => Macros;
 
         public JobItemMacro[] Macros { get; }
     }

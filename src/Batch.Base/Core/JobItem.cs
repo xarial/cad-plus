@@ -45,6 +45,7 @@ namespace Xarial.CadPlus.XBatch.Base.Core
         internal JobItem(string filePath) 
         {
             FilePath = filePath;
+            DisplayName = filePath;
             m_Status = JobItemStatus_e.AwaitingProcessing;
         }
     }

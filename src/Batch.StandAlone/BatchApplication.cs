@@ -14,12 +14,13 @@ using Xarial.CadPlus.Plus.Applications;
 using Xarial.CadPlus.Plus.Delegates;
 using Xarial.CadPlus.Plus.UI;
 using Xarial.XCad;
+using Xarial.XCad.Documents;
 
 namespace Xarial.CadPlus.Batch.StandAlone
 {
     internal class BatchApplication : IBatchApplication
     {
-        public event ProcessInputDelegate ProcessInput;
+        public event ProcessBatchInputDelegate ProcessInput;
         public event CreateCommandManagerDelegate CreateCommandManager;
 
         public Guid Id => Guid.Parse(ApplicationIds.BatchStandAlone);
@@ -41,7 +42,7 @@ namespace Xarial.CadPlus.Batch.StandAlone
         private void OnRequestCreateCommandManager(IRibbonCommandManager cmdMgr)
             => CreateCommandManager?.Invoke(cmdMgr);
 
-        private void OnRequestProcessInput(IXApplication app, List<string> input)
+        private void OnRequestProcessInput(IXApplication app, List<IXDocument> input)
             => ProcessInput?.Invoke(app, input);
 
         public void RegisterApplicationProvider(IApplicationProvider provider)
@@ -50,22 +51,22 @@ namespace Xarial.CadPlus.Batch.StandAlone
 
     public interface IBatchApplicationProxy
     {
-        event Action<IXApplication, List<string>> RequestProcessInput;
+        event Action<IXApplication, List<IXDocument>> RequestProcessInput;
         event Action<IRibbonCommandManager> RequestCreateCommandManager;
 
-        void ProcessInput(IXApplication app, List<string> input);
+        void ProcessInput(IXApplication app, List<IXDocument> input);
         void CreateCommandManager(IRibbonCommandManager cmdMgr);
     }
 
     internal class BatchApplicationProxy : IBatchApplicationProxy
     {
-        public event Action<IXApplication, List<string>> RequestProcessInput;
+        public event Action<IXApplication, List<IXDocument>> RequestProcessInput;
         public event Action<IRibbonCommandManager> RequestCreateCommandManager;
 
         public void CreateCommandManager(IRibbonCommandManager cmdMgr)
             => RequestCreateCommandManager?.Invoke(cmdMgr);
 
-        public void ProcessInput(IXApplication app, List<string> input)
+        public void ProcessInput(IXApplication app, List<IXDocument> input)
             => RequestProcessInput?.Invoke(app, input);
     }
 }

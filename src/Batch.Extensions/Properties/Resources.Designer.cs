@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Xarial.CadPlus.Batch.StandAlone.Modules.Properties {
+namespace Xarial.CadPlus.Batch.Extensions.Properties {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.Modules.Properties {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Xarial.CadPlus.Batch.StandAlone.Modules.Properties.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Xarial.CadPlus.Batch.Extensions.Properties.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
