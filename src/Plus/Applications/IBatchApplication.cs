@@ -59,8 +59,6 @@ namespace Xarial.CadPlus.Plus.Applications
         string GetVersionId(IXVersion value);
     }
 
-    public delegate void ProcessInputDelegate(IXApplication app, List<string> input);
-    
     public class BatchApplicationCommandManager 
     {
         public static class InputTab
@@ -93,7 +91,7 @@ namespace Xarial.CadPlus.Plus.Applications
 
     public interface IBatchApplication : IApplication
     {
-        event ProcessInputDelegate ProcessInput;
+        event ProcessBatchInputDelegate ProcessInput;
         event CreateCommandManagerDelegate CreateCommandManager;
 
         IApplicationProvider[] ApplicationProviders { get; }
