@@ -120,13 +120,13 @@ namespace Xarial.CadPlus.Batch.InApp
         {
             if (reason == PageCloseReasons_e.Okay) 
             {
-                if (!m_Data.Macros.Macros.Any()) 
+                if (!m_Data.Macros.Macros.Macros.Any()) 
                 {
                     arg.Cancel = true;
                     arg.ErrorMessage = "Select macros to run";
                 }
                 
-                if (!m_Data.Components.Any() && !m_Data.ProcessAllFiles) 
+                if (!m_Data.Input.Components.Any() && !m_Data.Input.ProcessAllFiles) 
                 {
                     arg.Cancel = true;
                     arg.ErrorMessage = "Select components to process";
@@ -143,19 +143,19 @@ namespace Xarial.CadPlus.Batch.InApp
                     IXDocument[] docs = null;
                     var assm = m_Host.Extension.Application.Documents.Active as IXAssembly;
 
-                    if (m_Data.ProcessAllFiles)
+                    if (m_Data.Input.ProcessAllFiles)
                     {
                         docs = assm.Dependencies;
                     }
                     else
                     {
-                        docs = m_Data.Components
+                        docs = m_Data.Input.Components
                             .Distinct(new ComponentDocumentSafeEqualityComparer())
                             .Select(c => c.Document).ToArray();
                     }
 
                     var exec = new AssemblyBatchRunJobExecutor(m_Host.Extension.Application, m_MacroRunnerSvc,
-                        docs, m_Data.Macros.Macros, m_Data.ActivateDocuments);
+                        docs, m_Data.Macros.Macros.Macros, m_Data.Options.ActivateDocuments);
                     
                     var vm = new JobResultVM(assm.Title, exec);
 
@@ -201,7 +201,7 @@ namespace Xarial.CadPlus.Batch.InApp
                     break;
 
                 case Commands_e.RunInApp:
-                    m_Data.Components = m_Host.Extension.Application.Documents.Active.Selections.OfType<IXComponent>().ToList();
+                    m_Data.Input.Components = m_Host.Extension.Application.Documents.Active.Selections.OfType<IXComponent>().ToList();
                     m_Page.Show(m_Data);
                     break;
             }

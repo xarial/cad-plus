@@ -47,43 +47,63 @@ namespace Xarial.CadPlus.Batch.InApp
     [Title("Batch+")]
     public class AssemblyBatchData
     {
-        [ControlOptions(height: 100)]
-        [DependentOn(typeof(NotProcessAllFilesDependencyHandler), nameof(ProcessAllFiles))]
-        [Description("List of components to run macros on")]
-        public List<IXComponent> Components { get; set; }
-
-        [Title("Process All Files")]
-        [ControlOptions(align: ControlLeftAlign_e.Indent)]
-        [ControlTag(nameof(ProcessAllFiles))]
-        public bool ProcessAllFiles { get; set; } = true;
-
-        [CustomControl(typeof(MacrosList))]
-        [ControlOptions(height: 100)]
-        [IconEx(typeof(Resources), nameof(Resources.macros_vector), nameof(Resources.macros_icon))]
-        public MacrosVM Macros { get; set; }
-
-        [Title("Add Macros...")]
-        [ControlOptions(align: ControlLeftAlign_e.Indent)]
-        public Action AddMacros { get; }
-
-        [Description("Open each document in its own window (activate)")]
-        [Title("Activate Documents")]
-        [ControlOptions(align: ControlLeftAlign_e.Indent)]
-        public bool ActivateDocuments { get; set; } = true;
-
-        private readonly IMacroFileFilterProvider m_FilterProvider;
-
-        public AssemblyBatchData(IMacroFileFilterProvider filterProvider) 
+        public class InputGroup 
         {
-            m_FilterProvider = filterProvider;
-            AddMacros = OnAddMacros;
+            [ControlOptions(height: 100)]
+            [DependentOn(typeof(NotProcessAllFilesDependencyHandler), nameof(ProcessAllFiles))]
+            [Description("List of components to run macros on")]
+            public List<IXComponent> Components { get; set; }
 
-            Macros = new MacrosVM(m_FilterProvider);
+            [Title("Process All Files")]
+            [ControlOptions(align: ControlLeftAlign_e.Indent)]
+            [ControlTag(nameof(ProcessAllFiles))]
+            public bool ProcessAllFiles { get; set; } = true;
         }
 
-        private void OnAddMacros() 
+        public class MacrosGroup 
         {
-            Macros.RequestAddMacros();
+            [CustomControl(typeof(MacrosList))]
+            [ControlOptions(height: 100)]
+            [IconEx(typeof(Resources), nameof(Resources.macros_vector), nameof(Resources.macros_icon))]
+            public MacrosVM Macros { get; set; }
+
+            [Title("Add Macros...")]
+            [ControlOptions(align: ControlLeftAlign_e.Indent)]
+            public Action AddMacros { get; }
+
+            private readonly IMacroFileFilterProvider m_FilterProvider;
+
+            public MacrosGroup(IMacroFileFilterProvider filterProvider) 
+            {
+                m_FilterProvider = filterProvider;
+                AddMacros = OnAddMacros;
+
+                Macros = new MacrosVM(m_FilterProvider);
+            }
+
+            private void OnAddMacros()
+            {
+                Macros.RequestAddMacros();
+            }
+        }
+
+        public class OptionsGroup 
+        {
+            [Description("Open each document in its own window (activate)")]
+            [Title("Activate Documents")]
+            [ControlOptions(align: ControlLeftAlign_e.Indent)]
+            public bool ActivateDocuments { get; set; } = true;
+        }
+
+        public InputGroup Input { get; }
+        public MacrosGroup Macros { get; }
+        public OptionsGroup Options { get; }
+
+        public AssemblyBatchData(IMacroFileFilterProvider filterProvider)
+        {
+            Input = new InputGroup();
+            Macros = new MacrosGroup(filterProvider);
+            Options = new OptionsGroup();
         }
     }
 }
