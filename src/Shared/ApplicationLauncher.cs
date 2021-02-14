@@ -95,10 +95,12 @@ namespace Xarial.CadPlus.Plus.Shared
     /// <summary>
     /// This service allows to run application in mixed mode (either console or WPF)
     /// </summary>
+    /// <typeparam name="TApplication">Type of application</typeparam>
     /// <typeparam name="TCliArgs">Class defining the arguments</typeparam>
     /// <typeparam name="TWindow">WPF window to create</typeparam>
     /// <remarks>To use: create new console project, set the STAThreadAttribute on the main class and change the output type to Window application. Create instance and call Start method</remarks>
-    public class ApplicationLauncher<TCliArgs, TWindow>
+    public class ApplicationLauncher<TApplication, TCliArgs, TWindow>
+        where TApplication : IApplication
         where TWindow : Window, new()
     {
         public event WriteHelpDelegate WriteHelp;
@@ -108,7 +110,6 @@ namespace Xarial.CadPlus.Plus.Shared
         public event RunConsoleDelegate<TCliArgs> RunConsole;
         public event ConfigureServicesDelegate<TCliArgs> ConfigureServices;
 
-        private readonly IApplication m_App;
         private readonly IInitiator m_Initiator;
 
         private readonly IXLogger m_Logger;
@@ -121,14 +122,13 @@ namespace Xarial.CadPlus.Plus.Shared
 
         public IContainer Container { get; private set; }
 
-        public ApplicationLauncher(IApplication app, IInitiator initiator)
+        public ApplicationLauncher(IInitiator initiator)
         {
             AppDomain.CurrentDomain.UnhandledException += OnDomainUnhandledException;
 
             m_Logger = new AppLogger();
             m_MsgService = new GenericMessageService();
 
-            m_App = app;
             m_Initiator = initiator;
 
             m_IsStarted = false;
@@ -180,7 +180,7 @@ namespace Xarial.CadPlus.Plus.Shared
                 }
 
                 var svc = CreateContainerBuilder(cliArgs);
-
+                
                 if (createConsole)
                 {
                     ConsoleHandler.Attach();
@@ -190,7 +190,7 @@ namespace Xarial.CadPlus.Plus.Shared
                     if (!hasError)
                     {
                         SynchronizationContext.SetSynchronizationContext(new SynchronizationContext());
-                        Host = new HostConsole(m_App, svc, m_Initiator);
+                        Host = new HostConsole(svc, m_Initiator);
 
                         try
                         {
@@ -230,7 +230,7 @@ namespace Xarial.CadPlus.Plus.Shared
                     m_WpfApp = new Application();
                     m_WpfApp.DispatcherUnhandledException += OnDispatcherUnhandledException;
 
-                    Host = new HostWpf(m_App, m_WpfApp, svc, m_Initiator, m_Logger);
+                    Host = new HostWpf(m_WpfApp, svc, m_Initiator, m_Logger);
 
                     var wnd = new TWindow();
                     WindowCreated?.Invoke(wnd, cliArgs);
@@ -335,6 +335,8 @@ namespace Xarial.CadPlus.Plus.Shared
                 .As<IMessageService>()
                 .WithParameter(new TypedParameter(typeof(string), "CAD+"));
 
+            RegisterApplication(builder);
+
             ConfigureServices?.Invoke(builder, args);
 
             var contWrapper = new ContainerBuilderWrapper(builder);
@@ -342,6 +344,11 @@ namespace Xarial.CadPlus.Plus.Shared
 
             return contWrapper;
         }
+
+        protected virtual void RegisterApplication(ContainerBuilder builder)
+            => builder.RegisterType<TApplication>()
+                .As<IApplication>()
+                .SingleInstance();
 
         private void OnContainerBuild(IContainer cont)
         {

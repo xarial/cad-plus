@@ -15,6 +15,7 @@ using System.Windows;
 using System.Windows.Interop;
 using Xarial.CadPlus.Plus.Services;
 using Xarial.XCad.Base;
+using Xarial.CadPlus.Plus.Extensions;
 
 namespace Xarial.CadPlus.Plus.Hosts
 {
@@ -42,13 +43,12 @@ namespace Xarial.CadPlus.Plus.Hosts
         private readonly IInitiator m_Initiator;
         private readonly IXLogger m_Logger;
 
-        public HostWpf(IApplication app, Application wpfApp, 
+        public HostWpf(Application wpfApp, 
             IContainerBuilder builder, IInitiator initiator, IXLogger logger)
         {
             m_Initiator = initiator;
             m_Initiator.Init(this);
             
-            Application = app;
             WpfApplication = wpfApp;
             
             m_IsLoaded = false;
@@ -58,6 +58,9 @@ namespace Xarial.CadPlus.Plus.Hosts
             m_ModulesLoader.Load(this);
             ConfigureServices?.Invoke(builder);
             Services = builder.Build();
+
+            Application = Services.GetService<IApplication>();
+
             Initialized?.Invoke();
             Connect?.Invoke();
 
