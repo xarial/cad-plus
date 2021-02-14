@@ -13,6 +13,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using Xarial.CadPlus.Plus.Services;
+using Xarial.CadPlus.Plus.Extensions;
 
 namespace Xarial.CadPlus.Plus.Hosts
 {
@@ -39,18 +40,18 @@ namespace Xarial.CadPlus.Plus.Hosts
 
         private readonly IInitiator m_Initiator;
 
-        public HostConsole(IApplication app, IContainerBuilder builder, IInitiator initiator)
+        public HostConsole(IContainerBuilder builder, IInitiator initiator)
         {
             m_Initiator = initiator;
             m_Initiator.Init(this);
 
-            Application = app;
-            
             m_ModulesLoader = new ModulesLoader();
             m_ModulesLoader.Load(this);
             
             ConfigureServices?.Invoke(builder);
             Services = builder.Build();
+
+            Application = Services.GetService<IApplication>();
 
             Initialized?.Invoke();
             Connect?.Invoke();

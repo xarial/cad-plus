@@ -71,7 +71,7 @@ namespace TestApp
         static void Main(string[] args)
         {
             m_Logger = new AppLogger();
-            var appLauncher = new ApplicationLauncher<MyAppArgs, MyWindow>(new MyApp(), new MyInitiator());
+            var appLauncher = new ApplicationLauncher<MyApp, MyAppArgs, MyWindow>(new MyInitiator());
             appLauncher.WriteHelp += OnWriteHelp;
             appLauncher.ConfigureServices += OnConfigureServices;
             appLauncher.ParseArguments += OnParseArguments;
