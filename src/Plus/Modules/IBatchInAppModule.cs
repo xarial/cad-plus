@@ -8,9 +8,16 @@ using Xarial.CadPlus.Plus.UI;
 
 namespace Xarial.CadPlus.Plus.Modules
 {
+    public enum Group_e 
+    {
+        Input,
+        Macros,
+        Options
+    }
+
     public interface IBatchInAppModule : IModule
     {
         event ProcessBatchInputDelegate ProcessInput;
-        void AddCommands(params IRibbonCommand[] cmd);
+        void AddCommands(Group_e group, params IRibbonCommand[] cmd);
     }
 }
