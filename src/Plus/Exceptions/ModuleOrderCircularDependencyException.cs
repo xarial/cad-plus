@@ -9,7 +9,7 @@ namespace Xarial.CadPlus.Plus.Exceptions
     public class ModuleOrderCircularDependencyException : Exception
     {
         public ModuleOrderCircularDependencyException(IEnumerable<IModule> modules)
-            : base($"Circular dependencies detected while ordering modules: {string.Join(", ", modules.Select(m => m.Id))}")
+            : base($"Circular dependencies detected while ordering modules: {string.Join(", ", modules.Select(m => m.GetType().FullName))}")
         {
         }
     }

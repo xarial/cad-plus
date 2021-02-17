@@ -40,13 +40,13 @@ namespace Xarial.CadPlus.Plus.Hosts
 
         private readonly IInitiator m_Initiator;
 
-        public HostConsole(IContainerBuilder builder, IInitiator initiator)
+        public HostConsole(IContainerBuilder builder, IInitiator initiator, Type hostApplicationType)
         {
             m_Initiator = initiator;
             m_Initiator.Init(this);
 
             m_ModulesLoader = new ModulesLoader();
-            m_ModulesLoader.Load(this);
+            m_ModulesLoader.Load(this, hostApplicationType);
             
             ConfigureServices?.Invoke(builder);
             Services = builder.Build();

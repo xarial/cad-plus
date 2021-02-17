@@ -15,9 +15,5 @@ namespace Xarial.CadPlus.Plus
 {
     public interface IApplication
     {
-        /// <summary>
-        /// Permanent identifier of this application
-        /// </summary>
-        Guid Id { get; }
     }
 }

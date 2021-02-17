@@ -24,7 +24,7 @@ namespace Xarial.CadPlus.Plus.Services
 {
     public interface IModulesLoader
     {
-        void Load(IHost host);
+        void Load(IHost host, Type hostApplicationType);
     }
 
     public class ModulesLoader : IModulesLoader
@@ -36,7 +36,7 @@ namespace Xarial.CadPlus.Plus.Services
             m_SettsProvider = new SettingsProvider();
         }
 
-        public void Load(IHost host)
+        public void Load(IHost host, Type hostApplicationType)
         {
             var modulesDir = Path.Combine(Path.GetDirectoryName(this.GetType().Assembly.Location), "Modules");
 
@@ -57,10 +57,10 @@ namespace Xarial.CadPlus.Plus.Services
             var container = new CompositionContainer(catalog);
 
             bool MatchesHostType(Type hostType) => hostType == null || hostType.IsAssignableFrom(host.GetType());
-            bool MatchesAppId(string[] appIds) => appIds?.Any() == false || appIds.Any(i => Guid.Parse(i).Equals(host.Application.Id));
+            bool MatchesAppType(Type[] appTypes) => appTypes?.Any() == false || appTypes.Any(t => t.IsAssignableFrom(hostApplicationType));
 
             var modules = container.GetExports<IModule, IModuleMetadata>()
-                .Where(e => MatchesHostType(e.Metadata.TargetHostType) && MatchesAppId(e.Metadata.TargetApplicationIds))
+                .Where(e => MatchesHostType(e.Metadata.TargetHostType) && MatchesAppType(e.Metadata.TargetApplicationTypes))
                 .Select(e => e.Value).ToArray();
 
             CheckDuplicates(modules);
@@ -121,11 +121,11 @@ namespace Xarial.CadPlus.Plus.Services
 
         private void CheckDuplicates(IModule[] modules)
         {
-            var dupModuleIds = modules.GroupBy(m => m.Id).Where(x => x.Count() > 1).Select(m => m.Key).ToArray();
+            var dupModuleTypes = modules.GroupBy(m => m.GetType().FullName).Where(x => x.Count() > 1).Select(m => m.Key).ToArray();
 
-            if (dupModuleIds.Any())
+            if (dupModuleTypes.Any())
             {
-                throw new UserException($"Duplicate modules detected: {string.Join(", ", dupModuleIds)}");
+                throw new UserException($"Duplicate modules detected: {string.Join(", ", dupModuleTypes)}");
             }
         }
 

@@ -14,16 +14,16 @@ namespace Xarial.CadPlus.Plus.Services
     {
         public IModule[] Sort(IModule[] modules)
         {
-            var modulePositions = new Dictionary<Guid, Tuple<IModule, int>>();
-            var moduleRelativePositions = new Dictionary<IModule, Tuple<Guid, ModuleRelativeOrder_e>>();
+            var modulePositions = new Dictionary<Type, Tuple<IModule, int>>();
+            var moduleRelativePositions = new Dictionary<IModule, Tuple<Type, ModuleRelativeOrder_e>>();
 
             foreach (var module in modules)
             {
-                var pos = ExtractPosition(module, out Tuple<Guid, ModuleRelativeOrder_e> relOrder);
+                var pos = ExtractPosition(module, out Tuple<Type, ModuleRelativeOrder_e> relOrder);
 
                 if (pos.HasValue)
                 {
-                    modulePositions.Add(module.Id, new Tuple<IModule, int>(module, pos.Value));
+                    modulePositions.Add(module.GetType(), new Tuple<IModule, int>(module, pos.Value));
                 }
                 else
                 {
@@ -46,8 +46,12 @@ namespace Xarial.CadPlus.Plus.Services
                 {
                     int? pos = null;
 
-                    if (modulePositions.TryGetValue(modRelPos.Value.Item1, out Tuple<IModule, int> modPos))
+                    var key = modulePositions.Keys.FirstOrDefault(t => modRelPos.Value.Item1.IsAssignableFrom(t));
+
+                    if (key != null)
                     {
+                        var modPos = modulePositions[key];
+
                         switch (modRelPos.Value.Item2)
                         {
                             case ModuleRelativeOrder_e.Before:
@@ -62,7 +66,7 @@ namespace Xarial.CadPlus.Plus.Services
                                 throw new NotSupportedException();
                         }
                     }
-                    else if (moduleRelativePositions.Keys.FirstOrDefault(m => m.Id == modRelPos.Value.Item1) == null)
+                    else if (moduleRelativePositions.Keys.FirstOrDefault(m => modRelPos.Value.Item1.IsAssignableFrom(m.GetType())) == null)
                     {
                         pos = 0;
                     }
@@ -71,7 +75,7 @@ namespace Xarial.CadPlus.Plus.Services
                     {
                         moduleRelativePositions.Remove(modRelPos.Key);
                         hasChanges = true;
-                        modulePositions.Add(modRelPos.Key.Id,
+                        modulePositions.Add(modRelPos.Key.GetType(),
                             new Tuple<IModule, int>(modRelPos.Key, pos.Value));
                     }
                 }
@@ -80,7 +84,7 @@ namespace Xarial.CadPlus.Plus.Services
             return modulePositions.OrderBy(x => x.Value.Item2).Select(x => x.Value.Item1).ToArray();
         }
 
-        private int? ExtractPosition(IModule module, out Tuple<Guid, ModuleRelativeOrder_e> rel)
+        private int? ExtractPosition(IModule module, out Tuple<Type, ModuleRelativeOrder_e> rel)
         {
             rel = null;
             ModuleOrderAttribute att = null;
@@ -93,12 +97,12 @@ namespace Xarial.CadPlus.Plus.Services
                 }
                 else
                 {
-                    if (string.IsNullOrEmpty(att.RelativeToModuleId) || !att.RelativeOrder.HasValue)
+                    if (att.RelativeToModuleType == null || !att.RelativeOrder.HasValue)
                     {
-                        throw new Exception($"Order is not set for module '{module.Id}'");
+                        throw new Exception($"Order is not set for module '{module.GetType().FullName}'");
                     }
 
-                    rel = new Tuple<Guid, ModuleRelativeOrder_e>(Guid.Parse(att.RelativeToModuleId), att.RelativeOrder.Value);
+                    rel = new Tuple<Type, ModuleRelativeOrder_e>(att.RelativeToModuleType, att.RelativeOrder.Value);
                     return null;
                 }
             }

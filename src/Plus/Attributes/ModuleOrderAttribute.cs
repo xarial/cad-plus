@@ -17,16 +17,16 @@ namespace Xarial.CadPlus.Plus.Atributes
     {
         public int? Order { get; }
         public ModuleRelativeOrder_e? RelativeOrder { get; }
-        public string RelativeToModuleId { get; }
+        public Type RelativeToModuleType { get; }
 
         public ModuleOrderAttribute(int order) 
         {
             Order = order;
         }
 
-        public ModuleOrderAttribute(string relToModuleId, ModuleRelativeOrder_e relOrder) 
+        public ModuleOrderAttribute(Type relToModuleType, ModuleRelativeOrder_e relOrder) 
         {
-            RelativeToModuleId = relToModuleId;
+            RelativeToModuleType = relToModuleType;
             RelativeOrder = relOrder;
         }
     }
