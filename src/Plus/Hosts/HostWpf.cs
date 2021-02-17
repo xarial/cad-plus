@@ -44,7 +44,7 @@ namespace Xarial.CadPlus.Plus.Hosts
         private readonly IXLogger m_Logger;
 
         public HostWpf(Application wpfApp, 
-            IContainerBuilder builder, IInitiator initiator, IXLogger logger)
+            IContainerBuilder builder, IInitiator initiator, IXLogger logger, Type hostApplicationType)
         {
             m_Initiator = initiator;
             m_Initiator.Init(this);
@@ -55,7 +55,7 @@ namespace Xarial.CadPlus.Plus.Hosts
             m_Logger = logger;
 
             m_ModulesLoader = new ModulesLoader();
-            m_ModulesLoader.Load(this);
+            m_ModulesLoader.Load(this, hostApplicationType);
             ConfigureServices?.Invoke(builder);
             Services = builder.Build();
 

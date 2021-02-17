@@ -19,11 +19,6 @@ namespace Xarial.CadPlus.Plus
     public interface IModule : IDisposable
     {
         /// <summary>
-        /// Permanent identifier of this module
-        /// </summary>
-        Guid Id { get; }
-
-        /// <summary>
         /// Called when instance of the module is created
         /// </summary>
         /// <remarks>Only subscribe to events and implement the actual loading from <see cref="IHost.Connect"/></remarks>
