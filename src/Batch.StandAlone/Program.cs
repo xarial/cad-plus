@@ -29,29 +29,24 @@ using Xarial.CadPlus.Batch.StandAlone.ViewModels;
 using Xarial.XCad.Base;
 using Xarial.XToolkit.Reporting;
 using Xarial.CadPlus.Plus.Exceptions;
+using Xarial.CadPlus.Plus;
 
 namespace Xarial.CadPlus.Batch.StandAlone
 {
     class Program
     {
         private const int MAX_RETRIES = 2;
-
-        private static IBatchApplication m_BatchApp;
-        private static IBatchApplicationProxy m_BatchAppProxy;
-
+        
         private static XBatch.Base.FileOptions m_StartupOptions;
 
-        private static ApplicationLauncher<BatchArguments, MainWindow> m_AppLauncher;
+        private static ApplicationLauncher<BatchApplication, BatchArguments, MainWindow> m_AppLauncher;
 
         private static BatchManagerVM m_BatchManager;
 
         [STAThread]
         static void Main(string[] args)
         {
-            m_BatchAppProxy = new BatchApplicationProxy();
-            m_BatchApp = new BatchApplication(m_BatchAppProxy);
-
-            m_AppLauncher = new ApplicationLauncher<BatchArguments, MainWindow>(m_BatchApp, new Initiator());
+            m_AppLauncher = new ApplicationLauncher<BatchApplication, BatchArguments, MainWindow>(new Initiator());
             m_AppLauncher.ConfigureServices += OnConfigureServices;
             m_AppLauncher.ParseArguments += OnParseArguments;
             m_AppLauncher.WriteHelp += OnWriteHelp;
@@ -93,10 +88,9 @@ namespace Xarial.CadPlus.Batch.StandAlone
             builder.RegisterType<PopupKiller>().As<IPopupKiller>();
             builder.RegisterType<BatchDocumentVM>();
 
-            builder.RegisterInstance(m_BatchApp);
-            builder.RegisterInstance(m_BatchAppProxy);
-
-            builder.RegisterAdapter<IBatchApplication, IApplicationProvider[]>(x => x.ApplicationProviders);
+            builder.RegisterType<BatchApplicationProxy>().As<IBatchApplicationProxy>().SingleInstance();
+            
+            builder.RegisterAdapter<IApplication, IApplicationProvider[]>(x => ((IBatchApplication)x).ApplicationProviders);
 
             builder.RegisterType<JobManager>().As<IJobManager>()
                 .SingleInstance()

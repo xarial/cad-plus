@@ -43,8 +43,6 @@ namespace Xarial.CadPlus.Export.InApp
             RunStandAlone,
         }
 
-        public Guid Id => Guid.Parse("961248D6-FB9B-442C-B7ED-16C113E48AEF");
-
         private IHostExtension m_Host;
 
         private IMessageService m_Msg;

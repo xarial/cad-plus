@@ -81,8 +81,6 @@ namespace Xarial.CadPlus.Batch.InApp
             RunInApp
         }
 
-        public Guid Id => Guid.Parse(ModuleIds.BatchInApp);
-
         private IHostExtension m_Host;
 
         private IXPropertyPage<AssemblyBatchData> m_Page;
@@ -207,7 +205,7 @@ namespace Xarial.CadPlus.Batch.InApp
             }
         }
 
-        public void AddCommands(params IRibbonCommand[] cmd)
+        public void AddCommands(Group_e group, params IRibbonCommand[] cmd)
         {
         }
 

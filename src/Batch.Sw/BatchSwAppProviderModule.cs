@@ -19,29 +19,27 @@ using Xarial.CadPlus.Plus.Extensions;
 
 namespace Xarial.CadPlus.Batch.Sw
 {
-    [Module(ApplicationIds.BatchStandAlone)]
+    [Module(typeof(IHostWpf), typeof(IBatchApplication))]
     public class BatchSwAppProviderModule : IModule
     {
-        public Guid Id => Guid.Parse("4903A43B-0228-471B-A6BD-21AFFF2CCE50");
-
         private IHost m_Host;
         private IBatchApplication m_App;
 
         public void Init(IHost host)
         {
-            if (!(host.Application is IBatchApplication))
-            {
-                throw new InvalidCastException("Only batch application is supported for this module");
-            }
-
             m_Host = host;
             m_Host.Connect += OnConnect;
-
-            m_App = (IBatchApplication)host.Application;
         }
         
         private void OnConnect()
         {
+            if (!(m_Host.Application is IBatchApplication))
+            {
+                throw new InvalidCastException("Only batch application is supported for this module");
+            }
+
+            m_App = (IBatchApplication)m_Host.Application;
+
             var logger = m_Host.Services.GetService<IXLogger>();
             m_App.RegisterApplicationProvider(new SwApplicationProvider(logger));
         }

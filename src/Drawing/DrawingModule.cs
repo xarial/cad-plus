@@ -44,11 +44,9 @@ namespace Xarial.CadPlus.Drawing
     }
 
     //TODO: remove the dependency on application once the common APIs are used
-    [Module(typeof(IHostExtension), ApplicationIds.SolidWorksAddIn)]
+    [Module(typeof(IHostExtension), typeof(ISwAddInApplication))]
     public class DrawingModule : IModule
     {
-        public Guid Id => Guid.Parse(ModuleIds.Drawing);
-
         private IHostExtension m_Host;
 
         private IXPropertyPage<InsertQrCodeData> m_Page;

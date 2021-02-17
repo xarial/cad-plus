@@ -101,7 +101,7 @@ namespace Xarial.CadPlus.AddIn.Base
                 }
 
                 m_ModulesLoader = new ModulesLoader();
-                m_ModulesLoader.Load(this);
+                m_ModulesLoader.Load(this, app.GetType());
                 
                 Initialized?.Invoke();
             }

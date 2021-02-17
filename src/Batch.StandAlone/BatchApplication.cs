@@ -18,12 +18,10 @@ using Xarial.XCad.Documents;
 
 namespace Xarial.CadPlus.Batch.StandAlone
 {
-    internal class BatchApplication : IBatchApplication
+    public class BatchApplication : IBatchApplication
     {
         public event ProcessBatchInputDelegate ProcessInput;
         public event CreateCommandManagerDelegate CreateCommandManager;
-
-        public Guid Id => Guid.Parse(ApplicationIds.BatchStandAlone);
 
         public IApplicationProvider[] ApplicationProviders => m_ApplicationProviders.ToArray();
 
@@ -31,7 +29,7 @@ namespace Xarial.CadPlus.Batch.StandAlone
 
         private readonly IBatchApplicationProxy m_Proxy;
 
-        internal BatchApplication(IBatchApplicationProxy proxy)
+        public BatchApplication(IBatchApplicationProxy proxy)
         {
             m_Proxy = proxy;
             m_Proxy.RequestProcessInput += OnRequestProcessInput;

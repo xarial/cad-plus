@@ -60,8 +60,6 @@ namespace Xarial.CadPlus.CustomToolbar
 
         private List<IIconsProvider> m_IconsProviders;
 
-        public Guid Id => Guid.Parse(ModuleIds.Toolbar);
-
         public CustomToolbarModule() 
         {
             m_IconsProviders = new List<IIconsProvider>();

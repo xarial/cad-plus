@@ -33,11 +33,9 @@ namespace Xarial.CadPlus.Batch.Extensions
             => 0;
     }
 
-    [Module(typeof(IHostWpf), ApplicationIds.BatchStandAlone)]
+    [Module(typeof(IHostWpf), typeof(IBatchApplication))]
     public class InputSorterModule : IModule
     {
-        public Guid Id => Guid.Parse(ModuleIds.BatchInputSorter);
-
         private IHostWpf m_Host;
         private IBatchApplication m_App;
 
@@ -47,11 +45,11 @@ namespace Xarial.CadPlus.Batch.Extensions
         {
             m_Host = (IHostWpf)host;
             m_Host.Connect += OnConnect;
-            m_App = m_Host.Application as IBatchApplication;
         }
 
         private void OnConnect()
         {
+            m_App = (IBatchApplication)m_Host.Application;
             m_App.ProcessInput += OnProcessInput;
             m_App.CreateCommandManager += OnCreateCommandManager;
         }

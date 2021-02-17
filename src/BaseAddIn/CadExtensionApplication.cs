@@ -14,12 +14,10 @@ namespace Xarial.CadPlus.AddIn.Base
     public class CadExtensionApplication : ICadExtensionApplication
     {
         public IXExtension Extension { get; }
-        public Guid Id { get; }
 
-        public CadExtensionApplication(IXExtension ext, Guid appId) 
+        public CadExtensionApplication(IXExtension ext) 
         {
             Extension = ext;
-            Id = appId;
         }
     }
 }
