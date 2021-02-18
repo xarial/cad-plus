@@ -29,17 +29,21 @@ namespace Xarial.CadPlus.Batch.Sw
         {
             m_Host = host;
             m_Host.Connect += OnConnect;
+            m_Host.Initialized += OnHostInitialized;
         }
-        
-        private void OnConnect()
+
+        private void OnHostInitialized(IApplication app)
         {
-            if (!(m_Host.Application is IBatchApplication))
+            if (!(app is IBatchApplication))
             {
                 throw new InvalidCastException("Only batch application is supported for this module");
             }
 
-            m_App = (IBatchApplication)m_Host.Application;
+            m_App = (IBatchApplication)app;
+        }
 
+        private void OnConnect()
+        {
             var logger = m_Host.Services.GetService<IXLogger>();
             m_App.RegisterApplicationProvider(new SwApplicationProvider(logger));
         }

@@ -27,6 +27,8 @@ using Xarial.CadPlus.Batch.InApp.ViewModels;
 using Xarial.CadPlus.Common.Attributes;
 using Xarial.CadPlus.Plus.Attributes;
 using Xarial.CadPlus.Plus.Services;
+using Xarial.CadPlus.Plus.UI;
+using Xarial.CadPlus.Plus.Modules;
 
 namespace Xarial.CadPlus.Batch.InApp
 {
@@ -93,6 +95,14 @@ namespace Xarial.CadPlus.Batch.InApp
             [Title("Activate Documents")]
             [ControlOptions(align: ControlLeftAlign_e.Indent)]
             public bool ActivateDocuments { get; set; } = true;
+
+            [DynamicControls(Group_e.Options)]
+            public List<IRibbonCommand> AdditionalCommands { get; }
+
+            public OptionsGroup() 
+            {
+                AdditionalCommands = new List<IRibbonCommand>();
+            }
         }
 
         public InputGroup Input { get; }

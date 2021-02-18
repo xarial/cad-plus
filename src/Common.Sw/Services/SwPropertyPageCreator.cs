@@ -14,6 +14,7 @@ using Xarial.CadPlus.Common.Services;
 using Xarial.XCad.SolidWorks;
 using Xarial.XCad.SolidWorks.UI.PropertyPage;
 using Xarial.XCad.UI.PropertyPage;
+using Xarial.XCad.UI.PropertyPage.Delegates;
 
 namespace Xarial.CadPlus.Common.Sw.Services
 {
@@ -27,7 +28,7 @@ namespace Xarial.CadPlus.Common.Sw.Services
             m_AddIn = addIn;
         }
 
-        public IXPropertyPage<TData> CreatePage<TData>()
-            => m_AddIn.CreatePage<TData, THandler>();
+        public IXPropertyPage<TData> CreatePage<TData>(CreateDynamicControlsDelegate createDynCtrlHandler = null)
+            => m_AddIn.CreatePage<TData, THandler>(createDynCtrlHandler);
     }
 }

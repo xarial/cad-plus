@@ -38,6 +38,8 @@ using Xarial.CadPlus.Plus.Extensions;
 using Xarial.CadPlus.Plus.Modules;
 using Xarial.CadPlus.Plus.Delegates;
 using Xarial.CadPlus.Plus.UI;
+using Xarial.XCad.UI.PropertyPage.Base;
+using Xarial.CadPlus.Batch.InApp.Controls;
 
 namespace Xarial.CadPlus.Batch.InApp
 {
@@ -99,6 +101,12 @@ namespace Xarial.CadPlus.Batch.InApp
 
             m_Host = (IHostExtension)host;
             m_Host.Connect += OnConnect;
+            m_Host.Initialized += OnHostInitialized;
+        }
+
+        private void OnHostInitialized(IApplication app)
+        {
+            m_Data = new AssemblyBatchData(m_Host.Services.GetService<IMacroFileFilterProvider>());
         }
 
         private void OnConnect()
@@ -108,10 +116,47 @@ namespace Xarial.CadPlus.Batch.InApp
             m_Logger = m_Host.Services.GetService<IXLogger>();
 
             m_Host.RegisterCommands<Commands_e>(OnCommandClick);
-            m_Page = m_Host.CreatePage<AssemblyBatchData>();
-            m_Data = new AssemblyBatchData(m_Host.Services.GetService<IMacroFileFilterProvider>());
+            m_Page = m_Host.CreatePage<AssemblyBatchData>(CreateDynamicPageControls);
             m_Page.Closing += OnPageClosing;
             m_Page.Closed += OnPageClosed;
+        }
+
+        private IControlDescriptor[] CreateDynamicPageControls(object tag)
+        {
+            var grp = (Group_e)tag;
+
+            switch (grp) 
+            {
+                case Group_e.Options:
+                    return CreateControls(m_Data.Options.AdditionalCommands);
+
+                default:
+                    throw new NotSupportedException();
+
+            }
+        }
+
+        private IControlDescriptor[] CreateControls(IEnumerable<IRibbonCommand> cmds) 
+        {
+            var ctrls = new List<IControlDescriptor>();
+
+            foreach (var cmd in cmds) 
+            {
+                switch (cmd) 
+                {
+                    case IRibbonToggleCommand toggle:
+                        ctrls.Add(new BaseControlDescriptor<List<IRibbonCommand>, bool, IRibbonToggleCommand>(
+                            toggle,
+                            ctx => toggle.Value,
+                            (ctx, v) => toggle.Value = v));
+                        break;
+
+                    default:
+                        throw new NotSupportedException();
+                }
+            }
+
+            return ctrls.ToArray();
         }
 
         private void OnPageClosing(PageCloseReasons_e reason, PageClosingArg arg)
@@ -152,8 +197,11 @@ namespace Xarial.CadPlus.Batch.InApp
                             .Select(c => c.Document).ToArray();
                     }
 
+                    var input = docs.ToList();
+                    ProcessInput?.Invoke(m_Host.Extension.Application, input);
+
                     var exec = new AssemblyBatchRunJobExecutor(m_Host.Extension.Application, m_MacroRunnerSvc,
-                        docs, m_Data.Macros.Macros.Macros, m_Data.Options.ActivateDocuments);
+                        input.ToArray(), m_Data.Macros.Macros.Macros, m_Data.Options.ActivateDocuments);
                     
                     var vm = new JobResultVM(assm.Title, exec);
 
@@ -207,6 +255,12 @@ namespace Xarial.CadPlus.Batch.InApp
 
         public void AddCommands(Group_e group, params IRibbonCommand[] cmd)
         {
+            switch (group) 
+            {
+                case Group_e.Options:
+                    m_Data.Options.AdditionalCommands.AddRange(cmd);
+                    break;
+            }
         }
 
         public void Dispose()
