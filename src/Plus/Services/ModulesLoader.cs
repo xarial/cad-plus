@@ -24,7 +24,7 @@ namespace Xarial.CadPlus.Plus.Services
 {
     public interface IModulesLoader
     {
-        void Load(IHost host, Type hostApplicationType);
+        IModule[] Load(IHost host, Type hostApplicationType);
     }
 
     public class ModulesLoader : IModulesLoader
@@ -36,7 +36,7 @@ namespace Xarial.CadPlus.Plus.Services
             m_SettsProvider = new SettingsProvider();
         }
 
-        public void Load(IHost host, Type hostApplicationType)
+        public IModule[] Load(IHost host, Type hostApplicationType)
         {
             var modulesDir = Path.Combine(Path.GetDirectoryName(this.GetType().Assembly.Location), "Modules");
 
@@ -65,27 +65,15 @@ namespace Xarial.CadPlus.Plus.Services
 
             CheckDuplicates(modules);
 
-            var field = host.GetType().GetFields(BindingFlags.Public | BindingFlags.Instance | BindingFlags.NonPublic)
-                .First(f => f.FieldType == typeof(IModule[])
-                && f.GetCustomAttributes<ImportManyAttribute>(true).Any());
-
-            if (field == null)
-            {
-                throw new Exception("Cannot find the modules import field");
-            }
-
             var sorter = new ModulesSorter();
             modules = sorter.Sort(modules);
 
-            field.SetValue(host, modules);
-
-            if (host.Modules?.Any() == true)
+            foreach (var module in modules)
             {
-                foreach (var module in modules)
-                {
-                    module.Init(host);
-                }
+                module.Init(host);
             }
+
+            return modules;
         }
 
         private void RemoveDuplicateAndNestedFolders(List<string> modulePaths)

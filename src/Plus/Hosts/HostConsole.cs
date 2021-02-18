@@ -20,24 +20,19 @@ namespace Xarial.CadPlus.Plus.Hosts
 {
     public class HostConsole : IHostConsole
     {
-        public IntPtr ParentWindow => IntPtr.Zero;
-
         public event Action Connect;
         public event Action Disconnect;
-        public event Action<IApplication> Initialized;
         public event Action<IContainerBuilder> ConfigureServices;
-        public event Action Started;
-
-        public IModule[] Modules => m_Modules;
-
-        public IServiceProvider Services { get; }
-
-        [ImportMany]
-        private IModule[] m_Modules;
-
+        public event HostStartedDelegate Started;
+        public event HostInitializedDelegate Initialized;
+        
         private readonly IModulesLoader m_ModulesLoader;
 
         private readonly IInitiator m_Initiator;
+
+        private readonly IModule[] m_Modules;
+
+        private readonly IServiceProvider m_Services;
 
         public HostConsole(IContainerBuilder builder, IInitiator initiator, Type hostApplicationType)
         {
@@ -45,23 +40,28 @@ namespace Xarial.CadPlus.Plus.Hosts
             m_Initiator.Init(this);
 
             m_ModulesLoader = new ModulesLoader();
-            m_ModulesLoader.Load(this, hostApplicationType);
+            m_Modules = m_ModulesLoader.Load(this, hostApplicationType);
             
             ConfigureServices?.Invoke(builder);
-            Services = builder.Build();
+            m_Services = builder.Build();
 
-            Initialized?.Invoke(Services.GetService<IApplication>());
+            Initialized?.Invoke(m_Services.GetService<IApplication>(), m_Services, m_Modules);
             Connect?.Invoke();
-            Started?.Invoke();
+            Started?.Invoke(IntPtr.Zero);
         }
 
         public void Dispose()
         {
             Disconnect?.Invoke();
 
-            if (Services is IDisposable)
+            if (m_Services is IDisposable)
             {
-                (Services as IDisposable).Dispose();
+                (m_Services as IDisposable).Dispose();
+            }
+
+            foreach (var module in m_Modules) 
+            {
+                module.Dispose();
             }
         }
 

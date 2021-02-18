@@ -50,10 +50,10 @@ namespace TestApp
             m_Host.Started += OnHostStartedStarted;
         }
 
-        private void OnHostStartedStarted()
+        private void OnHostStartedStarted(IntPtr parentWnd)
             => m_Logger.Log("7 - Host started");
 
-        private void OnHostInitialized(IApplication app)
+        private void OnHostInitialized(IApplication app, IServiceProvider svcProvider, IModule[] modules)
             => m_Logger.Log("4 - Host initiated");
 
         private void OnHostConnect()
