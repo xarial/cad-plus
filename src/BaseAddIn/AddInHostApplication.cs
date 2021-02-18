@@ -36,6 +36,7 @@ using Xarial.CadPlus.Plus.Shared.Extensions;
 using System.Windows;
 using System.Windows.Interop;
 using Xarial.XCad.UI.PropertyPage.Delegates;
+using Xarial.CadPlus.Plus.Delegates;
 
 namespace Xarial.CadPlus.AddIn.Base
 {
@@ -43,22 +44,15 @@ namespace Xarial.CadPlus.AddIn.Base
 
     public class AddInHost : IHostExtension
     {
-        [ImportMany]
-        private IModule[] m_Modules;
-
         internal const int ROOT_GROUP_ID = 1000;
 
-        public IntPtr ParentWindow => Extension.Application.WindowHandle;
-
         public IXExtension Extension { get; }
-
-        public IModule[] Modules => m_Modules;
-
+        
         public event Action Connect;
         public event Action Disconnect;
-        public event Action<IApplication> Initialized;
+        public event HostInitializedDelegate Initialized;
         public event Action<IContainerBuilder> ConfigureServices;
-        public event Action Started;
+        public event HostStartedDelegate Started;
 
         private CommandGroupSpec m_ParentGrpSpec;
 
@@ -77,6 +71,8 @@ namespace Xarial.CadPlus.AddIn.Base
         private readonly IInitiator m_Initiator;
 
         private readonly ICadExtensionApplication m_App;
+
+        private readonly IModule[] m_Modules;
 
         public AddInHost(ICadExtensionApplication app, IInitiator initiator) 
         {
@@ -102,7 +98,7 @@ namespace Xarial.CadPlus.AddIn.Base
                 }
 
                 m_ModulesLoader = new ModulesLoader();
-                m_ModulesLoader.Load(this, app.GetType());
+                m_Modules = m_ModulesLoader.Load(this, app.GetType());
             }
             catch (Exception ex)
             {
@@ -116,7 +112,7 @@ namespace Xarial.CadPlus.AddIn.Base
 
         private void OnStartupCompleted(IXExtension ext)
         {
-            Started?.Invoke();
+            Started?.Invoke(ext.Application.WindowHandle);
         }
 
         private void OnExtensionConnect(IXExtension ext) 
@@ -154,7 +150,7 @@ namespace Xarial.CadPlus.AddIn.Base
 
             m_PageCreator = m_SvcProvider.Container.Resolve<IPropertyPageCreator>();
 
-            Initialized?.Invoke(m_App);
+            Initialized?.Invoke(m_App, m_SvcProvider, m_Modules);
         }
 
         private void ConfigureHostServices(ContainerBuilder builder) 
@@ -239,7 +235,7 @@ namespace Xarial.CadPlus.AddIn.Base
         public void ShowPopup<TWindow>(TWindow wnd) where TWindow : Window
         {
             var interopHelper = new WindowInteropHelper(wnd);
-            interopHelper.Owner = ParentWindow;
+            interopHelper.Owner = m_App.Extension.Application.WindowHandle;
             wnd.ShowDialog();
         }
     }

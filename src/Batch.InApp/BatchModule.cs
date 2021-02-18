@@ -92,6 +92,8 @@ namespace Xarial.CadPlus.Batch.InApp
         private IMessageService m_Msg;
         private IXLogger m_Logger;
 
+        private IServiceProvider m_SvcProvider;
+
         public void Init(IHost host)
         {
             if (!(host is IHostExtension))
@@ -104,16 +106,17 @@ namespace Xarial.CadPlus.Batch.InApp
             m_Host.Initialized += OnHostInitialized;
         }
 
-        private void OnHostInitialized(IApplication app)
+        private void OnHostInitialized(IApplication app, IServiceProvider svcProvider, IModule[] modules)
         {
-            m_Data = new AssemblyBatchData(m_Host.Services.GetService<IMacroFileFilterProvider>());
+            m_SvcProvider = svcProvider;
+            m_Data = new AssemblyBatchData(m_SvcProvider.GetService<IMacroFileFilterProvider>());
         }
 
         private void OnConnect()
         {
-            m_MacroRunnerSvc = m_Host.Services.GetService<IMacroRunnerExService>();
-            m_Msg = m_Host.Services.GetService<IMessageService>();
-            m_Logger = m_Host.Services.GetService<IXLogger>();
+            m_MacroRunnerSvc = m_SvcProvider.GetService<IMacroRunnerExService>();
+            m_Msg = m_SvcProvider.GetService<IMessageService>();
+            m_Logger = m_SvcProvider.GetService<IXLogger>();
 
             m_Host.RegisterCommands<Commands_e>(OnCommandClick);
             m_Page = m_Host.CreatePage<AssemblyBatchData>(CreateDynamicPageControls);
