@@ -53,7 +53,7 @@ namespace TestApp
         private void OnHostStartedStarted()
             => m_Logger.Log("7 - Host started");
 
-        private void OnHostInitialized()
+        private void OnHostInitialized(IApplication app)
             => m_Logger.Log("4 - Host initiated");
 
         private void OnHostConnect()

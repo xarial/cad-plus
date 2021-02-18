@@ -25,7 +25,7 @@ namespace Xarial.CadPlus.Plus.Hosts
 
         public event Action Connect;
         public event Action Disconnect;
-        public event Action Initialized;
+        public event Action<IApplication> Initialized;
         public event Action<IContainerBuilder> ConfigureServices;
         public event Action Started;
 
@@ -59,9 +59,7 @@ namespace Xarial.CadPlus.Plus.Hosts
             ConfigureServices?.Invoke(builder);
             Services = builder.Build();
 
-            Application = Services.GetService<IApplication>();
-
-            Initialized?.Invoke();
+            Initialized?.Invoke(Services.GetService<IApplication>());
             Connect?.Invoke();
 
             WpfApplication.Activated += OnAppActivated;
@@ -71,8 +69,6 @@ namespace Xarial.CadPlus.Plus.Hosts
         public IntPtr ParentWindow => WpfApplication.MainWindow != null
             ? new WindowInteropHelper(WpfApplication.MainWindow).Handle
             : IntPtr.Zero;
-
-        public virtual IApplication Application { get; }
 
         private void OnAppActivated(object sender, EventArgs e)
         {
