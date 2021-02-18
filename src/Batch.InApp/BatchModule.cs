@@ -205,15 +205,18 @@ namespace Xarial.CadPlus.Batch.InApp
 
                     var exec = new AssemblyBatchRunJobExecutor(m_Host.Extension.Application, m_MacroRunnerSvc,
                         input.ToArray(), m_Data.Macros.Macros.Macros, m_Data.Options.ActivateDocuments);
-                    
+
                     var vm = new JobResultVM(assm.Title, exec);
 
                     exec.ExecuteAsync().Wait();
-                    
+
                     var wnd = m_Host.Extension.CreatePopupWindow<ResultsWindow>();
                     wnd.Control.Title = $"{assm.Title} batch job result";
                     wnd.Control.DataContext = vm;
                     wnd.Show();
+                }
+                catch (OperationCanceledException) 
+                {
                 }
                 catch (Exception ex)
                 {

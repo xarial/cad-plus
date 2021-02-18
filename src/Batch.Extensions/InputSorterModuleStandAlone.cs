@@ -12,6 +12,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Xarial.CadPlus.Batch.Extensions.Properties;
+using Xarial.CadPlus.Batch.Extensions.Services;
 using Xarial.CadPlus.Batch.Extensions.UI;
 using Xarial.CadPlus.Batch.Extensions.ViewModels;
 using Xarial.CadPlus.Plus;
@@ -40,6 +41,13 @@ namespace Xarial.CadPlus.Batch.Extensions
         private IBatchApplication m_App;
 
         private bool m_EnableOrdering;
+
+        private readonly TopologicalReferencesSorter m_Sorter;
+
+        public InputSorterModuleStandAlone() 
+        {
+            m_Sorter = new TopologicalReferencesSorter();
+        }
 
         public void Init(IHost host)
         {
@@ -100,43 +108,10 @@ namespace Xarial.CadPlus.Batch.Extensions
                     {
                         try
                         {
-                            var itemsList = await Task.Run(() =>
-                            {
-                                var groups = GroupTopological(src, doc =>
-                                {
-                                    try
-                                    {
-                                        return doc.Dependencies;
-                                    }
-                                    catch
-                                    {
-                                        return null;
-                                    }
-                                }, new DocumentComparer(),
+                            var itemsList = await Task.Run(
+                                () => m_Sorter.Sort(src,
                                 p => vm.Progress = p,
-                                cancellationToken);
-
-                                foreach (var group in groups)
-                                {
-                                    foreach (var extraItem in group.Except(src).ToArray())
-                                    {
-                                        group.Remove(extraItem);
-                                    }
-                                }
-
-                                var items = new List<ItemVM>();
-
-                                for (int i = 0; i < groups.Count; i++)
-                                {
-                                    items.AddRange(groups[i].Select(doc => new ItemVM()
-                                    {
-                                        Document = doc,
-                                        Level = groups.Count - i - 1
-                                    }));
-                                }
-
-                                return items;
-                            });
+                                cancellationToken));
 
                             vm.LoadItems(itemsList);
                         }
@@ -163,71 +138,6 @@ namespace Xarial.CadPlus.Batch.Extensions
             }
         }
         
-        //function code based on https://www.codeproject.com/Articles/869059/Topological-sorting-in-Csharp with minor modifications
-        private List<List<T>> GroupTopological<T>(T[] source,
-            Func<T, IEnumerable<T>> getDependenciesFunc, IEqualityComparer<T> comparer,
-            Action<double> prgHandler,
-            CancellationToken cancellationToken)
-        {
-            var sorted = new List<List<T>>();
-            var visited = new Dictionary<T, int>(comparer);
-
-            int curInst = 0;
-
-            foreach (var item in source)
-            {
-                Visit(item, getDependenciesFunc, sorted, visited, cancellationToken);
-                prgHandler.Invoke((double)++curInst / (double)source.Length);
-            }
-
-            return sorted;
-        }
-
-        private int Visit<T>(T item, Func<T, IEnumerable<T>> getDependenciesFunc,
-            List<List<T>> sorted, Dictionary<T, int> visited, CancellationToken cancellationToken)
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-
-            const int curLevel = -1;
-            int level;
-            var hasVisited = visited.TryGetValue(item, out level);
-
-            if (hasVisited)
-            {
-                if (level == curLevel)
-                {
-                    //throw new ArgumentException("Cyclic dependency found.");
-                }
-            }
-            else
-            {
-                level = curLevel;
-                visited[item] = level;
-
-                var dependencies = getDependenciesFunc.Invoke(item);
-
-                if (dependencies?.Any() == true)
-                {
-                    foreach (var dependency in dependencies)
-                    {
-                        var depLevel = Visit(dependency, getDependenciesFunc, sorted, visited, cancellationToken);
-                        level = Math.Max(level, depLevel);
-                    }
-                }
-
-                visited[item] = ++level;
-
-                while (sorted.Count <= level)
-                {
-                    sorted.Add(new List<T>());
-                }
-
-                sorted[level].Add(item);
-            }
-
-            return level;
-        }
-
         public void Dispose()
         {
         }

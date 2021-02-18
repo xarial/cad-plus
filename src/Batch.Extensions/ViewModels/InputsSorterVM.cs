@@ -105,7 +105,7 @@ namespace Xarial.CadPlus.Batch.Extensions.ViewModels
             IsInitializing = true;
         }
 
-        internal void LoadItems(List<ItemVM> input) 
+        internal void LoadItems(ItemVM[] input) 
         {
             InputView = CollectionViewSource.GetDefaultView(input);
             InputView.GroupDescriptions.Add(new ItemLevelGroupDescription());

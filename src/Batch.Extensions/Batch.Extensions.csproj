@@ -69,6 +69,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="Services\TopologicalReferencesSorter.cs" />
     <Compile Include="UI\InputsSorterWindow.xaml.cs">
       <DependentUpon>InputsSorterWindow.xaml</DependentUpon>
     </Compile>
@@ -93,9 +94,7 @@
   <ItemGroup>
     <None Include="Resources\order-dependencies.png" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Services\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(SolutionDir)common\common.module.props" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
