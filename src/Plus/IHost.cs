@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Windows;
+using Xarial.CadPlus.Plus.Delegates;
 using Xarial.XCad;
 
 namespace Xarial.CadPlus.Plus
@@ -16,12 +17,7 @@ namespace Xarial.CadPlus.Plus
     /// Represents stan-alone application
     /// </summary>
     public interface IHost : IDisposable
-    {
-        /// <summary>
-        /// Pointer to the application hosted in this host
-        /// </summary>
-        IApplication Application { get; }
-
+    {        
         /// <summary>
         /// Accesses the registered modules
         /// </summary>
@@ -31,7 +27,7 @@ namespace Xarial.CadPlus.Plus
         /// Notifies when all modules are initialized
         /// </summary>
         /// <remarks>Use this method to invoke modules APIs</remarks>
-        event Action Initialized;
+        event Action<IApplication> Initialized;
 
         /// <summary>
         /// Notifies when the application loaded its data and modules can start invoking APIs of this application

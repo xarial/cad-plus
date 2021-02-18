@@ -14,6 +14,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using Xarial.CadPlus.Plus.Services;
 using Xarial.CadPlus.Plus.Extensions;
+using Xarial.CadPlus.Plus.Delegates;
 
 namespace Xarial.CadPlus.Plus.Hosts
 {
@@ -23,15 +24,13 @@ namespace Xarial.CadPlus.Plus.Hosts
 
         public event Action Connect;
         public event Action Disconnect;
-        public event Action Initialized;
+        public event Action<IApplication> Initialized;
         public event Action<IContainerBuilder> ConfigureServices;
         public event Action Started;
 
         public IModule[] Modules => m_Modules;
 
         public IServiceProvider Services { get; }
-
-        public IApplication Application { get; }
 
         [ImportMany]
         private IModule[] m_Modules;
@@ -51,9 +50,7 @@ namespace Xarial.CadPlus.Plus.Hosts
             ConfigureServices?.Invoke(builder);
             Services = builder.Build();
 
-            Application = Services.GetService<IApplication>();
-
-            Initialized?.Invoke();
+            Initialized?.Invoke(Services.GetService<IApplication>());
             Connect?.Invoke();
             Started?.Invoke();
         }
