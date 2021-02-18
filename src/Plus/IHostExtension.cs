@@ -9,6 +9,7 @@ using System;
 using Xarial.XCad;
 using Xarial.XCad.Extensions;
 using Xarial.XCad.UI.PropertyPage;
+using Xarial.XCad.UI.PropertyPage.Delegates;
 
 namespace Xarial.CadPlus.Plus
 {
@@ -36,7 +37,8 @@ namespace Xarial.CadPlus.Plus
         /// Creates extension-specific page from the data
         /// </summary>
         /// <typeparam name="TData">Page data specification</typeparam>
+        /// <param name="createDynCtrlHandler">Dynamic control handler</param>
         /// <returns>Created page</returns>
-        IXPropertyPage<TData> CreatePage<TData>();
+        IXPropertyPage<TData> CreatePage<TData>(CreateDynamicControlsDelegate createDynCtrlHandler = null);
     }
 }
