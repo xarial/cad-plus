@@ -49,13 +49,14 @@ namespace Xarial.CadPlus.Plus.Applications
 
         IMacroFileFilterProvider MacroFileFiltersProvider { get; }
         IMacroRunnerExService MacroRunnerService { get; }
+        ICadEntityDescriptor EntityDescriptor { get; }
 
         IEnumerable<IXVersion> GetInstalledVersions();
         IXApplication StartApplication(IXVersion vers, StartupOptions_e opts,
             Action<Process> startingHandler, CancellationToken cancellationToken);
         IXVersion ParseVersion(string version);
+        
         bool CanProcessFile(string filePath);
-        FileTypeFilter[] InputFilesFilter { get; }
         string GetVersionId(IXVersion value);
     }
 
