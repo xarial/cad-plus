@@ -43,11 +43,8 @@ namespace Xarial.CadPlus.Plus.Applications
 
     public interface IApplicationProvider : IDisposable
     {
-        string DisplayName { get; }
         string ApplicationId { get; }
-        Image ApplicationIcon { get; }
-
-        IMacroFileFilterProvider MacroFileFiltersProvider { get; }
+        
         IMacroRunnerExService MacroRunnerService { get; }
         ICadEntityDescriptor EntityDescriptor { get; }
 
