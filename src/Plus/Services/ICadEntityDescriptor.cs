@@ -8,19 +8,22 @@ using Xarial.CadPlus.Plus.Data;
 
 namespace Xarial.CadPlus.Plus.Services
 {
-    public enum EntityType_e
-    {
-        Part,
-        Assembly,
-        Drawing,
-        Configuration,
-        CutList
-    }
-
     public interface ICadEntityDescriptor
     {
-        Image GetIcon(EntityType_e entType);
-        string GetTitle(EntityType_e entType);
-        FileTypeFilter[] GetFileFilters(EntityType_e entType);
+        string ApplicationName { get; }
+        Image ApplicationIcon { get; }
+
+        Image PartIcon { get; }
+        Image AssemblyIcon { get; }
+        Image DrawingIcon { get; }
+        Image ConfigurationIcon { get; }
+        Image SheetIcon { get; }
+        Image CutListIcon { get; }
+
+        FileTypeFilter PartFileFilter { get; }
+        FileTypeFilter AssemblyFileFilter { get; }
+        FileTypeFilter DrawingFileFilter { get; }
+
+        FileTypeFilter[] MacroFileFilters { get; }
     }
 }
