@@ -71,6 +71,11 @@ namespace Xarial.CadPlus.Plus.Shared
                 {
                     Title = "Polly",
                     Url = "https://licenses.nuget.org/BSD-3-Clause"
+                },
+                new LicenseInfo()
+                {
+                    Title = "OpenTK",
+                    Url = "https://github.com/opentk/opentk/blob/master/License.txt"
                 }
             };
         }
