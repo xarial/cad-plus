@@ -41,10 +41,8 @@ namespace Xarial.CadPlus.Plus.Applications
         Hidden = 8
     }
 
-    public interface IApplicationProvider : IDisposable
-    {
-        string ApplicationId { get; }
-        
+    public interface ICadApplicationInstanceProvider : IDisposable
+    {   
         IMacroRunnerExService MacroRunnerService { get; }
         ICadEntityDescriptor EntityDescriptor { get; }
 
@@ -92,7 +90,7 @@ namespace Xarial.CadPlus.Plus.Applications
         event ProcessBatchInputDelegate ProcessInput;
         event CreateCommandManagerDelegate CreateCommandManager;
 
-        IApplicationProvider[] ApplicationProviders { get; }
-        void RegisterApplicationProvider(IApplicationProvider provider);
+        ICadApplicationInstanceProvider[] ApplicationProviders { get; }
+        void RegisterApplicationProvider(ICadApplicationInstanceProvider provider);
     }
 }

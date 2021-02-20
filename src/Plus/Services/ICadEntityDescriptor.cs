@@ -10,6 +10,7 @@ namespace Xarial.CadPlus.Plus.Services
 {
     public interface ICadEntityDescriptor
     {
+        string ApplicationId { get; }
         string ApplicationName { get; }
         Image ApplicationIcon { get; }
 
