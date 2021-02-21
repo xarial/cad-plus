@@ -146,9 +146,9 @@ namespace Xarial.CadPlus.AddIn.Base
 
             m_SvcProvider = new ServiceProvider(builder.Build());
 
-            svcColl.Populate(m_SvcProvider.Container);
+            svcColl.Populate(m_SvcProvider.Context);
 
-            m_PageCreator = m_SvcProvider.Container.Resolve<IPropertyPageCreator>();
+            m_PageCreator = m_SvcProvider.Context.Resolve<IPropertyPageCreator>();
 
             Initialized?.Invoke(m_App, m_SvcProvider, m_Modules);
         }
