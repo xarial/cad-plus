@@ -8,6 +8,7 @@
 using Moq;
 using NUnit.Framework;
 using System;
+using System.IO;
 using System.Linq;
 using Xarial.CadPlus.Batch.Base.Models;
 using Xarial.CadPlus.Batch.StandAlone;
@@ -16,6 +17,7 @@ using Xarial.CadPlus.Common.Services;
 using Xarial.CadPlus.Plus.Applications;
 using Xarial.CadPlus.Plus.Data;
 using Xarial.CadPlus.Plus.Services;
+using Xarial.CadPlus.Plus.UI;
 using Xarial.CadPlus.XBatch.Base;
 using Xarial.CadPlus.XBatch.Base.Core;
 using Xarial.CadPlus.XBatch.Base.Models;
@@ -23,9 +25,25 @@ using Xarial.CadPlus.XBatch.Base.ViewModels;
 using Xarial.XCad;
 using Xarial.XCad.SolidWorks;
 using Xarial.XCad.SolidWorks.Enums;
+using Xarial.XToolkit.Wpf.Utils;
 
 namespace Xbatch.Tests
 {
+
+    public class BatchDocumentMockVM : BatchDocumentVM
+    {
+        public BatchDocumentMockVM(string name, BatchJob job, ICadApplicationInstanceProvider[] appProviders, IMessageService msgSvc, Func<BatchJob, IBatchRunJobExecutor> execFact, IBatchApplicationProxy batchAppProxy, MainWindow parentWnd, IRibbonButtonCommand[] backstageCmds) 
+            : base(name, job, appProviders, msgSvc, execFact, batchAppProxy, parentWnd, backstageCmds)
+        {
+        }
+
+        protected override RibbonCommandManager LoadRibbonCommands(IRibbonButtonCommand[] backstageCmds)
+            => null;
+
+        protected override FileFilter[] GetFileFilters(ICadEntityDescriptor cadEntDesc)
+            => new FileFilter[0];
+    }
+
     public class BatchRunnerVMTest
     {
         [Test]
@@ -108,7 +126,7 @@ namespace Xbatch.Tests
             var modelMock = mock.Object;
             var msgSvcMock = new Mock<IMessageService>().Object;
             
-            var docVm = new BatchDocumentVM("", new BatchJob(), new ICadApplicationInstanceProvider[] { appProviderMock.Object }, msgSvcMock,
+            var docVm = new BatchDocumentMockVM("", new BatchJob(), new ICadApplicationInstanceProvider[] { appProviderMock.Object }, msgSvcMock,
                 j =>
                 {
                     opts = j;

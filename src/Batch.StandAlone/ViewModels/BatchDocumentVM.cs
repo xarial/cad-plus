@@ -194,7 +194,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
             Macros.CollectionChanged += OnMacrosCollectionChanged;
         }
 
-        private FileFilter[] GetFileFilters(ICadEntityDescriptor cadEntDesc)
+        protected virtual FileFilter[] GetFileFilters(ICadEntityDescriptor cadEntDesc)
         {
             return new FileFilter[]
             {
@@ -208,7 +208,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
             };
         }
 
-        private RibbonCommandManager LoadRibbonCommands(IRibbonButtonCommand[] backstageCmds)
+        protected virtual RibbonCommandManager LoadRibbonCommands(IRibbonButtonCommand[] backstageCmds)
         {
             var cmdMgr = new RibbonCommandManager(backstageCmds,
                 new RibbonTab(BatchApplicationCommandManager.InputTab.Name, "Input",
