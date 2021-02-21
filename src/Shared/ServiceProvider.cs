@@ -17,19 +17,25 @@ namespace Xarial.CadPlus.Plus.Shared
 {
     public class ServiceProvider : IServiceContainer, IDisposable
     {
-        public IContainer Container { get; }
+        public IComponentContext Context { get; }
 
-        public ServiceProvider(IContainer container) 
+        public ServiceProvider(IComponentContext container) 
         {
-            Container = container;
+            Context = container;
         }
 
         public object GetService(Type serviceType)
-            => Container.Resolve(serviceType);
+            => Context.Resolve(serviceType);
 
         public object GetService(Type serviceType, string name)
-            => Container.ResolveNamed(name, serviceType);
+            => Context.ResolveNamed(name, serviceType);
 
-        public void Dispose() => Container.Dispose();
+        public void Dispose() 
+        {
+            if (Context is IDisposable) 
+            {
+                (Context as IDisposable).Dispose();
+            }
+        }
     }
 }
