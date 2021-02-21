@@ -60,12 +60,12 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
         private readonly IBatchRunnerModel m_Model;
         private readonly IMessageService m_MsgSvc;
 
-        public IApplicationProvider[] AppProviders { get; }
+        public ICadApplicationInstanceProvider[] AppProviders { get; }
 
         private readonly Func<System.IO.FileInfo, BatchJob, MainWindow, IRibbonButtonCommand[], BatchDocumentVM> m_OpenDocFunc;
         private readonly Func<string, BatchJob, MainWindow, IRibbonButtonCommand[], BatchDocumentVM> m_NewDocFunc;
 
-        public BatchManagerVM(IApplicationProvider[] appProviders,
+        public BatchManagerVM(ICadApplicationInstanceProvider[] appProviders,
             IBatchRunnerModel model, IMessageService msgSvc, 
             Func<System.IO.FileInfo, BatchJob, MainWindow, IRibbonButtonCommand[], BatchDocumentVM> openDocFunc,
             Func<string, BatchJob, MainWindow, IRibbonButtonCommand[], BatchDocumentVM> newDocFunc)

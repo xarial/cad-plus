@@ -23,9 +23,9 @@ namespace Xarial.CadPlus.Batch.StandAlone
         public event ProcessBatchInputDelegate ProcessInput;
         public event CreateCommandManagerDelegate CreateCommandManager;
 
-        public IApplicationProvider[] ApplicationProviders => m_ApplicationProviders.ToArray();
+        public ICadApplicationInstanceProvider[] ApplicationProviders => m_ApplicationProviders.ToArray();
 
-        private readonly List<IApplicationProvider> m_ApplicationProviders;
+        private readonly List<ICadApplicationInstanceProvider> m_ApplicationProviders;
 
         private readonly IBatchApplicationProxy m_Proxy;
 
@@ -34,7 +34,7 @@ namespace Xarial.CadPlus.Batch.StandAlone
             m_Proxy = proxy;
             m_Proxy.RequestProcessInput += OnRequestProcessInput;
             m_Proxy.RequestCreateCommandManager += OnRequestCreateCommandManager;
-            m_ApplicationProviders = new List<IApplicationProvider>();
+            m_ApplicationProviders = new List<ICadApplicationInstanceProvider>();
         }
 
         private void OnRequestCreateCommandManager(IRibbonCommandManager cmdMgr)
@@ -43,7 +43,7 @@ namespace Xarial.CadPlus.Batch.StandAlone
         private void OnRequestProcessInput(IXApplication app, List<IXDocument> input)
             => ProcessInput?.Invoke(app, input);
 
-        public void RegisterApplicationProvider(IApplicationProvider provider)
+        public void RegisterApplicationProvider(ICadApplicationInstanceProvider provider)
             => m_ApplicationProviders.Add(provider);
     }
 

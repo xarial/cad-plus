@@ -1,24 +1,16 @@
-﻿//*********************************************************************
-//CAD+ Toolset
-//Copyright(C) 2020 Xarial Pty Limited
-//Product URL: https://cadplus.xarial.com
-//License: https://cadplus.xarial.com/license/
-//*********************************************************************
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Xarial.CadPlus.Batch.Extensions.Properties;
-using Xarial.CadPlus.Batch.Extensions.Services;
 using Xarial.CadPlus.Batch.Extensions.UI;
 using Xarial.CadPlus.Batch.Extensions.ViewModels;
 using Xarial.CadPlus.Plus;
 using Xarial.CadPlus.Plus.Applications;
+using Xarial.CadPlus.Plus.Atributes;
 using Xarial.CadPlus.Plus.Attributes;
-using Xarial.CadPlus.Plus.Modules;
 using Xarial.CadPlus.Plus.Services;
 using Xarial.CadPlus.Plus.UI;
 using Xarial.XCad;
@@ -27,18 +19,16 @@ using Xarial.XCad.Documents;
 namespace Xarial.CadPlus.Batch.Extensions
 {
     [Module(typeof(IHostWpf), typeof(IBatchApplication))]
-    public class InputSorterModuleStandAlone : IModule
+    [ModuleOrder(typeof(InputSorterModuleStandAlone), ModuleRelativeOrder_e.Before)]
+    public class ReferenceExtractorModuleStandAlone : IModule
     {
         private IHostWpf m_Host;
         private IBatchApplication m_App;
 
-        private bool m_EnableOrdering;
+        private bool m_ExtractReferences;
 
-        private readonly TopologicalReferencesSorter m_Sorter;
-
-        public InputSorterModuleStandAlone() 
+        public ReferenceExtractorModuleStandAlone()
         {
-            m_Sorter = new TopologicalReferencesSorter();
         }
 
         public void Init(IHost host)
@@ -61,7 +51,7 @@ namespace Xarial.CadPlus.Batch.Extensions
 
         private void OnCreateCommandManager(IRibbonCommandManager cmdMgr)
         {
-            if (!cmdMgr.TryGetTab(BatchApplicationCommandManager.InputTab.Name, out IRibbonTab inputTab)) 
+            if (!cmdMgr.TryGetTab(BatchApplicationCommandManager.InputTab.Name, out IRibbonTab inputTab))
             {
                 inputTab = new RibbonTab(BatchApplicationCommandManager.InputTab.Name, "Input");
                 cmdMgr.Tabs.Add(inputTab);
@@ -73,17 +63,17 @@ namespace Xarial.CadPlus.Batch.Extensions
                 inputTab.Groups.Add(group);
             }
 
-            group.Commands.Add(new RibbonToggleCommand("Order By Dependencies",
+            group.Commands.Add(new RibbonToggleCommand("Extract References",
                 Resources.order_dependencies, "",
-                () => m_EnableOrdering,
-                x => m_EnableOrdering = x));
+                () => m_ExtractReferences,
+                x => m_ExtractReferences = x));
         }
 
         private void OnProcessInput(IXApplication app, List<IXDocument> input)
         {
-            if (m_EnableOrdering)
+            if (m_ExtractReferences)
             {
-                var vm = new InputsSorterVM();
+                //var vm = new ReferenceExtractorVM();
 
                 var cts = new CancellationTokenSource();
                 var cancellationToken = cts.Token;
@@ -93,19 +83,19 @@ namespace Xarial.CadPlus.Batch.Extensions
 
                 m_Host.WpfApplication.Dispatcher.Invoke(() =>
                 {
-                    var wnd = new InputsSorterWindow();
-                    wnd.DataContext = vm;
+                    var wnd = new ReferenceExtractorWindow();
+                    //wnd.DataContext = vm;
 
-                    wnd.Loaded += async (s, e)=> 
+                    wnd.Loaded += async (s, e) =>
                     {
                         try
                         {
-                            var itemsList = await Task.Run(
-                                () => m_Sorter.Sort(src,
-                                p => vm.Progress = p,
-                                cancellationToken));
+                            //var itemsList = await Task.Run(
+                            //    () => m_Sorter.Sort(src,
+                            //    p => vm.Progress = p,
+                            //    cancellationToken));
 
-                            vm.LoadItems(itemsList);
+                            //vm.LoadItems(itemsList);
                         }
                         catch (OperationCanceledException)
                         {
@@ -113,15 +103,15 @@ namespace Xarial.CadPlus.Batch.Extensions
                     };
 
                     var res = wnd.ShowDialog();
-                    
+
                     if (res == true)
                     {
-                        foreach (ItemVM item in vm.InputView)
-                        {
-                            input.Add(item.Document);
-                        }
+                        //foreach (ItemVM item in vm.InputView)
+                        //{
+                        //    input.Add(item.Document);
+                        //}
                     }
-                    else 
+                    else
                     {
                         cts.Cancel();
                         throw new OperationCanceledException();
@@ -129,7 +119,7 @@ namespace Xarial.CadPlus.Batch.Extensions
                 });
             }
         }
-        
+
         public void Dispose()
         {
         }

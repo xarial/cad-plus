@@ -56,7 +56,7 @@ namespace Xarial.CadPlus.XBatch.Base.Core
     {
         private readonly TextWriter m_UserLogger;
         private readonly IProgressHandler m_ProgressHandler;
-        private readonly IApplicationProvider m_AppProvider;
+        private readonly ICadApplicationInstanceProvider m_AppProvider;
         private readonly IMacroRunnerExService m_MacroRunnerSvc;
 
         private readonly IXLogger m_Logger;
@@ -70,7 +70,7 @@ namespace Xarial.CadPlus.XBatch.Base.Core
 
         private readonly BatchJob m_Job;
 
-        public BatchRunner(BatchJob job, IApplicationProvider[] appProviders, 
+        public BatchRunner(BatchJob job, ICadApplicationInstanceProvider[] appProviders, 
             TextWriter userLogger, IProgressHandler progressHandler,
             IBatchApplicationProxy batchAppProxy,
             IJobManager jobMgr, IXLogger logger,

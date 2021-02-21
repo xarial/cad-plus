@@ -48,7 +48,7 @@
     <Reference Include="System.Xml" />
     <Reference Include="WindowsBase" />
     <Reference Include="Xarial.CadPlusPlus, Version=0.2.0.0, Culture=neutral, PublicKeyToken=60dcaf351d4060db, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Xarial.CadPlusPlus.0.2.0-20210218.3\lib\net461\Xarial.CadPlusPlus.dll</HintPath>
+      <HintPath>..\..\packages\Xarial.CadPlusPlus.0.2.0-20210221.1\lib\net461\Xarial.CadPlusPlus.dll</HintPath>
     </Reference>
     <Reference Include="Xarial.XCad, Version=0.7.0.0, Culture=neutral, PublicKeyToken=60dcaf351d4060db, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Xarial.XCad.0.7.0-20210214.1\lib\net461\Xarial.XCad.dll</HintPath>
@@ -61,6 +61,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Services\DocumentComparer.cs" />
     <Compile Include="InputSorterModuleInApp.cs" />
     <Compile Include="InputSorterModuleStandAlone.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -69,11 +70,18 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="ReferenceExtractorModuleStandAlone.cs" />
+    <Compile Include="Services\DrawingsFinder.cs" />
     <Compile Include="Services\TopologicalReferencesSorter.cs" />
     <Compile Include="UI\InputsSorterWindow.xaml.cs">
       <DependentUpon>InputsSorterWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI\ReferenceExtractorWindow.xaml.cs">
+      <DependentUpon>ReferenceExtractorWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="ViewModels\InputsSorterVM.cs" />
+    <Compile Include="ViewModels\ReferenceExtractorVM.cs" />
+    <Compile Include="ViewModels\ReferenceVM.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
@@ -81,6 +89,10 @@
   </ItemGroup>
   <ItemGroup>
     <Page Include="UI\InputsSorterWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\ReferenceExtractorWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

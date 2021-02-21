@@ -298,9 +298,9 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
         private int m_CachedTimeout;
         private int m_CachedBatchSize;
         private readonly BatchJob m_Job;
-        public IApplicationProvider AppProvider { get; }
+        public ICadApplicationInstanceProvider AppProvider { get; }
 
-        public BatchDocumentSettingsVM(BatchJob job, IApplicationProvider appProvider) 
+        public BatchDocumentSettingsVM(BatchJob job, ICadApplicationInstanceProvider appProvider) 
         {
             m_Job = job;
             m_CachedTimeout = m_Job.Timeout;

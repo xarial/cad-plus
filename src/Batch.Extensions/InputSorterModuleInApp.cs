@@ -11,6 +11,7 @@ using Xarial.CadPlus.Batch.Extensions.ViewModels;
 using Xarial.CadPlus.Plus;
 using Xarial.CadPlus.Plus.Attributes;
 using Xarial.CadPlus.Plus.Modules;
+using Xarial.CadPlus.Plus.Services;
 using Xarial.CadPlus.Plus.UI;
 using Xarial.XCad;
 using Xarial.XCad.Documents;
@@ -38,7 +39,7 @@ namespace Xarial.CadPlus.Batch.Extensions
             m_Host.Connect += OnConnect;
         }
 
-        private void OnInitialized(IApplication app, IServiceProvider svcProvider, IModule[] modules)
+        private void OnInitialized(IApplication app, IServiceContainer svcProvider, IModule[] modules)
         {
             m_BatchInAppModule = modules.OfType<IBatchInAppModule>().FirstOrDefault();
 

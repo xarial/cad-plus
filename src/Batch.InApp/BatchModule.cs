@@ -106,10 +106,10 @@ namespace Xarial.CadPlus.Batch.InApp
             m_Host.Initialized += OnHostInitialized;
         }
 
-        private void OnHostInitialized(IApplication app, IServiceProvider svcProvider, IModule[] modules)
+        private void OnHostInitialized(IApplication app, IServiceContainer svcProvider, IModule[] modules)
         {
             m_SvcProvider = svcProvider;
-            m_Data = new AssemblyBatchData(m_SvcProvider.GetService<IMacroFileFilterProvider>());
+            m_Data = new AssemblyBatchData(m_SvcProvider.GetService<ICadEntityDescriptor>().MacroFileFilters);
         }
 
         private void OnConnect()

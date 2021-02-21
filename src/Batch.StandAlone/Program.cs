@@ -90,7 +90,7 @@ namespace Xarial.CadPlus.Batch.StandAlone
 
             builder.RegisterType<BatchApplicationProxy>().As<IBatchApplicationProxy>().SingleInstance();
             
-            builder.RegisterAdapter<IApplication, IApplicationProvider[]>(x => ((IBatchApplication)x).ApplicationProviders);
+            builder.RegisterAdapter<IApplication, ICadApplicationInstanceProvider[]>(x => ((IBatchApplication)x).ApplicationProviders);
 
             builder.RegisterType<JobManager>().As<IJobManager>()
                 .SingleInstance()

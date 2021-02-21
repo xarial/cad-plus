@@ -29,6 +29,7 @@ using Xarial.CadPlus.Plus.Attributes;
 using Xarial.CadPlus.Plus.Services;
 using Xarial.CadPlus.Plus.UI;
 using Xarial.CadPlus.Plus.Modules;
+using Xarial.CadPlus.Plus.Data;
 
 namespace Xarial.CadPlus.Batch.InApp
 {
@@ -73,14 +74,11 @@ namespace Xarial.CadPlus.Batch.InApp
             [ControlOptions(align: ControlLeftAlign_e.Indent)]
             public Action AddMacros { get; }
 
-            private readonly IMacroFileFilterProvider m_FilterProvider;
-
-            public MacrosGroup(IMacroFileFilterProvider filterProvider) 
+            public MacrosGroup(FileTypeFilter[] macroFilters) 
             {
-                m_FilterProvider = filterProvider;
                 AddMacros = OnAddMacros;
 
-                Macros = new MacrosVM(m_FilterProvider);
+                Macros = new MacrosVM(macroFilters);
             }
 
             private void OnAddMacros()
@@ -109,10 +107,10 @@ namespace Xarial.CadPlus.Batch.InApp
         public MacrosGroup Macros { get; }
         public OptionsGroup Options { get; }
 
-        public AssemblyBatchData(IMacroFileFilterProvider filterProvider)
+        public AssemblyBatchData(FileTypeFilter[] macroFilters)
         {
             Input = new InputGroup();
-            Macros = new MacrosGroup(filterProvider);
+            Macros = new MacrosGroup(macroFilters);
             Options = new OptionsGroup();
         }
     }

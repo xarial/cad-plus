@@ -67,7 +67,7 @@ namespace Xarial.CadPlus.Drawing
             m_Host.Connect += OnConnect;
         }
 
-        private void OnHostInitialized(IApplication app, IServiceProvider svcProvider, IModule[] modules)
+        private void OnHostInitialized(IApplication app, IServiceContainer svcProvider, IModule[] modules)
         {
             m_SvcProvider = svcProvider;
         }

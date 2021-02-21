@@ -81,7 +81,7 @@ namespace Xarial.CadPlus.CustomToolbar
             m_Host.Connect += OnConnect;
         }
 
-        private void OnHostInitialized(IApplication app, IServiceProvider svcProvider, IModule[] modules)
+        private void OnHostInitialized(IApplication app, IServiceContainer svcProvider, IModule[] modules)
         {
             m_SvcProvider = svcProvider;
         }
@@ -129,7 +129,7 @@ namespace Xarial.CadPlus.CustomToolbar
 
             builder.RegisterFromServiceProvider<IMacroRunnerExService>(m_SvcProvider);
             builder.RegisterFromServiceProvider<IMessageService>(m_SvcProvider);
-            builder.RegisterFromServiceProvider<IMacroFileFilterProvider>(m_SvcProvider);
+            builder.RegisterFromServiceProvider<ICadEntityDescriptor>(m_SvcProvider);
             builder.RegisterFromServiceProvider<ISettingsProvider>(m_SvcProvider);
 
             builder.RegisterInstance(m_IconsProviders.ToArray());
