@@ -21,8 +21,13 @@ namespace Xarial.CadPlus.Plus.Shared.Extensions
         {
             foreach (var reg in context.ComponentRegistry.Registrations)
             {
-                var svcType = (reg.Services.First() as Autofac.Core.TypedService).ServiceType;
-                svcColl.AddOrReplace(svcType, () => context.Resolve(svcType));
+                var svc = reg.Services.First();
+
+                if (svc is Autofac.Core.TypedService)
+                {
+                    var svcType = (svc as Autofac.Core.TypedService).ServiceType;
+                    svcColl.AddOrReplace(svcType, () => context.Resolve(svcType));
+                }
             }
         }
     }
