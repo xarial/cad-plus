@@ -39,7 +39,7 @@ namespace Xarial.CadPlus.Plus.Hosts
         private readonly IInitiator m_Initiator;
         private readonly IXLogger m_Logger;
 
-        private readonly IServiceProvider m_Services;
+        private readonly IServiceContainer m_Services;
 
         public HostWpf(Application wpfApp, 
             IContainerBuilder builder, IInitiator initiator, IXLogger logger, Type hostApplicationType)

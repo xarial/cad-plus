@@ -12,6 +12,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Xarial.CadPlus.Plus;
+using Xarial.CadPlus.Plus.Services;
 
 namespace Xarial.CadPlus.Plus.Shared
 {
@@ -21,6 +22,8 @@ namespace Xarial.CadPlus.Plus.Shared
 
         public ContainerBuilder Builder { get; }
 
+        private IServiceContainer m_Container;
+
         public ContainerBuilderWrapper(ContainerBuilder builder) 
         {
             Builder = builder;
@@ -29,11 +32,21 @@ namespace Xarial.CadPlus.Plus.Shared
         public void Register<TImplementer, TService>() where TImplementer : TService
             => Builder.RegisterType<TImplementer>().As<TService>();
 
-        public IServiceProvider Build()
+        public IServiceContainer Build()
         {
-            var cont = Builder.Build();
-            ContainerBuild?.Invoke(cont);
-            return new ServiceProvider(cont);
+            if (m_Container == null)
+            {
+                var cont = Builder.Build();
+                ContainerBuild?.Invoke(cont);
+
+                m_Container = new ServiceProvider(cont);
+
+                return m_Container;
+            }
+            else 
+            {
+                throw new Exception("Contained already built");
+            }
         }
 
         public void RegisterInstance<TInstance, TService>(TInstance inst)
@@ -43,5 +56,16 @@ namespace Xarial.CadPlus.Plus.Shared
                 .AsSelf()
                 .As<TService>();
         }
+
+        public void Register<TImplementer, TService>(string name)
+            where TImplementer : TService
+            => Builder.RegisterType<TImplementer>().Named<TService>(name);
+
+        public void Register<TService>(Func<IServiceContainer, TService> provider)
+            => Builder.Register(c => provider.Invoke(m_Container));
+
+        public void RegisterAdapter<TFrom, TTo>(Func<TFrom, TTo> adapter)
+            where TTo : TFrom
+            => Builder.RegisterAdapter<TFrom, TTo>(adapter);
     }
 }
