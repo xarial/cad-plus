@@ -11,10 +11,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Xarial.CadPlus.Plus.Services;
 
 namespace Xarial.CadPlus.Plus.Shared
 {
-    public class ServiceProvider : IServiceProvider, IDisposable
+    public class ServiceProvider : IServiceContainer, IDisposable
     {
         public IContainer Container { get; }
 
@@ -25,6 +26,9 @@ namespace Xarial.CadPlus.Plus.Shared
 
         public object GetService(Type serviceType)
             => Container.Resolve(serviceType);
+
+        public object GetService(Type serviceType, string name)
+            => Container.ResolveNamed(name, serviceType);
 
         public void Dispose() => Container.Dispose();
     }

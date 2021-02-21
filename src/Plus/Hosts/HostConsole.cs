@@ -32,7 +32,7 @@ namespace Xarial.CadPlus.Plus.Hosts
 
         private readonly IModule[] m_Modules;
 
-        private readonly IServiceProvider m_Services;
+        private readonly IServiceContainer m_Services;
 
         public HostConsole(IContainerBuilder builder, IInitiator initiator, Type hostApplicationType)
         {
