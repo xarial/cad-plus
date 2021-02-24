@@ -33,16 +33,56 @@ using Xarial.CadPlus.Plus.Data;
 
 namespace Xarial.CadPlus.Batch.InApp
 {
-    public class NotProcessAllFilesDependencyHandler : IDependencyHandler
+    public class SelectionScopeDependencyHandler : IDependencyHandler
     {
         public void UpdateState(IXApplication app, IControl source, IControl[] dependencies)
         {
-            var isChecked = dependencies.First()?.GetValue();
+            var scope = dependencies.First()?.GetValue();
 
-            if (isChecked is bool) 
+            if (scope is InputScope_e) 
             {
-                source.Enabled = !(bool)isChecked; 
+                source.Visible = (InputScope_e)scope == InputScope_e.Selection; 
             }
+        }
+    }
+
+    public class ReferencesScopeDependencyHandler : IDependencyHandler
+    {
+        public void UpdateState(IXApplication app, IControl source, IControl[] dependencies)
+        {
+            var scope = dependencies.First()?.GetValue();
+
+            if (scope is InputScope_e)
+            {
+                source.Visible = (InputScope_e)scope == InputScope_e.AllReferences;
+            }
+        }
+    }
+
+    public enum InputScope_e
+    {
+        [Title("Selected Components")]
+        Selection,
+
+        [Title("All Referenced Documents")]
+        AllReferences
+    }
+
+    public class ReferenceDocumentsVM 
+    {
+        public ICadEntityDescriptor EntityDescriptor { get; }
+        public IXDocument3D[] References => m_References.Value;
+
+        private Lazy<IXDocument3D[]> m_References;
+
+        public void SetDocument(IXDocument doc) 
+        {
+            m_References = new Lazy<IXDocument3D[]>(() => doc.Dependencies);
+        }
+
+        public ReferenceDocumentsVM(ICadEntityDescriptor cadEntDesc) 
+        {
+            EntityDescriptor = cadEntDesc;
         }
     }
 
@@ -53,14 +93,41 @@ namespace Xarial.CadPlus.Batch.InApp
         public class InputGroup 
         {
             [ControlOptions(height: 100)]
-            [DependentOn(typeof(NotProcessAllFilesDependencyHandler), nameof(ProcessAllFiles))]
+            [DependentOn(typeof(SelectionScopeDependencyHandler), nameof(Scope))]
             [Description("List of components to run macros on")]
             public List<IXComponent> Components { get; set; }
 
-            [Title("Process All Files")]
+            [ControlOptions(height: 100)]
+            [DependentOn(typeof(ReferencesScopeDependencyHandler), nameof(Scope))]
+            [Description("All referenced docyments")]
+            [StandardControlIcon(BitmapLabelType_e.SelectComponent)]
+            [CustomControl(typeof(ReferencesList))]
+            public ReferenceDocumentsVM AllDocuments { get; }
+
+            [OptionBox]
             [ControlOptions(align: ControlLeftAlign_e.Indent)]
-            [ControlTag(nameof(ProcessAllFiles))]
-            public bool ProcessAllFiles { get; set; } = true;
+            [ControlTag(nameof(Scope))]
+            public InputScope_e Scope { get; set; }
+
+            private IXDocument m_Document;
+
+            [ExcludeControl]
+            internal IXDocument Document 
+            {
+                get => m_Document;
+                set 
+                {
+                    m_Document = value;
+                    
+                    Components = m_Document.Selections.OfType<IXComponent>().ToList();
+                    AllDocuments.SetDocument(value);
+                }
+            }
+
+            public InputGroup(ICadEntityDescriptor cadEntDesc) 
+            {
+                AllDocuments = new ReferenceDocumentsVM(cadEntDesc);
+            }
         }
 
         public class MacrosGroup 
@@ -107,10 +174,10 @@ namespace Xarial.CadPlus.Batch.InApp
         public MacrosGroup Macros { get; }
         public OptionsGroup Options { get; }
 
-        public AssemblyBatchData(FileTypeFilter[] macroFilters)
+        public AssemblyBatchData(ICadEntityDescriptor cadEntDesc)
         {
-            Input = new InputGroup();
-            Macros = new MacrosGroup(macroFilters);
+            Input = new InputGroup(cadEntDesc);
+            Macros = new MacrosGroup(cadEntDesc.MacroFileFilters);
             Options = new OptionsGroup();
         }
     }

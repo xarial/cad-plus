@@ -40,6 +40,7 @@ using Xarial.CadPlus.Plus.Delegates;
 using Xarial.CadPlus.Plus.UI;
 using Xarial.XCad.UI.PropertyPage.Base;
 using Xarial.CadPlus.Batch.InApp.Controls;
+using Xarial.CadPlus.Plus.Data;
 
 namespace Xarial.CadPlus.Batch.InApp
 {
@@ -109,7 +110,7 @@ namespace Xarial.CadPlus.Batch.InApp
         private void OnHostInitialized(IApplication app, IServiceContainer svcProvider, IModule[] modules)
         {
             m_SvcProvider = svcProvider;
-            m_Data = new AssemblyBatchData(m_SvcProvider.GetService<ICadEntityDescriptor>().MacroFileFilters);
+            m_Data = new AssemblyBatchData(m_SvcProvider.GetService<ICadEntityDescriptor>());
         }
 
         private void OnConnect()
@@ -172,7 +173,7 @@ namespace Xarial.CadPlus.Batch.InApp
                     arg.ErrorMessage = "Select macros to run";
                 }
                 
-                if (!m_Data.Input.Components.Any() && !m_Data.Input.ProcessAllFiles) 
+                if (!m_Data.Input.Components.Any() && m_Data.Input.Scope == InputScope_e.Selection) 
                 {
                     arg.Cancel = true;
                     arg.ErrorMessage = "Select components to process";
@@ -187,17 +188,22 @@ namespace Xarial.CadPlus.Batch.InApp
                 try
                 {
                     IXDocument[] docs = null;
-                    var assm = m_Host.Extension.Application.Documents.Active as IXAssembly;
+                    var rootDoc = m_Data.Input.Document;
 
-                    if (m_Data.Input.ProcessAllFiles)
+                    switch (m_Data.Input.Scope) 
                     {
-                        docs = assm.Dependencies;
-                    }
-                    else
-                    {
-                        docs = m_Data.Input.Components
-                            .Distinct(new ComponentDocumentSafeEqualityComparer())
-                            .Select(c => c.Document).ToArray();
+                        case InputScope_e.AllReferences:
+                            docs = m_Data.Input.AllDocuments.References;
+                            break;
+
+                        case InputScope_e.Selection:
+                            docs = m_Data.Input.Components
+                                .Distinct(new ComponentDocumentSafeEqualityComparer())
+                                .Select(c => c.Document).ToArray();
+                            break;
+
+                        default:
+                            throw new NotSupportedException();
                     }
 
                     var input = docs.ToList();
@@ -206,12 +212,12 @@ namespace Xarial.CadPlus.Batch.InApp
                     var exec = new AssemblyBatchRunJobExecutor(m_Host.Extension.Application, m_MacroRunnerSvc,
                         input.ToArray(), m_Data.Macros.Macros.Macros, m_Data.Options.ActivateDocuments);
 
-                    var vm = new JobResultVM(assm.Title, exec);
+                    var vm = new JobResultVM(rootDoc.Title, exec);
 
                     exec.ExecuteAsync().Wait();
 
                     var wnd = m_Host.Extension.CreatePopupWindow<ResultsWindow>();
-                    wnd.Control.Title = $"{assm.Title} batch job result";
+                    wnd.Control.Title = $"{rootDoc.Title} batch job result";
                     wnd.Control.DataContext = vm;
                     wnd.Show();
                 }
@@ -253,7 +259,8 @@ namespace Xarial.CadPlus.Batch.InApp
                     break;
 
                 case Commands_e.RunInApp:
-                    m_Data.Input.Components = m_Host.Extension.Application.Documents.Active.Selections.OfType<IXComponent>().ToList();
+                    var activeDoc = m_Host.Extension.Application.Documents.Active;
+                    m_Data.Input.Document = activeDoc;
                     m_Page.Show(m_Data);
                     break;
             }
