@@ -63,6 +63,16 @@ namespace Xarial.CadPlus.Batch.Extensions.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap extract_references {
+            get {
+                object obj = ResourceManager.GetObject("extract_references", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap order_dependencies {
             get {
                 object obj = ResourceManager.GetObject("order_dependencies", resourceCulture);

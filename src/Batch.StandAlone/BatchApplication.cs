@@ -40,8 +40,8 @@ namespace Xarial.CadPlus.Batch.StandAlone
         private void OnRequestCreateCommandManager(IRibbonCommandManager cmdMgr)
             => CreateCommandManager?.Invoke(cmdMgr);
 
-        private void OnRequestProcessInput(IXApplication app, List<IXDocument> input)
-            => ProcessInput?.Invoke(app, input);
+        private void OnRequestProcessInput(IXApplication app, ICadApplicationInstanceProvider instProvider, List<IXDocument> input)
+            => ProcessInput?.Invoke(app, instProvider, input);
 
         public void RegisterApplicationProvider(ICadApplicationInstanceProvider provider)
             => m_ApplicationProviders.Add(provider);
@@ -49,22 +49,22 @@ namespace Xarial.CadPlus.Batch.StandAlone
 
     public interface IBatchApplicationProxy
     {
-        event Action<IXApplication, List<IXDocument>> RequestProcessInput;
+        event ProcessBatchInputDelegate RequestProcessInput;
         event Action<IRibbonCommandManager> RequestCreateCommandManager;
 
-        void ProcessInput(IXApplication app, List<IXDocument> input);
+        void ProcessInput(IXApplication app, ICadApplicationInstanceProvider instProvider, List<IXDocument> input);
         void CreateCommandManager(IRibbonCommandManager cmdMgr);
     }
 
     internal class BatchApplicationProxy : IBatchApplicationProxy
     {
-        public event Action<IXApplication, List<IXDocument>> RequestProcessInput;
+        public event ProcessBatchInputDelegate RequestProcessInput;
         public event Action<IRibbonCommandManager> RequestCreateCommandManager;
 
         public void CreateCommandManager(IRibbonCommandManager cmdMgr)
             => RequestCreateCommandManager?.Invoke(cmdMgr);
 
-        public void ProcessInput(IXApplication app, List<IXDocument> input)
-            => RequestProcessInput?.Invoke(app, input);
+        public void ProcessInput(IXApplication app, ICadApplicationInstanceProvider instProvider, List<IXDocument> input)
+            => RequestProcessInput?.Invoke(app, instProvider, input);
     }
 }

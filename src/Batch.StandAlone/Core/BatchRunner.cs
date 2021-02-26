@@ -283,7 +283,7 @@ namespace Xarial.CadPlus.XBatch.Base.Core
                 return doc;
             }).ToList();
 
-            m_BatchAppProxy.ProcessInput(app, inputDocs);
+            m_BatchAppProxy.ProcessInput(app, m_AppProvider, inputDocs);
 
             return inputDocs
                 .Select(d => new JobItemDocument(d, macros.Select(m => new JobItemMacro(m)).ToArray()))

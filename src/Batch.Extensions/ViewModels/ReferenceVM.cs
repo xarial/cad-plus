@@ -9,13 +9,35 @@ using Xarial.XToolkit.Wpf.Extensions;
 
 namespace Xarial.CadPlus.Batch.Extensions.ViewModels
 {
-    public class ReferenceVM : INotifyPropertyChanged
+    public class DocumentVM : INotifyPropertyChanged
+    {
+        public event PropertyChangedEventHandler PropertyChanged;
+        
+        public IXDocument Document { get; }
+
+        private bool m_IsChecked;
+
+        public bool IsChecked 
+        {
+            get => m_IsChecked;
+            set 
+            {
+                m_IsChecked = value;
+                this.NotifyChanged();
+            }
+        }
+
+        public DocumentVM(IXDocument doc) 
+        {
+            Document = doc;
+        }
+    }
+
+    public class ReferenceVM : DocumentVM
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public IXDocument Document { get; }
-
-        public IXDrawing[] Drawings 
+        public DocumentVM[] Drawings 
         {
             get => m_Drawings;
             set 
@@ -25,12 +47,10 @@ namespace Xarial.CadPlus.Batch.Extensions.ViewModels
             }
         }
 
-        private IXDrawing[] m_Drawings;
+        private DocumentVM[] m_Drawings;
 
-        public ReferenceVM(IXDocument doc, IXDrawing[] drawings) 
+        public ReferenceVM(IXDocument doc)  : base(doc)
         {
-            Document = doc;
-            Drawings = drawings;
         }
     }
 }

@@ -19,9 +19,9 @@ namespace Xarial.CadPlus.Common.Sw.Services
 
         public Image PartIcon => Resources.document_icon;
         public Image AssemblyIcon => Resources.assembly_icon;
-        public Image DrawingIcon => null;
+        public Image DrawingIcon => Resources.drawing_icon;
         public Image ConfigurationIcon => Resources.config_icon;
-        public Image SheetIcon => null;
+        public Image SheetIcon => Resources.sheet_icon;
         public Image CutListIcon => Resources.cutlist_icon;
 
         public FileTypeFilter PartFileFilter => new FileTypeFilter("SOLIDWORKS Parts", "*.sldprt");

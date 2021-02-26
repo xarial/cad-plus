@@ -19,7 +19,7 @@ using Xarial.XCad.Documents;
 namespace Xarial.CadPlus.Batch.Extensions
 {
     [Module(typeof(IHostExtension))]
-    public class InputSorterModuleInApp : IModule
+    public class InputSorterModuleInApp : IInputSorterModule
     {
         private IHostExtension m_Host;
         private IBatchInAppModule m_BatchInAppModule;

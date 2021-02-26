@@ -10,8 +10,16 @@
     <UserControl.Resources>
         <conv:ReferenceTitleConverter x:Key="refTitleConv"/>
         <conv:ReferenceIconConverter x:Key="refIconConv"/>
+        <conv:ReferenceScopeConverter x:Key="refScopeConv"/>
     </UserControl.Resources>
-    <ListBox ItemsSource="{Binding Path=References}">
+    <ListBox>
+        <ListBox.ItemsSource>
+            <MultiBinding Converter="{StaticResource refScopeConv}">
+                <Binding Path="TopLevelOnly"/>
+                <Binding Path="TopLevelReferences"/>
+                <Binding Path="AllReferences"/>
+            </MultiBinding>
+        </ListBox.ItemsSource>
         <ListBox.ItemTemplate>
             <DataTemplate>
                 <Grid IsEnabled="{Binding Path=IsCommitted}" ToolTip="{Binding Path=Path}">

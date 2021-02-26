@@ -64,7 +64,7 @@ namespace Xarial.CadPlus.Batch.InApp
     [Module(typeof(IHostExtension))]
     public class BatchModule : IBatchInAppModule
     {
-        public event ProcessBatchInputDelegate ProcessInput;
+        public event ProcessInAppBatchInputDelegate ProcessInput;
 
         [Title("Batch+")]
         [Description("Commands to batch run macros")]
@@ -193,7 +193,11 @@ namespace Xarial.CadPlus.Batch.InApp
                     switch (m_Data.Input.Scope) 
                     {
                         case InputScope_e.AllReferences:
-                            docs = m_Data.Input.AllDocuments.References;
+                            docs = m_Data.Input.AllDocuments.AllReferences;
+                            break;
+
+                        case InputScope_e.TopLevelReferences:
+                            docs = m_Data.Input.AllDocuments.TopLevelReferences;
                             break;
 
                         case InputScope_e.Selection:

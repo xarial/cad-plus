@@ -27,7 +27,7 @@ using Xarial.XCad.Documents;
 namespace Xarial.CadPlus.Batch.Extensions
 {
     [Module(typeof(IHostWpf), typeof(IBatchApplication))]
-    public class InputSorterModuleStandAlone : IModule
+    public class InputSorterModuleStandAlone : IInputSorterModule
     {
         private IHostWpf m_Host;
         private IBatchApplication m_App;
@@ -79,7 +79,7 @@ namespace Xarial.CadPlus.Batch.Extensions
                 x => m_EnableOrdering = x));
         }
 
-        private void OnProcessInput(IXApplication app, List<IXDocument> input)
+        private void OnProcessInput(IXApplication app, ICadApplicationInstanceProvider instProvider, List<IXDocument> input)
         {
             if (m_EnableOrdering)
             {

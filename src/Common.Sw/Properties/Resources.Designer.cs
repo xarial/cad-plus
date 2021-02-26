@@ -103,6 +103,26 @@ namespace Xarial.CadPlus.Common.Sw.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap drawing_icon {
+            get {
+                object obj = ResourceManager.GetObject("drawing_icon", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap sheet_icon {
+            get {
+                object obj = ResourceManager.GetObject("sheet_icon", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap sw_application {
             get {
                 object obj = ResourceManager.GetObject("sw_application", resourceCulture);

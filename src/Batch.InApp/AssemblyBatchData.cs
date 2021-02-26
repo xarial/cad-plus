@@ -30,6 +30,8 @@ using Xarial.CadPlus.Plus.Services;
 using Xarial.CadPlus.Plus.UI;
 using Xarial.CadPlus.Plus.Modules;
 using Xarial.CadPlus.Plus.Data;
+using Xarial.XCad.Documents.Extensions;
+using Xarial.XToolkit.Wpf.Extensions;
 
 namespace Xarial.CadPlus.Batch.InApp
 {
@@ -54,7 +56,7 @@ namespace Xarial.CadPlus.Batch.InApp
 
             if (scope is InputScope_e)
             {
-                source.Visible = (InputScope_e)scope == InputScope_e.AllReferences;
+                source.Visible = (InputScope_e)scope != InputScope_e.Selection;
             }
         }
     }
@@ -64,20 +66,40 @@ namespace Xarial.CadPlus.Batch.InApp
         [Title("Selected Components")]
         Selection,
 
+        [Title("Top Level Referenced Documents")]
+        TopLevelReferences,
+
         [Title("All Referenced Documents")]
         AllReferences
     }
 
-    public class ReferenceDocumentsVM 
+    public class ReferenceDocumentsVM : INotifyPropertyChanged
     {
         public ICadEntityDescriptor EntityDescriptor { get; }
-        public IXDocument3D[] References => m_References.Value;
+        public IXDocument3D[] AllReferences => m_AllReferences.Value;
+        public IXDocument3D[] TopLevelReferences => m_TopLevelReferences.Value;
 
-        private Lazy<IXDocument3D[]> m_References;
+        private Lazy<IXDocument3D[]> m_AllReferences;
+        private Lazy<IXDocument3D[]> m_TopLevelReferences;
+        private bool m_TopLevelOnly;
 
-        public void SetDocument(IXDocument doc) 
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        public bool TopLevelOnly 
         {
-            m_References = new Lazy<IXDocument3D[]>(() => doc.Dependencies);
+            get => m_TopLevelOnly;
+            set 
+            {
+                m_TopLevelOnly = value;
+                this.NotifyChanged();
+            }
+        }
+
+        public void SetDocument(IXDocument doc, bool topLevelOnly) 
+        {
+            m_TopLevelOnly = topLevelOnly;
+            m_TopLevelReferences = new Lazy<IXDocument3D[]>(() => doc.Dependencies);
+            m_AllReferences = new Lazy<IXDocument3D[]>(() => doc.GetAllDependencies().ToArray());
         }
 
         public ReferenceDocumentsVM(ICadEntityDescriptor cadEntDesc) 
@@ -107,9 +129,22 @@ namespace Xarial.CadPlus.Batch.InApp
             [OptionBox]
             [ControlOptions(align: ControlLeftAlign_e.Indent)]
             [ControlTag(nameof(Scope))]
-            public InputScope_e Scope { get; set; }
+            public InputScope_e Scope 
+            {
+                get => m_Scope;
+                set 
+                {
+                    m_Scope = value;
+
+                    if (m_Scope == InputScope_e.AllReferences || m_Scope == InputScope_e.TopLevelReferences) 
+                    {
+                        AllDocuments.TopLevelOnly = m_Scope == InputScope_e.TopLevelReferences;
+                    }
+                }
+            }
 
             private IXDocument m_Document;
+            private InputScope_e m_Scope;
 
             [ExcludeControl]
             internal IXDocument Document 
@@ -120,7 +155,7 @@ namespace Xarial.CadPlus.Batch.InApp
                     m_Document = value;
                     
                     Components = m_Document.Selections.OfType<IXComponent>().ToList();
-                    AllDocuments.SetDocument(value);
+                    AllDocuments.SetDocument(value, Scope == InputScope_e.TopLevelReferences);
                 }
             }
 

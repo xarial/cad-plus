@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Xarial.CadPlus.Batch.Extensions.Models;
 using Xarial.CadPlus.Batch.Extensions.Properties;
 using Xarial.CadPlus.Batch.Extensions.UI;
 using Xarial.CadPlus.Batch.Extensions.ViewModels;
@@ -15,22 +16,19 @@ using Xarial.CadPlus.Plus.Services;
 using Xarial.CadPlus.Plus.UI;
 using Xarial.XCad;
 using Xarial.XCad.Documents;
+using Xarial.CadPlus.Plus.Extensions;
 
 namespace Xarial.CadPlus.Batch.Extensions
 {
     [Module(typeof(IHostWpf), typeof(IBatchApplication))]
-    [ModuleOrder(typeof(InputSorterModuleStandAlone), ModuleRelativeOrder_e.Before)]
+    [ModuleOrder(typeof(IInputSorterModule), ModuleRelativeOrder_e.Before)]
     public class ReferenceExtractorModuleStandAlone : IModule
     {
         private IHostWpf m_Host;
         private IBatchApplication m_App;
 
         private bool m_ExtractReferences;
-
-        public ReferenceExtractorModuleStandAlone()
-        {
-        }
-
+        
         public void Init(IHost host)
         {
             m_Host = (IHostWpf)host;
@@ -41,6 +39,7 @@ namespace Xarial.CadPlus.Batch.Extensions
         private void OnHostInitialized(IApplication app, IServiceContainer svcProvider, IModule[] modules)
         {
             m_App = (IBatchApplication)app;
+
         }
 
         private void OnConnect()
@@ -64,38 +63,36 @@ namespace Xarial.CadPlus.Batch.Extensions
             }
 
             group.Commands.Add(new RibbonToggleCommand("Extract References",
-                Resources.order_dependencies, "",
+                Resources.extract_references, "",
                 () => m_ExtractReferences,
                 x => m_ExtractReferences = x));
         }
 
-        private void OnProcessInput(IXApplication app, List<IXDocument> input)
+        private void OnProcessInput(IXApplication app, ICadApplicationInstanceProvider instProvider, List<IXDocument> input)
         {
             if (m_ExtractReferences)
             {
-                //var vm = new ReferenceExtractorVM();
+                var vm = new ReferenceExtractorVM(new ReferenceExtractor(app, instProvider.EntityDescriptor.DrawingFileFilter.Extensions),
+                    input.ToArray());
+
+                vm.ReferencesScope = ReferencesScope_e.AllReferences;
+                vm.FindDrawings = true;
 
                 var cts = new CancellationTokenSource();
                 var cancellationToken = cts.Token;
 
-                var src = input.ToArray();
                 input.Clear();
 
                 m_Host.WpfApplication.Dispatcher.Invoke(() =>
                 {
                     var wnd = new ReferenceExtractorWindow();
-                    //wnd.DataContext = vm;
+                    wnd.DataContext = vm;
 
                     wnd.Loaded += async (s, e) =>
                     {
                         try
                         {
-                            //var itemsList = await Task.Run(
-                            //    () => m_Sorter.Sort(src,
-                            //    p => vm.Progress = p,
-                            //    cancellationToken));
-
-                            //vm.LoadItems(itemsList);
+                            await Task.Run(() => vm.CollectReferences());
                         }
                         catch (OperationCanceledException)
                         {
@@ -106,10 +103,15 @@ namespace Xarial.CadPlus.Batch.Extensions
 
                     if (res == true)
                     {
-                        //foreach (ItemVM item in vm.InputView)
-                        //{
-                        //    input.Add(item.Document);
-                        //}
+                        foreach (ReferenceVM reference in vm.References)
+                        {
+                            if (reference.IsChecked)
+                            {
+                                input.Add(reference.Document);
+                            }
+
+                            input.AddRange(reference.Drawings.Where(d => d.IsChecked).Select(d => d.Document));
+                        }
                     }
                     else
                     {
