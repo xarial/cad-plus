@@ -78,10 +78,10 @@ namespace Xarial.CadPlus.Plus.Services
 
         private void RemoveDuplicateAndNestedFolders(List<string> modulePaths)
         {
-            string NormilizePath(string path) => path.TrimEnd('\\') + "\\";
+            string NormalizePath(string path) => path.TrimEnd('\\') + "\\";
 
             bool IsInDirectory(string thisDir, string parentDir)
-                => NormilizePath(thisDir).StartsWith(NormilizePath(parentDir),
+                => NormalizePath(thisDir).StartsWith(NormalizePath(parentDir),
                     StringComparison.CurrentCultureIgnoreCase);
 
             for (int i = modulePaths.Count - 1; i >= 0; i--)

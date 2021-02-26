@@ -17,7 +17,7 @@ namespace Xarial.CadPlus.Plus.Modules
 
     public interface IBatchInAppModule : IModule
     {
-        event ProcessBatchInputDelegate ProcessInput;
+        event ProcessInAppBatchInputDelegate ProcessInput;
         void AddCommands(Group_e group, params IRibbonCommand[] cmd);
     }
 }
