@@ -73,11 +73,8 @@ namespace Xarial.CadPlus.Batch.Extensions
             if (m_ExtractReferences)
             {
                 var vm = new ReferenceExtractorVM(new ReferenceExtractor(app, instProvider.EntityDescriptor.DrawingFileFilter.Extensions),
-                    input.ToArray());
-
-                vm.ReferencesScope = ReferencesScope_e.AllReferences;
-                vm.FindDrawings = true;
-
+                    input.ToArray(), instProvider.EntityDescriptor, ReferencesScope_e.AllReferences, true);
+                
                 var cts = new CancellationTokenSource();
                 var cancellationToken = cts.Token;
 
@@ -92,7 +89,7 @@ namespace Xarial.CadPlus.Batch.Extensions
                     {
                         try
                         {
-                            await Task.Run(() => vm.CollectReferences());
+                            await vm.CollectReferencesAsync();
                         }
                         catch (OperationCanceledException)
                         {

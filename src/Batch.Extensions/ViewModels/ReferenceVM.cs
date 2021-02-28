@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Data;
 using Xarial.XCad.Documents;
 using Xarial.XToolkit.Wpf.Extensions;
 
@@ -30,27 +32,20 @@ namespace Xarial.CadPlus.Batch.Extensions.ViewModels
         public DocumentVM(IXDocument doc) 
         {
             Document = doc;
+            IsChecked = true;
         }
     }
 
     public class ReferenceVM : DocumentVM
     {
-        public event PropertyChangedEventHandler PropertyChanged;
+        public ObservableCollection<DocumentVM> Drawings { get; }
 
-        public DocumentVM[] Drawings 
-        {
-            get => m_Drawings;
-            set 
-            {
-                m_Drawings = value;
-                this.NotifyChanged();
-            }
-        }
-
-        private DocumentVM[] m_Drawings;
+        private object m_Lock = new object();
 
         public ReferenceVM(IXDocument doc)  : base(doc)
         {
+            Drawings = new ObservableCollection<DocumentVM>();
+            BindingOperations.EnableCollectionSynchronization(Drawings, m_Lock);
         }
     }
 }

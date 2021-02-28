@@ -21,5 +21,17 @@ namespace Xarial.CadPlus.Batch.Extensions.UI
         {
             InitializeComponent();
         }
+
+        private void OnCancelClick(object sender, RoutedEventArgs e)
+        {
+            this.DialogResult = false;
+            this.Close();
+        }
+
+        private void OnOkClick(object sender, RoutedEventArgs e)
+        {
+            this.DialogResult = true;
+            this.Close();
+        }
     }
 }

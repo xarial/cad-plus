@@ -5,18 +5,11 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
         xmlns:local="clr-namespace:Xarial.CadPlus.Batch.Extensions.UI"
         xmlns:xctrls="clr-namespace:Xarial.XToolkit.Wpf.Controls;assembly=Xarial.XToolkit.Wpf"
-        xmlns:win="clr-namespace:System.Windows;assembly=PresentationCore"
-        xmlns:sys="clr-namespace:System;assembly=mscorlib"
         xmlns:xconv="clr-namespace:Xarial.XToolkit.Wpf.Converters;assembly=Xarial.XToolkit.Wpf"
+        xmlns:sys="clr-namespace:System;assembly=mscorlib"
         mc:Ignorable="d" Title="Batch Order"
         d:DesignHeight="450" d:DesignWidth="800">
     <Window.Resources>
-        <xconv:BooleanUniversalConverter x:Key="boolToVisConv" 
-                                         TrueValue="{x:Static win:Visibility.Visible}"
-                                         FalseValue="{x:Static win:Visibility.Collapsed}"/>
-        <xconv:BooleanUniversalConverter x:Key="boolToVisRevConv" 
-                                         TrueValue="{x:Static win:Visibility.Collapsed}"
-                                         FalseValue="{x:Static win:Visibility.Visible}"/>
         <xconv:BooleanUniversalConverter x:Key="boolRevConv">
             <xconv:BooleanUniversalConverter.TrueValue>
                 <sys:Boolean>False</sys:Boolean>
@@ -31,46 +24,41 @@
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <Grid Visibility="{Binding Path=IsInitializing, Converter={StaticResource boolToVisRevConv}}">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
-            <Grid Grid.Row="0">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
-                <TextBlock Text="Sort Type:" VerticalAlignment="Center" Margin="5"/>
-                <xctrls:EnumComboBox Grid.Column="1" Margin="5" Width="150" HorizontalAlignment="Left" Value="{Binding Path=SortType}"/>
+        <xctrls:ProgressPanel IsWorkInProgress="{Binding Path=IsInitializing}"
+                              Message="Building dependency tree..."
+                              Progress="{Binding Path=Progress}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <Grid Grid.Row="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="Sort Type:" VerticalAlignment="Center" Margin="5"/>
+                    <xctrls:EnumComboBox Grid.Column="1" Margin="5" Width="150" HorizontalAlignment="Left" 
+                                         Value="{Binding Path=SortType}"/>
+                </Grid>
+                <ListView ItemsSource="{Binding Path=InputView}" Grid.Row="1" Margin="5">
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Path=Document.Path}"/>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                    <ListView.GroupStyle>
+                        <GroupStyle>
+                            <GroupStyle.HeaderTemplate>
+                                <DataTemplate>
+                                    <TextBlock FontWeight="Bold" Text="{Binding Name}"/>
+                                </DataTemplate>
+                            </GroupStyle.HeaderTemplate>
+                        </GroupStyle>
+                    </ListView.GroupStyle>
+                </ListView>
             </Grid>
-            <ListView ItemsSource="{Binding Path=InputView}" Grid.Row="1" Margin="5">
-                <ListView.ItemTemplate>
-                    <DataTemplate>
-                        <TextBlock Text="{Binding Path=Document.Path}"/>
-                    </DataTemplate>
-                </ListView.ItemTemplate>
-                <ListView.GroupStyle>
-                    <GroupStyle>
-                        <GroupStyle.HeaderTemplate>
-                            <DataTemplate>
-                                <TextBlock FontWeight="Bold" Text="{Binding Name}"/>
-                            </DataTemplate>
-                        </GroupStyle.HeaderTemplate>
-                    </GroupStyle>
-                </ListView.GroupStyle>
-            </ListView>
-        </Grid>
-        <Grid Visibility="{Binding Path=IsInitializing, Converter={StaticResource boolToVisConv}}"
-              VerticalAlignment="Center">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="Auto"/>
-            </Grid.RowDefinitions>
-            <TextBlock Text="Building dependency tree..." TextWrapping="Wrap" FontSize="18"
-                       VerticalAlignment="Center" TextAlignment="Center"/>
-            <ProgressBar Value="{Binding Path=Progress}" Minimum="0" Maximum="1" Grid.Row="1" Height="20"/>
-        </Grid>
+        </xctrls:ProgressPanel>
         <Grid Grid.Row="1" HorizontalAlignment="Right">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>

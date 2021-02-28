@@ -8,6 +8,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -27,6 +28,26 @@ using Xarial.XToolkit.Wpf.Utils;
 
 namespace Xarial.CadPlus.Common.Controls
 {
+    public class WatermarkVisibilityConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value is int && (int)value > 0)
+            {
+                return Visibility.Collapsed;
+            }
+            else 
+            {
+                return Visibility.Visible;
+            }
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
     public class PathListBox : Control
     {
         private ListBox m_ListBox;
@@ -120,7 +141,6 @@ namespace Xarial.CadPlus.Common.Controls
             set { SetValue(ItemTemplateProperty, value); }
         }
 
-
         public static readonly DependencyProperty ItemToPathConverterProperty =
             DependencyProperty.Register(
             nameof(ItemToPathConverter), typeof(Func<object, string>),
@@ -141,6 +161,17 @@ namespace Xarial.CadPlus.Common.Controls
         {
             get { return (Func<string, object>)GetValue(PathToItemConverterProperty); }
             set { SetValue(PathToItemConverterProperty, value); }
+        }
+
+        public static readonly DependencyProperty WatermarkProperty =
+            DependencyProperty.Register(
+            nameof(Watermark), typeof(string),
+            typeof(PathListBox));
+
+        public string Watermark
+        {
+            get { return (string)GetValue(WatermarkProperty); }
+            set { SetValue(WatermarkProperty, value); }
         }
 
         public PathListBox() 

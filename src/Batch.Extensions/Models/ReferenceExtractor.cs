@@ -9,6 +9,7 @@ using Xarial.CadPlus.Batch.Extensions.ViewModels;
 using Xarial.XCad;
 using Xarial.XCad.Documents;
 using Xarial.XCad.Documents.Extensions;
+using Xarial.XToolkit;
 
 namespace Xarial.CadPlus.Batch.Extensions.Models
 {
@@ -67,48 +68,55 @@ namespace Xarial.CadPlus.Batch.Extensions.Models
         }
 
         public Dictionary<IXDocument, IXDrawing[]> FindAllDrawings(
-            IXDocument[] docs, string[] additionalFolders) 
+            IXDocument[] docs, string[] additionalFolders, Action<double> prgHandler)
         {
             var workDirs = GetDocumentsWorkingDirectories(docs);
 
             var res = new Dictionary<IXDocument, IXDrawing[]>(new DocumentComparer());
 
-            foreach (var searchDir in RemoveDuplicateAndNestedFolders(
-                workDirs.Union(additionalFolders ?? new string[0]))) 
+            var searchDrawings = new List<string>();
+
+            foreach (var searchDir in FileSystemUtils.GetTopFolders(
+                workDirs.Union(additionalFolders ?? new string[0])))
             {
-                foreach(var filter in m_DrwExtensions) 
+                foreach (var filter in m_DrwExtensions)
                 {
-                    foreach (var drwFile in Directory.GetFiles(searchDir, filter,
-                        SearchOption.AllDirectories)) 
+                    searchDrawings.AddRange(Directory.GetFiles(searchDir, filter,
+                        SearchOption.AllDirectories));
+                }
+            }
+
+            for (int i = 0; i < searchDrawings.Count; i++)
+            {
+                var drwFile = searchDrawings[i];
+
+                var drw = m_App.Documents.PreCreate<IXDrawing>();
+                drw.Path = drwFile;
+
+                var usedDocs = drw.Dependencies.Intersect(docs,
+                    new DocumentComparer());
+
+                if (usedDocs.Any())
+                {
+                    foreach (var usedDoc in usedDocs)
                     {
-                        var drw = m_App.Documents.PreCreate<IXDrawing>();
-                        drw.Path = drwFile;
+                        List<IXDrawing> drwsList;
 
-                        var usedDocs = drw.Dependencies.Intersect(docs,
-                            new DocumentComparer());
-
-                        if (usedDocs.Any()) 
+                        if (res.TryGetValue(usedDoc, out IXDrawing[] drws))
                         {
-                            foreach (var usedDoc in usedDocs) 
-                            {
-                                List<IXDrawing> drwsList;
-
-                                if (res.TryGetValue(usedDoc, out IXDrawing[] drws))
-                                {
-                                    drwsList = new List<IXDrawing>(drws);
-                                }
-                                else 
-                                {
-                                    drwsList = new List<IXDrawing>();
-                                }
-
-                                drwsList.Add(drw);
-                                res[usedDoc] = drwsList.ToArray();
-                            }
+                            drwsList = new List<IXDrawing>(drws);
                         }
+                        else
+                        {
+                            drwsList = new List<IXDrawing>();
+                        }
+
+                        drwsList.Add(drw);
+                        res[usedDoc] = drwsList.ToArray();
                     }
                 }
-                
+
+                prgHandler.Invoke((double)(i + 1) / (double)searchDrawings.Count);
             }
 
             return res;
@@ -117,29 +125,5 @@ namespace Xarial.CadPlus.Batch.Extensions.Models
         private string[] GetDocumentsWorkingDirectories(IXDocument[] docs)
             => docs.Select(d => Path.GetDirectoryName(d.Path))
             .Distinct(StringComparer.CurrentCultureIgnoreCase).ToArray();
-
-
-        private string[] RemoveDuplicateAndNestedFolders(IEnumerable<string> paths)
-        {
-            var result = new List<string>();
-
-            foreach (var path in paths.OrderBy(p => p)) 
-            {
-                if (!result.Any(r => IsInDirectory(path, r))) 
-                {
-                    result.Add(path);
-                }
-            }
-
-            return result.ToArray();
-        }
-
-        private bool IsInDirectory(string thisDir, string parentDir)
-        {
-            string NormalizePath(string path) => path.TrimEnd('\\') + "\\";
-
-            return NormalizePath(thisDir).StartsWith(NormalizePath(parentDir),
-                    StringComparison.CurrentCultureIgnoreCase);
-        }
     }
 }

@@ -138,12 +138,14 @@
                     <GroupBox Header="Files And Folders" Grid.Row="0">
                         <cmnctrls:PathListBox x:Name="lstInputs" Filters="{Binding Path=InputFilesFilter}" 
                                               Grid.Row="0" PathsSource="{Binding Path=Input}"
+                                              Watermark="Select files and folders to process. Use buttons in the ribbon toolbar or drag-n-drop files and folders"
                                               ShowAddFileButton="False" ShowAddFolderButton="False"/>
                     </GroupBox>
                     <GridSplitter Height="5" Background="Gray" Grid.Row="1"/>
                     <GroupBox Header="Macros" Grid.Row="2">
                         <cmnctrls:PathListBox x:Name="lstMacros" Grid.Row="1" ShowAddFolderButton="False" 
                               ShowAddFileButton="False" AllowDropFolders="False"
+                              Watermark="Select macros to run for all input files and folders. Use buttons in the ribbon toolbar or drag-n-drop files and folders"
                               PathToItemConverter="{Binding Path=PathToMacroDataConverter}"
                               ItemToPathConverter="{Binding Path=MacroDataToPathConverter}"
                               AllowDropFiles="True"

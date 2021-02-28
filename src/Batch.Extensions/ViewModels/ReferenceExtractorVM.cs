@@ -6,7 +6,9 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Data;
 using Xarial.CadPlus.Batch.Extensions.Models;
+using Xarial.CadPlus.Plus.Services;
 using Xarial.XCad.Documents;
 using Xarial.XToolkit.Wpf.Extensions;
 
@@ -23,17 +25,7 @@ namespace Xarial.CadPlus.Batch.Extensions.ViewModels
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
-        private ReferenceVM[] m_References;
-
-        public ReferenceVM[] References 
-        {
-            get => m_References;
-            private set 
-            {
-                m_References = value;
-                this.NotifyChanged();
-            }
-        }
+        public ObservableCollection<ReferenceVM> References { get; }
 
         public ObservableCollection<string> AdditionalDrawingFolders { get; }
 
@@ -41,7 +33,7 @@ namespace Xarial.CadPlus.Batch.Extensions.ViewModels
         private bool m_FindDrawings;
 
         private bool m_IsInitializing;
-        private double m_Progress;
+        private double? m_Progress;
         
         public ReferencesScope_e ReferencesScope
         {
@@ -50,6 +42,7 @@ namespace Xarial.CadPlus.Batch.Extensions.ViewModels
             {
                 m_ReferencesScope = value;
                 this.NotifyChanged();
+                OnScopeChanged();
             }
         }
         
@@ -60,6 +53,7 @@ namespace Xarial.CadPlus.Batch.Extensions.ViewModels
             {
                 m_FindDrawings = value;
                 this.NotifyChanged();
+                OnFindDrawingChanged();
             }
         }
 
@@ -73,7 +67,7 @@ namespace Xarial.CadPlus.Batch.Extensions.ViewModels
             }
         }
 
-        public double Progress
+        public double? Progress
         {
             get => m_Progress;
             set
@@ -83,68 +77,142 @@ namespace Xarial.CadPlus.Batch.Extensions.ViewModels
             }
         }
 
+        public ICadEntityDescriptor EntityDescriptor { get; }
+
         private readonly IXDocument[] m_InputDocs;
         private readonly ReferenceExtractor m_RefsExtractor;
 
-        public ReferenceExtractorVM(ReferenceExtractor refsExtractor, IXDocument[] docs) 
+        private object m_Lock = new object();
+
+        public ReferenceExtractorVM(ReferenceExtractor refsExtractor,
+            IXDocument[] docs, ICadEntityDescriptor cadEntDesc,
+            ReferencesScope_e scope, bool findDrws) 
         {
             m_InputDocs = docs;
             m_RefsExtractor = refsExtractor;
+
+            m_ReferencesScope = scope;
+            m_FindDrawings = findDrws;
+
+            EntityDescriptor = cadEntDesc;
+
+            References = new ObservableCollection<ReferenceVM>();
+            BindingOperations.EnableCollectionSynchronization(References, m_Lock);
 
             AdditionalDrawingFolders = new ObservableCollection<string>();
             AdditionalDrawingFolders.CollectionChanged += OnAdditionalDrawingFoldersChanged;
         }
 
-        private void OnAdditionalDrawingFoldersChanged(object sender,
+        private async void OnAdditionalDrawingFoldersChanged(object sender,
             NotifyCollectionChangedEventArgs e)
         {
-            CollectDrawings();
-        }
-
-        public void CollectReferences()
-        {
-            var docs = m_RefsExtractor.GetAllReferences(m_InputDocs, ReferencesScope);
-
-            References = docs.Select(d => new ReferenceVM(d)).ToArray();
-
-            if (FindDrawings)
+            try
             {
-                CollectDrawings();
+                await CollectDrawingsAsync();
+            }
+            catch
+            {
+                //TODO: show error
             }
         }
 
-        public void CollectDrawings() 
+        private async void OnScopeChanged()
+        {
+            try
+            {
+                await CollectReferencesAsync();
+            }
+            catch
+            {
+                //TODO: show error
+            }
+        }
+
+        private async void OnFindDrawingChanged()
+        {
+            try
+            {
+                await CollectDrawingsAsync();
+            }
+            catch
+            {
+                //TODO: show error
+            }
+        }
+
+        public async Task CollectReferencesAsync()
         {
             IsInitializing = true;
+            Progress = null;
 
-            var drawings = m_RefsExtractor.FindAllDrawings(References.Select(r => r.Document).ToArray(),
-                AdditionalDrawingFolders.ToArray());
-
-            var allDrws = new Dictionary<string, DocumentVM>(StringComparer.CurrentCultureIgnoreCase);
-
-            foreach (var reference in References) 
+            try
             {
-                drawings.TryGetValue(reference.Document, out IXDrawing[] refDrws);
+                var docs = await Task.Run(() => m_RefsExtractor.GetAllReferences(m_InputDocs, ReferencesScope));
 
-                var allDocVms = new List<DocumentVM>();
+                References.Clear();
 
-                if (refDrws != null)
+                foreach (var doc in docs)
                 {
-                    foreach (var refDrw in refDrws) 
+                    References.Add(new ReferenceVM(doc));
+                }
+
+                await CollectDrawingsAsync();
+            }
+            finally 
+            {
+                IsInitializing = false;
+            }
+        }
+
+        public async Task CollectDrawingsAsync()
+        {
+            IsInitializing = true;
+            Progress = null;
+
+            try
+            {
+                Dictionary<IXDocument, IXDrawing[]> drawings;
+
+                if (FindDrawings)
+                {
+                    var allRefs = References.Select(r => r.Document).ToArray();
+
+                    drawings = await Task.Run(() => m_RefsExtractor.FindAllDrawings(allRefs,
+                        AdditionalDrawingFolders.ToArray(), p => Progress = p));
+                }
+                else 
+                {
+                    drawings = new Dictionary<IXDocument, IXDrawing[]>();
+                }
+
+                var allDocVms = References.ToDictionary(x => x.Document.Path,
+                        x => (DocumentVM)x, StringComparer.CurrentCultureIgnoreCase);
+
+                foreach (var reference in References)
+                {
+                    reference.Drawings.Clear();
+
+                    drawings.TryGetValue(reference.Document, out IXDrawing[] refDrws);
+
+                    if (refDrws?.Any() == true)
                     {
-                        if (!allDrws.TryGetValue(refDrw.Path, out DocumentVM refDrwVm)) 
+                        foreach (var refDrw in refDrws)
                         {
-                            refDrwVm = new DocumentVM(refDrw);
-                            allDrws.Add(refDrw.Path, refDrwVm);
+                            if (!allDocVms.TryGetValue(refDrw.Path, out DocumentVM refDrwVm))
+                            {
+                                refDrwVm = new DocumentVM(refDrw);
+                                allDocVms.Add(refDrw.Path, refDrwVm);
+                            }
+
+                            reference.Drawings.Add(refDrwVm);
                         }
                     }
                 }
-                
-                reference.Drawings = allDocVms.ToArray();
             }
-
-            //TODO:associate drawings with view models
-            IsInitializing = false;
+            finally 
+            {
+                IsInitializing = false;
+            }
         }
     }
 }
