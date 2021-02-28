@@ -19,6 +19,7 @@ using Xarial.CadPlus.Plus.Atributes;
 using Xarial.CadPlus.Plus.Attributes;
 using Xarial.CadPlus.Plus.Exceptions;
 using Xarial.XToolkit.Reflection;
+using Xarial.XToolkit;
 
 namespace Xarial.CadPlus.Plus.Services
 {
@@ -50,9 +51,8 @@ namespace Xarial.CadPlus.Plus.Services
                 modulePaths.AddRange(hostSettings.AdditionalModuleFolders);
             }
 
-            RemoveDuplicateAndNestedFolders(modulePaths);
-
-            var catalog = CreateDirectoryCatalog(modulePaths.ToArray(), "*.Module.dll");
+            var catalog = CreateDirectoryCatalog(FileSystemUtils.GetTopFolders(modulePaths),
+                "*.Module.dll");
 
             var container = new CompositionContainer(catalog);
 
@@ -75,38 +75,7 @@ namespace Xarial.CadPlus.Plus.Services
 
             return modules;
         }
-
-        private void RemoveDuplicateAndNestedFolders(List<string> modulePaths)
-        {
-            string NormalizePath(string path) => path.TrimEnd('\\') + "\\";
-
-            bool IsInDirectory(string thisDir, string parentDir)
-                => NormalizePath(thisDir).StartsWith(NormalizePath(parentDir),
-                    StringComparison.CurrentCultureIgnoreCase);
-
-            for (int i = modulePaths.Count - 1; i >= 0; i--)
-            {
-                var existingDirIndex = -1;
-
-                for (int j = 0; j < modulePaths.Count; j++)
-                {
-                    if (i != j)
-                    {
-                        if (IsInDirectory(modulePaths[i], modulePaths[j]))
-                        {
-                            existingDirIndex = j;
-                            break;
-                        }
-                    }
-                }
-
-                if (existingDirIndex != -1)
-                {
-                    modulePaths.RemoveAt(i);
-                }
-            }
-        }
-
+        
         private void CheckDuplicates(IModule[] modules)
         {
             var dupModuleTypes = modules.GroupBy(m => m.GetType().FullName).Where(x => x.Count() > 1).Select(m => m.Key).ToArray();
