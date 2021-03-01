@@ -94,6 +94,7 @@ namespace Xarial.CadPlus.Batch.Extensions
                 m_Host.WpfApplication.Dispatcher.Invoke(() =>
                 {
                     var wnd = new InputsSorterWindow();
+                    wnd.Owner = m_Host.WpfApplication.MainWindow;
                     wnd.DataContext = vm;
 
                     wnd.Loaded += async (s, e)=> 

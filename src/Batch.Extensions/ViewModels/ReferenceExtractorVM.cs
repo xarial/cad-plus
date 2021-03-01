@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows.Data;
 using Xarial.CadPlus.Batch.Extensions.Models;
 using Xarial.CadPlus.Plus.Services;
+using Xarial.XCad.Base.Attributes;
 using Xarial.XCad.Documents;
 using Xarial.XToolkit.Wpf.Extensions;
 
@@ -16,16 +17,23 @@ namespace Xarial.CadPlus.Batch.Extensions.ViewModels
 {
     public enum ReferencesScope_e 
     {
+        [Title("Source Documents")]
         SourceDocumentsOnly,
-        TopLevelReferences,
-        AllReferences
+
+        [Title("Top Level Dependencies")]
+        TopLevelDependencies,
+
+        [Title("All Dependencies")]
+        AllDependencies
     }
 
     public class ReferenceExtractorVM : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public ObservableCollection<ReferenceVM> References { get; }
+        public IReadOnlyCollection<ReferenceVM> References => m_References;
+
+        private ObservableCollection<ReferenceVM> m_References;
 
         public ObservableCollection<string> AdditionalDrawingFolders { get; }
 
@@ -77,10 +85,39 @@ namespace Xarial.CadPlus.Batch.Extensions.ViewModels
             }
         }
 
+        private bool? m_AllDocumentsIsChecked;
+
+        public bool? AllDocumentsIsChecked 
+        {
+            get => m_AllDocumentsIsChecked;
+            set 
+            {
+                m_AllDocumentsIsChecked = value;
+                this.NotifyChanged();
+                BatchSetCheck(References, m_AllDocumentsIsChecked);
+            }
+        }
+
+        private bool? m_AllDrawingsIsChecked;
+
+        public bool? AllDrawingsIsChecked
+        {
+            get => m_AllDrawingsIsChecked;
+            set
+            {
+                m_AllDrawingsIsChecked = value;
+                this.NotifyChanged();
+                BatchSetCheck(m_DrawingVms, m_AllDrawingsIsChecked);
+            }
+        }
+
         public ICadEntityDescriptor EntityDescriptor { get; }
 
         private readonly IXDocument[] m_InputDocs;
         private readonly ReferenceExtractor m_RefsExtractor;
+
+        private int m_CheckedReferencesCount;
+        private int m_CheckedDrawingsCount;
 
         private object m_Lock = new object();
 
@@ -96,7 +133,9 @@ namespace Xarial.CadPlus.Batch.Extensions.ViewModels
 
             EntityDescriptor = cadEntDesc;
 
-            References = new ObservableCollection<ReferenceVM>();
+            m_DrawingVms = new List<DocumentVM>();
+
+            m_References = new ObservableCollection<ReferenceVM>();
             BindingOperations.EnableCollectionSynchronization(References, m_Lock);
 
             AdditionalDrawingFolders = new ObservableCollection<string>();
@@ -149,12 +188,23 @@ namespace Xarial.CadPlus.Batch.Extensions.ViewModels
             {
                 var docs = await Task.Run(() => m_RefsExtractor.GetAllReferences(m_InputDocs, ReferencesScope));
 
-                References.Clear();
-
+                m_References.Clear();
+                m_CheckedReferencesCount = 0;
+                
                 foreach (var doc in docs)
                 {
-                    References.Add(new ReferenceVM(doc));
+                    var refVm = new ReferenceVM(doc);
+                    refVm.CheckedChanged += OnReferenceCheckedChanged;
+
+                    if (refVm.IsChecked)
+                    {
+                        m_CheckedReferencesCount++;
+                    }
+
+                    m_References.Add(refVm);
                 }
+
+                ResolveAllDocumensIsCheckedFlag();
 
                 await CollectDrawingsAsync();
             }
@@ -164,13 +214,18 @@ namespace Xarial.CadPlus.Batch.Extensions.ViewModels
             }
         }
 
+        private readonly List<DocumentVM> m_DrawingVms;
+
         public async Task CollectDrawingsAsync()
         {
             IsInitializing = true;
             Progress = null;
+            m_CheckedDrawingsCount = 0;
 
             try
             {
+                m_DrawingVms.Clear();
+
                 Dictionary<IXDocument, IXDrawing[]> drawings;
 
                 if (FindDrawings)
@@ -201,17 +256,83 @@ namespace Xarial.CadPlus.Batch.Extensions.ViewModels
                             if (!allDocVms.TryGetValue(refDrw.Path, out DocumentVM refDrwVm))
                             {
                                 refDrwVm = new DocumentVM(refDrw);
+                                
                                 allDocVms.Add(refDrw.Path, refDrwVm);
+                            }
+
+                            if (!m_DrawingVms.Contains(refDrwVm))
+                            {
+                                if (refDrwVm.IsChecked)
+                                {
+                                    m_CheckedDrawingsCount++;
+                                }
+
+                                refDrwVm.CheckedChanged += OnReferenceDrawingCheckedChanged;
+
+                                m_DrawingVms.Add(refDrwVm);
                             }
 
                             reference.Drawings.Add(refDrwVm);
                         }
                     }
                 }
+
+                ResolveAllDrawingsIsCheckedFlag();
             }
             finally 
             {
                 IsInitializing = false;
+            }
+        }
+
+        private void OnReferenceDrawingCheckedChanged(DocumentVM drw, bool isChecked)
+        {
+            m_CheckedDrawingsCount += isChecked ? 1 : -1;
+            ResolveAllDrawingsIsCheckedFlag();
+        }
+
+        private void OnReferenceCheckedChanged(DocumentVM refDoc, bool isChecked)
+        {
+            m_CheckedReferencesCount += isChecked ? 1 : -1;
+            ResolveAllDocumensIsCheckedFlag();
+        }
+
+        private void BatchSetCheck(IEnumerable<DocumentVM> coll, bool? isChecked)
+        {
+            if (isChecked.HasValue)
+            {
+                foreach (var refDoc in coll)
+                {
+                    refDoc.IsChecked = isChecked.Value;
+                }
+            }
+        }
+
+        private void ResolveAllDocumensIsCheckedFlag()
+        {
+            m_AllDocumentsIsChecked = GetBatchCheckedFlag(m_CheckedReferencesCount, References.Count);
+            this.NotifyChanged(nameof(AllDocumentsIsChecked));
+        }
+
+        private void ResolveAllDrawingsIsCheckedFlag()
+        {
+            m_AllDrawingsIsChecked = GetBatchCheckedFlag(m_CheckedDrawingsCount, m_DrawingVms.Count);
+            this.NotifyChanged(nameof(AllDrawingsIsChecked));
+        }
+
+        private bool? GetBatchCheckedFlag(int checkedCount, int totalCount) 
+        {
+            if (checkedCount == 0)
+            {
+                return false;
+            }
+            else if (checkedCount == totalCount)
+            {
+                return true;
+            }
+            else
+            {
+                return null;
             }
         }
     }

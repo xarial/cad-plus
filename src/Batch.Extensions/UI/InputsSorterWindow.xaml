@@ -8,7 +8,7 @@
         xmlns:xconv="clr-namespace:Xarial.XToolkit.Wpf.Converters;assembly=Xarial.XToolkit.Wpf"
         xmlns:sys="clr-namespace:System;assembly=mscorlib"
         mc:Ignorable="d" Title="Batch Order"
-        d:DesignHeight="450" d:DesignWidth="800">
+        d:DesignHeight="450" d:DesignWidth="800" WindowStartupLocation="CenterOwner">
     <Window.Resources>
         <xconv:BooleanUniversalConverter x:Key="boolRevConv">
             <xconv:BooleanUniversalConverter.TrueValue>

@@ -39,7 +39,6 @@ namespace Xarial.CadPlus.Batch.Extensions
         private void OnHostInitialized(IApplication app, IServiceContainer svcProvider, IModule[] modules)
         {
             m_App = (IBatchApplication)app;
-
         }
 
         private void OnConnect()
@@ -73,7 +72,7 @@ namespace Xarial.CadPlus.Batch.Extensions
             if (m_ExtractReferences)
             {
                 var vm = new ReferenceExtractorVM(new ReferenceExtractor(app, instProvider.EntityDescriptor.DrawingFileFilter.Extensions),
-                    input.ToArray(), instProvider.EntityDescriptor, ReferencesScope_e.AllReferences, true);
+                    input.ToArray(), instProvider.EntityDescriptor, ReferencesScope_e.AllDependencies, true);
                 
                 var cts = new CancellationTokenSource();
                 var cancellationToken = cts.Token;
@@ -83,6 +82,7 @@ namespace Xarial.CadPlus.Batch.Extensions
                 m_Host.WpfApplication.Dispatcher.Invoke(() =>
                 {
                     var wnd = new ReferenceExtractorWindow();
+                    wnd.Owner = m_Host.WpfApplication.MainWindow;
                     wnd.DataContext = vm;
 
                     wnd.Loaded += async (s, e) =>
@@ -100,15 +100,12 @@ namespace Xarial.CadPlus.Batch.Extensions
 
                     if (res == true)
                     {
-                        foreach (ReferenceVM reference in vm.References)
-                        {
-                            if (reference.IsChecked)
-                            {
-                                input.Add(reference.Document);
-                            }
-
-                            input.AddRange(reference.Drawings.Where(d => d.IsChecked).Select(d => d.Document));
-                        }
+                        input.AddRange(
+                            vm.References
+                            .Union(vm.References.SelectMany(d => d.Drawings))
+                            .Distinct()
+                            .Where(d => d.IsChecked)
+                            .Select(d => d.Document));
                     }
                     else
                     {

@@ -13,6 +13,8 @@ namespace Xarial.CadPlus.Batch.Extensions.ViewModels
 {
     public class DocumentVM : INotifyPropertyChanged
     {
+        public event Action<DocumentVM, bool> CheckedChanged;
+
         public event PropertyChangedEventHandler PropertyChanged;
         
         public IXDocument Document { get; }
@@ -26,6 +28,7 @@ namespace Xarial.CadPlus.Batch.Extensions.ViewModels
             {
                 m_IsChecked = value;
                 this.NotifyChanged();
+                CheckedChanged?.Invoke(this, m_IsChecked);
             }
         }
 

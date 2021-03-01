@@ -9,8 +9,8 @@
              xmlns:xconv="clr-namespace:Xarial.XToolkit.Wpf.Converters;assembly=Xarial.XToolkit.Wpf"
              xmlns:commctrls="clr-namespace:Xarial.CadPlus.Common.Controls;assembly=Xarial.CadPlus.Common"
              xmlns:sys="clr-namespace:System;assembly=mscorlib"
-             mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
+             mc:Ignorable="d" Title="References Extractor" WindowStartupLocation="CenterOwner"
+             Height="800" Width="800">
     <Window.Resources>
         <conv:ReferenceTitleConverter x:Key="refTitleConv"/>
         <conv:ReferenceIconConverter x:Key="refIconConv"/>
@@ -41,7 +41,7 @@
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
-                    <GroupBox Grid.Column="0" Header="References">
+                    <GroupBox Grid.Column="0" Header="References" Margin="5">
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto"/>
@@ -54,7 +54,7 @@
                                 <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
                             <TextBlock Text="Scope: " VerticalAlignment="Center" Margin="5" Grid.Column="0" Grid.Row="0"/>
-                            <xctrls:EnumComboBox Grid.Column="1" Grid.Row="0" Margin="5" Width="150" HorizontalAlignment="Left" 
+                            <xctrls:EnumComboBox Grid.Column="1" Grid.Row="0" Margin="5" Width="200" HorizontalAlignment="Left" 
                                          Value="{Binding Path=ReferencesScope}"/>
 
                             <CheckBox IsChecked="{Binding Path=FindDrawings}" Grid.Row="1" Margin="5" Grid.ColumnSpan="2">
@@ -62,52 +62,69 @@
                             </CheckBox>
                         </Grid>
                     </GroupBox>
-                    <GroupBox Grid.Column="1" Header="Additional Search Folders">
+                    <GroupBox Grid.Column="1" Header="Additional Search Folders" Margin="5">
                         <commctrls:PathListBox PathsSource="{Binding Path=AdditionalDrawingFolders}" 
                                                Grid.ColumnSpan="2" Grid.Row="3" Height="150" Margin="5"
                                                Watermark="List of additional folders to search for referencing drawings"
                                                AllowDropFolders="True" ShowAddFolderButton="True" ShowAddFileButton="False" AllowDropFiles="False"/>
                     </GroupBox>
                 </Grid>
-                <ListView ItemsSource="{Binding Path=References}" Grid.Row="1">
-                    <ListView.Resources>
-                        <DataTemplate x:Key="ReferenceTemplate">
-                            <Grid ToolTip="{Binding Path=Document.Path}" Margin="2">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto"/>
-                                    <ColumnDefinition Width="Auto"/>
-                                    <ColumnDefinition Width="*"/>
-                                </Grid.ColumnDefinitions>
-                                <CheckBox IsChecked="{Binding Path=IsChecked}" VerticalAlignment="Center"/>
-                                <Image Grid.Column="1" Margin="2" RenderOptions.BitmapScalingMode="Fant"
+                <GroupBox Grid.Row="1" Margin="5" Header="Input">
+                    <ListView ItemsSource="{Binding Path=References}">
+                        <ListView.Resources>
+                            <DataTemplate x:Key="ReferenceTemplate">
+                                <Grid ToolTip="{Binding Path=Document.Path}" Margin="2">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <CheckBox IsChecked="{Binding Path=IsChecked}" VerticalAlignment="Center"/>
+                                    <Image Grid.Column="1" Margin="2" RenderOptions.BitmapScalingMode="Fant"
                                        Width="14" Height="14" VerticalAlignment="Center" HorizontalAlignment="Center"
                                        Stretch="Uniform">
-                                    <Image.Source>
-                                        <MultiBinding Converter="{StaticResource refIconConv}">
-                                            <Binding Path="Document"/>
-                                            <Binding Path="DataContext.EntityDescriptor" RelativeSource="{RelativeSource AncestorType={x:Type local:ReferenceExtractorWindow}}"/>
-                                        </MultiBinding>
-                                    </Image.Source>
-                                </Image>
-                                <TextBlock Text="{Binding Path=Document, Converter={StaticResource refTitleConv}}"
+                                        <Image.Source>
+                                            <MultiBinding Converter="{StaticResource refIconConv}">
+                                                <Binding Path="Document"/>
+                                                <Binding Path="DataContext.EntityDescriptor" RelativeSource="{RelativeSource AncestorType={x:Type local:ReferenceExtractorWindow}}"/>
+                                            </MultiBinding>
+                                        </Image.Source>
+                                    </Image>
+                                    <TextBlock Text="{Binding Path=Document, Converter={StaticResource refTitleConv}}"
                                            Grid.Column="2"/>
-                            </Grid>
-                        </DataTemplate>
-                    </ListView.Resources>
-                    <ListView.View>
-                        <GridView>
-                            <GridViewColumn Header="Document" Width="Auto" CellTemplate="{StaticResource ReferenceTemplate}"/>
-                            <GridViewColumn Header="Drawings" Width="Auto">
-                                <GridViewColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <ItemsControl ItemsSource="{Binding Path=Drawings}"
+                                </Grid>
+                            </DataTemplate>
+                        </ListView.Resources>
+                        <ListView.View>
+                            <GridView>
+                                <GridViewColumn Header="{Binding}" CellTemplate="{StaticResource ReferenceTemplate}">
+                                    <GridViewColumn.HeaderTemplate>
+                                        <DataTemplate>
+                                            <CheckBox Margin="2" HorizontalAlignment="Center" IsChecked="{Binding Path=AllDocumentsIsChecked}">
+                                                <TextBlock Text="Documents"/>
+                                            </CheckBox>
+                                        </DataTemplate>
+                                    </GridViewColumn.HeaderTemplate>
+                                </GridViewColumn> 
+                                <GridViewColumn Header="{Binding}">
+                                    <GridViewColumn.HeaderTemplate>
+                                        <DataTemplate>
+                                            <CheckBox Margin="2" HorizontalAlignment="Center" IsChecked="{Binding Path=AllDrawingsIsChecked}">
+                                                <TextBlock Text="Drawings"/>
+                                            </CheckBox>
+                                        </DataTemplate>
+                                    </GridViewColumn.HeaderTemplate>
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <ItemsControl ItemsSource="{Binding Path=Drawings}"
                                                  ItemTemplate="{StaticResource ReferenceTemplate}"/>
-                                    </DataTemplate>
-                                </GridViewColumn.CellTemplate>
-                            </GridViewColumn>
-                        </GridView>
-                    </ListView.View>
-                </ListView>
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+                            </GridView>
+                        </ListView.View>
+                    </ListView>
+                </GroupBox>
             </Grid>
         </xctrls:ProgressPanel>
         <Grid Grid.Row="1" HorizontalAlignment="Right">

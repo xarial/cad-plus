@@ -43,11 +43,11 @@ namespace Xarial.CadPlus.Batch.Extensions.Models
 
                 switch (scope) 
                 {
-                    case ReferencesScope_e.TopLevelReferences:
+                    case ReferencesScope_e.TopLevelDependencies:
                         deps = doc.Dependencies;
                         break;
 
-                    case ReferencesScope_e.AllReferences:
+                    case ReferencesScope_e.AllDependencies:
                         deps = doc.GetAllDependencies().ToArray();
                         break;
 
