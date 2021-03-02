@@ -22,7 +22,7 @@ namespace Xarial.CadPlus.Common.Services
         Warning
     }
 
-    public interface IJobItemFile : IJobItem
+    public interface IJobItemDocument : IJobItem
     {
         IEnumerable<IJobItemOperation> Operations { get; }
     }

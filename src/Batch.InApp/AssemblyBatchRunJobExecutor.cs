@@ -23,16 +23,6 @@ using Xarial.XToolkit.Reporting;
 
 namespace Xarial.CadPlus.Batch.InApp
 {
-    internal class JobItemDocument : JobItemFile
-    {
-        public IXDocument Document { get; }
-
-        public JobItemDocument(IXDocument doc, JobItemMacro[] macros) : base(doc.Path, macros)
-        {
-            Document = doc;
-        }
-    }
-
     public class AssemblyBatchRunJobExecutor : IBatchRunJobExecutor
     {
         public event Action<IJobItem[], DateTime> JobSet;

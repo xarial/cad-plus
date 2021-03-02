@@ -44,11 +44,9 @@ namespace Xarial.CadPlus.Drawing
     }
 
     //TODO: remove the dependency on application once the common APIs are used
-    [Module(typeof(IHostExtension), ApplicationIds.SolidWorksAddIn)]
+    [Module(typeof(IHostExtension), typeof(ISwAddInApplication))]
     public class DrawingModule : IModule
     {
-        public Guid Id => Guid.Parse(ModuleIds.Drawing);
-
         private IHostExtension m_Host;
 
         private IXPropertyPage<InsertQrCodeData> m_Page;
@@ -60,11 +58,18 @@ namespace Xarial.CadPlus.Drawing
         private IXDrawing m_CurDrawing;
         private string m_CurQrCodeData;
         private ISettingsProvider m_SettsProvider;
+        private IServiceProvider m_SvcProvider;
 
         public void Init(IHost host)
         {
             m_Host = (IHostExtension)host;
+            m_Host.Initialized += OnHostInitialized;
             m_Host.Connect += OnConnect;
+        }
+
+        private void OnHostInitialized(IApplication app, IServiceContainer svcProvider, IModule[] modules)
+        {
+            m_SvcProvider = svcProvider;
         }
 
         private void OnConnect()
@@ -73,7 +78,7 @@ namespace Xarial.CadPlus.Drawing
             m_Page = m_Host.CreatePage<InsertQrCodeData>();
             m_CurPageData = new InsertQrCodeData();
 
-            m_SettsProvider = m_Host.Services.GetService<ISettingsProvider>();
+            m_SettsProvider = m_SvcProvider.GetService<ISettingsProvider>();
 
             m_QrDataProvider = new QrDataProvider(m_Host.Extension.Application,
                 m_SettsProvider.ReadSettings<DrawingSettings>());

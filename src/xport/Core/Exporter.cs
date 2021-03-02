@@ -55,7 +55,7 @@ namespace Xarial.CadPlus.Xport.Core
         }
     }
 
-    internal class JobItemFile : JobItem, IJobItemFile
+    internal class JobItemFile : JobItem, IJobItemDocument
     {
         public IEnumerable<IJobItemOperation> Operations => throw new NotImplementedException();
 

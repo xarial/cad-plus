@@ -104,10 +104,10 @@ namespace Xarial.CadPlus.XBatch.Base.Core
 
     public static class BatchJobExtension 
     {
-        public static IApplicationProvider FindApplicationProvider(this BatchJob job, IApplicationProvider[] appProviders)
+        public static ICadApplicationInstanceProvider FindApplicationProvider(this BatchJob job, ICadApplicationInstanceProvider[] appProviders)
         {
             var appProvider = appProviders.FirstOrDefault(
-                p => string.Equals(p.ApplicationId, job.ApplicationId,
+                p => string.Equals(p.EntityDescriptor.ApplicationId, job.ApplicationId,
                 StringComparison.CurrentCultureIgnoreCase));
 
             if (appProvider == null)

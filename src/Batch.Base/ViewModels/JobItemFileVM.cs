@@ -19,11 +19,11 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
 {
     public class JobItemFileVM : JobItemVM
     {
-        private readonly IJobItemFile m_JobItemFile;
+        private readonly IJobItemDocument m_JobItemFile;
 
         public JobItemMacroVM[] Macros { get; }
 
-        public JobItemFileVM(IJobItemFile jobItemFile) : base(jobItemFile)
+        public JobItemFileVM(IJobItemDocument jobItemFile) : base(jobItemFile)
         {
             m_JobItemFile = jobItemFile;
             Macros = m_JobItemFile.Operations.Select(o => new JobItemMacroVM(o)).ToArray();

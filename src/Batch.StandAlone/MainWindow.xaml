@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:cmnctrls="clr-namespace:Xarial.CadPlus.Common.Controls;assembly=Xarial.CadPlus.Common"
         xmlns:ctrls="clr-namespace:Xarial.CadPlus.Batch.StandAlone.Controls"
-        xmlns:ctrlsbase="clr-namespace:Xarial.CadPlus.XBatch.Base.Controls;assembly=Batch.Base"
+        xmlns:ctrlsbase="clr-namespace:Xarial.CadPlus.Batch.Base.Controls;assembly=Batch.Base"
         xmlns:conv="clr-namespace:Xarial.CadPlus.Batch.StandAlone.Converters"
         xmlns:xconv="clr-namespace:Xarial.XToolkit.Wpf.Converters;assembly=Xarial.XToolkit.Wpf"
         xmlns:fluent="clr-namespace:Fluent;assembly=Fluent"
@@ -138,12 +138,14 @@
                     <GroupBox Header="Files And Folders" Grid.Row="0">
                         <cmnctrls:PathListBox x:Name="lstInputs" Filters="{Binding Path=InputFilesFilter}" 
                                               Grid.Row="0" PathsSource="{Binding Path=Input}"
+                                              Watermark="Select files and folders to process. Use buttons in the ribbon toolbar or drag-n-drop files and folders"
                                               ShowAddFileButton="False" ShowAddFolderButton="False"/>
                     </GroupBox>
                     <GridSplitter Height="5" Background="Gray" Grid.Row="1"/>
                     <GroupBox Header="Macros" Grid.Row="2">
                         <cmnctrls:PathListBox x:Name="lstMacros" Grid.Row="1" ShowAddFolderButton="False" 
                               ShowAddFileButton="False" AllowDropFolders="False"
+                              Watermark="Select macros to run for all input files and folders. Use buttons in the ribbon toolbar or drag-n-drop files and folders"
                               PathToItemConverter="{Binding Path=PathToMacroDataConverter}"
                               ItemToPathConverter="{Binding Path=MacroDataToPathConverter}"
                               AllowDropFiles="True"
@@ -214,7 +216,7 @@
                             <RowDefinition Height="*"/>
                             <RowDefinition Height="Auto"/>
                         </Grid.RowDefinitions>
-                        <ctrlsbase:ResultsControl Grid.Row="0"/>
+                        <ctrlsbase:ResultsControl JobItemsDataGridStyle="{StaticResource MahApps.Styles.DataGrid}"  Grid.Row="0"/>
                         <metro:MetroProgressBar Grid.Row="1" IsIndeterminate="{Binding Path=Summary.IsInitializing}"
                                                 Margin="0,5"
                                                 Visibility="{Binding Path=IsBatchInProgress, Converter={StaticResource boolToVisConv}}"

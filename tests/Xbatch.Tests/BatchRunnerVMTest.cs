@@ -25,18 +25,23 @@ using Xarial.CadPlus.XBatch.Base.ViewModels;
 using Xarial.XCad;
 using Xarial.XCad.SolidWorks;
 using Xarial.XCad.SolidWorks.Enums;
+using Xarial.XToolkit.Wpf.Utils;
 
 namespace Xbatch.Tests
 {
 
     public class BatchDocumentMockVM : BatchDocumentVM
     {
-        public BatchDocumentMockVM(string name, BatchJob job, IApplicationProvider[] appProviders, IMessageService msgSvc, Func<BatchJob, IBatchRunJobExecutor> execFact, IBatchApplicationProxy batchAppProxy, MainWindow parentWnd, IRibbonButtonCommand[] backstageCmds) : base(name, job, appProviders, msgSvc, execFact, batchAppProxy, parentWnd, backstageCmds)
+        public BatchDocumentMockVM(string name, BatchJob job, ICadApplicationInstanceProvider[] appProviders, IMessageService msgSvc, Func<BatchJob, IBatchRunJobExecutor> execFact, IBatchApplicationProxy batchAppProxy, MainWindow parentWnd, IRibbonButtonCommand[] backstageCmds) 
+            : base(name, job, appProviders, msgSvc, execFact, batchAppProxy, parentWnd, backstageCmds)
         {
         }
 
         protected override RibbonCommandManager LoadRibbonCommands(IRibbonButtonCommand[] backstageCmds)
             => null;
+
+        protected override FileFilter[] GetFileFilters(ICadEntityDescriptor cadEntDesc)
+            => new FileFilter[0];
     }
 
     public class BatchRunnerVMTest
@@ -109,19 +114,19 @@ namespace Xbatch.Tests
             var mock = new Mock<IBatchRunnerModel>();
             BatchJob opts = null;
 
-            var macroFilterProviderMock = new Mock<IMacroFileFilterProvider>();
-            macroFilterProviderMock.Setup(m => m.GetSupportedMacros()).Returns(new FileTypeFilter[0]);
+            var cadEntDescMock = new Mock<ICadEntityDescriptor>();
+            cadEntDescMock.Setup(m => m.MacroFileFilters).Returns(new FileTypeFilter[0]);
 
-            var appProviderMock = new Mock<IApplicationProvider>();
-            appProviderMock.Setup(m => m.MacroFileFiltersProvider)
-                .Returns(macroFilterProviderMock.Object);
+            var appProviderMock = new Mock<ICadApplicationInstanceProvider>();
+            appProviderMock.Setup(m => m.EntityDescriptor)
+                .Returns(cadEntDescMock.Object);
             appProviderMock.Setup(m => m.GetVersionId(It.IsAny<IXVersion>())).Returns("Sw2020");
             appProviderMock.Setup(m => m.ParseVersion(It.IsAny<string>())).Returns(new Mock<IXVersion>().Object);
 
             var modelMock = mock.Object;
             var msgSvcMock = new Mock<IMessageService>().Object;
             
-            var docVm = new BatchDocumentMockVM("", new BatchJob(), new IApplicationProvider[] { appProviderMock.Object }, msgSvcMock,
+            var docVm = new BatchDocumentMockVM("", new BatchJob(), new ICadApplicationInstanceProvider[] { appProviderMock.Object }, msgSvcMock,
                 j =>
                 {
                     opts = j;

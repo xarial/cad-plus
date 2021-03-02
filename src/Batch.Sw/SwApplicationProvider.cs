@@ -14,8 +14,6 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Xarial.CadPlus.Batch.Sw.Properties;
-using Xarial.CadPlus.Common.Sw.Services;
 using Xarial.CadPlus.Plus.Applications;
 using Xarial.CadPlus.Plus.Data;
 using Xarial.CadPlus.Plus.Services;
@@ -28,37 +26,23 @@ using Xarial.XCad.Toolkit;
 
 namespace Xarial.CadPlus.Batch.Sw
 {
-    public class SwApplicationProvider : IApplicationProvider
+    public class SwApplicationProvider : ICadApplicationInstanceProvider
     {
-        public FileTypeFilter[] InputFilesFilter { get; }
-
-        public string DisplayName => "SOLIDWORKS";
-        public string ApplicationId => "DsSolidWorks";
-        public Image ApplicationIcon => Resources.sw_application;
-
-        public IMacroFileFilterProvider MacroFileFiltersProvider => new SwMacroFileFilterProvider();
-
-        public IMacroRunnerExService MacroRunnerService => new SwMacroRunnerExService();
-
         private readonly Dictionary<Process, List<string>> m_ForceDisabledAddIns;
 
         private readonly IXLogger m_Logger;
 
         private readonly IXServiceCollection m_CustomServices;
-        
-        public SwApplicationProvider(IXLogger logger)
-        {
-            InputFilesFilter = new FileTypeFilter[]
-            {
-                new FileTypeFilter("SOLIDWORKS Parts", "*.sldprt"),
-                new FileTypeFilter("SOLIDWORKS Assemblies", "*.sldasm"),
-                new FileTypeFilter("SOLIDWORKS Drawings", "*.slddrw"),
-                new FileTypeFilter("SOLIDWORKS Files", "*.sldprt", "*.sldasm", "*.slddrw"),
-                new FileTypeFilter("All Files", "*.*"),
-            };
 
+        public IMacroRunnerExService MacroRunnerService { get; }
+        public ICadEntityDescriptor EntityDescriptor { get; }
+
+        public SwApplicationProvider(IXLogger logger, IMacroRunnerExService svc, ICadEntityDescriptor entDesc)
+        {
             m_Logger = logger;
 
+            MacroRunnerService = svc;
+            EntityDescriptor = entDesc;
             m_CustomServices = new ServiceCollection();
             m_CustomServices.AddOrReplace<IXLogger>(() => m_Logger);
 

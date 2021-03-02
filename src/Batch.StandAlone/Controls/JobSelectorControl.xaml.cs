@@ -1,4 +1,11 @@
-﻿using System;
+﻿//*********************************************************************
+//CAD+ Toolset
+//Copyright(C) 2020 Xarial Pty Limited
+//Product URL: https://cadplus.xarial.com
+//License: https://cadplus.xarial.com/license/
+//*********************************************************************
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -27,12 +34,12 @@ namespace Xarial.CadPlus.Batch.StandAlone.Controls
 
 		public static readonly DependencyProperty AppProvidersProperty =
 			DependencyProperty.Register(
-			nameof(AppProviders), typeof(IApplicationProvider[]),
+			nameof(AppProviders), typeof(ICadApplicationInstanceProvider[]),
 			typeof(JobSelectorControl));
 
-		public IApplicationProvider[] AppProviders
+		public ICadApplicationInstanceProvider[] AppProviders
 		{
-			get { return (IApplicationProvider[])GetValue(AppProvidersProperty); }
+			get { return (ICadApplicationInstanceProvider[])GetValue(AppProvidersProperty); }
 			set { SetValue(AppProvidersProperty, value); }
 		}
 
@@ -49,8 +56,8 @@ namespace Xarial.CadPlus.Batch.StandAlone.Controls
 
 		private void OnCreateDocumentClick(object sender, RoutedEventArgs e)
 		{
-			var appProvider = (sender as Button).DataContext as IApplicationProvider;
-			CreateDocumentCommand?.Execute(appProvider.ApplicationId);
+			var appProvider = (sender as Button).DataContext as ICadApplicationInstanceProvider;
+			CreateDocumentCommand?.Execute(appProvider.EntityDescriptor.ApplicationId);
 			Selected?.Invoke();
 		}
 	}

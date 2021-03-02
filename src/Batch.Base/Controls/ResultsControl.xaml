@@ -1,9 +1,9 @@
-﻿<UserControl x:Class="Xarial.CadPlus.XBatch.Base.Controls.ResultsControl"
+﻿<UserControl x:Class="Xarial.CadPlus.Batch.Base.Controls.ResultsControl"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:Xarial.CadPlus.XBatch.Base.Controls"
+             xmlns:local="clr-namespace:Xarial.CadPlus.Batch.Base.Controls"
              xmlns:xconv="clr-namespace:Xarial.XToolkit.Wpf.Converters;assembly=Xarial.XToolkit.Wpf"
              xmlns:win="clr-namespace:System.Windows;assembly=PresentationCore"
              mc:Ignorable="d" 
@@ -58,7 +58,8 @@
         <TabItem Header="Status">
             <Grid Visibility="{Binding Converter={StaticResource objIsNotNullToVisConv}}"
                                   DataContext="{Binding Path=Summary}">
-                <local:JobItemsDataGrid ItemsSource="{Binding Path=JobItemFiles}" Grid.Row="1" Margin="5"/>
+                <local:JobItemsDataGrid DataGridStyle="{Binding Path=JobItemsDataGridStyle, RelativeSource={RelativeSource AncestorType={x:Type local:ResultsControl}}}"
+                                        ItemsSource="{Binding Path=JobItemFiles}" Grid.Row="1" Margin="5"/>
             </Grid>
         </TabItem>
         <TabItem Header="Log">

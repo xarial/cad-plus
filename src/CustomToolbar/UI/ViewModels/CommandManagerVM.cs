@@ -52,13 +52,13 @@ namespace Xarial.CadPlus.CustomToolbar.UI.ViewModels
         public CommandManagerVM(IToolbarConfigurationProvider confsProvider,
             ISettingsProvider settsProvider, 
             IMessageService msgService, IIconsProvider[] iconsProviders,
-            IMacroFileFilterProvider macroFilterProvider)
+            ICadEntityDescriptor cadEntDesc)
         {
             m_ConfsProvider = confsProvider;
             m_SettsProvider = settsProvider;
             m_MsgService = msgService;
 
-            m_MacroExtensions = macroFilterProvider.GetSupportedMacros()
+            m_MacroExtensions = cadEntDesc.MacroFileFilters
                 .Select(f => f.Extensions)
                 .SelectMany(x => x)
                 .Select(x => Path.GetExtension(x))

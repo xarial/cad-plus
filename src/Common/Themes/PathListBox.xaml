@@ -8,6 +8,8 @@
     <xconv:BooleanUniversalConverter TrueValue="{x:Static win:Visibility.Visible}"
                                      FalseValue="{x:Static win:Visibility.Collapsed}" 
                                      x:Key="boolToVisConv"/>
+
+    <local:WatermarkVisibilityConverter x:Key="watermarkVisConv"/>
     
     <Style TargetType="{x:Type local:PathListBox}">
         <Setter Property="Template">
@@ -28,6 +30,10 @@
                                  HorizontalContentAlignment="Stretch"
                                  SelectionMode="Extended" ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                                  ItemTemplate="{TemplateBinding ItemTemplate}"/>
+                        <TextBlock Text="{TemplateBinding Watermark}" Grid.ColumnSpan="3"
+                                   VerticalAlignment="Center" HorizontalAlignment="Center" Margin="5" TextWrapping="Wrap"
+                                   FontSize="16" TextTrimming="CharacterEllipsis" TextAlignment="Center" Foreground="Gray" IsHitTestVisible="False"
+                                   Visibility="{Binding Path=PathsSource.Count, RelativeSource={RelativeSource Mode=TemplatedParent}, Converter={StaticResource watermarkVisConv}}"/>
                         <Button x:Name="PART_AddFilesButton" Grid.Row="1" Grid.Column="1" 
                                 Visibility="{TemplateBinding ShowAddFileButton, Converter={StaticResource boolToVisConv}}"
                                 VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2">

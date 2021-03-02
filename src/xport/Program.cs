@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 using System.Windows.Interop;
 using Xarial.CadPlus.Common.Services;
 using Xarial.CadPlus.Init;
+using Xarial.CadPlus.Plus;
 using Xarial.CadPlus.Plus.Applications;
 using Xarial.CadPlus.Plus.Shared;
 using Xarial.CadPlus.Plus.Shared.Services;
@@ -22,13 +23,16 @@ using Xarial.CadPlus.Xport.ViewModels;
 
 namespace Xarial.CadPlus.Xport
 {
+    public class ExportApplication : IApplication
+    {
+    }
+
     class Program
     {
         [STAThread]
         static void Main(string[] args)
         {
-            var appLauncher = new ApplicationLauncher<Arguments, MainWindow>(
-                new BaseApplication("EA027A58-D1AF-4D3F-840D-1A11BD23A182"), new Initiator());
+            var appLauncher = new ApplicationLauncher<ExportApplication, Arguments, MainWindow>(new Initiator());
             appLauncher.RunConsoleAsync += OnRunConsoleAsync;
             appLauncher.WindowCreated += OnWindowCreated;
             appLauncher.Start(args);

@@ -12,12 +12,13 @@ using System.Text;
 using System.Threading.Tasks;
 using Xarial.XCad.Extensions;
 using Xarial.XCad.UI.PropertyPage;
+using Xarial.XCad.UI.PropertyPage.Delegates;
 
 namespace Xarial.CadPlus.Common.Services
 {
     public interface IPropertyPageCreator
     {
-        IXPropertyPage<TData> CreatePage<TData>();
+        IXPropertyPage<TData> CreatePage<TData>(CreateDynamicControlsDelegate createDynCtrlHandler);
     }
 
     public class PropertyPageCreator : IPropertyPageCreator
@@ -29,6 +30,6 @@ namespace Xarial.CadPlus.Common.Services
             m_Ext = ext;
         }
 
-        public IXPropertyPage<TData> CreatePage<TData>() => m_Ext.CreatePage<TData>();
+        public IXPropertyPage<TData> CreatePage<TData>(CreateDynamicControlsDelegate createDynCtrlHandler) => m_Ext.CreatePage<TData>(createDynCtrlHandler);
     }
 }

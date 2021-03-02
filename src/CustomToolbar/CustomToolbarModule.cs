@@ -60,7 +60,7 @@ namespace Xarial.CadPlus.CustomToolbar
 
         private List<IIconsProvider> m_IconsProviders;
 
-        public Guid Id => Guid.Parse(ModuleIds.Toolbar);
+        private IServiceProvider m_SvcProvider;
 
         public CustomToolbarModule() 
         {
@@ -77,7 +77,13 @@ namespace Xarial.CadPlus.CustomToolbar
             }
 
             m_Host = (IHostExtension)host;
+            m_Host.Initialized += OnHostInitialized;
             m_Host.Connect += OnConnect;
+        }
+
+        private void OnHostInitialized(IApplication app, IServiceContainer svcProvider, IModule[] modules)
+        {
+            m_SvcProvider = svcProvider;
         }
 
         private void OnConnect()
@@ -121,10 +127,10 @@ namespace Xarial.CadPlus.CustomToolbar
 
             builder.RegisterType<UserSettingsService>();
 
-            builder.RegisterFromServiceProvider<IMacroRunnerExService>(m_Host.Services);
-            builder.RegisterFromServiceProvider<IMessageService>(m_Host.Services);
-            builder.RegisterFromServiceProvider<IMacroFileFilterProvider>(m_Host.Services);
-            builder.RegisterFromServiceProvider<ISettingsProvider>(m_Host.Services);
+            builder.RegisterFromServiceProvider<IMacroRunnerExService>(m_SvcProvider);
+            builder.RegisterFromServiceProvider<IMessageService>(m_SvcProvider);
+            builder.RegisterFromServiceProvider<ICadEntityDescriptor>(m_SvcProvider);
+            builder.RegisterFromServiceProvider<ISettingsProvider>(m_SvcProvider);
 
             builder.RegisterInstance(m_IconsProviders.ToArray());
 

@@ -117,7 +117,7 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
 
         private void OnJobSet(IJobItem[] files, DateTime startTime)
         {
-            JobItemFiles = files.Select(f => new JobItemFileVM((IJobItemFile)f)).ToArray();
+            JobItemFiles = files.Select(f => new JobItemFileVM((IJobItemDocument)f)).ToArray();
             StartTime = startTime;
         }
 

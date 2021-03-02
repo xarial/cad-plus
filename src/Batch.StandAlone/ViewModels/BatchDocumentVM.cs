@@ -21,6 +21,7 @@ using Xarial.CadPlus.Batch.StandAlone.ViewModels;
 using Xarial.CadPlus.Common.Exceptions;
 using Xarial.CadPlus.Common.Services;
 using Xarial.CadPlus.Plus.Applications;
+using Xarial.CadPlus.Plus.Data;
 using Xarial.CadPlus.Plus.Exceptions;
 using Xarial.CadPlus.Plus.Services;
 using Xarial.CadPlus.Plus.Shared.Services;
@@ -134,7 +135,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
         public string FilePath => m_FilePath;
 
         private readonly Func<BatchJob, IBatchRunJobExecutor> m_ExecFact;
-        private readonly IApplicationProvider m_AppProvider;
+        private readonly ICadApplicationInstanceProvider m_AppProvider;
 
         public event Action<BatchDocumentVM, BatchJob, string> Save;
 
@@ -142,7 +143,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
 
         private readonly MainWindow m_ParentWnd;
 
-        public BatchDocumentVM(FileInfo file, BatchJob job, IApplicationProvider[] appProviders, 
+        public BatchDocumentVM(FileInfo file, BatchJob job, ICadApplicationInstanceProvider[] appProviders, 
             IMessageService msgSvc,
             Func<BatchJob, IBatchRunJobExecutor> execFact,
             IBatchApplicationProxy batchAppProxy, MainWindow parentWnd, IRibbonButtonCommand[] backstageCmds)
@@ -154,7 +155,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
         }
 
         public BatchDocumentVM(string name, BatchJob job,
-            IApplicationProvider[] appProviders,
+            ICadApplicationInstanceProvider[] appProviders,
             IMessageService msgSvc, Func<BatchJob, IBatchRunJobExecutor> execFact,
             IBatchApplicationProxy batchAppProxy, MainWindow parentWnd, IRibbonButtonCommand[] backstageCmds)
         {
@@ -167,8 +168,8 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
 
             CommandManager = LoadRibbonCommands(backstageCmds);
 
-            InputFilesFilter = m_AppProvider.InputFilesFilter?.Select(f => new FileFilter(f.Name, f.Extensions)).ToArray();
-            MacroFilesFilter = m_AppProvider.MacroFileFiltersProvider.GetSupportedMacros()
+            InputFilesFilter = GetFileFilters(m_AppProvider.EntityDescriptor);
+            MacroFilesFilter = m_AppProvider.EntityDescriptor.MacroFileFilters
                 .Select(f => new FileFilter(f.Name, f.Extensions)).Union(new FileFilter[] { FileFilter.AllFiles }).ToArray();
 
             IsDirty = true;
@@ -191,6 +192,20 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
 
             Macros = new ObservableCollection<MacroData>(m_Job.Macros ?? Enumerable.Empty<MacroData>());
             Macros.CollectionChanged += OnMacrosCollectionChanged;
+        }
+
+        protected virtual FileFilter[] GetFileFilters(ICadEntityDescriptor cadEntDesc)
+        {
+            return new FileFilter[]
+            {
+                new FileFilter(cadEntDesc.PartFileFilter.Name, cadEntDesc.PartFileFilter.Extensions),
+                new FileFilter(cadEntDesc.AssemblyFileFilter.Name, cadEntDesc.AssemblyFileFilter.Extensions),
+                new FileFilter(cadEntDesc.DrawingFileFilter.Name, cadEntDesc.DrawingFileFilter.Extensions),
+                new FileFilter($"{cadEntDesc.ApplicationName} Files", cadEntDesc.PartFileFilter.Extensions
+                                                                      .Union(cadEntDesc.AssemblyFileFilter.Extensions)
+                                                                      .Union(cadEntDesc.DrawingFileFilter.Extensions).ToArray()),
+                FileFilter.AllFiles
+            };
         }
 
         protected virtual RibbonCommandManager LoadRibbonCommands(IRibbonButtonCommand[] backstageCmds)
@@ -221,7 +236,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
                             () => m_ParentWnd.lstMacros.DeleteSelectedCommand.CanExecute(null)))),
                 new RibbonTab(BatchApplicationCommandManager.SettingsTab.Name, "Settings",
                     new RibbonGroup(BatchApplicationCommandManager.SettingsTab.StartupOptionsGroupName, "Startup Options",
-                        new RibbonDropDownButton("Version", m_AppProvider.ApplicationIcon, "",
+                        new RibbonDropDownButton("Version", m_AppProvider.EntityDescriptor.ApplicationIcon, "",
                             () => new VersionVM(Settings.Version),
                             v => Settings.Version = ((VersionVM)v).Version,
                             m_AppProvider.GetInstalledVersions().Select(v => new VersionVM(v))),
