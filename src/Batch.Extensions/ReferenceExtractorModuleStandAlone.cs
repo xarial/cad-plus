@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Xarial.CadPlus.Batch.Extensions.Models;
 using Xarial.CadPlus.Batch.Extensions.Properties;
 using Xarial.CadPlus.Batch.Extensions.UI;
 using Xarial.CadPlus.Batch.Extensions.ViewModels;
@@ -17,6 +16,7 @@ using Xarial.CadPlus.Plus.UI;
 using Xarial.XCad;
 using Xarial.XCad.Documents;
 using Xarial.CadPlus.Plus.Extensions;
+using Xarial.CadPlus.Batch.Extensions.Services;
 
 namespace Xarial.CadPlus.Batch.Extensions
 {
@@ -100,12 +100,7 @@ namespace Xarial.CadPlus.Batch.Extensions
 
                     if (res == true)
                     {
-                        input.AddRange(
-                            vm.References
-                            .Union(vm.References.SelectMany(d => d.Drawings))
-                            .Distinct()
-                            .Where(d => d.IsChecked)
-                            .Select(d => d.Document));
+                        input.AddRange(vm.GetCheckedDocuments());
                     }
                     else
                     {

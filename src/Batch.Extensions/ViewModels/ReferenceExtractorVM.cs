@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Data;
-using Xarial.CadPlus.Batch.Extensions.Models;
+using Xarial.CadPlus.Batch.Extensions.Services;
 using Xarial.CadPlus.Plus.Services;
 using Xarial.XCad.Base.Attributes;
 using Xarial.XCad.Documents;
@@ -30,6 +30,8 @@ namespace Xarial.CadPlus.Batch.Extensions.ViewModels
     public class ReferenceExtractorVM : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
+
+        public event Action GridDataChanged;
 
         public IReadOnlyCollection<ReferenceVM> References => m_References;
 
@@ -278,6 +280,7 @@ namespace Xarial.CadPlus.Batch.Extensions.ViewModels
                 }
 
                 ResolveAllDrawingsIsCheckedFlag();
+                GridDataChanged?.Invoke();
             }
             finally 
             {
@@ -334,6 +337,18 @@ namespace Xarial.CadPlus.Batch.Extensions.ViewModels
             {
                 return null;
             }
+        }
+    }
+
+    public static class ReferenceExtractorVMExtension 
+    {
+        public static IEnumerable<IXDocument> GetCheckedDocuments(this ReferenceExtractorVM vm) 
+        {
+            return vm.References
+                .Union(vm.References.SelectMany(d => d.Drawings))
+                .Distinct()
+                .Where(d => d.IsChecked)
+                .Select(d => d.Document);
         }
     }
 }

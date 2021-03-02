@@ -11,7 +11,7 @@ using Xarial.XCad.Documents;
 using Xarial.XCad.Documents.Extensions;
 using Xarial.XToolkit;
 
-namespace Xarial.CadPlus.Batch.Extensions.Models
+namespace Xarial.CadPlus.Batch.Extensions.Services
 {
     public class ReferenceExtractor
     {

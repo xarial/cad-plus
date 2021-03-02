@@ -96,7 +96,7 @@
                             </DataTemplate>
                         </ListView.Resources>
                         <ListView.View>
-                            <GridView>
+                            <GridView x:Name="grdRefs">
                                 <GridViewColumn Header="{Binding}" CellTemplate="{StaticResource ReferenceTemplate}">
                                     <GridViewColumn.HeaderTemplate>
                                         <DataTemplate>

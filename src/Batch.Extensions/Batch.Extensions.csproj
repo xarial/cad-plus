@@ -64,7 +64,7 @@
     <Compile Include="Converters\ReferenceIconConverter.cs" />
     <Compile Include="Converters\ReferenceTitleConverter.cs" />
     <Compile Include="IInputSorterModule.cs" />
-    <Compile Include="Models\ReferenceExtractor.cs" />
+    <Compile Include="Services\ReferenceExtractor.cs" />
     <Compile Include="ReferenceExtractorModuleInApp.cs" />
     <Compile Include="Services\DocumentComparer.cs" />
     <Compile Include="InputSorterModuleInApp.cs" />

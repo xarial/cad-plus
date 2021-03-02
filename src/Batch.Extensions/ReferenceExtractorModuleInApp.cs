@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Xarial.CadPlus.Batch.Extensions.Models;
 using Xarial.CadPlus.Batch.Extensions.Properties;
 using Xarial.CadPlus.Batch.Extensions.Services;
 using Xarial.CadPlus.Batch.Extensions.UI;
@@ -88,12 +87,7 @@ namespace Xarial.CadPlus.Batch.Extensions
 
                 if (popup.ShowDialog() == true)
                 {
-                    input.AddRange(
-                        vm.References
-                        .Union(vm.References.SelectMany(d => d.Drawings))
-                        .Distinct()
-                        .Where(d => d.IsChecked)
-                        .Select(d => d.Document));
+                    input.AddRange(vm.GetCheckedDocuments());
                 }
                 else
                 {

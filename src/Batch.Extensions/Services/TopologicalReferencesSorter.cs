@@ -27,14 +27,6 @@ namespace Xarial.CadPlus.Batch.Extensions.Services
                 prgHandler,
                 cancellationToken);
 
-            foreach (var group in groups)
-            {
-                foreach (var extraItem in group.Except(src).ToArray())
-                {
-                    group.Remove(extraItem);
-                }
-            }
-
             var items = new List<ItemVM>();
 
             for (int i = 0; i < groups.Count; i++)
