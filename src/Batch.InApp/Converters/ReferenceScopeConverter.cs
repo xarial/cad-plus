@@ -20,7 +20,7 @@ namespace Xarial.CadPlus.Batch.InApp.Converters
     {
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {
-            if (values[0] is bool && values[1] is IXDocument3D[] && values[2] is IXDocument3D[])
+            if (values[0] is bool && values[1] is IXDocument[] && values[2] is IXDocument[])
             {
                 var topLevelOnly = (bool)values[0];
 

@@ -73,6 +73,7 @@
     <Compile Include="Controls\ResultsControl.xaml.cs">
       <DependentUpon>ResultsControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Converters\ArgumentsConverter.cs" />
     <Compile Include="Converters\ExceptionToErrorConverter.cs" />
     <Compile Include="Converters\FilePathConverter.cs" />
     <Compile Include="Converters\JobItemStatusToImageConverter.cs" />
@@ -88,6 +89,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="ViewModels\ArgumentVM.cs" />
     <Compile Include="ViewModels\JobItemFileVM.cs" />
     <Compile Include="ViewModels\JobItemMacroVM.cs" />
     <Compile Include="ViewModels\JobItemVM.cs" />

@@ -5,10 +5,14 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Xarial.CadPlus.Batch.Base.Controls"
              xmlns:conv="clr-namespace:Xarial.CadPlus.Batch.Base.Converters"
+             xmlns:xconv="clr-namespace:Xarial.XToolkit.Wpf.Converters;assembly=Xarial.XToolkit.Wpf"
              mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
         <conv:FilePathConverter x:Key="filePathConv"/>
+        <conv:ArgumentsConverter x:Key="argsConv"/>
+        <xconv:ObjectIsNotNullVisibilityConverter x:Key="objIsNotNullToVisConv"/>
+        <xconv:ObjectIsNotNullVisibilityConverter x:Key="objIsNullToVisConv" Reverse="True"/>
     </UserControl.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
@@ -25,6 +29,34 @@
             </TextBlock.Text>
         </TextBlock>
         <Image Grid.Column="1" Width="20" VerticalAlignment="Center" Source="/Batch.Base;component/Resources/arguments-icon.png"/>
-        <TextBox Text="{Binding Path=Arguments, UpdateSourceTrigger=PropertyChanged}" Grid.Column="2" HorizontalAlignment="Stretch"/>
+        <TextBox Text="{Binding Path=Arguments, UpdateSourceTrigger=PropertyChanged}" Grid.Column="2" HorizontalAlignment="Stretch">
+            <TextBox.ToolTip>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <TextBlock Text="{Binding Path=Arguments}" Margin="2" FontWeight="Bold"/>
+                    <Grid Grid.Row="1" DataContext="{Binding Path=Arguments, Converter={StaticResource argsConv}}">
+                        <ItemsControl ItemsSource="{Binding}" Visibility="{Binding Converter={StaticResource objIsNotNullToVisConv}}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid Grid.IsSharedSizeScope="True">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" SharedSizeGroup="Index"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Text="{Binding Path=Index, StringFormat={}#{0} - }" Margin="2" FontWeight="Bold" Foreground="DarkGray"/>
+                                        <TextBlock Text="{Binding Path=Value}" Grid.Column="1" Margin="2" Foreground="DarkGray"/>
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                        <TextBlock Text="No arguments specified" Visibility="{Binding Converter={StaticResource objIsNullToVisConv}}"  FontWeight="Bold"
+                                   VerticalAlignment="Center" HorizontalAlignment="Center" TextAlignment="Center"/>
+                    </Grid>
+                </Grid>
+            </TextBox.ToolTip>
+        </TextBox>
     </Grid>
 </UserControl>
