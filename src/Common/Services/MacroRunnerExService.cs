@@ -9,6 +9,7 @@ using System;
 using System.Linq;
 using System.Runtime.InteropServices;
 using Xarial.CadPlus.Common.Exceptions;
+using Xarial.CadPlus.Common.Utils;
 using Xarial.CadPlus.MacroRunner;
 using Xarial.CadPlus.Plus.Exceptions;
 using Xarial.CadPlus.Plus.Services;
@@ -23,10 +24,6 @@ namespace Xarial.CadPlus.Common.Services
 {
     public abstract class MacroRunnerExService : IMacroRunnerExService, IDisposable
     {
-        [DllImport("shell32.dll", SetLastError = true)]
-        private static extern IntPtr CommandLineToArgvW(
-            [MarshalAs(UnmanagedType.LPWStr)] string lpCmdLine, out int pNumArgs);
-
         private readonly IMacroRunner m_Runner;
 
         public MacroRunnerExService()
@@ -77,7 +74,7 @@ namespace Xarial.CadPlus.Common.Services
                         }
                         if (!string.IsNullOrEmpty(args))
                         {
-                            param.Set("Args", ParseCommandLine(args));
+                            param.Set("Args", CommandLineHelper.ParseCommandLine(args));
                         }
 
                         var res = m_Runner.Run(GetAppDispatch(app),
@@ -112,40 +109,6 @@ namespace Xarial.CadPlus.Common.Services
         protected abstract string MacroRunnerProgId { get; }
         protected abstract object GetDocumentDispatch(IXDocument doc);
         protected abstract object GetAppDispatch(IXApplication app);
-
-        private string[] ParseCommandLine(string cmdLineArgs)
-        {
-            int count;
-            var argsPtr = CommandLineToArgvW(cmdLineArgs, out count);
-
-            if (argsPtr != IntPtr.Zero)
-            {
-                try
-                {
-                    var args = new string[count];
-
-                    for (var i = 0; i < args.Length; i++)
-                    {
-                        var ptr = Marshal.ReadIntPtr(argsPtr, i * IntPtr.Size);
-                        args[i] = Marshal.PtrToStringUni(ptr);
-                    }
-
-                    return args;
-                }
-                catch (Exception ex)
-                {
-                    throw new UserException("Failed to parse arguments", ex);
-                }
-                finally
-                {
-                    Marshal.FreeHGlobal(argsPtr);
-                }
-            }
-            else
-            {
-                throw new Exception("Failed to parse arguments, pointer is null");
-            }
-        }
 
         public void Dispose()
         {

@@ -76,11 +76,11 @@ namespace Xarial.CadPlus.Batch.InApp
     public class ReferenceDocumentsVM : INotifyPropertyChanged
     {
         public ICadEntityDescriptor EntityDescriptor { get; }
-        public IXDocument3D[] AllReferences => m_AllReferences.Value;
-        public IXDocument3D[] TopLevelReferences => m_TopLevelReferences.Value;
+        public IXDocument[] AllReferences => m_AllReferences.Value;
+        public IXDocument[] TopLevelReferences => m_TopLevelReferences.Value;
 
-        private Lazy<IXDocument3D[]> m_AllReferences;
-        private Lazy<IXDocument3D[]> m_TopLevelReferences;
+        private Lazy<IXDocument[]> m_AllReferences;
+        private Lazy<IXDocument[]> m_TopLevelReferences;
         private bool m_TopLevelOnly;
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -98,8 +98,8 @@ namespace Xarial.CadPlus.Batch.InApp
         public void SetDocument(IXDocument doc, bool topLevelOnly) 
         {
             m_TopLevelOnly = topLevelOnly;
-            m_TopLevelReferences = new Lazy<IXDocument3D[]>(() => doc.Dependencies);
-            m_AllReferences = new Lazy<IXDocument3D[]>(() => doc.GetAllDependencies().ToArray());
+            m_TopLevelReferences = new Lazy<IXDocument[]>(() => new IXDocument[] { doc }.Union(doc.Dependencies).ToArray());
+            m_AllReferences = new Lazy<IXDocument[]>(() => new IXDocument[] { doc }.Union(doc.GetAllDependencies()).ToArray());
         }
 
         public ReferenceDocumentsVM(ICadEntityDescriptor cadEntDesc) 
@@ -195,6 +195,16 @@ namespace Xarial.CadPlus.Batch.InApp
             [Title("Activate Documents")]
             [ControlOptions(align: ControlLeftAlign_e.Indent)]
             public bool ActivateDocuments { get; set; } = true;
+
+            [Description("Allow opening documents which are not currently loaded into memory as read-only")]
+            [Title("Allow Read-Only")]
+            [ControlOptions(align: ControlLeftAlign_e.Indent)]
+            public bool AllowReadOnly { get; set; } = false;
+
+            [Description("Allow opening documents which are not currently loaded into memory in a rapid mode")]
+            [Title("Allow Rapid")]
+            [ControlOptions(align: ControlLeftAlign_e.Indent)]
+            public bool AllowRapid { get; set; } = false;
 
             [DynamicControls(Group_e.Options)]
             public List<IRibbonCommand> AdditionalCommands { get; }
