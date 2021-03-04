@@ -228,6 +228,7 @@ namespace Xarial.CadPlus.Plus.Shared
                 else
                 {
                     m_WpfApp = new Application();
+                    m_WpfApp.ShutdownMode = ShutdownMode.OnMainWindowClose;
                     m_WpfApp.DispatcherUnhandledException += OnDispatcherUnhandledException;
 
                     Host = new HostWpf(m_WpfApp, svc, m_Initiator, m_Logger, typeof(TApplication));
