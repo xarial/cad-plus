@@ -10,13 +10,27 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Xarial.CadPlus.Plus.Delegates;
 using Xarial.CadPlus.Plus.Services;
 using Xarial.XCad.Documents;
 
 namespace Xarial.CadPlus.Plus.Applications
 {
+    public class PropertiesApplicationCommandManager
+    {
+        public static class SourceTab
+        {
+            public const string Name = "Source";
+
+            public const string InputGroupName = "Input";
+            public const string ScopeGroupName = "Scope";
+        }
+    }
+
     public interface IPropertiesApplication : IApplication
     {
+        event CreateCommandManagerDelegate CreateCommandManager;
+
         void OpenFile(string filePath);
         IDocumentProvider[] DocumentProviders { get; }
         void RegisterDocumentProvider(IDocumentProvider provider);
