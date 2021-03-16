@@ -60,7 +60,7 @@ namespace Xarial.CadPlus.Batch.Extensions
         {
             if (m_BatchInAppModule != null)
             {
-                m_BatchInAppModule.AddCommands(Group_e.Options,
+                m_BatchInAppModule.AddCommands(BatchModuleGroup_e.Options,
                     new RibbonToggleCommand("Order By Dependencies",
                     null, "",
                     () => m_EnableOrdering,

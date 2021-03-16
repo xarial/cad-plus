@@ -206,7 +206,7 @@ namespace Xarial.CadPlus.Batch.InApp
             [ControlOptions(align: ControlLeftAlign_e.Indent)]
             public bool AllowRapid { get; set; } = false;
 
-            [DynamicControls(Group_e.Options)]
+            [DynamicControls(BatchModuleGroup_e.Options)]
             public List<IRibbonCommand> AdditionalCommands { get; }
 
             public OptionsGroup() 

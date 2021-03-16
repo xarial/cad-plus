@@ -127,11 +127,11 @@ namespace Xarial.CadPlus.Batch.InApp
 
         private IControlDescriptor[] CreateDynamicPageControls(object tag)
         {
-            var grp = (Group_e)tag;
+            var grp = (BatchModuleGroup_e)tag;
 
             switch (grp) 
             {
-                case Group_e.Options:
+                case BatchModuleGroup_e.Options:
                     return CreateControls(m_Data.Options.AdditionalCommands);
 
                 default:
@@ -271,11 +271,11 @@ namespace Xarial.CadPlus.Batch.InApp
             }
         }
 
-        public void AddCommands(Group_e group, params IRibbonCommand[] cmd)
+        public void AddCommands(BatchModuleGroup_e group, params IRibbonCommand[] cmd)
         {
             switch (group) 
             {
-                case Group_e.Options:
+                case BatchModuleGroup_e.Options:
                     m_Data.Options.AdditionalCommands.AddRange(cmd);
                     break;
             }
