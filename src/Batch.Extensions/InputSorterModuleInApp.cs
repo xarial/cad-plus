@@ -22,6 +22,7 @@ using Xarial.CadPlus.Plus.Services;
 using Xarial.CadPlus.Plus.UI;
 using Xarial.XCad;
 using Xarial.XCad.Documents;
+using Xarial.CadPlus.Plus.Extensions;
 
 namespace Xarial.CadPlus.Batch.Extensions
 {
@@ -33,6 +34,8 @@ namespace Xarial.CadPlus.Batch.Extensions
         private bool m_EnableOrdering;
 
         private readonly TopologicalReferencesSorter m_Sorter;
+
+        private ICadEntityDescriptor m_EntDesc;
 
         public InputSorterModuleInApp()
         {
@@ -52,6 +55,7 @@ namespace Xarial.CadPlus.Batch.Extensions
 
             if (m_BatchInAppModule != null)
             {
+                m_EntDesc = svcProvider.GetService<ICadEntityDescriptor>();
                 m_BatchInAppModule.ProcessInput += OnProcessInput;
             }
         }
@@ -89,7 +93,7 @@ namespace Xarial.CadPlus.Batch.Extensions
                                     cancellationToken);
                 }
 
-                var vm = new InputsSorterVM();
+                var vm = new InputsSorterVM(m_EntDesc);
                 vm.LoadItems(itemsList);
 
                 var popup = m_Host.Extension.CreatePopupWindow<InputsSorterWindow>();

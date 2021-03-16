@@ -13,6 +13,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Data;
+using Xarial.CadPlus.Plus.Services;
 using Xarial.XCad.Base.Attributes;
 using Xarial.XCad.Documents;
 using Xarial.XToolkit.Wpf.Extensions;
@@ -77,6 +78,8 @@ namespace Xarial.CadPlus.Batch.Extensions.ViewModels
             }
         }
 
+        public ICadEntityDescriptor EntityDescriptor { get; }
+
         private bool m_IsInitializing;
         private double m_Progress;
 
@@ -100,8 +103,9 @@ namespace Xarial.CadPlus.Batch.Extensions.ViewModels
             }
         }
 
-        public InputsSorterVM() 
+        public InputsSorterVM(ICadEntityDescriptor cadEntDesc) 
         {
+            EntityDescriptor = cadEntDesc;
             IsInitializing = true;
         }
 

@@ -83,7 +83,7 @@ namespace Xarial.CadPlus.Batch.Extensions
         {
             if (m_EnableOrdering)
             {
-                var vm = new InputsSorterVM();
+                var vm = new InputsSorterVM(instProvider.EntityDescriptor);
 
                 var cts = new CancellationTokenSource();
                 var cancellationToken = cts.Token;

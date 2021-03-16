@@ -70,7 +70,9 @@
                     </GroupBox>
                 </Grid>
                 <GroupBox Grid.Row="1" Margin="5" Header="Input">
-                    <ListView ItemsSource="{Binding Path=References}">
+                    <ListView ItemsSource="{Binding Path=References}"
+                              VirtualizingPanel.VirtualizationMode="Standard"
+                              VirtualizingPanel.IsVirtualizing="True">
                         <ListView.Resources>
                             <DataTemplate x:Key="ReferenceTemplate">
                                 <Grid ToolTip="{Binding Path=Document.Path}" Margin="2">

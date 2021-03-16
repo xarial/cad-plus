@@ -19,9 +19,10 @@ namespace Xarial.CadPlus.Batch.StandAlone.Converters
     {
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {
-            if (values[0] is string && values[1] is int && values[2] is int && values[3] is int)
+            var jobName = values[0] as string;
+
+            if (values[1] is int && values[2] is int && values[3] is int)
             {
-                var jobName = (string)values[0];
                 var procFilesCount = (int)values[1];
                 var failedFilesCount = (int)values[2];
                 var totalFilesCount = (int)values[3];
@@ -37,7 +38,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.Converters
             }
             else 
             {
-                return "";
+                return jobName;
             }
         }
 

@@ -272,7 +272,7 @@ namespace Xarial.CadPlus.XBatch.Base.Core
                 }
                 else
                 {
-                    throw new UserException("Specify input file or directory");
+                    throw new UserException($"Input '{input}' does not exist");
                 }
             }
 

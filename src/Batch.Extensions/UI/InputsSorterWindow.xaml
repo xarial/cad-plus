@@ -6,6 +6,7 @@
         xmlns:local="clr-namespace:Xarial.CadPlus.Batch.Extensions.UI"
         xmlns:xctrls="clr-namespace:Xarial.XToolkit.Wpf.Controls;assembly=Xarial.XToolkit.Wpf"
         xmlns:xconv="clr-namespace:Xarial.XToolkit.Wpf.Converters;assembly=Xarial.XToolkit.Wpf"
+        xmlns:conv="clr-namespace:Xarial.CadPlus.Batch.Extensions.Converters"
         xmlns:sys="clr-namespace:System;assembly=mscorlib"
         mc:Ignorable="d" Title="Batch Order"
         d:DesignHeight="450" d:DesignWidth="800" WindowStartupLocation="CenterOwner">
@@ -18,6 +19,7 @@
                 <sys:Boolean>True</sys:Boolean>
             </xconv:BooleanUniversalConverter.FalseValue>
         </xconv:BooleanUniversalConverter>
+        <conv:ReferenceIconConverter x:Key="refIconConv"/>
     </Window.Resources>
     <Grid Margin="5">
         <Grid.RowDefinitions>
@@ -32,19 +34,40 @@
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
-                <Grid Grid.Row="0">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
-                    <TextBlock Text="Sort Type:" VerticalAlignment="Center" Margin="5"/>
-                    <xctrls:EnumComboBox Grid.Column="1" Margin="5" Width="150" HorizontalAlignment="Left" 
-                                         Value="{Binding Path=SortType}"/>
-                </Grid>
-                <ListView ItemsSource="{Binding Path=InputView}" Grid.Row="1" Margin="5">
+                <GroupBox Grid.Row="0" Header="Options" Margin="5">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Sort Type:" VerticalAlignment="Center" Margin="5"/>
+                        <xctrls:EnumComboBox Grid.Column="1" Margin="5" Width="150" HorizontalAlignment="Left" 
+                                             Value="{Binding Path=SortType}"/>
+                    </Grid>
+                </GroupBox>
+                <GroupBox Grid.Row="1" Header="Input" Margin="5">
+                    <ListView ItemsSource="{Binding Path=InputView}" Margin="5"
+                          VirtualizingPanel.VirtualizationMode="Standard"
+                          VirtualizingPanel.IsVirtualizing="True">
                     <ListView.ItemTemplate>
                         <DataTemplate>
-                            <TextBlock Text="{Binding Path=Document.Path}"/>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Image Grid.Column="0" Margin="2" RenderOptions.BitmapScalingMode="Fant"
+                                       Width="16" Height="16" VerticalAlignment="Center" HorizontalAlignment="Center"
+                                       Stretch="Uniform">
+                                    <Image.Source>
+                                        <MultiBinding Converter="{StaticResource refIconConv}">
+                                            <Binding Path="Document"/>
+                                            <Binding Path="DataContext.EntityDescriptor" RelativeSource="{RelativeSource AncestorType={x:Type local:InputsSorterWindow}}"/>
+                                        </MultiBinding>
+                                    </Image.Source>
+                                </Image>
+                                <TextBlock Grid.Column="1" Margin="2" Text="{Binding Path=Document.Path}"/>
+                            </Grid>
                         </DataTemplate>
                     </ListView.ItemTemplate>
                     <ListView.GroupStyle>
@@ -57,6 +80,7 @@
                         </GroupStyle>
                     </ListView.GroupStyle>
                 </ListView>
+                </GroupBox>
             </Grid>
         </xctrls:ProgressPanel>
         <Grid Grid.Row="1" HorizontalAlignment="Right">

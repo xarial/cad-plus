@@ -88,8 +88,11 @@ namespace Xarial.CadPlus.Batch.Extensions.Services
             {
                 foreach (var filter in m_DrwExtensions)
                 {
-                    searchDrawings.AddRange(Directory.GetFiles(searchDir, filter,
-                        SearchOption.AllDirectories));
+                    if (Directory.Exists(searchDir))
+                    {
+                        searchDrawings.AddRange(Directory.GetFiles(searchDir, filter,
+                            SearchOption.AllDirectories));
+                    }
                 }
             }
 
