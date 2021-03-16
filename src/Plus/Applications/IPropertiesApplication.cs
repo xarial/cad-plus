@@ -27,12 +27,8 @@ namespace Xarial.CadPlus.Plus.Applications
         }
     }
 
-    public interface IPropertiesApplication : IApplication
+    public interface IPropertiesApplication : IDocumentConsumerApplication, IHasCommandManager
     {
-        event CreateCommandManagerDelegate CreateCommandManager;
-
         void OpenFile(string filePath);
-        IDocumentProvider[] DocumentProviders { get; }
-        void RegisterDocumentProvider(IDocumentProvider provider);
     }
 }

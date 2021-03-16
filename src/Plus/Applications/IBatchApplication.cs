@@ -85,11 +85,10 @@ namespace Xarial.CadPlus.Plus.Applications
         }
     }
 
-    public interface IBatchApplication : IApplication
+    public interface IBatchApplication : IHasCommandManager
     {
         event ProcessBatchInputDelegate ProcessInput;
-        event CreateCommandManagerDelegate CreateCommandManager;
-
+        
         ICadApplicationInstanceProvider[] ApplicationProviders { get; }
         void RegisterApplicationProvider(ICadApplicationInstanceProvider provider);
     }

@@ -26,12 +26,8 @@ namespace Xarial.CadPlus.Plus.Applications
         }
     }
 
-    public interface IBomApplication : IApplication
+    public interface IBomApplication : IDocumentConsumerApplication, IHasCommandManager
     {
-        event CreateCommandManagerDelegate CreateCommandManager;
-
         void ViewBom(string filePath);
-        IDocumentProvider[] DocumentProviders { get; }
-        void RegisterDocumentProvider(IDocumentProvider provider);
     }
 }
