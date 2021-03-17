@@ -36,13 +36,22 @@ namespace Xarial.CadPlus.Batch.Extensions.Services
 
             var items = new List<ItemVM>();
 
-            for (int i = 0; i < groups.Count; i++)
+            var curLevel = 0;
+
+            for (int i = groups.Count - 1; i >= 0 ; i--)
             {
-                items.AddRange(groups[i].Select(doc => new ItemVM()
+                var docs = groups[i].Intersect(src, new DocumentComparer());
+
+                if (docs.Any())
                 {
-                    Document = doc,
-                    Level = groups.Count - i - 1
-                }));
+                    items.AddRange(docs.Select(doc => new ItemVM()
+                    {
+                        Document = doc,
+                        Level = curLevel
+                    }));
+
+                    curLevel++;
+                }
             }
 
             return items.ToArray();
