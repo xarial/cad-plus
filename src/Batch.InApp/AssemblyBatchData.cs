@@ -76,11 +76,29 @@ namespace Xarial.CadPlus.Batch.InApp
     public class ReferenceDocumentsVM : INotifyPropertyChanged
     {
         public ICadEntityDescriptor EntityDescriptor { get; }
-        public IXDocument[] AllReferences => m_AllReferences.Value;
-        public IXDocument[] TopLevelReferences => m_TopLevelReferences.Value;
+        
+        public IXDocument[] AllReferences 
+        {
+            get => m_AllReferences;
+            private set 
+            {
+                m_AllReferences = value;
+                this.NotifyChanged();
+            }
+        }
 
-        private Lazy<IXDocument[]> m_AllReferences;
-        private Lazy<IXDocument[]> m_TopLevelReferences;
+        public IXDocument[] TopLevelReferences
+        {
+            get => m_TopLevelReferences;
+            private set
+            {
+                m_TopLevelReferences = value;
+                this.NotifyChanged();
+            }
+        }
+
+        private IXDocument[] m_AllReferences;
+        private IXDocument[] m_TopLevelReferences;
         private bool m_TopLevelOnly;
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -95,11 +113,35 @@ namespace Xarial.CadPlus.Batch.InApp
             }
         }
 
-        public void SetDocument(IXDocument doc, bool topLevelOnly) 
+        private IXDocument m_Doc;
+
+        public void SetDocument(IXDocument doc) 
         {
-            m_TopLevelOnly = topLevelOnly;
-            m_TopLevelReferences = new Lazy<IXDocument[]>(() => new IXDocument[] { doc }.Union(doc.Dependencies).ToArray());
-            m_AllReferences = new Lazy<IXDocument[]>(() => new IXDocument[] { doc }.Union(doc.GetAllDependencies()).ToArray());
+            m_Doc = doc;
+            m_AllReferences = null;
+            m_TopLevelReferences = null;
+        }
+
+        public void SetScope(InputScope_e scope)
+        {
+            switch (scope) 
+            {
+                case InputScope_e.AllReferences:
+                    if (m_AllReferences == null)
+                    {
+                        AllReferences = new IXDocument[] { m_Doc }.Union(m_Doc.GetAllDependencies()).ToArray();
+                    }
+                    break;
+
+                case InputScope_e.TopLevelReferences:
+                    if (m_TopLevelReferences == null)
+                    {
+                        TopLevelReferences = new IXDocument[] { m_Doc }.Union(m_Doc.Dependencies).ToArray();
+                    }
+                    break;
+            }
+
+            TopLevelOnly = (scope == InputScope_e.TopLevelReferences);
         }
 
         public ReferenceDocumentsVM(ICadEntityDescriptor cadEntDesc) 
@@ -136,10 +178,7 @@ namespace Xarial.CadPlus.Batch.InApp
                 {
                     m_Scope = value;
 
-                    if (m_Scope == InputScope_e.AllReferences || m_Scope == InputScope_e.TopLevelReferences) 
-                    {
-                        AllDocuments.TopLevelOnly = m_Scope == InputScope_e.TopLevelReferences;
-                    }
+                    AllDocuments.SetScope(value);
                 }
             }
 
@@ -155,7 +194,7 @@ namespace Xarial.CadPlus.Batch.InApp
                     m_Document = value;
                     
                     Components = m_Document.Selections.OfType<IXComponent>().ToList();
-                    AllDocuments.SetDocument(value, Scope == InputScope_e.TopLevelReferences);
+                    AllDocuments.SetDocument(value);
                 }
             }
 

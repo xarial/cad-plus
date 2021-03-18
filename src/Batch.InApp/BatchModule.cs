@@ -266,6 +266,7 @@ namespace Xarial.CadPlus.Batch.InApp
                 case Commands_e.RunInApp:
                     var activeDoc = m_Host.Extension.Application.Documents.Active;
                     m_Data.Input.Document = activeDoc;
+                    m_Data.Input.AllDocuments.SetScope(m_Data.Input.Scope);
                     m_Page.Show(m_Data);
                     break;
             }
