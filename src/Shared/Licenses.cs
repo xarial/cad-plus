@@ -76,6 +76,11 @@ namespace Xarial.CadPlus.Plus.Shared
                 {
                     Title = "OpenTK",
                     Url = "https://github.com/opentk/opentk/blob/master/License.txt"
+                },
+                new LicenseInfo()
+                {
+                    Title = "ClosedXML",
+                    Url = "https://licenses.nuget.org/MIT"
                 }
             };
         }
