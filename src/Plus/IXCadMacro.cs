@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Xarial.XCad;
 using Xarial.XCad.Documents;
 
-namespace Xarial.CadPlus.Plus.Batch
+namespace Xarial.CadPlus.Plus
 {
     public interface IXCadMacro
     {
