@@ -61,6 +61,7 @@ namespace Xarial.CadPlus.CustomToolbar.UI.ViewModels
             m_MacroExtensions = cadEntDesc.MacroFileFilters
                 .Select(f => f.Extensions)
                 .SelectMany(x => x)
+                .Union(XCadMacroProvider.Filter.Extensions)
                 .Select(x => Path.GetExtension(x))
                 .Distinct(StringComparer.InvariantCultureIgnoreCase)
                 .ToArray();

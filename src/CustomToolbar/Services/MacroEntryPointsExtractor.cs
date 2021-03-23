@@ -27,6 +27,7 @@ namespace Xarial.CadPlus.CustomToolbar.Services
 
         public MacroStartFunction[] GetEntryPoints(string macroPath)
         {
+            //TODO: implement check for xCAD macro
             return m_App.OpenMacro(macroPath).EntryPoints.Select(x => new MacroStartFunction()
             {
                 ModuleName = x.ModuleName,

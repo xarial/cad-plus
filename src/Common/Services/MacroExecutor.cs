@@ -6,6 +6,7 @@
 //*********************************************************************
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 using Xarial.CadPlus.Common.Exceptions;
@@ -27,11 +28,13 @@ namespace Xarial.CadPlus.Common.Services
     {
         private readonly IMacroRunner m_Runner;
         private readonly IXCadMacroProvider m_XCadMacroProvider;
-
+        private readonly Dictionary<string, IXCadMacro> m_XCadMacrosCache;
+            
         public MacroExecutor(IXCadMacroProvider xCadMacroProvider)
         {
             m_Runner = TryCreateMacroRunner();
             m_XCadMacroProvider = xCadMacroProvider;
+            m_XCadMacrosCache = new Dictionary<string, IXCadMacro>(StringComparer.CurrentCultureIgnoreCase);
         }
 
         private IMacroRunner TryCreateMacroRunner() 
@@ -122,14 +125,24 @@ namespace Xarial.CadPlus.Common.Services
 
         private IXCadMacro GetXCadMacroIfExists(string path) 
         {
+            IXCadMacro macro;
+
+            if (m_XCadMacrosCache.TryGetValue(path, out macro)) 
+            {
+                return macro;
+            }
+
             try
             {
-                return m_XCadMacroProvider.GetMacro(path);
+                macro = m_XCadMacroProvider.GetMacro(path);
+                m_XCadMacrosCache.Add(path, macro);
             }
             catch (NotXCadMacroDllException)
             {
                 return null;
             }
+
+            return macro;
         }
 
         protected abstract string MacroRunnerProgId { get; }

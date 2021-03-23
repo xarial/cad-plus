@@ -154,7 +154,7 @@ namespace Xarial.CadPlus.CustomToolbar.UI.ViewModels
         {
             m_MacroFileFilters = CustomToolbarModule.Resolve<ICadEntityDescriptor>().MacroFileFilters
                 .Select(f => new FileFilter(f.Name, f.Extensions))
-                .Union(new FileFilter[] { FileFilter.AllFiles }).ToArray();
+                .Union(new FileFilter[] { XCadMacroProvider.Filter, FileFilter.AllFiles }).ToArray();
         }
     }
 }
