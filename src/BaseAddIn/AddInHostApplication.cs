@@ -163,8 +163,10 @@ namespace Xarial.CadPlus.AddIn.Base
                 .As<IDocumentAdapter>();
             builder.RegisterType<SettingsProvider>()
                 .As<ISettingsProvider>();
+            builder.RegisterType<XCadMacroProvider>()
+                .As<IXCadMacroProvider>();
         }
-                
+
         public void RegisterCommands<TCmd>(CommandHandler<TCmd> handler)
             where TCmd : Enum
         {

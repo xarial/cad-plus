@@ -34,13 +34,13 @@ namespace Xarial.CadPlus.Batch.InApp
 
         private readonly IXDocument[] m_Docs;
 
-        private readonly IMacroRunnerExService m_MacroRunner;
+        private readonly IMacroExecutor m_MacroRunner;
         private readonly IEnumerable<MacroData> m_Macros;
         private readonly bool m_ActivateDocs;
         private readonly bool m_AllowReadOnly;
         private readonly bool m_AllowRapid;
 
-        internal AssemblyBatchRunJobExecutor(IXApplication app, IMacroRunnerExService macroRunnerSvc,
+        internal AssemblyBatchRunJobExecutor(IXApplication app, IMacroExecutor macroRunnerSvc,
             IXDocument[] documents, IEnumerable<MacroData> macros, bool activateDocs, bool allowReadOnly, bool allowRapid) 
         {
             m_App = app;
@@ -214,7 +214,7 @@ namespace Xarial.CadPlus.Batch.InApp
                 }
                 else
                 {
-                    errorDesc = "Unknown error";
+                    errorDesc = ex.ParseUserError(out _, "Unknown error");
                 }
 
                 LogMessage($"Failed to run macro '{macro.FilePath}': {errorDesc}");

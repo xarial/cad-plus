@@ -77,7 +77,7 @@ namespace Xarial.CadPlus.AddIn.Sw
                 .WithParameter(new TypedParameter(typeof(ISwAddInEx), this));
 
             builder.RegisterAdapter<IXApplication, ISwApplication>(a => (ISwApplication)a);
-            builder.Register(x => x.GetService<IMacroRunnerExService>(CadApplicationIds.SolidWorks));
+            builder.Register(x => x.GetService<IMacroExecutor>(CadApplicationIds.SolidWorks));
             builder.Register(x => x.GetService<ICadEntityDescriptor>(CadApplicationIds.SolidWorks));
         }
 

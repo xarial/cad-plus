@@ -170,7 +170,9 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
 
             InputFilesFilter = GetFileFilters(m_AppProvider.EntityDescriptor);
             MacroFilesFilter = m_AppProvider.EntityDescriptor.MacroFileFilters
-                .Select(f => new FileFilter(f.Name, f.Extensions)).Union(new FileFilter[] { FileFilter.AllFiles }).ToArray();
+                .Select(f => new FileFilter(f.Name, f.Extensions))
+                .Concat(new FileFilter[] { XCadMacroProvider.Filter, FileFilter.AllFiles })
+                .ToArray();
 
             IsDirty = true;
 

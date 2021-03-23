@@ -18,10 +18,14 @@ using Xarial.XCad.SolidWorks.Documents;
 
 namespace Xarial.CadPlus.Common.Sw.Services
 {
-    public class SwMacroRunnerExService : MacroRunnerExService
+    public class SwMacroExecutor : MacroExecutor
     {
         protected override string MacroRunnerProgId => "CadPlus.MacroRunner.Sw";
         protected override object GetAppDispatch(IXApplication app) => ((ISwApplication)app).Sw;
         protected override object GetDocumentDispatch(IXDocument doc) => ((ISwDocument)doc).Model;
+
+        public SwMacroExecutor(IXCadMacroProvider xCadMacroProvider) : base(xCadMacroProvider)
+        {
+        }
     }
 }

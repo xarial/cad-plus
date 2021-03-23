@@ -92,6 +92,8 @@ namespace Xarial.CadPlus.Batch.StandAlone
             
             builder.RegisterAdapter<IApplication, ICadApplicationInstanceProvider[]>(x => ((IBatchApplication)x).ApplicationProviders);
 
+            builder.RegisterType<XCadMacroProvider>().As<IXCadMacroProvider>();
+
             builder.RegisterType<JobManager>().As<IJobManager>()
                 .SingleInstance()
                 .OnActivating(x => x.Instance.Init());

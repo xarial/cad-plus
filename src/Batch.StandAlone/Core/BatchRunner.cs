@@ -57,7 +57,7 @@ namespace Xarial.CadPlus.XBatch.Base.Core
         private readonly TextWriter m_UserLogger;
         private readonly IProgressHandler m_ProgressHandler;
         private readonly ICadApplicationInstanceProvider m_AppProvider;
-        private readonly IMacroRunnerExService m_MacroRunnerSvc;
+        private readonly IMacroExecutor m_MacroRunnerSvc;
 
         private readonly IXLogger m_Logger;
         private readonly IJobManager m_JobMgr;

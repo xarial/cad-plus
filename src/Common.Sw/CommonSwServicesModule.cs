@@ -32,7 +32,7 @@ namespace Xarial.CadPlus.Common.Sw
 
         private void OnConfigureServices(IContainerBuilder contBuilder)
         {
-            contBuilder.Register<SwMacroRunnerExService, IMacroRunnerExService>(CadApplicationIds.SolidWorks);
+            contBuilder.Register<SwMacroExecutor, IMacroExecutor>(CadApplicationIds.SolidWorks);
             contBuilder.Register<SwEntityDescriptor, ICadEntityDescriptor>(CadApplicationIds.SolidWorks);
         }
 

@@ -89,7 +89,7 @@ namespace Xarial.CadPlus.Batch.InApp
         private IXPropertyPage<AssemblyBatchData> m_Page;
         private AssemblyBatchData m_Data;
 
-        private IMacroRunnerExService m_MacroRunnerSvc;
+        private IMacroExecutor m_MacroRunnerSvc;
         private IMessageService m_Msg;
         private IXLogger m_Logger;
 
@@ -115,7 +115,7 @@ namespace Xarial.CadPlus.Batch.InApp
 
         private void OnConnect()
         {
-            m_MacroRunnerSvc = m_SvcProvider.GetService<IMacroRunnerExService>();
+            m_MacroRunnerSvc = m_SvcProvider.GetService<IMacroExecutor>();
             m_Msg = m_SvcProvider.GetService<IMessageService>();
             m_Logger = m_SvcProvider.GetService<IXLogger>();
 
