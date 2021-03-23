@@ -89,8 +89,18 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
 
                 if (await m_Executor.ExecuteAsync().ConfigureAwait(false))
                 {
-                    Status = Summary.JobItemFiles.Any(i => i.Status != Common.Services.JobItemStatus_e.Succeeded)
-                        ? JobState_e.CompletedWithWarning : JobState_e.Succeeded;
+                    if (Summary.JobItemFiles.All(f => f.Status == Common.Services.JobItemStatus_e.Succeeded))
+                    {
+                        Status = JobState_e.Succeeded;
+                    }
+                    else if (Summary.JobItemFiles.Any(f => f.Status == Common.Services.JobItemStatus_e.Succeeded))
+                    {
+                        Status = JobState_e.CompletedWithWarning;
+                    }
+                    else 
+                    {
+                        Status = JobState_e.Failed;
+                    }
                 }
                 else
                 {

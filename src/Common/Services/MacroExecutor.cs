@@ -111,7 +111,7 @@ namespace Xarial.CadPlus.Common.Services
                 }
                 else 
                 {
-                    xCadMacro.Run(app, doc, argsArr);
+                    xCadMacro.Run(app, doc ?? app.Documents.Active, argsArr);
                 }
             }
             catch (MacroUserInterruptException) //do not consider this as an error

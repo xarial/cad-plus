@@ -38,7 +38,7 @@ namespace Xarial.CadPlus.Batch.InApp.ViewModels
             Macros = new ObservableCollection<MacroData>();
             MacroFilesFilter = macroFilters
                 .Select(f => new FileFilter(f.Name, f.Extensions))
-                .Union(new FileFilter[] { FileFilter.AllFiles }).ToArray();
+                .Union(new FileFilter[] { XCadMacroProvider.Filter, FileFilter.AllFiles }).ToArray();
         }
 
         internal void RequestAddMacros() => AddMacros?.Invoke();

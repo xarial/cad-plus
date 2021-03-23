@@ -358,7 +358,6 @@ namespace Xarial.CadPlus.XBatch.Base.Core
                 try
                 {
                     worker.DoWork(RunMacro, context, cancellationToken);
-                    macro.Status = JobItemStatus_e.Succeeded;
                 }
                 catch (OperationCanceledException)
                 {
@@ -429,11 +428,15 @@ namespace Xarial.CadPlus.XBatch.Base.Core
 
             try
             {
+                context.CurrentMacro.Status = JobItemStatus_e.InProgress;
+                
                 m_MacroRunnerSvc.RunMacro(context.CurrentApplication, context.CurrentMacro.FilePath, null,
                     XCad.Enums.MacroRunOptions_e.UnloadAfterRun,
                     context.CurrentMacro.Macro.Arguments, context.CurrentDocument);
+
+                context.CurrentMacro.Status = JobItemStatus_e.Succeeded;
             }
-            catch (MacroRunFailedException ex)
+            catch (Exception ex)
             {
                 context.CurrentMacro.Status = JobItemStatus_e.Failed;
 
@@ -441,9 +444,13 @@ namespace Xarial.CadPlus.XBatch.Base.Core
                 {
                     throw new CriticalErrorException(ex);
                 }
-                else
+                else if (ex is MacroRunFailedException)
                 {
                     throw new UserException($"Failed to run macro '{context.CurrentMacro.DisplayName}': {ex.Message}", ex);
+                }
+                else 
+                {
+                    throw;
                 }
             }
 
