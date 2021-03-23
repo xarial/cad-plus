@@ -8,7 +8,7 @@ using Xarial.CadPlus.Plus.Data;
 
 namespace Xarial.CadPlus.Plus.Services
 {
-    public interface ICadEntityDescriptor
+    public interface ICadDescriptor
     {
         string ApplicationId { get; }
         string ApplicationName { get; }

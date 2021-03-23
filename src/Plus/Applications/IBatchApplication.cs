@@ -44,7 +44,7 @@ namespace Xarial.CadPlus.Plus.Applications
     public interface ICadApplicationInstanceProvider : IDisposable
     {   
         IMacroExecutor MacroRunnerService { get; }
-        ICadEntityDescriptor EntityDescriptor { get; }
+        ICadDescriptor EntityDescriptor { get; }
 
         IEnumerable<IXVersion> GetInstalledVersions();
         IXApplication StartApplication(IXVersion vers, StartupOptions_e opts,
