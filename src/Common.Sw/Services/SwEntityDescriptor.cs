@@ -18,7 +18,7 @@ using Xarial.CadPlus.Plus.Services;
 
 namespace Xarial.CadPlus.Common.Sw.Services
 {
-    public class SwEntityDescriptor : ICadEntityDescriptor
+    public class SwEntityDescriptor : ICadDescriptor
     {
         public string ApplicationId => CadApplicationIds.SolidWorks;
         public string ApplicationName => "SOLIDWORKS";

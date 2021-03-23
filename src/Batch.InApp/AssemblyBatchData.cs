@@ -75,7 +75,7 @@ namespace Xarial.CadPlus.Batch.InApp
 
     public class ReferenceDocumentsVM : INotifyPropertyChanged
     {
-        public ICadEntityDescriptor EntityDescriptor { get; }
+        public ICadDescriptor EntityDescriptor { get; }
         
         public IXDocument[] AllReferences 
         {
@@ -144,7 +144,7 @@ namespace Xarial.CadPlus.Batch.InApp
             TopLevelOnly = (scope == InputScope_e.TopLevelReferences);
         }
 
-        public ReferenceDocumentsVM(ICadEntityDescriptor cadEntDesc) 
+        public ReferenceDocumentsVM(ICadDescriptor cadEntDesc) 
         {
             EntityDescriptor = cadEntDesc;
         }
@@ -198,7 +198,7 @@ namespace Xarial.CadPlus.Batch.InApp
                 }
             }
 
-            public InputGroup(ICadEntityDescriptor cadEntDesc) 
+            public InputGroup(ICadDescriptor cadEntDesc) 
             {
                 AllDocuments = new ReferenceDocumentsVM(cadEntDesc);
             }
@@ -258,7 +258,7 @@ namespace Xarial.CadPlus.Batch.InApp
         public MacrosGroup Macros { get; }
         public OptionsGroup Options { get; }
 
-        public AssemblyBatchData(ICadEntityDescriptor cadEntDesc)
+        public AssemblyBatchData(ICadDescriptor cadEntDesc)
         {
             Input = new InputGroup(cadEntDesc);
             Macros = new MacrosGroup(cadEntDesc.MacroFileFilters);

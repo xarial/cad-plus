@@ -120,7 +120,7 @@ namespace Xarial.CadPlus.Batch.Extensions.ViewModels
             }
         }
 
-        public ICadEntityDescriptor EntityDescriptor { get; }
+        public ICadDescriptor EntityDescriptor { get; }
 
         private readonly IXDocument[] m_InputDocs;
         private readonly ReferenceExtractor m_RefsExtractor;
@@ -131,7 +131,7 @@ namespace Xarial.CadPlus.Batch.Extensions.ViewModels
         private object m_Lock = new object();
 
         public ReferenceExtractorVM(ReferenceExtractor refsExtractor,
-            IXDocument[] docs, ICadEntityDescriptor cadEntDesc,
+            IXDocument[] docs, ICadDescriptor cadEntDesc,
             ReferencesScope_e scope, bool findDrws) 
         {
             m_InputDocs = docs;

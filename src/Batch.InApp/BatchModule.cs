@@ -110,7 +110,7 @@ namespace Xarial.CadPlus.Batch.InApp
         private void OnHostInitialized(IApplication app, IServiceContainer svcProvider, IModule[] modules)
         {
             m_SvcProvider = svcProvider;
-            m_Data = new AssemblyBatchData(m_SvcProvider.GetService<ICadEntityDescriptor>());
+            m_Data = new AssemblyBatchData(m_SvcProvider.GetService<ICadDescriptor>());
         }
 
         private void OnConnect()

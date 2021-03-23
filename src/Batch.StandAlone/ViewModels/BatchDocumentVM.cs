@@ -196,7 +196,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
             Macros.CollectionChanged += OnMacrosCollectionChanged;
         }
 
-        protected virtual FileFilter[] GetFileFilters(ICadEntityDescriptor cadEntDesc)
+        protected virtual FileFilter[] GetFileFilters(ICadDescriptor cadEntDesc)
         {
             return new FileFilter[]
             {

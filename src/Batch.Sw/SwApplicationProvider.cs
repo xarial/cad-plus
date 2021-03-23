@@ -35,9 +35,9 @@ namespace Xarial.CadPlus.Batch.Sw
         private readonly IXServiceCollection m_CustomServices;
 
         public IMacroExecutor MacroRunnerService { get; }
-        public ICadEntityDescriptor EntityDescriptor { get; }
+        public ICadDescriptor EntityDescriptor { get; }
 
-        public SwApplicationProvider(IXLogger logger, IMacroExecutor svc, ICadEntityDescriptor entDesc)
+        public SwApplicationProvider(IXLogger logger, IMacroExecutor svc, ICadDescriptor entDesc)
         {
             m_Logger = logger;
 

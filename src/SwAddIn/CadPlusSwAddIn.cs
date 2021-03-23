@@ -78,7 +78,7 @@ namespace Xarial.CadPlus.AddIn.Sw
 
             builder.RegisterAdapter<IXApplication, ISwApplication>(a => (ISwApplication)a);
             builder.Register(x => x.GetService<IMacroExecutor>(CadApplicationIds.SolidWorks));
-            builder.Register(x => x.GetService<ICadEntityDescriptor>(CadApplicationIds.SolidWorks));
+            builder.Register(x => x.GetService<ICadDescriptor>(CadApplicationIds.SolidWorks));
         }
 
         protected override void Dispose(bool disposing)

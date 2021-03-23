@@ -36,7 +36,7 @@ namespace Xarial.CadPlus.Batch.Extensions.Converters
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {
             var item = values[0];
-            var cadDesc = (ICadEntityDescriptor)values[1];
+            var cadDesc = (ICadDescriptor)values[1];
 
             var docType = GetDocumentType(item, cadDesc);
 
@@ -56,7 +56,7 @@ namespace Xarial.CadPlus.Batch.Extensions.Converters
             }
         }
 
-        private DocumentType_e? GetDocumentType(object item, ICadEntityDescriptor cadDesc) 
+        private DocumentType_e? GetDocumentType(object item, ICadDescriptor cadDesc) 
         {
             if (item is IXPart)
             {

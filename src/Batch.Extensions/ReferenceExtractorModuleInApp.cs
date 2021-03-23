@@ -34,7 +34,7 @@ namespace Xarial.CadPlus.Batch.Extensions
         private IHostExtension m_Host;
         private IBatchInAppModule m_BatchInAppModule;
         private bool m_FindDrawings;
-        private ICadEntityDescriptor m_EntDesc;
+        private ICadDescriptor m_EntDesc;
 
         public void Init(IHost host)
         {
@@ -49,7 +49,7 @@ namespace Xarial.CadPlus.Batch.Extensions
 
             if (m_BatchInAppModule != null)
             {
-                m_EntDesc = svcProvider.GetService<ICadEntityDescriptor>();
+                m_EntDesc = svcProvider.GetService<ICadDescriptor>();
                 m_BatchInAppModule.ProcessInput += OnProcessInput;
             }
         }

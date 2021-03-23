@@ -35,7 +35,7 @@ namespace Xarial.CadPlus.Batch.Extensions
 
         private readonly TopologicalReferencesSorter m_Sorter;
 
-        private ICadEntityDescriptor m_EntDesc;
+        private ICadDescriptor m_EntDesc;
 
         public InputSorterModuleInApp()
         {
@@ -55,7 +55,7 @@ namespace Xarial.CadPlus.Batch.Extensions
 
             if (m_BatchInAppModule != null)
             {
-                m_EntDesc = svcProvider.GetService<ICadEntityDescriptor>();
+                m_EntDesc = svcProvider.GetService<ICadDescriptor>();
                 m_BatchInAppModule.ProcessInput += OnProcessInput;
             }
         }

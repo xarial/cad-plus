@@ -152,7 +152,7 @@ namespace Xarial.CadPlus.CustomToolbar.UI.ViewModels
 
         public CommandMacroVM(CommandMacroInfo cmd, IIconsProvider[] providers) : base(cmd, providers)
         {
-            m_MacroFileFilters = CustomToolbarModule.Resolve<ICadEntityDescriptor>().MacroFileFilters
+            m_MacroFileFilters = CustomToolbarModule.Resolve<ICadDescriptor>().MacroFileFilters
                 .Select(f => new FileFilter(f.Name, f.Extensions))
                 .Union(new FileFilter[] { XCadMacroProvider.Filter, FileFilter.AllFiles }).ToArray();
         }

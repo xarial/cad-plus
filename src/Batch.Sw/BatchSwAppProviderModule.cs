@@ -48,7 +48,7 @@ namespace Xarial.CadPlus.Batch.Sw
         {
             var logger = m_Services.GetService<IXLogger>();
             var macroRunner = m_Services.GetService<IMacroExecutor>(CadApplicationIds.SolidWorks);
-            var entDesc = m_Services.GetService<ICadEntityDescriptor>(CadApplicationIds.SolidWorks);
+            var entDesc = m_Services.GetService<ICadDescriptor>(CadApplicationIds.SolidWorks);
 
             m_App.RegisterApplicationProvider(new SwApplicationProvider(logger, macroRunner, entDesc));
         }

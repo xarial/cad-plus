@@ -129,7 +129,7 @@ namespace Xarial.CadPlus.CustomToolbar
 
             builder.RegisterFromServiceProvider<IMacroExecutor>(m_SvcProvider);
             builder.RegisterFromServiceProvider<IMessageService>(m_SvcProvider);
-            builder.RegisterFromServiceProvider<ICadEntityDescriptor>(m_SvcProvider);
+            builder.RegisterFromServiceProvider<ICadDescriptor>(m_SvcProvider);
             builder.RegisterFromServiceProvider<ISettingsProvider>(m_SvcProvider);
 
             builder.RegisterInstance(m_IconsProviders.ToArray());

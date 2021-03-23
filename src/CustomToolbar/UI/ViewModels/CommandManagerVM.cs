@@ -52,7 +52,7 @@ namespace Xarial.CadPlus.CustomToolbar.UI.ViewModels
         public CommandManagerVM(IToolbarConfigurationProvider confsProvider,
             ISettingsProvider settsProvider, 
             IMessageService msgService, IIconsProvider[] iconsProviders,
-            ICadEntityDescriptor cadEntDesc)
+            ICadDescriptor cadEntDesc)
         {
             m_ConfsProvider = confsProvider;
             m_SettsProvider = settsProvider;

@@ -28,7 +28,7 @@ namespace Xarial.CadPlus.Batch.InApp.Converters
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {
             var item = values[0];
-            var cadDesc = (ICadEntityDescriptor)values[1];
+            var cadDesc = (ICadDescriptor)values[1];
 
             if (item is IXPart)
             {

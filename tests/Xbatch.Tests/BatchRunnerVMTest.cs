@@ -40,7 +40,7 @@ namespace Xbatch.Tests
         protected override RibbonCommandManager LoadRibbonCommands(IRibbonButtonCommand[] backstageCmds)
             => null;
 
-        protected override FileFilter[] GetFileFilters(ICadEntityDescriptor cadEntDesc)
+        protected override FileFilter[] GetFileFilters(ICadDescriptor cadEntDesc)
             => new FileFilter[0];
     }
 
@@ -114,7 +114,7 @@ namespace Xbatch.Tests
             var mock = new Mock<IBatchRunnerModel>();
             BatchJob opts = null;
 
-            var cadEntDescMock = new Mock<ICadEntityDescriptor>();
+            var cadEntDescMock = new Mock<ICadDescriptor>();
             cadEntDescMock.Setup(m => m.MacroFileFilters).Returns(new FileTypeFilter[0]);
 
             var appProviderMock = new Mock<ICadApplicationInstanceProvider>();
