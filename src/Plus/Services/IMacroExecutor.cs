@@ -17,7 +17,7 @@ using Xarial.XCad.Structures;
 
 namespace Xarial.CadPlus.Plus.Services
 {
-    public interface IMacroRunnerExService
+    public interface IMacroExecutor
     {
         void RunMacro(IXApplication app, string macroPath, MacroEntryPoint entryPoint,
             MacroRunOptions_e opts, string args, IXDocument doc);
