@@ -28,8 +28,8 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Xarial.XCad" Version="0.7.0-20210321.1" />
-    <PackageReference Include="Xarial.XToolkit" Version="0.2.18" />
+    <PackageReference Include="Xarial.XCad" Version="0.7.0-20210323.1" />
+    <PackageReference Include="Xarial.XToolkit" Version="0.2.19" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="PresentationCore" />
