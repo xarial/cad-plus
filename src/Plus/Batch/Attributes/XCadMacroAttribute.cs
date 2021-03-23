@@ -10,7 +10,7 @@ namespace Xarial.CadPlus.Plus.Batch.Attributes
     [AttributeUsage(AttributeTargets.Class)]
     public class XCadMacroAttribute : ExportAttribute
     {
-        public XCadMacroAttribute() : base(typeof(IModule)) 
+        public XCadMacroAttribute() : base(typeof(IXCadMacro)) 
         {
         }
     }
