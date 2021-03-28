@@ -27,19 +27,20 @@ namespace Xarial.CadPlus.Plus.UI
             }
         }
 
-        public IEnumerable<object> ItemsSource { get; }
+        public IEnumerable<object> ItemsSource => m_ItemsSourceGetter.Invoke();
 
         private readonly Func<object> m_ValueGetter;
         private readonly Action<object> m_ValueSetter;
+        private readonly Func<IEnumerable<object>> m_ItemsSourceGetter;
 
         public RibbonDropDownButton(string title, Image icon, string description,
-            Func<object> valueGetter, Action<object> valueSetter, IEnumerable<object> itemsSource) 
+            Func<object> valueGetter, Action<object> valueSetter, Func<IEnumerable<object>> itemsSourceGetter) 
             : base(title, icon, description)
         {
             m_ValueGetter = valueGetter;
             m_ValueSetter = valueSetter;
 
-            ItemsSource = itemsSource;
+            m_ItemsSourceGetter = itemsSourceGetter;
         }
 
         public override void Update()
