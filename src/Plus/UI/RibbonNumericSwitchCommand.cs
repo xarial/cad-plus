@@ -39,7 +39,7 @@ namespace Xarial.CadPlus.Plus.UI
             set
             {
                 m_NumericSetter.Invoke(value);
-                RaisePropertyChanged(nameof(NumericValue));
+                NotifyChanged(nameof(NumericValue));
             }
         }
 
@@ -58,6 +58,14 @@ namespace Xarial.CadPlus.Plus.UI
             m_NumericSetter = numSetter;
 
             Options = opts;
+        }
+
+        public override void Update()
+        {
+            base.Update();
+
+            this.NotifyChanged(nameof(NumericValue));
+            this.NotifyChanged(nameof(Options));
         }
     }
 }

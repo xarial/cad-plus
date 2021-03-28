@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -12,10 +13,13 @@ namespace Xarial.CadPlus.Plus.UI
         Image Icon { get; }
         string Title { get; }
         string Description { get; }
+        void Update();
     }
 
-    public abstract class RibbonCommand : IRibbonCommand
+    public abstract class RibbonCommand : IRibbonCommand, INotifyPropertyChanged
     {
+        public event PropertyChangedEventHandler PropertyChanged;
+
         public Image Icon { get; }
         public string Title { get; }
         public string Description { get; }
@@ -26,5 +30,15 @@ namespace Xarial.CadPlus.Plus.UI
             Icon = icon;
             Description = description;
         }
+
+        public virtual void Update()
+        {
+            NotifyChanged(nameof(Icon));
+            NotifyChanged(nameof(Title));
+            NotifyChanged(nameof(Description));
+        }
+
+        protected void NotifyChanged(string prpName)
+            => this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(prpName));
     }
 }

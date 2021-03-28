@@ -15,17 +15,15 @@ namespace Xarial.CadPlus.Plus.UI
         IEnumerable<object> ItemsSource { get; }
     }
 
-    public class RibbonDropDownButton : RibbonCommand, IRibbonDropDownButton, INotifyPropertyChanged
+    public class RibbonDropDownButton : RibbonCommand, IRibbonDropDownButton
     {
-        public event PropertyChangedEventHandler PropertyChanged;
-
         public object Value 
         {
             get => m_ValueGetter.Invoke();
             set
             {
                 m_ValueSetter.Invoke(value);
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Value)));
+                NotifyChanged(nameof(Value));
             }
         }
 
@@ -42,6 +40,14 @@ namespace Xarial.CadPlus.Plus.UI
             m_ValueSetter = valueSetter;
 
             ItemsSource = itemsSource;
+        }
+
+        public override void Update()
+        {
+            base.Update();
+
+            this.NotifyChanged(nameof(Value));
+            this.NotifyChanged(nameof(ItemsSource));
         }
     }
 }

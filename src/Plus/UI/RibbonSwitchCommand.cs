@@ -26,5 +26,13 @@ namespace Xarial.CadPlus.Plus.UI
             OnText = onText;
             OffText = offText;
         }
+
+        public override void Update()
+        {
+            base.Update();
+
+            this.NotifyChanged(nameof(OnText));
+            this.NotifyChanged(nameof(OffText));
+        }
     }
 }

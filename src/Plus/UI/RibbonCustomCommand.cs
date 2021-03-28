@@ -26,5 +26,13 @@ namespace Xarial.CadPlus.Plus.UI
             Content = content;
             Template = template;
         }
+
+        public override void Update()
+        {
+            base.Update();
+
+            this.NotifyChanged(nameof(Content));
+            this.NotifyChanged(nameof(Template));
+        }
     }
 }
