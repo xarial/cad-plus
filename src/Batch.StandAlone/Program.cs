@@ -60,15 +60,25 @@ namespace Xarial.CadPlus.Batch.StandAlone
 
         private static async Task RunConsoleBatch(BatchArguments args)
         {
-            using (var batchRunner = m_AppLauncher.Container.Resolve<BatchRunner>(
-                new TypedParameter[]
-                {
+            try
+            {
+                using (var batchRunner = m_AppLauncher.Container.Resolve<BatchRunner>(
+                    new TypedParameter[]
+                    {
                     new TypedParameter(typeof(BatchJob), args.Job),
                     new TypedParameter(typeof(TextWriter), Console.Out),
                     new TypedParameter(typeof(IProgressHandler), new ConsoleProgressWriter())
-                }))
+                    }))
+                {
+                    await batchRunner.BatchRunAsync().ConfigureAwait(false);
+                }
+            }
+            catch (Exception ex)
             {
-                await batchRunner.BatchRunAsync().ConfigureAwait(false);
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine(ex.ParseUserError(out _));
+                Console.ResetColor();
+                Environment.Exit(1);
             }
         }
 

@@ -19,7 +19,7 @@ using Xarial.CadPlus.Plus.Services;
 
 namespace Xarial.CadPlus.Batch.Sw
 {
-    [Module(typeof(IHostWpf), typeof(IBatchApplication))]
+    [Module(typeof(IHost), typeof(IBatchApplication))]
     public class BatchSwAppProviderModule : IModule
     {
         private IHost m_Host;

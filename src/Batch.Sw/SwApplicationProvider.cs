@@ -140,12 +140,7 @@ namespace Xarial.CadPlus.Batch.Sw
 
             return app;
         }
-
-        private void App_Starting(IXApplication sender, Process process)
-        {
-            throw new NotImplementedException();
-        }
-
+        
         private void OnProcessExited(object sender, EventArgs e)
         {
             var prc = sender as Process;
@@ -200,7 +195,8 @@ namespace Xarial.CadPlus.Batch.Sw
 
         public void Dispose()
         {
-            var guids = m_ForceDisabledAddIns.SelectMany(x => x.Value).Distinct();
+            var guids = m_ForceDisabledAddIns.Where(x => x.Value != null)
+                .SelectMany(x => x.Value).Distinct();
 
             TryEnableAddIns(guids.ToList());
         }

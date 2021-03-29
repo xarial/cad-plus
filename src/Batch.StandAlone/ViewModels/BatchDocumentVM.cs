@@ -241,7 +241,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
                         new RibbonDropDownButton("Version", m_AppProvider.EntityDescriptor.ApplicationIcon, "",
                             () => new VersionVM(Settings.Version),
                             v => Settings.Version = ((VersionVM)v).Version,
-                            m_AppProvider.GetInstalledVersions().Select(v => new VersionVM(v))),
+                            () => m_AppProvider.GetInstalledVersions().Select(v => new VersionVM(v))),
                         new RibbonToggleCommand("Safe Mode", Resources.safe_mode, "",
                             () => Settings.StartupOptionSafe,
                             v => Settings.StartupOptionSafe = v),

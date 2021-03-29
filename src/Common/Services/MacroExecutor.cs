@@ -134,8 +134,11 @@ namespace Xarial.CadPlus.Common.Services
 
             try
             {
-                macro = m_XCadMacroProvider.GetMacro(path);
-                m_XCadMacrosCache.Add(path, macro);
+                if (FileHelper.MatchesFilter(path, XCadMacroProvider.Filter.Extensions))
+                {
+                    macro = m_XCadMacroProvider.GetMacro(path);
+                    m_XCadMacrosCache.Add(path, macro);
+                }
             }
             catch (NotXCadMacroDllException)
             {

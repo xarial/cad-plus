@@ -31,6 +31,7 @@ using Xarial.XCad.Documents.Structures;
 using Xarial.XCad.Exceptions;
 using Xarial.XToolkit.Reporting;
 using Xarial.CadPlus.Batch.StandAlone.Exceptions;
+using Xarial.CadPlus.Common.Utils;
 
 namespace Xarial.CadPlus.XBatch.Base.Core
 {
@@ -214,28 +215,7 @@ namespace Xarial.CadPlus.XBatch.Base.Core
             m_UserLogger.WriteLine("Operation timed out");
             TryShutDownApplication(context.CurrentApplicationProcess);
         }
-
-        private bool MatchesFilter(string file, string[] filters) 
-        {
-            if (filters?.Any() == false)
-            {
-                return true;
-            }
-            else 
-            {
-                const string ANY_FILTER = "*";
-
-                return filters.Any(f => 
-                {
-                    var regex = (f.StartsWith(ANY_FILTER) ? "" : "^")
-                    + Regex.Escape(f).Replace($"\\{ANY_FILTER}", ".*").Replace("\\?", ".")
-                    + (f.EndsWith(ANY_FILTER) ? "" : "$");
-
-                    return Regex.IsMatch(file, regex, RegexOptions.IgnoreCase);
-                });
-            }
-        }
-
+        
         private JobItemDocument[] PrepareJobScope(IXApplication app,
             IEnumerable<string> inputs, string[] filters, IEnumerable<MacroData> macros) 
         {
@@ -247,7 +227,7 @@ namespace Xarial.CadPlus.XBatch.Base.Core
                 {
                     foreach (var file in Directory.EnumerateFiles(input, "*.*", SearchOption.AllDirectories))
                     {
-                        if (MatchesFilter(file, filters))
+                        if (FileHelper.MatchesFilter(file, filters))
                         {
                             if (m_AppProvider.CanProcessFile(file))
                             {
