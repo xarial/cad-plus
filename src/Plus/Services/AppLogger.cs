@@ -16,14 +16,14 @@ namespace Xarial.CadPlus.Plus.Services
 {
     public class AppLogger : IXLogger
     {
-        private readonly string m_Category;
+        protected readonly string m_Category;
 
         public AppLogger()
         {
             m_Category = "CAD+ Toolset";
         }
 
-        public void Log(string msg)
+        public virtual void Log(string msg)
         {
             System.Diagnostics.Trace.WriteLine(msg, m_Category);
         }

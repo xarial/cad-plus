@@ -23,7 +23,7 @@ namespace Xarial.CadPlus.Plus.Services
 
     public static class IMessageServiceExtension
     {
-        public static void ShowError(this IMessageService msgSvc, Exception ex, string baseMsg)
+        public static void ShowError(this IMessageService msgSvc, Exception ex, string baseMsg = "Generic error")
         {
             var err = ex.ParseUserError(out _, baseMsg);
             msgSvc.ShowError(err);
