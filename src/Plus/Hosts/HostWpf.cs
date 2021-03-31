@@ -42,7 +42,7 @@ namespace Xarial.CadPlus.Plus.Hosts
         private readonly IServiceContainer m_Services;
 
         public HostWpf(Application wpfApp, 
-            IContainerBuilder builder, IInitiator initiator, IXLogger logger, Type hostApplicationType)
+            IContainerBuilder builder, IInitiator initiator, Type hostApplicationType)
         {
             m_Initiator = initiator;
             m_Initiator.Init(this);
@@ -50,12 +50,15 @@ namespace Xarial.CadPlus.Plus.Hosts
             WpfApplication = wpfApp;
             
             m_IsLoaded = false;
-            m_Logger = logger;
-
+            
             m_ModulesLoader = new ModulesLoader();
             m_Modules = m_ModulesLoader.Load(this, hostApplicationType);
             ConfigureServices?.Invoke(builder);
             m_Services = builder.Build();
+
+            m_Logger = m_Services.GetService<IXLogger>();
+
+            m_Logger.Log("Initiating WPF host");
 
             Initialized?.Invoke(m_Services.GetService<IApplication>(), m_Services, m_Modules);
             Connect?.Invoke();

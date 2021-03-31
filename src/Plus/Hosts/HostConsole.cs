@@ -15,6 +15,7 @@ using System.Windows;
 using Xarial.CadPlus.Plus.Services;
 using Xarial.CadPlus.Plus.Extensions;
 using Xarial.CadPlus.Plus.Delegates;
+using Xarial.XCad.Base;
 
 namespace Xarial.CadPlus.Plus.Hosts
 {
@@ -34,6 +35,8 @@ namespace Xarial.CadPlus.Plus.Hosts
 
         private readonly IServiceContainer m_Services;
 
+        private readonly IXLogger m_Logger;
+
         public HostConsole(IContainerBuilder builder, IInitiator initiator, Type hostApplicationType)
         {
             m_Initiator = initiator;
@@ -44,6 +47,10 @@ namespace Xarial.CadPlus.Plus.Hosts
             
             ConfigureServices?.Invoke(builder);
             m_Services = builder.Build();
+
+            m_Logger = m_Services.GetService<IXLogger>();
+
+            m_Logger.Log("Initiating Console host");
 
             Initialized?.Invoke(m_Services.GetService<IApplication>(), m_Services, m_Modules);
             Connect?.Invoke();

@@ -214,8 +214,7 @@ namespace Xarial.CadPlus.Plus.Shared
                         }
                         catch (Exception ex)
                         {
-                            //TODO: message exception
-                            PrintError(ex.Message);
+                            PrintError(ex.ParseUserError(out _));
                         }
                     }
                     else
@@ -231,7 +230,7 @@ namespace Xarial.CadPlus.Plus.Shared
                     m_WpfApp.ShutdownMode = ShutdownMode.OnMainWindowClose;
                     m_WpfApp.DispatcherUnhandledException += OnDispatcherUnhandledException;
 
-                    Host = new HostWpf(m_WpfApp, svc, m_Initiator, m_Logger, typeof(TApplication));
+                    Host = new HostWpf(m_WpfApp, svc, m_Initiator, typeof(TApplication));
 
                     var wnd = new TWindow();
                     WindowCreated?.Invoke(wnd, cliArgs);
