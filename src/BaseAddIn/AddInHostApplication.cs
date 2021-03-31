@@ -156,7 +156,6 @@ namespace Xarial.CadPlus.AddIn.Base
         private void ConfigureHostServices(ContainerBuilder builder) 
         {   
             builder.RegisterInstance(Extension.Application);
-            builder.RegisterType<AppLogger>().As<IXLogger>();
             builder.RegisterType<CadAppMessageService>()
                 .As<IMessageService>();
             builder.RegisterType<DefaultDocumentAdapter>()

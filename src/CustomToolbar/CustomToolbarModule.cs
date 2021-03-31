@@ -103,10 +103,7 @@ namespace Xarial.CadPlus.CustomToolbar
             builder.RegisterInstance(m_Host.Extension).ExternallyOwned();
             builder.RegisterInstance(m_Host.Extension.Application).ExternallyOwned();
             builder.RegisterInstance(m_Host.Extension.Logger);
-
-            builder.RegisterType<AppLogger>()
-                .As<IXLogger>();
-
+            
             builder.RegisterType<MacroEntryPointsExtractor>()
                 .As<IMacroEntryPointsExtractor>();
 

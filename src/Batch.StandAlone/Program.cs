@@ -87,7 +87,6 @@ namespace Xarial.CadPlus.Batch.StandAlone
             builder.RegisterType<RecentFilesManager>()
                 .As<IRecentFilesManager>();
 
-            builder.RegisterType<AppLogger>().As<IXLogger>();
             builder.RegisterType<BatchRunner>();
             builder.RegisterType<BatchRunnerModel>().As<IBatchRunnerModel>();
             builder.RegisterType<BatchRunJobExecutor>().As<IBatchRunJobExecutor>();

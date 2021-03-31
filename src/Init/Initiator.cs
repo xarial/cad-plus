@@ -10,12 +10,16 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using Xarial.CadPlus.Plus;
+using Xarial.CadPlus.Plus.Services;
+using Xarial.XCad.Base;
 using Xarial.XToolkit.Reflection;
 
 namespace Xarial.CadPlus.Init
 {
     public class Initiator : IInitiator
     {
+        private IHost m_Host;
+
         public Initiator() 
         {
             AppDomain.CurrentDomain.ResolveBindingRedirects(
@@ -24,6 +28,13 @@ namespace Xarial.CadPlus.Init
 
         public void Init(IHost host)
         {
+            m_Host = host;
+            m_Host.ConfigureServices += OnConfigureServices;
+        }
+
+        private void OnConfigureServices(IContainerBuilder builder)
+        {
+            builder.Register<AppLogger, IXLogger>();
         }
     }
 }
