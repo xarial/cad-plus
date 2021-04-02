@@ -11,6 +11,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using Xarial.XCad.Base;
+using Xarial.XCad.Base.Enums;
 
 namespace Xarial.CadPlus.Plus.Shared.Services
 {
@@ -114,7 +115,7 @@ namespace Xarial.CadPlus.Plus.Shared.Services
             
             if (className.ToString() == m_PopupClassName)
             {
-                m_Logger.Log($"Killing popup: {hwnd}");
+                m_Logger.Log($"Killing popup: {hwnd}", LoggerMessageSeverity_e.Debug);
                 SendMessage(hwnd, WM_SYSCOMMAND, SC_CLOSE, 0);
 
                 if (IsWindow(hwnd)) 

@@ -17,6 +17,7 @@ using Xarial.CadPlus.Plus.Services;
 using Xarial.XCad.Base;
 using Xarial.CadPlus.Plus.Extensions;
 using Xarial.CadPlus.Plus.Delegates;
+using Xarial.XCad.Base.Enums;
 
 namespace Xarial.CadPlus.Plus.Hosts
 {
@@ -58,7 +59,7 @@ namespace Xarial.CadPlus.Plus.Hosts
 
             m_Logger = m_Services.GetService<IXLogger>();
 
-            m_Logger.Log("Initiating WPF host");
+            m_Logger.Log("Initiating WPF host", LoggerMessageSeverity_e.Debug);
 
             Initialized?.Invoke(m_Services.GetService<IApplication>(), m_Services, m_Modules);
             Connect?.Invoke();
@@ -71,7 +72,7 @@ namespace Xarial.CadPlus.Plus.Hosts
         {
             if (!m_IsLoaded)
             {
-                m_Logger.Log("AppActivated event called");
+                m_Logger.Log("AppActivated event called", LoggerMessageSeverity_e.Debug);
 
                 m_IsLoaded = true;
                 WpfApplication.Activated -= OnAppActivated;

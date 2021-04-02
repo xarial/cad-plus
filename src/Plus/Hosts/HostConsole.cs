@@ -16,6 +16,7 @@ using Xarial.CadPlus.Plus.Services;
 using Xarial.CadPlus.Plus.Extensions;
 using Xarial.CadPlus.Plus.Delegates;
 using Xarial.XCad.Base;
+using Xarial.XCad.Base.Enums;
 
 namespace Xarial.CadPlus.Plus.Hosts
 {
@@ -50,7 +51,7 @@ namespace Xarial.CadPlus.Plus.Hosts
 
             m_Logger = m_Services.GetService<IXLogger>();
 
-            m_Logger.Log("Initiating Console host");
+            m_Logger.Log("Initiating Console host", LoggerMessageSeverity_e.Debug);
 
             Initialized?.Invoke(m_Services.GetService<IApplication>(), m_Services, m_Modules);
             Connect?.Invoke();

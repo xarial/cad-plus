@@ -22,6 +22,7 @@ using Xarial.CadPlus.Plus.Hosts;
 using Xarial.CadPlus.Plus.Services;
 using Xarial.CadPlus.Plus.Shared.Services;
 using Xarial.XCad.Base;
+using Xarial.XCad.Base.Enums;
 using Xarial.XToolkit.Reporting;
 
 namespace Xarial.CadPlus.Plus.Shared
@@ -140,7 +141,7 @@ namespace Xarial.CadPlus.Plus.Shared
             {
                 m_IsStarted = true;
 
-                m_Logger.Log("Starting mixed applicaton");
+                m_Logger.Log("Starting mixed applicaton", LoggerMessageSeverity_e.Debug);
 
                 var parserOutput = new StringBuilder();
 
@@ -359,15 +360,15 @@ namespace Xarial.CadPlus.Plus.Shared
         {
             var ex = e.ExceptionObject as Exception ?? new Exception("");
 
-            m_Logger.Log("Unhandled domain exception");
-            m_Logger.Log(ex);
+            m_Logger.Log("Unhandled domain exception", LoggerMessageSeverity_e.Fatal);
+            m_Logger.Log(ex, true, LoggerMessageSeverity_e.Fatal);
             m_MsgService.ShowError(ex, "Unknown error");
         }
 
         private void OnDispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
         {
-            m_Logger.Log("Unhandled dispatcher exception");
-            m_Logger.Log(e.Exception);
+            m_Logger.Log("Unhandled dispatcher exception", LoggerMessageSeverity_e.Fatal);
+            m_Logger.Log(e.Exception, true, LoggerMessageSeverity_e.Fatal);
             m_MsgService.ShowError(e.Exception, "Unknown error");
 
             e.Handled = true;

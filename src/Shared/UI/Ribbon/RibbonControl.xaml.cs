@@ -1,4 +1,11 @@
-﻿using Fluent;
+﻿//*********************************************************************
+//CAD+ Toolset
+//Copyright(C) 2020 Xarial Pty Limited
+//Product URL: https://cadplus.xarial.com
+//License: https://cadplus.xarial.com/license/
+//*********************************************************************
+
+using Fluent;
 using System;
 using System.Collections.Generic;
 using System.Linq;
