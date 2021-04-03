@@ -65,16 +65,20 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
         private readonly Func<System.IO.FileInfo, BatchJob, MainWindow, IRibbonButtonCommand[], BatchDocumentVM> m_OpenDocFunc;
         private readonly Func<string, BatchJob, MainWindow, IRibbonButtonCommand[], BatchDocumentVM> m_NewDocFunc;
 
+        private readonly IAboutService m_AboutSvc;
+
         public BatchManagerVM(ICadApplicationInstanceProvider[] appProviders,
             IBatchRunnerModel model, IMessageService msgSvc, 
             Func<System.IO.FileInfo, BatchJob, MainWindow, IRibbonButtonCommand[], BatchDocumentVM> openDocFunc,
-            Func<string, BatchJob, MainWindow, IRibbonButtonCommand[], BatchDocumentVM> newDocFunc)
+            Func<string, BatchJob, MainWindow, IRibbonButtonCommand[], BatchDocumentVM> newDocFunc, IAboutService aboutSvc)
         {
             AppProviders = appProviders;
             m_Model = model;
             m_MsgSvc = msgSvc;
             m_OpenDocFunc = openDocFunc;
             m_NewDocFunc = newDocFunc;
+
+            m_AboutSvc = aboutSvc;
 
             CreateDocumentCommand = new RelayCommand<string>(CreateDocument);
             OpenDocumentCommand = new RelayCommand<string>(OpenDocument);
@@ -194,16 +198,8 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
             }
         }
 
-        private void ShowAbout() 
-        {
-            var aboutDlg = new AboutDialog(
-                new AboutDialogSpec(this.GetType().Assembly,
-                Resources.batch_plus_icon,
-                Licenses.ThirdParty));
-
-            aboutDlg.Owner = ParentWindow;
-            aboutDlg.ShowDialog();
-        }
+        private void ShowAbout()
+            => m_AboutSvc.ShowAbout(this.GetType().Assembly, Resources.batch_plus_icon);
 
         private void OpenHelp() 
         {

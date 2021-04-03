@@ -14,6 +14,7 @@ using System.Linq;
 using System;
 using Xarial.CadPlus.Common.Services;
 using Xarial.CadPlus.Plus.Services;
+using Xarial.CadPlus.Plus.Shared.Services;
 
 namespace Xport.Tests
 {
@@ -26,7 +27,7 @@ namespace Xport.Tests
             ExportOptions opts = null;
             mock.Setup(m => m.Export(It.IsAny<ExportOptions>())).Callback<ExportOptions>(e => opts = e);
 
-            var vm = new ExporterVM(mock.Object, new Mock<IMessageService>().Object);
+            var vm = new ExporterVM(mock.Object, new Mock<IMessageService>().Object, new Mock<IAboutService>().Object);
 
             vm.Filter = "*.sld*";
             vm.Format = Format_e.Pdf | Format_e.Html;
@@ -49,7 +50,7 @@ namespace Xport.Tests
             ExportOptions opts = null;
             mock.Setup(m => m.Export(It.IsAny<ExportOptions>())).Callback<ExportOptions>(e => opts = e);
 
-            var vm = new ExporterVM(mock.Object, new Mock<IMessageService>().Object);
+            var vm = new ExporterVM(mock.Object, new Mock<IMessageService>().Object, new Mock<IAboutService>().Object);
 
             vm.IsTimeoutEnabled = false;
             vm.Timeout = 30;
@@ -77,12 +78,12 @@ namespace Xport.Tests
             msgMock.Setup(m => m.ShowError(It.IsAny<string>())).Callback<string>(m => errShown++);
             msgMock.Setup(m => m.ShowInformation(It.IsAny<string>())).Callback<string>(m => succShown++);
 
-            new ExporterVM(mock1.Object, msgMock.Object).ExportCommand.Execute(null);
+            new ExporterVM(mock1.Object, msgMock.Object, new Mock<IAboutService>().Object).ExportCommand.Execute(null);
             var res1 = errShown == 0 && succShown == 1;
             errShown = 0;
             succShown = 0;
 
-            new ExporterVM(mock2.Object, msgMock.Object).ExportCommand.Execute(null);
+            new ExporterVM(mock2.Object, msgMock.Object, new Mock<IAboutService>().Object).ExportCommand.Execute(null);
             var res2 = errShown == 1 && succShown == 0;
 
             Assert.IsTrue(res1, "Success message and no error messages");

@@ -80,8 +80,7 @@ namespace Xarial.CadPlus.Drawing
 
             m_SettsProvider = m_SvcProvider.GetService<ISettingsProvider>();
 
-            m_QrDataProvider = new QrDataProvider(m_Host.Extension.Application,
-                m_SettsProvider.ReadSettings<DrawingSettings>());
+            m_QrDataProvider = new QrDataProvider(m_Host.Extension.Application);
 
             m_Page.DataChanged += OnPageDataChanged;
             m_Page.Closed += OnPageClosed;

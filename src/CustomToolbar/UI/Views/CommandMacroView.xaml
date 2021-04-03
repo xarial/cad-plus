@@ -80,8 +80,18 @@
                 </ComboBox>
 
                 <TextBlock Text="Arguments:" VerticalAlignment="Center" Grid.Column="0" Grid.Row="2" Margin="2" />
-                <TextBox Text="{Binding Path=Arguments, UpdateSourceTrigger=PropertyChanged}" Grid.Column="1" Grid.Row="2" Margin="2"/>
-
+                <Grid Grid.Column="1" Grid.Row="2">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBox Text="{Binding Path=Arguments, UpdateSourceTrigger=PropertyChanged}" Margin="2"/>
+                    <Button Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" Focusable="False"
+                            Grid.Column="2" HorizontalAlignment="Right"
+                            ToolTip="About macro arguments" Width="24" Height="24" Click="OnHelpClicked">
+                        <Image Source="/Xarial.CadPlus.Toolbar.Module;component/Resources/help-icon.png"/>
+                    </Button>
+                </Grid>
             </Grid>
         </GroupBox>
         <GroupBox Header="Behavior">

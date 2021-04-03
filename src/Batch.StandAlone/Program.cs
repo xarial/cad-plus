@@ -30,6 +30,7 @@ using Xarial.XCad.Base;
 using Xarial.XToolkit.Reporting;
 using Xarial.CadPlus.Plus.Exceptions;
 using Xarial.CadPlus.Plus;
+using System.Windows;
 
 namespace Xarial.CadPlus.Batch.StandAlone
 {
@@ -42,6 +43,8 @@ namespace Xarial.CadPlus.Batch.StandAlone
         private static ApplicationLauncher<BatchApplication, BatchArguments, MainWindow> m_AppLauncher;
 
         private static BatchManagerVM m_BatchManager;
+
+        private static Window m_Window;
 
         [STAThread]
         static void Main(string[] args)
@@ -96,6 +99,8 @@ namespace Xarial.CadPlus.Batch.StandAlone
                 .WithParameter(new TypedParameter(typeof(int), MAX_RETRIES));
             builder.RegisterType<PopupKiller>().As<IPopupKiller>();
             builder.RegisterType<BatchDocumentVM>();
+            builder.RegisterType<AboutService>().As<IAboutService>();
+            builder.Register<Window>(c => m_Window);
 
             builder.RegisterType<BatchApplicationProxy>().As<IBatchApplicationProxy>().SingleInstance();
             
@@ -112,6 +117,8 @@ namespace Xarial.CadPlus.Batch.StandAlone
         {
             try 
             {
+                m_Window = window;
+
                 m_BatchManager = m_AppLauncher.Container.Resolve<BatchManagerVM>();
                 window.Closing += OnWindowClosing;
                 window.DataContext = m_BatchManager;

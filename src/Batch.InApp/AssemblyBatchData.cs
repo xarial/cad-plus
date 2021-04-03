@@ -152,6 +152,7 @@ namespace Xarial.CadPlus.Batch.InApp
 
     [IconEx(typeof(Resources), nameof(Resources.batch_plus_assm_vector), nameof(Resources.batch_plus_assm_icon))]
     [Title("Batch+")]
+    [Help("https://cadplus.xarial.com/batch/assembly/")]
     public class AssemblyBatchData
     {
         public class InputGroup 

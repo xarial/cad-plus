@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Windows.Input;
@@ -58,6 +59,8 @@ namespace Xarial.CadPlus.CustomToolbar.UI.ViewModels
             m_SettsProvider = settsProvider;
             m_MsgService = msgService;
 
+            HelpCommand = new RelayCommand(Help);
+
             m_MacroExtensions = cadEntDesc.MacroFileFilters
                 .Select(f => f.Extensions)
                 .SelectMany(x => x)
@@ -71,6 +74,17 @@ namespace Xarial.CadPlus.CustomToolbar.UI.ViewModels
             Settings = m_SettsProvider.ReadSettings<ToolbarSettings>();
 
             LoadCommands();
+        }
+
+        private void Help()
+        {
+            try
+            {
+                Process.Start("https://cadplus.xarial.com/toolbar/");
+            }
+            catch 
+            {
+            }
         }
 
         private void LoadCommands()
@@ -351,6 +365,8 @@ namespace Xarial.CadPlus.CustomToolbar.UI.ViewModels
                 return m_MacroDropCommand;
             }
         }
+
+        public ICommand HelpCommand { get; }
 
         private bool IsValidFilesDrop(string[] files)
             => files?.All(f => m_MacroExtensions
