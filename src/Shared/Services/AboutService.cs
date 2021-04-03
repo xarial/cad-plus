@@ -15,7 +15,7 @@ namespace Xarial.CadPlus.Plus.Shared.Services
         void ShowAbout(Assembly assm, Image icon);
     }
 
-    public class AboutService
+    public class AboutService : IAboutService
     {
         private readonly Window m_Wnd;
 
@@ -23,7 +23,7 @@ namespace Xarial.CadPlus.Plus.Shared.Services
         {
             m_Wnd = wnd;
         }
-
+        
         public void ShowAbout(Assembly assm, Image icon) 
         {
             var aboutDlg = new AboutDialog(
