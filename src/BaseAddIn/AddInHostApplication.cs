@@ -64,8 +64,6 @@ namespace Xarial.CadPlus.AddIn.Base
 
         private ServiceProvider m_SvcProvider;
 
-        private IPropertyPageCreator m_PageCreator;
-
         private readonly IModulesLoader m_ModulesLoader;
 
         private readonly IInitiator m_Initiator;
@@ -148,8 +146,6 @@ namespace Xarial.CadPlus.AddIn.Base
 
             svcColl.Populate(m_SvcProvider.Context);
 
-            m_PageCreator = m_SvcProvider.Context.Resolve<IPropertyPageCreator>();
-
             Initialized?.Invoke(m_App, m_SvcProvider, m_Modules);
         }
 
@@ -193,10 +189,7 @@ namespace Xarial.CadPlus.AddIn.Base
                 System.Diagnostics.Debug.Assert(false, "Handler is not registered");
             }
         }
-
-        public IXPropertyPage<TData> CreatePage<TData>(CreateDynamicControlsDelegate createDynCtrlHandler = null)
-            => m_PageCreator.CreatePage<TData>(createDynCtrlHandler);
-
+        
         private void OnCommandClick(CadPlusCommands_e spec)
         {
             switch (spec)

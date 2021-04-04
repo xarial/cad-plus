@@ -75,7 +75,7 @@ namespace Xarial.CadPlus.Drawing
         private void OnConnect()
         {
             m_Host.RegisterCommands<Commands_e>(OnCommandClick);
-            m_Page = m_Host.CreatePage<InsertQrCodeData>();
+            m_Page = m_Host.Extension.CreatePage<InsertQrCodeData>();
             m_CurPageData = new InsertQrCodeData();
 
             m_SettsProvider = m_SvcProvider.GetService<ISettingsProvider>();

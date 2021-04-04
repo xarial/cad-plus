@@ -120,7 +120,7 @@ namespace Xarial.CadPlus.Batch.InApp
             m_Logger = m_SvcProvider.GetService<IXLogger>();
 
             m_Host.RegisterCommands<Commands_e>(OnCommandClick);
-            m_Page = m_Host.CreatePage<AssemblyBatchData>(CreateDynamicPageControls);
+            m_Page = m_Host.Extension.CreatePage<AssemblyBatchData>(CreateDynamicPageControls);
             m_Page.Closing += OnPageClosing;
             m_Page.Closed += OnPageClosed;
         }

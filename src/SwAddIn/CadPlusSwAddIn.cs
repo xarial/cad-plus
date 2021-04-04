@@ -27,6 +27,8 @@ using Xarial.CadPlus.Plus.Applications;
 using Xarial.CadPlus.Plus.Shared;
 using Xarial.CadPlus.Plus.Services;
 using Xarial.CadPlus.Plus.Extensions;
+using Xarial.CadPlus.AddIn.Sw.Services;
+using Xarial.XCad.SolidWorks.Services;
 
 namespace Xarial.CadPlus.AddIn.Sw
 {
@@ -72,9 +74,8 @@ namespace Xarial.CadPlus.AddIn.Sw
         {
             var svc = ((ContainerBuilderWrapper)builder).Builder;
 
-            svc.RegisterType<SwPropertyPageCreator<SwGeneralPropertyManagerPageHandler>>()
-                .As<IPropertyPageCreator>()
-                .WithParameter(new TypedParameter(typeof(ISwAddInEx), this));
+            svc.RegisterType<CadPlusPropertyPageHandlerProvider>().As<IPropertyPageHandlerProvider>();
+            svc.RegisterType<CadPlusTaskPaneControlProvider>().As<ITaskPaneControlProvider>();
 
             builder.RegisterAdapter<IXApplication, ISwApplication>(a => (ISwApplication)a);
             builder.Register(x => x.GetService<IMacroExecutor>(CadApplicationIds.SolidWorks));
