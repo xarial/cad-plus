@@ -6,8 +6,11 @@
 //*********************************************************************
 
 using System;
+using System.Windows;
 using Xarial.XCad;
+using Xarial.XCad.Documents;
 using Xarial.XCad.Extensions;
+using Xarial.XCad.UI;
 using Xarial.XCad.UI.PropertyPage;
 using Xarial.XCad.UI.PropertyPage.Delegates;
 
@@ -26,19 +29,11 @@ namespace Xarial.CadPlus.Plus
         IXExtension Extension { get; }
 
         /// <summary>
-        /// Registers new command in teh extension
+        /// Registers new command in the extension
         /// </summary>
         /// <typeparam name="TCmd">Commands spec</typeparam>
         /// <param name="handler">Command handler</param>
         void RegisterCommands<TCmd>(CommandHandler<TCmd> handler)
             where TCmd : Enum;
-
-        /// <summary>
-        /// Creates extension-specific page from the data
-        /// </summary>
-        /// <typeparam name="TData">Page data specification</typeparam>
-        /// <param name="createDynCtrlHandler">Dynamic control handler</param>
-        /// <returns>Created page</returns>
-        IXPropertyPage<TData> CreatePage<TData>(CreateDynamicControlsDelegate createDynCtrlHandler = null);
     }
 }
