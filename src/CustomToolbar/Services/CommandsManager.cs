@@ -248,7 +248,7 @@ namespace Xarial.CadPlus.CustomToolbar.Services
                 }
                 else
                 {
-                    m_Logger.Log("Skipped saving of read-only toolbar settings", XCad.Base.Enums.LoggerMessageSeverity_e.Information);
+                    m_Logger.Log("Skipped saving of read-only toolbar settings", XCad.Base.Enums.LoggerMessageSeverity_e.Debug);
                 }
             }
         }

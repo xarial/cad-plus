@@ -41,6 +41,7 @@ using Xarial.CadPlus.Plus.UI;
 using Xarial.XCad.UI.PropertyPage.Base;
 using Xarial.CadPlus.Batch.InApp.Controls;
 using Xarial.CadPlus.Plus.Data;
+using Xarial.XCad.Base.Enums;
 
 namespace Xarial.CadPlus.Batch.InApp
 {
@@ -232,7 +233,7 @@ namespace Xarial.CadPlus.Batch.InApp
                 catch (Exception ex)
                 {
                     m_Msg.ShowError(ex.ParseUserError(out string callStack));
-                    m_Logger.Log(callStack);
+                    m_Logger.Log(callStack, LoggerMessageSeverity_e.Error);
                 }
             }
         }

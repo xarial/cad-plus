@@ -13,6 +13,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using Xarial.XCad.Base;
+using Xarial.XCad.Base.Enums;
 
 namespace Xarial.CadPlus.XBatch.Base.Services
 {
@@ -138,7 +139,7 @@ namespace Xarial.CadPlus.XBatch.Base.Services
                         throw new Exception(string.Format("Unable to set information.  Error: {0}", Marshal.GetLastWin32Error()));
                     }
 
-                    m_Logger.Log($"Job initiated: {m_JobHandle}");
+                    m_Logger.Log($"Job initiated: {m_JobHandle}", LoggerMessageSeverity_e.Debug);
                     m_IsInit = true;
                 }
                 else
@@ -162,7 +163,7 @@ namespace Xarial.CadPlus.XBatch.Base.Services
                     throw new Exception($"Failed to assign process to job: {process.Id}");
                 }
 
-                m_Logger.Log($"Added process to job: {process.Id}");
+                m_Logger.Log($"Added process to job: {process.Id}", LoggerMessageSeverity_e.Debug);
             }
             else 
             {
@@ -172,7 +173,7 @@ namespace Xarial.CadPlus.XBatch.Base.Services
 
         public void Dispose()
         {
-            m_Logger.Log("Disposing job manager");
+            m_Logger.Log("Disposing job manager", LoggerMessageSeverity_e.Debug);
 
             CloseHandle(m_JobHandle);
             m_JobHandle = IntPtr.Zero;

@@ -200,7 +200,7 @@ namespace Xarial.CadPlus.CustomToolbar.Services
 
                 if (cmds != null && cmds.Any())
                 {
-                    m_Logger.Log($"Invoking {cmds.Length} command(s) for the trigger {trigger}");
+                    m_Logger.Log($"Invoking {cmds.Length} command(s) for the trigger {trigger}", XCad.Base.Enums.LoggerMessageSeverity_e.Debug);
 
                     foreach (var cmd in cmds)
                     {
