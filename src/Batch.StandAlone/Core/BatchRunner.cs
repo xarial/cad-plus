@@ -505,16 +505,9 @@ namespace Xarial.CadPlus.XBatch.Base.Core
 
                 if (doc == null)
                 {
-                    if (!templateDoc.IsCommitted)
-                    {
-                        doc = templateDoc;
-                    }
-                    else
-                    {
-                        doc = app.Documents.PreCreate<IXDocument>();
+                    doc = app.Documents.PreCreate<IXDocument>();
 
-                        doc.Path = templateDoc.Path;
-                    }
+                    doc.Path = templateDoc.Path;
                 }
             }
 

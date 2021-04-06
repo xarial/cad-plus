@@ -154,7 +154,7 @@ namespace Xarial.CadPlus.Common.Services
 
         public void Dispose()
         {
-            m_Runner.Dispose();
+            m_Runner?.Dispose();
         }
     }
 }

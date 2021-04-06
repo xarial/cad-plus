@@ -288,7 +288,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
                             () => Settings.IsBatchSizeLimited,
                             v => Settings.IsBatchSizeLimited = v,
                             () => Convert.ToDouble(Settings.BatchSize),
-                            t => Settings.BatchSize = Convert.ToInt32(t), new RibbonNumericSwitchCommandOptions(0, 1000, true, "0")))),
+                            t => Settings.BatchSize = Convert.ToInt32(t == 0 ? 1 : t), new RibbonNumericSwitchCommandOptions(0, 1000, true, "0")))),//TODO: some issues when limit is set from 1 (binding does not work) - implemented workaround
                 new RibbonTab(BatchApplicationCommandManager.JobTab.Name, "Job",
                     new RibbonGroup(BatchApplicationCommandManager.JobTab.ExecutionGroupName, "Execution",
                         new RibbonButtonCommand("Run Job", Resources.run_job, "", RunJob, () => CanRunJob),
