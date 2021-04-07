@@ -20,6 +20,7 @@ using Xarial.CadPlus.Plus.Attributes;
 using Xarial.CadPlus.Plus.Exceptions;
 using Xarial.XToolkit.Reflection;
 using Xarial.XToolkit;
+using Xarial.CadPlus.Plus.Hosts;
 
 namespace Xarial.CadPlus.Plus.Services
 {
@@ -42,7 +43,10 @@ namespace Xarial.CadPlus.Plus.Services
             var modulesDir = Path.Combine(Path.GetDirectoryName(this.GetType().Assembly.Location), "Modules");
 
             var modulePaths = new List<string>();
+
             modulePaths.Add(modulesDir);
+
+            modulePaths.Add(Path.Combine(Locations.AppDirectoryPath, "Plus"));
 
             var hostSettings = m_SettsProvider.ReadSettings<HostSettings>();
 

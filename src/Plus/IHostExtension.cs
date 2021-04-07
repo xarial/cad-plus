@@ -19,7 +19,7 @@ namespace Xarial.CadPlus.Plus
     public delegate void CommandHandler<TCmd>(TCmd cmd) where TCmd : Enum;
 
     /// <summary>
-    /// Represents specific hsot application which runs inside the CAD host process
+    /// Represents specific host application which runs inside the CAD host process
     /// </summary>
     public interface IHostExtension : IHost
     {
