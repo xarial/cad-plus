@@ -37,6 +37,7 @@ using System.Windows;
 using System.Windows.Interop;
 using Xarial.XCad.UI.PropertyPage.Delegates;
 using Xarial.CadPlus.Plus.Delegates;
+using Xarial.XCad.UI.Structures;
 
 namespace Xarial.CadPlus.AddIn.Base
 {
@@ -72,9 +73,13 @@ namespace Xarial.CadPlus.AddIn.Base
 
         private readonly IModule[] m_Modules;
 
+        private readonly List<CommandGroupSpec> m_Specs;
+
         public AddInHost(ICadExtensionApplication app, IInitiator initiator) 
         {
             m_App = app;
+
+            m_Specs = new List<CommandGroupSpec>();
 
             m_Initiator = initiator;
             m_Initiator.Init(this);
@@ -123,6 +128,13 @@ namespace Xarial.CadPlus.AddIn.Base
                 m_ParentGrpSpec = cmdGrp.Spec;
 
                 Connect?.Invoke();
+
+                foreach (var spec in m_Specs) 
+                {
+                    var grp = Extension.CommandManager.AddCommandGroup(spec);
+
+                    grp.CommandClick += OnCommandClick;
+                }
             }
             catch (Exception ex)
             {
@@ -165,17 +177,50 @@ namespace Xarial.CadPlus.AddIn.Base
         public void RegisterCommands<TCmd>(CommandHandler<TCmd> handler)
             where TCmd : Enum
         {
-            var spec = Extension.CommandManager.CreateSpecFromEnum<TCmd>(m_NextId++, m_ParentGrpSpec);
-            spec.Parent = m_ParentGrpSpec;
-            
-            var grp = Extension.CommandManager.AddCommandGroup(spec);
+            var newSpec = Extension.CommandManager.CreateSpecFromEnum<TCmd>(m_NextId++, m_ParentGrpSpec);
 
-            foreach (var cmd in grp.Spec.Commands) 
+            var spec = m_Specs.FirstOrDefault(s => string.Equals(s.Title, newSpec.Title, StringComparison.CurrentCultureIgnoreCase));
+
+            CommandSpec[] existingCmds;
+
+            if (spec != null)
             {
-                m_Handlers.Add(cmd, new Tuple<Delegate, Enum>(handler, (Enum)Enum.ToObject(typeof(TCmd), cmd.UserId)));
+                existingCmds = spec.Commands;
+            }
+            else 
+            {
+                existingCmds = new CommandSpec[0];
+                newSpec.Parent = m_ParentGrpSpec;
+                m_Specs.Add(newSpec);
+                spec = newSpec;
             }
 
-            grp.CommandClick += OnCommandClick;
+            var cmds = new List<CommandSpec>();
+            cmds.AddRange(existingCmds);
+
+            for (int i = 0; i < newSpec.Commands.Length; i++) 
+            {
+                var src = newSpec.Commands[i];
+
+                var cmd = new CommandSpec(existingCmds.Length + i)
+                {
+                    HasMenu = src.HasMenu,
+                    HasSpacer = src.HasSpacer,
+                    HasTabBox = src.HasTabBox,
+                    HasToolbar = src.HasToolbar,
+                    Icon = src.Icon,
+                    SupportedWorkspace = src.SupportedWorkspace,
+                    TabBoxStyle = src.TabBoxStyle,
+                    Title = src.Title,
+                    Tooltip = src.Tooltip
+                };
+
+                m_Handlers.Add(cmd, new Tuple<Delegate, Enum>(handler, (Enum)Enum.ToObject(typeof(TCmd), src.UserId)));
+
+                cmds.Add(cmd);
+            }
+
+            spec.Commands = cmds.ToArray();
         }
 
         private void OnCommandClick(CommandSpec spec)
