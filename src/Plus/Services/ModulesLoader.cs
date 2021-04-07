@@ -46,7 +46,12 @@ namespace Xarial.CadPlus.Plus.Services
 
             modulePaths.Add(modulesDir);
 
-            modulePaths.Add(Path.Combine(Locations.AppDirectoryPath, "Plus"));
+            var plusDir = Path.Combine(Locations.AppDirectoryPath, "Plus");
+
+            if (Directory.Exists(plusDir))
+            {
+                modulePaths.Add(plusDir);
+            }
 
             var hostSettings = m_SettsProvider.ReadSettings<HostSettings>();
 
@@ -107,7 +112,7 @@ namespace Xarial.CadPlus.Plus.Services
                 }
                 else 
                 {
-                    throw new Exception($"Specified directory '{path}' with modules does not exist");
+                    throw new UserException($"Specified directory '{path}' with modules does not exist");
                 }
             }
 
