@@ -17,7 +17,7 @@ namespace Xarial.CadPlus.Plus.Shared.Services
 {
     public interface IPopupKiller : IDisposable
     {
-        event Action<Process> PopupNotClosed;
+        event Action<Process, IntPtr> PopupNotClosed;
 
         bool IsStarted { get; }
         void Start(Process prc, TimeSpan period, string popupClassName = "#32770");
@@ -41,7 +41,19 @@ namespace Xarial.CadPlus.Plus.Shared.Services
         [return: MarshalAs(UnmanagedType.Bool)]
         private static extern bool IsWindow(IntPtr hWnd);
 
-        public event Action<Process> PopupNotClosed;
+        [DllImport("user32.dll", SetLastError = true)]
+        private static extern IntPtr GetWindow(IntPtr hWnd, uint uCmd);
+
+        [DllImport("user32.dll", SetLastError = true)]
+        private static extern int GetWindowLong(IntPtr hWnd, int nIndex);
+
+        [DllImport("user32.dll", ExactSpelling = true)]
+        static extern IntPtr GetAncestor(IntPtr hwnd, uint flags);
+
+        [DllImport("user32.dll", SetLastError = false)]
+        static extern IntPtr GetDesktopWindow();
+
+        public event Action<Process, IntPtr> PopupNotClosed;
 
         private Timer m_Timer;
         private Process m_Process;
@@ -109,24 +121,38 @@ namespace Xarial.CadPlus.Plus.Shared.Services
         {
             const int WM_SYSCOMMAND = 0x0112;
             const int SC_CLOSE = 0xF060;
-
+            
             var className = new StringBuilder(256);
             GetClassName(hwnd, className, 256);
             
             if (className.ToString() == m_PopupClassName)
             {
-                m_Logger.Log($"Killing popup: {hwnd}", LoggerMessageSeverity_e.Debug);
-                SendMessage(hwnd, WM_SYSCOMMAND, SC_CLOSE, 0);
-
-                if (IsWindow(hwnd)) 
+                if (IsWindow(hwnd) && IsModalPopup(hwnd))
                 {
-                    PopupNotClosed?.Invoke(m_Process);
-                }
+                    m_Logger.Log($"Killing popup: {hwnd}", LoggerMessageSeverity_e.Debug);
+                    SendMessage(hwnd, WM_SYSCOMMAND, SC_CLOSE, 0);
 
-                return false;
+                    if (IsWindow(hwnd))
+                    {
+                        PopupNotClosed?.Invoke(m_Process, hwnd);
+                    }
+
+                    return false;
+                }
             }
 
             return true;
+        }
+
+        private bool IsModalPopup(IntPtr hwnd) 
+        {
+            const uint GW_OWNER = 4;
+            const int GWL_STYLE = -16;
+            const uint WS_DISABLED = 0x8000000;
+            const uint GA_PARENT = 1;
+
+            return GetAncestor(hwnd, GA_PARENT) == GetDesktopWindow()
+                && (GetWindowLong(GetWindow(hwnd, GW_OWNER), GWL_STYLE) & WS_DISABLED) != 0;
         }
 
         public void Dispose() => Stop();
