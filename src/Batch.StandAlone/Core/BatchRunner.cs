@@ -94,7 +94,7 @@ namespace Xarial.CadPlus.XBatch.Base.Core
             m_JobMgr = jobMgr;
         }
 
-        private void OnPopupNotClosed(Process prc)
+        private void OnPopupNotClosed(Process prc, IntPtr hwnd)
         {
             m_UserLogger.WriteLine("Failed to close the blocking popup window");
             TryShutDownApplication(prc);
