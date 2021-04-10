@@ -34,6 +34,7 @@ using Xarial.CadPlus.Plus.Modules;
 namespace Xarial.CadPlus.Drawing
 {
     [Title("Drawing+")]
+    [IconEx(typeof(Resources), nameof(Resources.drawing_vector), nameof(Resources.drawing_icon))]
     public enum Commands_e 
     {
         [CommandItemInfo(WorkspaceTypes_e.Drawing)]
