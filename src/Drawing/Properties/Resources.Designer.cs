@@ -83,6 +83,26 @@ namespace Xarial.CadPlus.Drawing.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap drawing_icon {
+            get {
+                object obj = ResourceManager.GetObject("drawing_icon", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] drawing_vector {
+            get {
+                object obj = ResourceManager.GetObject("drawing_vector", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap offsetx_icon {
             get {
                 object obj = ResourceManager.GetObject("offsetx_icon", resourceCulture);

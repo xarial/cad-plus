@@ -33,6 +33,11 @@ using Xarial.CadPlus.Init;
 using Xarial.CadPlus.Plus.Shared;
 using Xarial.CadPlus.Plus.Shared.Services;
 using Xarial.CadPlus.Plus.Shared.Extensions;
+using System.Windows;
+using System.Windows.Interop;
+using Xarial.XCad.UI.PropertyPage.Delegates;
+using Xarial.CadPlus.Plus.Delegates;
+using Xarial.XCad.UI.Structures;
 
 namespace Xarial.CadPlus.AddIn.Base
 {
@@ -40,22 +45,15 @@ namespace Xarial.CadPlus.AddIn.Base
 
     public class AddInHost : IHostExtension
     {
-        [ImportMany]
-        private IModule[] m_Modules;
-
         internal const int ROOT_GROUP_ID = 1000;
 
-        public IntPtr ParentWindow => Extension.Application.WindowHandle;
-
         public IXExtension Extension { get; }
-
-        public IModule[] Modules => m_Modules;
-
+        
         public event Action Connect;
         public event Action Disconnect;
-        public event Action Initialized;
+        public event HostInitializedDelegate Initialized;
         public event Action<IContainerBuilder> ConfigureServices;
-        public event Action Started;
+        public event HostStartedDelegate Started;
 
         private CommandGroupSpec m_ParentGrpSpec;
 
@@ -65,26 +63,30 @@ namespace Xarial.CadPlus.AddIn.Base
         
         public IServiceProvider Services => m_SvcProvider;
 
-        public IApplication Application { get; }
-
         private ServiceProvider m_SvcProvider;
-
-        private IPropertyPageCreator m_PageCreator;
 
         private readonly IModulesLoader m_ModulesLoader;
 
         private readonly IInitiator m_Initiator;
 
+        private readonly ICadExtensionApplication m_App;
+
+        private readonly IModule[] m_Modules;
+
+        private readonly List<CommandGroupSpec> m_Specs;
+
         public AddInHost(ICadExtensionApplication app, IInitiator initiator) 
         {
+            m_App = app;
+
+            m_Specs = new List<CommandGroupSpec>();
+
             m_Initiator = initiator;
             m_Initiator.Init(this);
 
-            Application = app;
-            
             try
             {
-                Extension = app.Extension;
+                Extension = m_App.Extension;
 
                 m_NextId = ROOT_GROUP_ID + 1;
 
@@ -99,9 +101,7 @@ namespace Xarial.CadPlus.AddIn.Base
                 }
 
                 m_ModulesLoader = new ModulesLoader();
-                m_ModulesLoader.Load(this);
-                
-                Initialized?.Invoke();
+                m_Modules = m_ModulesLoader.Load(this, app.GetType());
             }
             catch (Exception ex)
             {
@@ -115,7 +115,7 @@ namespace Xarial.CadPlus.AddIn.Base
 
         private void OnStartupCompleted(IXExtension ext)
         {
-            Started?.Invoke();
+            Started?.Invoke(ext.Application.WindowHandle);
         }
 
         private void OnExtensionConnect(IXExtension ext) 
@@ -128,6 +128,13 @@ namespace Xarial.CadPlus.AddIn.Base
                 m_ParentGrpSpec = cmdGrp.Spec;
 
                 Connect?.Invoke();
+
+                foreach (var spec in m_Specs) 
+                {
+                    var grp = Extension.CommandManager.AddCommandGroup(spec);
+
+                    grp.CommandClick += OnCommandClick;
+                }
             }
             catch (Exception ex)
             {
@@ -149,37 +156,71 @@ namespace Xarial.CadPlus.AddIn.Base
 
             m_SvcProvider = new ServiceProvider(builder.Build());
 
-            svcColl.Populate(m_SvcProvider.Container);
+            svcColl.Populate(m_SvcProvider.Context);
 
-            m_PageCreator = m_SvcProvider.Container.Resolve<IPropertyPageCreator>();
+            Initialized?.Invoke(m_App, m_SvcProvider, m_Modules);
         }
 
         private void ConfigureHostServices(ContainerBuilder builder) 
         {   
             builder.RegisterInstance(Extension.Application);
-            builder.RegisterType<AppLogger>().As<IXLogger>();
             builder.RegisterType<CadAppMessageService>()
                 .As<IMessageService>();
             builder.RegisterType<DefaultDocumentAdapter>()
                 .As<IDocumentAdapter>();
             builder.RegisterType<SettingsProvider>()
                 .As<ISettingsProvider>();
+            builder.RegisterType<XCadMacroProvider>()
+                .As<IXCadMacroProvider>();
         }
-                
+
         public void RegisterCommands<TCmd>(CommandHandler<TCmd> handler)
             where TCmd : Enum
         {
-            var spec = Extension.CommandManager.CreateSpecFromEnum<TCmd>(m_NextId++, m_ParentGrpSpec);
-            spec.Parent = m_ParentGrpSpec;
-            
-            var grp = Extension.CommandManager.AddCommandGroup(spec);
+            var newSpec = Extension.CommandManager.CreateSpecFromEnum<TCmd>(m_NextId++, m_ParentGrpSpec);
 
-            foreach (var cmd in grp.Spec.Commands) 
+            var spec = m_Specs.FirstOrDefault(s => string.Equals(s.Title, newSpec.Title, StringComparison.CurrentCultureIgnoreCase));
+
+            CommandSpec[] existingCmds;
+
+            if (spec != null)
             {
-                m_Handlers.Add(cmd, new Tuple<Delegate, Enum>(handler, (Enum)Enum.ToObject(typeof(TCmd), cmd.UserId)));
+                existingCmds = spec.Commands;
+            }
+            else 
+            {
+                existingCmds = new CommandSpec[0];
+                newSpec.Parent = m_ParentGrpSpec;
+                m_Specs.Add(newSpec);
+                spec = newSpec;
             }
 
-            grp.CommandClick += OnCommandClick;
+            var cmds = new List<CommandSpec>();
+            cmds.AddRange(existingCmds);
+
+            for (int i = 0; i < newSpec.Commands.Length; i++) 
+            {
+                var src = newSpec.Commands[i];
+
+                var cmd = new CommandSpec(existingCmds.Length + i)
+                {
+                    HasMenu = src.HasMenu,
+                    HasSpacer = src.HasSpacer,
+                    HasTabBox = src.HasTabBox,
+                    HasToolbar = src.HasToolbar,
+                    Icon = src.Icon,
+                    SupportedWorkspace = src.SupportedWorkspace,
+                    TabBoxStyle = src.TabBoxStyle,
+                    Title = src.Title,
+                    Tooltip = src.Tooltip
+                };
+
+                m_Handlers.Add(cmd, new Tuple<Delegate, Enum>(handler, (Enum)Enum.ToObject(typeof(TCmd), src.UserId)));
+
+                cmds.Add(cmd);
+            }
+
+            spec.Commands = cmds.ToArray();
         }
 
         private void OnCommandClick(CommandSpec spec)
@@ -193,10 +234,7 @@ namespace Xarial.CadPlus.AddIn.Base
                 System.Diagnostics.Debug.Assert(false, "Handler is not registered");
             }
         }
-
-        public IXPropertyPage<TData> CreatePage<TData>()
-            => m_PageCreator.CreatePage<TData>();
-
+        
         private void OnCommandClick(CadPlusCommands_e spec)
         {
             switch (spec)
@@ -212,8 +250,10 @@ namespace Xarial.CadPlus.AddIn.Base
                     break;
 
                 case CadPlusCommands_e.About:
-                    AboutDialog.Show(this.GetType().Assembly, Resources.logo,
-                        Extension.Application.WindowHandle);
+                    ShowPopup(new AboutDialog(
+                        new AboutDialogSpec(this.GetType().Assembly,
+                        Resources.logo,
+                        Licenses.ThirdParty)));
                     break;
             }
         }
@@ -229,6 +269,13 @@ namespace Xarial.CadPlus.AddIn.Base
                     module.Dispose();
                 }
             }
+        }
+
+        public void ShowPopup<TWindow>(TWindow wnd) where TWindow : Window
+        {
+            var interopHelper = new WindowInteropHelper(wnd);
+            interopHelper.Owner = m_App.Extension.Application.WindowHandle;
+            wnd.ShowDialog();
         }
     }
 }

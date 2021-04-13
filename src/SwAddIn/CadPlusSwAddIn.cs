@@ -20,13 +20,15 @@ using Xarial.XCad.UI.PropertyPage;
 using System.Reflection;
 using Xarial.XToolkit.Reflection;
 using Xarial.CadPlus.Plus;
-using Xarial.CadPlus.Common.Sw.Services;
-using Xarial.CadPlus.Common.Sw;
 using Autofac;
 using Xarial.CadPlus.Common;
 using Xarial.CadPlus.Init;
 using Xarial.CadPlus.Plus.Applications;
 using Xarial.CadPlus.Plus.Shared;
+using Xarial.CadPlus.Plus.Services;
+using Xarial.CadPlus.Plus.Extensions;
+using Xarial.CadPlus.AddIn.Sw.Services;
+using Xarial.XCad.SolidWorks.Services;
 
 namespace Xarial.CadPlus.AddIn.Sw
 {
@@ -63,8 +65,7 @@ namespace Xarial.CadPlus.AddIn.Sw
 
         public CadPlusSwAddIn()
         {
-            m_Host = new AddInHost(new CadExtensionApplication(this, 
-                Guid.Parse(ApplicationIds.SolidWorksAddIn)), 
+            m_Host = new AddInHost(new SwAddInApplication(this), 
                 new Initiator());
             m_Host.ConfigureServices += OnConfigureModuleServices;
         }
@@ -73,11 +74,12 @@ namespace Xarial.CadPlus.AddIn.Sw
         {
             var svc = ((ContainerBuilderWrapper)builder).Builder;
 
-            svc.RegisterType<SwPropertyPageCreator<SwGeneralPropertyManagerPageHandler>>()
-                .As<IPropertyPageCreator>()
-                .WithParameter(new TypedParameter(typeof(ISwAddInEx), this));
-            
-            svc.UsingCommonSwServices();
+            svc.RegisterType<CadPlusPropertyPageHandlerProvider>().As<IPropertyPageHandlerProvider>();
+            svc.RegisterType<CadPlusTaskPaneControlProvider>().As<ITaskPaneControlProvider>();
+
+            builder.RegisterAdapter<IXApplication, ISwApplication>(a => (ISwApplication)a);
+            builder.Register(x => x.GetService<IMacroExecutor>(CadApplicationIds.SolidWorks));
+            builder.Register(x => x.GetService<ICadDescriptor>(CadApplicationIds.SolidWorks));
         }
 
         protected override void Dispose(bool disposing)

@@ -37,15 +37,12 @@ namespace Xarial.CadPlus.XBatch.Base.Models
         
         private bool m_IsExecuting;
 
-        private readonly Func<TextWriter, IProgressHandler, IApplicationProvider, BatchRunner> m_BatchRunnerFact;
-
-        private readonly IApplicationProvider m_AppProvider;
-
-        public BatchRunJobExecutor(BatchJob job, IApplicationProvider appProvider,
-            Func<TextWriter, IProgressHandler, IApplicationProvider, BatchRunner> batchRunnerFact) 
+        private readonly Func<BatchJob, TextWriter, IProgressHandler, BatchRunner> m_BatchRunnerFact;
+        
+        public BatchRunJobExecutor(BatchJob job,
+            Func<BatchJob, TextWriter, IProgressHandler, BatchRunner> batchRunnerFact) 
         {
             m_Job = job;
-            m_AppProvider = appProvider;
 
             m_LogWriter = new LogWriter();
             m_PrgHander = new ProgressHandler();
@@ -72,9 +69,9 @@ namespace Xarial.CadPlus.XBatch.Base.Models
                 {
                     var cancellationToken = m_CurrentCancellationToken.Token;
 
-                    using (var batchRunner = m_BatchRunnerFact.Invoke(m_LogWriter, m_PrgHander, m_AppProvider))
+                    using (var batchRunner = m_BatchRunnerFact.Invoke(m_Job, m_LogWriter, m_PrgHander))
                     {
-                        return await batchRunner.BatchRun(m_Job, cancellationToken).ConfigureAwait(false);
+                        return await batchRunner.BatchRunAsync(cancellationToken).ConfigureAwait(false);
                     }
                 }
                 catch (Exception ex)

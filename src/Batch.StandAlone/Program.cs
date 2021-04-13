@@ -28,31 +28,31 @@ using Xarial.CadPlus.XBatch.Base.Services;
 using Xarial.CadPlus.Batch.StandAlone.ViewModels;
 using Xarial.XCad.Base;
 using Xarial.XToolkit.Reporting;
+using Xarial.CadPlus.Plus.Exceptions;
+using Xarial.CadPlus.Plus;
+using System.Windows;
 
 namespace Xarial.CadPlus.Batch.StandAlone
 {
     class Program
     {
         private const int MAX_RETRIES = 2;
-
-        private static IBatchApplication m_BatchApp;
-        private static IBatchApplicationProxy m_BatchAppProxy;
-
+        
         private static XBatch.Base.FileOptions m_StartupOptions;
 
-        private static ApplicationLauncher<BatchArguments, MainWindow> m_AppLauncher;
+        private static ApplicationLauncher<BatchApplication, BatchArguments, MainWindow> m_AppLauncher;
 
         private static BatchManagerVM m_BatchManager;
+
+        private static Window m_Window;
 
         [STAThread]
         static void Main(string[] args)
         {
-            m_BatchAppProxy = new BatchApplicationProxy();
-            m_BatchApp = new BatchApplication(m_BatchAppProxy);
-
-            m_AppLauncher = new ApplicationLauncher<BatchArguments, MainWindow>(m_BatchApp, new Initiator());
+            m_AppLauncher = new ApplicationLauncher<BatchApplication, BatchArguments, MainWindow>(new Initiator());
             m_AppLauncher.ConfigureServices += OnConfigureServices;
             m_AppLauncher.ParseArguments += OnParseArguments;
+            m_AppLauncher.WriteHelp += OnWriteHelp;
             m_AppLauncher.WindowCreated += OnWindowCreated;
             m_AppLauncher.RunConsoleAsync += OnRunConsoleAsync;
             m_AppLauncher.Start(args);
@@ -63,14 +63,25 @@ namespace Xarial.CadPlus.Batch.StandAlone
 
         private static async Task RunConsoleBatch(BatchArguments args)
         {
-            using (var batchRunner = m_AppLauncher.Container.Resolve<BatchRunner>(
-                new TypedParameter[]
-                {
+            try
+            {
+                using (var batchRunner = m_AppLauncher.Container.Resolve<BatchRunner>(
+                    new TypedParameter[]
+                    {
+                    new TypedParameter(typeof(BatchJob), args.Job),
                     new TypedParameter(typeof(TextWriter), Console.Out),
                     new TypedParameter(typeof(IProgressHandler), new ConsoleProgressWriter())
-                }))
+                    }))
+                {
+                    await batchRunner.BatchRunAsync().ConfigureAwait(false);
+                }
+            }
+            catch (Exception ex)
             {
-                await batchRunner.BatchRun(args.Job).ConfigureAwait(false);
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine(ex.ParseUserError(out _));
+                Console.ResetColor();
+                Environment.Exit(1);
             }
         }
 
@@ -79,7 +90,6 @@ namespace Xarial.CadPlus.Batch.StandAlone
             builder.RegisterType<RecentFilesManager>()
                 .As<IRecentFilesManager>();
 
-            builder.RegisterType<AppLogger>().As<IXLogger>();
             builder.RegisterType<BatchRunner>();
             builder.RegisterType<BatchRunnerModel>().As<IBatchRunnerModel>();
             builder.RegisterType<BatchRunJobExecutor>().As<IBatchRunJobExecutor>();
@@ -89,36 +99,30 @@ namespace Xarial.CadPlus.Batch.StandAlone
                 .WithParameter(new TypedParameter(typeof(int), MAX_RETRIES));
             builder.RegisterType<PopupKiller>().As<IPopupKiller>();
             builder.RegisterType<BatchDocumentVM>();
+            builder.RegisterType<AboutService>().As<IAboutService>();
+            builder.Register<Window>(c => m_Window);
 
-            builder.RegisterInstance(m_BatchApp);
-            builder.RegisterInstance(m_BatchAppProxy);
+            builder.RegisterType<BatchApplicationProxy>().As<IBatchApplicationProxy>().SingleInstance();
+            
+            builder.RegisterAdapter<IApplication, ICadApplicationInstanceProvider[]>(x => ((IBatchApplication)x).ApplicationProviders);
 
-            builder.RegisterAdapter<IBatchApplication, IApplicationProvider[]>(x => x.ApplicationProviders);
+            builder.RegisterType<XCadMacroProvider>().As<IXCadMacroProvider>();
 
             builder.RegisterType<JobManager>().As<IJobManager>()
                 .SingleInstance()
-                .OnActivating(x =>
-                {
-                    try
-                    {
-                        x.Instance.Init();
-                    }
-                    catch (Exception ex)
-                    {
-                        var logger = x.Context.Resolve<IXLogger>();
-                        logger.Log(ex);
-                    }
-                });
+                .OnActivating(x => x.Instance.Init());
         }
 
         private static void OnWindowCreated(MainWindow window, BatchArguments args)
         {
             try 
             {
+                m_Window = window;
+
                 m_BatchManager = m_AppLauncher.Container.Resolve<BatchManagerVM>();
                 window.Closing += OnWindowClosing;
                 window.DataContext = m_BatchManager;
-
+                
                 m_BatchManager.ParentWindow = window;
 
                 if (m_StartupOptions != null)
@@ -168,7 +172,7 @@ namespace Xarial.CadPlus.Batch.StandAlone
                 BatchArguments argsLocal = default;
                 bool createConsoleLocal = false;
 
-                parser.ParseArguments<XBatch.Base.FileOptions, RunOptions, JobOptions>(input)
+                CreateParserResult(parser, input)
                     .WithParsed<RunOptions>(a => { argsLocal = a; createConsoleLocal = true; })
                     .WithParsed<JobOptions>(a => { argsLocal = a; createConsoleLocal = true; })
                     .WithParsed<XBatch.Base.FileOptions>(a => m_StartupOptions = a)
@@ -178,7 +182,15 @@ namespace Xarial.CadPlus.Batch.StandAlone
                 createConsole = createConsoleLocal;
             }
 
-            return hasError;
+            return !hasError;
         }
+
+        private static void OnWriteHelp(Parser parser, string[] args)
+        {
+            CreateParserResult(parser, args);
+        }
+
+        private static ParserResult<object> CreateParserResult(Parser parser, string[] args)
+            => parser.ParseArguments<XBatch.Base.FileOptions, RunOptions, JobOptions>(args);
     }
 }

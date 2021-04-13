@@ -21,13 +21,16 @@ using Xarial.CadPlus.Batch.StandAlone.ViewModels;
 using Xarial.CadPlus.Common.Exceptions;
 using Xarial.CadPlus.Common.Services;
 using Xarial.CadPlus.Plus.Applications;
+using Xarial.CadPlus.Plus.Data;
 using Xarial.CadPlus.Plus.Exceptions;
 using Xarial.CadPlus.Plus.Services;
 using Xarial.CadPlus.Plus.Shared.Services;
 using Xarial.CadPlus.Plus.UI;
+using Xarial.CadPlus.XBatch.Base;
 using Xarial.CadPlus.XBatch.Base.Core;
 using Xarial.CadPlus.XBatch.Base.Exceptions;
 using Xarial.CadPlus.XBatch.Base.Models;
+using Xarial.XCad;
 using Xarial.XToolkit.Services.UserSettings;
 using Xarial.XToolkit.Wpf;
 using Xarial.XToolkit.Wpf.Extensions;
@@ -108,9 +111,6 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
         public ICommand RunJobCommand { get; }
 
         public ICommand SaveDocumentCommand { get; }
-        public ICommand SaveAsDocumentCommand { get; }
-
-        public ICommand AddFromFileCommand { get; }
 
         public ICommand FilterEditEndingCommand { get; }
 
@@ -134,53 +134,56 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
 
         public string FilePath => m_FilePath;
 
-        private readonly Func<BatchJob, IApplicationProvider, IBatchRunJobExecutor> m_ExecFact;
-        private readonly IApplicationProvider m_AppProvider;
+        private readonly Func<BatchJob, IBatchRunJobExecutor> m_ExecFact;
+        private readonly ICadApplicationInstanceProvider m_AppProvider;
 
         public event Action<BatchDocumentVM, BatchJob, string> Save;
 
         private readonly IBatchApplicationProxy m_BatchAppProxy;
 
-        public BatchDocumentVM(FileInfo file, BatchJob job, IApplicationProvider appProvider, 
+        private readonly MainWindow m_ParentWnd;
+
+        public BatchDocumentVM(FileInfo file, BatchJob job, ICadApplicationInstanceProvider[] appProviders, 
             IMessageService msgSvc,
-            Func<BatchJob, IApplicationProvider, IBatchRunJobExecutor> execFact,
-            IBatchApplicationProxy batchAppProxy)
-            : this(Path.GetFileNameWithoutExtension(file.FullName), job, appProvider, 
-                  msgSvc, execFact, batchAppProxy)
+            Func<BatchJob, IBatchRunJobExecutor> execFact,
+            IBatchApplicationProxy batchAppProxy, MainWindow parentWnd, IRibbonButtonCommand[] backstageCmds)
+            : this(Path.GetFileNameWithoutExtension(file.FullName), job, appProviders, 
+                  msgSvc, execFact, batchAppProxy, parentWnd, backstageCmds)
         {
             m_FilePath = file.FullName;
             IsDirty = false;
         }
 
         public BatchDocumentVM(string name, BatchJob job,
-            IApplicationProvider appProvider,
-            IMessageService msgSvc, Func<BatchJob, IApplicationProvider, IBatchRunJobExecutor> execFact,
-            IBatchApplicationProxy batchAppProxy)
+            ICadApplicationInstanceProvider[] appProviders,
+            IMessageService msgSvc, Func<BatchJob, IBatchRunJobExecutor> execFact,
+            IBatchApplicationProxy batchAppProxy, MainWindow parentWnd, IRibbonButtonCommand[] backstageCmds)
         {
             m_ExecFact = execFact;
-            m_AppProvider = appProvider;
+            m_AppProvider = job.FindApplicationProvider(appProviders);
             m_Job = job;
             m_MsgSvc = msgSvc;
             m_BatchAppProxy = batchAppProxy;
+            m_ParentWnd = parentWnd;
 
-            CommandManager = LoadRibbonCommands();
+            CommandManager = LoadRibbonCommands(backstageCmds);
 
-            InputFilesFilter = appProvider.InputFilesFilter?.Select(f => new FileFilter(f.Name, f.Extensions)).ToArray();
-            MacroFilesFilter = appProvider.MacroFileFiltersProvider.GetSupportedMacros()
-                .Select(f => new FileFilter(f.Name, f.Extensions)).Union(new FileFilter[] { FileFilter.AllFiles }).ToArray();
+            InputFilesFilter = GetFileFilters(m_AppProvider.EntityDescriptor);
+            MacroFilesFilter = m_AppProvider.EntityDescriptor.MacroFileFilters
+                .Select(f => new FileFilter(f.Name, f.Extensions))
+                .Concat(new FileFilter[] { XCadMacroProvider.Filter, FileFilter.AllFiles })
+                .ToArray();
 
             IsDirty = true;
 
             RunJobCommand = new RelayCommand(RunJob, () => CanRunJob);
             SaveDocumentCommand = new RelayCommand(SaveDocument, () => IsDirty);
-            SaveAsDocumentCommand = new RelayCommand(SaveAsDocument);
             FilterEditEndingCommand = new RelayCommand<DataGridCellEditEndingEventArgs>(FilterEditEnding);
-            AddFromFileCommand = new RelayCommand(AddFromFile);
 
             Name = name;
             Settings = new BatchDocumentSettingsVM(m_Job, m_AppProvider);
             Settings.Modified += OnSettingsModified;
-            Results = new JobResultsVM(m_Job, m_AppProvider, m_ExecFact);
+            Results = new JobResultsVM(m_Job, m_ExecFact);
 
             Filters = new ObservableCollection<FilterVM>((m_Job.Filters ?? Enumerable.Empty<string>()).Select(f => new FilterVM(f)));
             Filters.CollectionChanged += OnFiltersCollectionChanged;
@@ -193,36 +196,124 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
             Macros.CollectionChanged += OnMacrosCollectionChanged;
         }
 
-        private RibbonCommandManager LoadRibbonCommands()
+        protected virtual FileFilter[] GetFileFilters(ICadDescriptor cadEntDesc)
         {
-            var cmdMgr = new RibbonCommandManager();
-            var jobTab = new RibbonTab(BatchApplicationCommandManager.JobTab.Name, "Job");
-            cmdMgr.Tabs.Add(jobTab);
-            var execGroup = new RibbonGroup(BatchApplicationCommandManager.JobTab.ExecutionGroupName, "Execution");
-            jobTab.Groups.Add(execGroup);
+            return new FileFilter[]
+            {
+                new FileFilter(cadEntDesc.PartFileFilter.Name, cadEntDesc.PartFileFilter.Extensions),
+                new FileFilter(cadEntDesc.AssemblyFileFilter.Name, cadEntDesc.AssemblyFileFilter.Extensions),
+                new FileFilter(cadEntDesc.DrawingFileFilter.Name, cadEntDesc.DrawingFileFilter.Extensions),
+                new FileFilter($"{cadEntDesc.ApplicationName} Files", cadEntDesc.PartFileFilter.Extensions
+                                                                      .Union(cadEntDesc.AssemblyFileFilter.Extensions)
+                                                                      .Union(cadEntDesc.DrawingFileFilter.Extensions).ToArray()),
+                FileFilter.AllFiles
+            };
+        }
 
-            execGroup.Commands.Add(new RibbonButtonCommand("Run Job", Resources.run_job, RunJob, () => CanRunJob));
-            execGroup.Commands.Add(new RibbonButtonCommand("Cancel Job", Resources.cancel_job,
-                ()=>
-                {
-                    if (Results?.Selected != null) 
-                    {
-                        Results.Selected.CancelJob();
-                    }
-                },
-                () => 
-                {
-                    if (Results?.Selected != null)
-                    {
-                        return Results.Selected.IsBatchInProgress;
-                    }
-                    else 
-                    {
-                        return false;
-                    }
-                    
-                }));
+        protected virtual RibbonCommandManager LoadRibbonCommands(IRibbonButtonCommand[] backstageCmds)
+        {
+            var cmdMgr = new RibbonCommandManager(backstageCmds,
+                new RibbonTab(BatchApplicationCommandManager.InputTab.Name, "Input",
+                    new RibbonGroup(BatchApplicationCommandManager.InputTab.FilesGroupName, "Files",
+                        new RibbonButtonCommand("Add Files...", Resources.add_file, "",
+                            () => m_ParentWnd.lstInputs.AddFilesCommand.Execute(null),
+                            () => m_ParentWnd.lstInputs.AddFilesCommand.CanExecute(null)),
+                        new RibbonButtonCommand("Add Folders...", Resources.add_folder, "",
+                            () => m_ParentWnd.lstInputs.AddFoldersCommand.Execute(null),
+                            () => m_ParentWnd.lstInputs.AddFoldersCommand.CanExecute(null)),
+                        new RibbonButtonCommand("Add From File...", Resources.add_from_file, "",
+                            AddFromFile, null),
+                        new RibbonButtonCommand("Remove Files And Folders", Resources.remove_file_folder, "",
+                            () => m_ParentWnd.lstInputs.DeleteSelectedCommand.Execute(null),
+                            () => m_ParentWnd.lstInputs.DeleteSelectedCommand.CanExecute(null))),
+                new RibbonGroup(BatchApplicationCommandManager.InputTab.FolderFiltersGroupName, "Folder Filters",
+                        new RibbonCustomCommand("Folder Filters", Resources.filter, "",
+                        this, (System.Windows.DataTemplate)m_ParentWnd.FindResource("folderFilterGridTemplate"))),
+                new RibbonGroup(BatchApplicationCommandManager.InputTab.MacrosGroupName, "Macros",
+                        new RibbonButtonCommand("Add Macros...", Resources.add_macro, "",
+                            () => m_ParentWnd.lstMacros.AddFilesCommand.Execute(null),
+                            () => m_ParentWnd.lstMacros.AddFilesCommand.CanExecute(null)),
+                        new RibbonButtonCommand("Remove Macros", Resources.remove_macro, "",
+                            () => m_ParentWnd.lstMacros.DeleteSelectedCommand.Execute(null),
+                            () => m_ParentWnd.lstMacros.DeleteSelectedCommand.CanExecute(null)))),
+                new RibbonTab(BatchApplicationCommandManager.SettingsTab.Name, "Settings",
+                    new RibbonGroup(BatchApplicationCommandManager.SettingsTab.StartupOptionsGroupName, "Startup Options",
+                        new RibbonDropDownButton("Version", m_AppProvider.EntityDescriptor.ApplicationIcon, "",
+                            () => new VersionVM(Settings.Version),
+                            v => Settings.Version = ((VersionVM)v).Version,
+                            () => m_AppProvider.GetInstalledVersions().Select(v => new VersionVM(v))),
+                        new RibbonToggleCommand("Safe Mode", Resources.safe_mode, "",
+                            () => Settings.StartupOptionSafe,
+                            v => Settings.StartupOptionSafe = v),
+                        new RibbonToggleCommand("Background", Resources.background_mode, "",
+                            () => Settings.StartupOptionBackground,
+                            v => Settings.StartupOptionBackground = v),
+                        new RibbonToggleCommand("Silent", Resources.no_popup_mode, "",
+                            () => Settings.StartupOptionSilent,
+                            v => Settings.StartupOptionSilent = v),
+                        new RibbonToggleCommand("Hidden", Resources.hidden_application, "",
+                            () => Settings.StartupOptionHidden,
+                            v => Settings.StartupOptionHidden = v)),
+                    new RibbonGroup(BatchApplicationCommandManager.SettingsTab.FileOpenOptionsGroupName, "File Open Options",
+                        new RibbonToggleCommand("Silent", Resources.silent_mode, "",
+                            () => Settings.OpenFileOptionSilent,
+                            v => Settings.OpenFileOptionSilent = v),
+                        new RibbonToggleCommand("Rapid", Resources.rapid_mode, "",
+                            () => Settings.OpenFileOptionRapid,
+                            v => Settings.OpenFileOptionRapid = v),
+                        new RibbonToggleCommand("Invisible", Resources.invisible_mode, "",
+                            () => Settings.OpenFileOptionInvisible,
+                            v => Settings.OpenFileOptionInvisible = v)),
+                    new RibbonGroup(BatchApplicationCommandManager.SettingsTab.ProtectionGroupName, "Protection",
+                        new RibbonToggleCommand("Read Only", Resources.read_only_mode, "",
+                            () => Settings.OpenFileOptionReadOnly,
+                            v => Settings.OpenFileOptionReadOnly = v),
+                        new RibbonToggleCommand("Forbid Files Upgrade", Resources.forbid_upgrade, "",
+                            () => Settings.ForbidUpgrade,
+                            v => Settings.ForbidUpgrade = v)),
+                    new RibbonGroup(BatchApplicationCommandManager.SettingsTab.ActionsGroupName, "Actions",
+                        new RibbonToggleCommand("Automatically Save Documents", Resources.auto_save_docs, "",
+                            () => Settings.AutoSaveDocuments,
+                            v => Settings.AutoSaveDocuments = v)),
+                    new RibbonGroup(BatchApplicationCommandManager.SettingsTab.ResilienceGroupName, "Resilience",
+                        new RibbonNumericSwitchCommand("Timeout", null, "", "Timeout On", "Timeout Off",
+                            () => Settings.IsTimeoutEnabled,
+                            v => Settings.IsTimeoutEnabled = v,
+                            () => Convert.ToDouble(Settings.Timeout),
+                            t => Settings.Timeout = Convert.ToInt32(t), new RibbonNumericSwitchCommandOptions(0, 3600, false, "0")),
+                        new RibbonSwitchCommand("Continue On Error", null, "", "Continue on error", "Stop on error",
+                            () => Settings.ContinueOnError,
+                            v => Settings.ContinueOnError = v),
+                        new RibbonNumericSwitchCommand("Batch Size", null, "", "Limit Batch Size", "Unlimited Batch Size",
+                            () => Settings.IsBatchSizeLimited,
+                            v => Settings.IsBatchSizeLimited = v,
+                            () => Convert.ToDouble(Settings.BatchSize),
+                            t => Settings.BatchSize = Convert.ToInt32(t == 0 ? 1 : t), new RibbonNumericSwitchCommandOptions(0, 1000, true, "0")))),//TODO: some issues when limit is set from 1 (binding does not work) - implemented workaround
+                new RibbonTab(BatchApplicationCommandManager.JobTab.Name, "Job",
+                    new RibbonGroup(BatchApplicationCommandManager.JobTab.ExecutionGroupName, "Execution",
+                        new RibbonButtonCommand("Run Job", Resources.run_job, "", RunJob, () => CanRunJob),
+                        new RibbonButtonCommand("Cancel Job", Resources.cancel_job, "",
+                        () =>
+                        {
+                            if (Results?.Selected != null)
+                            {
+                                Results.Selected.CancelJob();
+                            }
+                        },
+                        () =>
+                        {
+                            if (Results?.Selected != null)
+                            {
+                                return Results.Selected.IsBatchInProgress;
+                            }
+                            else
+                            {
+                                return false;
+                            }
 
+                        }))
+                ));
+            
             m_BatchAppProxy.CreateCommandManager(cmdMgr);
 
             return cmdMgr;
@@ -255,7 +346,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
             IsDirty = true;
         }
 
-        private void SaveAsDocument()
+        internal void SaveAsDocument()
         {
             if (FileSystemBrowser.BrowseFileSave(out m_FilePath, 
                 "Select file path",

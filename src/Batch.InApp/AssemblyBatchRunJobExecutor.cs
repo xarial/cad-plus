@@ -23,16 +23,6 @@ using Xarial.XToolkit.Reporting;
 
 namespace Xarial.CadPlus.Batch.InApp
 {
-    internal class JobItemDocument : JobItemFile
-    {
-        public IXDocument Document { get; }
-
-        public JobItemDocument(IXDocument doc, JobItemMacro[] macros) : base(doc.Path, macros)
-        {
-            Document = doc;
-        }
-    }
-
     public class AssemblyBatchRunJobExecutor : IBatchRunJobExecutor
     {
         public event Action<IJobItem[], DateTime> JobSet;
@@ -44,19 +34,24 @@ namespace Xarial.CadPlus.Batch.InApp
 
         private readonly IXDocument[] m_Docs;
 
-        private readonly IMacroRunnerExService m_MacroRunner;
+        private readonly IMacroExecutor m_MacroRunner;
         private readonly IEnumerable<MacroData> m_Macros;
         private readonly bool m_ActivateDocs;
+        private readonly bool m_AllowReadOnly;
+        private readonly bool m_AllowRapid;
 
-        internal AssemblyBatchRunJobExecutor(IXApplication app, IMacroRunnerExService macroRunnerSvc,
-            IXDocument[] documents, IEnumerable<MacroData> macros, bool activateDocs) 
+        internal AssemblyBatchRunJobExecutor(IXApplication app, IMacroExecutor macroRunnerSvc,
+            IXDocument[] documents, IEnumerable<MacroData> macros, bool activateDocs, bool allowReadOnly, bool allowRapid) 
         {
             m_App = app;
 
             m_MacroRunner = macroRunnerSvc;
             m_Docs = documents;
             m_Macros = macros;
+
             m_ActivateDocs = activateDocs;
+            m_AllowReadOnly = allowReadOnly;
+            m_AllowRapid = allowRapid;
         }
 
         public void Cancel()
@@ -136,6 +131,16 @@ namespace Xarial.CadPlus.Batch.InApp
                         state |= DocumentState_e.Hidden;
                     }
 
+                    if (m_AllowReadOnly) 
+                    {
+                        state |= DocumentState_e.ReadOnly;
+                    }
+
+                    if (m_AllowRapid) 
+                    {
+                        state |= DocumentState_e.Rapid;
+                    }
+
                     doc.State = state;
                     doc.Commit(cancellationToken);
                 }
@@ -209,7 +214,7 @@ namespace Xarial.CadPlus.Batch.InApp
                 }
                 else
                 {
-                    errorDesc = "Unknown error";
+                    errorDesc = ex.ParseUserError(out _, "Unknown error");
                 }
 
                 LogMessage($"Failed to run macro '{macro.FilePath}': {errorDesc}");

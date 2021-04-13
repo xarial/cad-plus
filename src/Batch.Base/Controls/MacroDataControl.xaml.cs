@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -20,7 +21,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Xarial.CadPlus.XBatch.Base.Controls
+namespace Xarial.CadPlus.Batch.Base.Controls
 {
     public partial class MacroDataControl : UserControl
     {
@@ -39,6 +40,17 @@ namespace Xarial.CadPlus.XBatch.Base.Controls
 		{
 			get { return (bool)GetValue(ShowFullPathProperty); }
 			set { SetValue(ShowFullPathProperty, value); }
+		}
+
+		private void OnHelpClicked(object sender, RoutedEventArgs e)
+		{
+			try
+			{
+				Process.Start("https://cadplus.xarial.com/macro-arguments/");
+			}
+			catch 
+			{
+			}
 		}
 	}
 }

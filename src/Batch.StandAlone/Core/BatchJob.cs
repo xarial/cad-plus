@@ -13,6 +13,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Xarial.CadPlus.Plus.Applications;
+using Xarial.CadPlus.Plus.Exceptions;
 using Xarial.XCad;
 using Xarial.XToolkit.Services.UserSettings;
 using Xarial.XToolkit.Services.UserSettings.Attributes;
@@ -98,6 +99,23 @@ namespace Xarial.CadPlus.XBatch.Base.Core
             StartupOptions = StartupOptions_e.Silent | StartupOptions_e.Safe;
             OpenFileOptions = OpenFileOptions_e.Silent | OpenFileOptions_e.ForbidUpgrade;
             Actions = Actions_e.None;
+        }
+    }
+
+    public static class BatchJobExtension 
+    {
+        public static ICadApplicationInstanceProvider FindApplicationProvider(this BatchJob job, ICadApplicationInstanceProvider[] appProviders)
+        {
+            var appProvider = appProviders.FirstOrDefault(
+                p => string.Equals(p.EntityDescriptor.ApplicationId, job.ApplicationId,
+                StringComparison.CurrentCultureIgnoreCase));
+
+            if (appProvider == null)
+            {
+                throw new UserException("Failed to find the application provider for this job file");
+            }
+
+            return appProvider;
         }
     }
 }

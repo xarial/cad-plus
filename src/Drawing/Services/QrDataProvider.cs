@@ -24,12 +24,10 @@ namespace Xarial.CadPlus.Drawing.Services
 {
     public class QrDataProvider
     {
-        private readonly DrawingSettings m_Setts;
         private readonly IXApplication m_App;
 
-        public QrDataProvider(IXApplication app, DrawingSettings setts) 
+        public QrDataProvider(IXApplication app) 
         {
-            m_Setts = setts;
             m_App = app;
         }
 
@@ -103,13 +101,13 @@ namespace Xarial.CadPlus.Drawing.Services
                     return $"conisio://{vault.Name}/{CONISIO_URL_ACTION}?projectid={folder.ID}&documentid={file.ID}&objecttype={(int)file.ObjectType}";
 
                 case Source_e.PdmWeb2Url:
-                    if (string.IsNullOrEmpty(m_Setts.PdmWeb2Server)) 
+                    if (string.IsNullOrEmpty(srcData.PdmWeb2Server)) 
                     {
                         throw new UserException("Url of Web2 server is not specified");
                     }
 
                     vaultRelPath = FindRelativeVaultPath(doc.Path, out vault);
-                    return $"{m_Setts.PdmWeb2Server}/{vault.Name}/{Path.GetDirectoryName(vaultRelPath).Replace('\\', '/')}?view=bom&file={Path.GetFileName(vaultRelPath)}";
+                    return $"{srcData.PdmWeb2Server}/{vault.Name}/{Path.GetDirectoryName(vaultRelPath).Replace('\\', '/')}?view=bom&file={Path.GetFileName(vaultRelPath)}";
 
                 case Source_e.Custom:
                     return srcData.CustomValue;

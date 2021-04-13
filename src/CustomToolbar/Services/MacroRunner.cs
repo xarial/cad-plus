@@ -23,9 +23,9 @@ namespace Xarial.CadPlus.CustomToolbar.Services
     public class MacroRunner : IMacroRunner
     {
         private readonly IXApplication m_App;
-        private readonly IMacroRunnerExService m_Runner;
+        private readonly IMacroExecutor m_Runner;
 
-        public MacroRunner(IXApplication app, IMacroRunnerExService runner)
+        public MacroRunner(IXApplication app, IMacroExecutor runner)
         {
             m_App = app;
             m_Runner = runner;

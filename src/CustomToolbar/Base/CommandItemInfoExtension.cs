@@ -13,6 +13,7 @@ using Xarial.CadPlus.CustomToolbar.Properties;
 using Xarial.CadPlus.CustomToolbar.Structs;
 using Xarial.CadPlus.Plus;
 using Xarial.CadPlus.Plus.Data;
+using Xarial.CadPlus.Plus.Extensions;
 using Xarial.CadPlus.Plus.Modules;
 using Xarial.XCad.UI;
 
@@ -41,12 +42,12 @@ namespace Xarial.CadPlus.CustomToolbar.Base
             {
                 if (info is CommandMacroInfo)
                 {
-                    icon = new ImageEx(ImageIcon.ImageToByteArray(Resources.macro_icon_default), 
+                    icon = new ImageEx(Resources.macro_icon_default.GetBytes(), 
                         Resources.macro_vector);
                 }
                 else if (info is CommandGroupInfo) 
                 {
-                    icon = new ImageEx(ImageIcon.ImageToByteArray(Resources.group_icon_default),
+                    icon = new ImageEx(Resources.group_icon_default.GetBytes(),
                         Resources.macros_vector);
                 }
             }

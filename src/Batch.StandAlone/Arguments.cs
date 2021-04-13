@@ -53,6 +53,9 @@ namespace Xarial.CadPlus.XBatch.Base
         public RunOptions() 
         {
             Job = new BatchJob();
+
+            //TODO: make this a parameter once more providers are implemented
+            Job.ApplicationId = Plus.CadApplicationIds.SolidWorks;
         }
         
         [Option('i', "input", Required = true, HelpText = "List of input directories or file paths to process")]
@@ -62,9 +65,9 @@ namespace Xarial.CadPlus.XBatch.Base
         }
 
         [Option('f', "filters", Required = false, HelpText = "Filters to extract input files, if input parameter contains directories. Default (all files): *.*")]
-        public string[] Filters
+        public IEnumerable<string> Filters
         {
-            set => Job.Filters = value;
+            set => Job.Filters = value.ToArray();
         }
 
         [Option('m', "macros", Required = true, HelpText = "List of macros to run")]
@@ -128,7 +131,7 @@ namespace Xarial.CadPlus.XBatch.Base
             }
         }
 
-        [Option('b', "batch", Required = false, HelpText = "maximum number of files to process in the single session of CAD application before restarting. Default: 25")]
+        [Option('b', "batch", Required = false, HelpText = "Maximum number of files to process in the single session of CAD application before restarting. Default: 25")]
         public int BatchSize
         {
             set => Job.BatchSize = value;

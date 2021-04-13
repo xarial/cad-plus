@@ -22,99 +22,107 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Xarial.CadPlus.Batch.Base.Controls;
 using Xarial.CadPlus.XBatch.Base.ViewModels;
+using Xarial.XToolkit.Wpf.Controls;
 
-namespace Xarial.CadPlus.XBatch.Base.Controls
+namespace Xarial.CadPlus.Batch.Base.Controls
 {
-    public partial class JobItemsDataGrid : UserControl
+	public class MacroColumnHeaderVM 
+	{
+		public string Name { get; }
+		public int MacroIndex { get; }
+
+		public MacroColumnHeaderVM(string name, int index) 
+		{
+			Name = name;
+			MacroIndex = index;
+		}
+	}
+
+	public class MacroCellContentSelector : ICellContentSelector
+	{
+		public object SelectContent(object dataItem, DataGridColumn column, DataGridCell cell)
+		{
+			var jobItem = dataItem as JobItemFileVM;
+			var macroColumn = (MacroColumnHeaderVM)column.Header;
+
+			return jobItem.Macros[macroColumn.MacroIndex];
+		}
+	}
+
+	public partial class JobItemsDataGrid : UserControl
     {
         public JobItemsDataGrid()
         {
             InitializeComponent();
         }
 
+		public static readonly DependencyProperty DataGridStyleProperty =
+			DependencyProperty.Register(
+			nameof(DataGridStyle), typeof(Style),
+			typeof(JobItemsDataGrid));
+
+		public Style DataGridStyle
+		{
+			get { return (Style)GetValue(DataGridStyleProperty); }
+			set { SetValue(DataGridStyleProperty, value); }
+		}
+
 		public static readonly DependencyProperty ItemsSourceProperty =
 			DependencyProperty.Register(
-			nameof(ItemsSource), typeof(IList),
+			nameof(ItemsSource), typeof(IEnumerable),
 			typeof(JobItemsDataGrid), new PropertyMetadata(OnItemsSourceChanged));
 
-		public string ItemsSource
+		public IEnumerable ItemsSource
 		{
-			get { return (string)GetValue(ItemsSourceProperty); }
+			get { return (IEnumerable)GetValue(ItemsSourceProperty); }
 			set { SetValue(ItemsSourceProperty, value); }
+		}
+
+		private static readonly DependencyPropertyKey MacroColumnsPropertyKey
+			= DependencyProperty.RegisterReadOnly(nameof(MacroColumns),
+				typeof(IEnumerable), typeof(JobItemsDataGrid),
+				new FrameworkPropertyMetadata(default(IEnumerable),
+					FrameworkPropertyMetadataOptions.None));
+
+		public static readonly DependencyProperty MacroColumnsProperty
+			= MacroColumnsPropertyKey.DependencyProperty;
+
+		public IEnumerable MacroColumns
+		{
+			get { return (IEnumerable)GetValue(MacroColumnsProperty); }
+			private set { SetValue(MacroColumnsPropertyKey, value); }
 		}
 
 		private static void OnItemsSourceChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) 
 		{
 			var grd = d as JobItemsDataGrid;
-			grd.LoadItems(e.NewValue as IEnumerable<JobItemFileVM>);
-		}
 
-		//TODO: replace with XDataGrid with dynamic columns
+			var jobItems = (e.NewValue as IEnumerable<JobItemFileVM>)?.ToArray();
 
-		private DataGridColumn CreateStatusColumn(string header, Binding binding) 
-		{	
-			var elemFact = new FrameworkElementFactory(typeof(JobItemStatusControl));
-			
-			elemFact.SetValue(JobItemStatusControl.DataContextProperty, binding);
-			//elemFact.SetValue(Image.WidthProperty, 16d);
-			//elemFact.SetValue(Image.HeightProperty, 16d);
-
-			var cellTemplate = new DataTemplate()
+			if (jobItems?.Any() == true)
 			{
-				VisualTree = elemFact
-			};
+				var templateJob = jobItems.First();
+				var columns = new MacroColumnHeaderVM[templateJob.Macros.Length];
 
-			var statusCol = new DataGridTemplateColumn()
-			{
-				IsReadOnly = true,
-				Header = header,
-				CellTemplate = cellTemplate,
-				Width = DataGridLength.SizeToHeader,
-				SortMemberPath = "Status"
-			};
-
-			return statusCol;
-		}
-
-		private void LoadItems(IEnumerable<JobItemFileVM> items) 
-		{
-			dgrdJobItems.Columns.Clear();
-
-			if (items?.Any() == true)
-			{
-				var fileStatusCol = CreateStatusColumn("Status", new Binding()
+				for (int i = 0; i < templateJob.Macros.Length; i++) 
 				{
-					Mode = BindingMode.OneWay
-				});
-
-				dgrdJobItems.Columns.Add(fileStatusCol);
-
-				var fileCol = new DataGridTextColumn()
-				{
-					Header = "File",
-					Binding = new Binding("Name")
-				};
-
-				dgrdJobItems.Columns.Add(fileCol);
-
-				var headerMacros = items.First().Macros;
-
-				for (int i = 0; i < headerMacros.Length; i++)
-				{
-					var macro = headerMacros[i];
-
-					var macroCol = CreateStatusColumn(
-						macro.Name,
-						new Binding(string.Format("Macros[{0}]", i)) 
-						{
-							Mode = BindingMode.OneWay
-						});
-
-					dgrdJobItems.Columns.Add(macroCol);
+					columns[i] = new MacroColumnHeaderVM(templateJob.Macros[i].Name, i);
 				}
-			}
 
-			dgrdJobItems.ItemsSource = items;
+				grd.MacroColumns = columns;
+			}
+			else
+			{
+				grd.MacroColumns = null;
+			}
+		}
+
+		private void OnColumnsPreCreated(List<DataGridColumn> columns)
+		{
+			foreach (var macroCol in columns.Where(c => c.Header is MacroColumnHeaderVM)) 
+			{
+				macroCol.SortMemberPath = nameof(JobItemMacroVM.Status);
+			}
 		}
 	}
 }

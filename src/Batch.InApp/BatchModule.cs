@@ -35,6 +35,13 @@ using Xarial.CadPlus.Plus.Attributes;
 using Xarial.CadPlus.XBatch.Base.ViewModels;
 using Xarial.CadPlus.Plus.Services;
 using Xarial.CadPlus.Plus.Extensions;
+using Xarial.CadPlus.Plus.Modules;
+using Xarial.CadPlus.Plus.Delegates;
+using Xarial.CadPlus.Plus.UI;
+using Xarial.XCad.UI.PropertyPage.Base;
+using Xarial.CadPlus.Batch.InApp.Controls;
+using Xarial.CadPlus.Plus.Data;
+using Xarial.XCad.Base.Enums;
 
 namespace Xarial.CadPlus.Batch.InApp
 {
@@ -56,8 +63,10 @@ namespace Xarial.CadPlus.Batch.InApp
     }
 
     [Module(typeof(IHostExtension))]
-    public class BatchModule : IModule
+    public class BatchModule : IBatchInAppModule
     {
+        public event ProcessInAppBatchInputDelegate ProcessInput;
+
         [Title("Batch+")]
         [Description("Commands to batch run macros")]
         [IconEx(typeof(Resources), nameof(Resources.batch_plus_vector), nameof(Resources.batch_plus_icon))]
@@ -76,16 +85,16 @@ namespace Xarial.CadPlus.Batch.InApp
             RunInApp
         }
 
-        public Guid Id => Guid.Parse("EBB21DBD-5310-42ED-9301-229847676459");
-
         private IHostExtension m_Host;
 
         private IXPropertyPage<AssemblyBatchData> m_Page;
         private AssemblyBatchData m_Data;
 
-        private IMacroRunnerExService m_MacroRunnerSvc;
+        private IMacroExecutor m_MacroRunnerSvc;
         private IMessageService m_Msg;
         private IXLogger m_Logger;
+
+        private IServiceProvider m_SvcProvider;
 
         public void Init(IHost host)
         {
@@ -96,32 +105,76 @@ namespace Xarial.CadPlus.Batch.InApp
 
             m_Host = (IHostExtension)host;
             m_Host.Connect += OnConnect;
+            m_Host.Initialized += OnHostInitialized;
+        }
+
+        private void OnHostInitialized(IApplication app, IServiceContainer svcProvider, IModule[] modules)
+        {
+            m_SvcProvider = svcProvider;
+            m_Data = new AssemblyBatchData(m_SvcProvider.GetService<ICadDescriptor>());
         }
 
         private void OnConnect()
         {
-            m_MacroRunnerSvc = m_Host.Services.GetService<IMacroRunnerExService>();
-            m_Msg = m_Host.Services.GetService<IMessageService>();
-            m_Logger = m_Host.Services.GetService<IXLogger>();
+            m_MacroRunnerSvc = m_SvcProvider.GetService<IMacroExecutor>();
+            m_Msg = m_SvcProvider.GetService<IMessageService>();
+            m_Logger = m_SvcProvider.GetService<IXLogger>();
 
             m_Host.RegisterCommands<Commands_e>(OnCommandClick);
-            m_Page = m_Host.CreatePage<AssemblyBatchData>();
-            m_Data = new AssemblyBatchData(m_Host.Services.GetService<IMacroFileFilterProvider>());
+            m_Page = m_Host.Extension.CreatePage<AssemblyBatchData>(CreateDynamicPageControls);
             m_Page.Closing += OnPageClosing;
             m_Page.Closed += OnPageClosed;
+        }
+
+        private IControlDescriptor[] CreateDynamicPageControls(object tag)
+        {
+            var grp = (BatchModuleGroup_e)tag;
+
+            switch (grp) 
+            {
+                case BatchModuleGroup_e.Options:
+                    return CreateControls(m_Data.Options.AdditionalCommands);
+
+                default:
+                    throw new NotSupportedException();
+
+            }
+        }
+
+        private IControlDescriptor[] CreateControls(IEnumerable<IRibbonCommand> cmds) 
+        {
+            var ctrls = new List<IControlDescriptor>();
+
+            foreach (var cmd in cmds) 
+            {
+                switch (cmd) 
+                {
+                    case IRibbonToggleCommand toggle:
+                        ctrls.Add(new BaseControlDescriptor<List<IRibbonCommand>, bool, IRibbonToggleCommand>(
+                            toggle,
+                            ctx => toggle.Value,
+                            (ctx, v) => toggle.Value = v));
+                        break;
+
+                    default:
+                        throw new NotSupportedException();
+                }
+            }
+
+            return ctrls.ToArray();
         }
 
         private void OnPageClosing(PageCloseReasons_e reason, PageClosingArg arg)
         {
             if (reason == PageCloseReasons_e.Okay) 
             {
-                if (!m_Data.Macros.Macros.Any()) 
+                if (!m_Data.Macros.Macros.Macros.Any()) 
                 {
                     arg.Cancel = true;
                     arg.ErrorMessage = "Select macros to run";
                 }
                 
-                if (!m_Data.Components.Any() && !m_Data.ProcessAllFiles) 
+                if (!m_Data.Input.Components.Any() && m_Data.Input.Scope == InputScope_e.Selection) 
                 {
                     arg.Cancel = true;
                     arg.ErrorMessage = "Select components to process";
@@ -136,35 +189,51 @@ namespace Xarial.CadPlus.Batch.InApp
                 try
                 {
                     IXDocument[] docs = null;
-                    var assm = m_Host.Extension.Application.Documents.Active as IXAssembly;
+                    var rootDoc = m_Data.Input.Document;
 
-                    if (m_Data.ProcessAllFiles)
+                    switch (m_Data.Input.Scope) 
                     {
-                        docs = assm.Dependencies;
+                        case InputScope_e.AllReferences:
+                            docs = m_Data.Input.AllDocuments.AllReferences;
+                            break;
+
+                        case InputScope_e.TopLevelReferences:
+                            docs = m_Data.Input.AllDocuments.TopLevelReferences;
+                            break;
+
+                        case InputScope_e.Selection:
+                            docs = m_Data.Input.Components
+                                .Distinct(new ComponentDocumentSafeEqualityComparer())
+                                .Select(c => c.Document).ToArray();
+                            break;
+
+                        default:
+                            throw new NotSupportedException();
                     }
-                    else
-                    {
-                        docs = m_Data.Components
-                            .Distinct(new ComponentDocumentSafeEqualityComparer())
-                            .Select(c => c.Document).ToArray();
-                    }
+
+                    var input = docs.ToList();
+                    ProcessInput?.Invoke(m_Host.Extension.Application, input);
 
                     var exec = new AssemblyBatchRunJobExecutor(m_Host.Extension.Application, m_MacroRunnerSvc,
-                        docs, m_Data.Macros.Macros, m_Data.ActivateDocuments);
-                    
-                    var vm = new JobResultVM(assm.Title, exec);
+                        input.ToArray(), m_Data.Macros.Macros.Macros,
+                        m_Data.Options.ActivateDocuments, m_Data.Options.AllowReadOnly, m_Data.Options.AllowRapid);
+
+                    var vm = new JobResultVM(rootDoc.Title, exec);
 
                     exec.ExecuteAsync().Wait();
-                    
+
                     var wnd = m_Host.Extension.CreatePopupWindow<ResultsWindow>();
-                    wnd.Control.Title = $"{assm.Title} batch job result";
+                    wnd.Control.Title = $"{rootDoc.Title} batch job result";
                     wnd.Control.DataContext = vm;
                     wnd.Show();
+                }
+                catch (OperationCanceledException) 
+                {
                 }
                 catch (Exception ex)
                 {
                     m_Msg.ShowError(ex.ParseUserError(out string callStack));
-                    m_Logger.Log(callStack);
+                    m_Logger.Log(callStack, LoggerMessageSeverity_e.Error);
                 }
             }
         }
@@ -196,8 +265,20 @@ namespace Xarial.CadPlus.Batch.InApp
                     break;
 
                 case Commands_e.RunInApp:
-                    m_Data.Components = m_Host.Extension.Application.Documents.Active.Selections.OfType<IXComponent>().ToList();
+                    var activeDoc = m_Host.Extension.Application.Documents.Active;
+                    m_Data.Input.Document = activeDoc;
+                    m_Data.Input.AllDocuments.SetScope(m_Data.Input.Scope);
                     m_Page.Show(m_Data);
+                    break;
+            }
+        }
+
+        public void AddCommands(BatchModuleGroup_e group, params IRibbonCommand[] cmd)
+        {
+            switch (group) 
+            {
+                case BatchModuleGroup_e.Options:
+                    m_Data.Options.AdditionalCommands.AddRange(cmd);
                     break;
             }
         }
