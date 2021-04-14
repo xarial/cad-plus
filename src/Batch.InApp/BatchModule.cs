@@ -173,11 +173,24 @@ namespace Xarial.CadPlus.Batch.InApp
                     arg.Cancel = true;
                     arg.ErrorMessage = "Select macros to run";
                 }
-                
-                if (!m_Data.Input.Components.Any() && m_Data.Input.Scope == InputScope_e.Selection) 
+
+                switch (m_Data.Input.Scope) 
                 {
-                    arg.Cancel = true;
-                    arg.ErrorMessage = "Select components to process";
+                    case InputScope_e.Selection:
+                        if (!m_Data.Input.Components.Any())
+                        {
+                            arg.Cancel = true;
+                            arg.ErrorMessage = "Select components to process";
+                        }
+                        break;
+
+                    case InputScope_e.AllReferences:
+                        if (!m_Data.Input.AllDocuments.References.Any(d => d.IsChecked))
+                        {
+                            arg.Cancel = true;
+                            arg.ErrorMessage = "Select at least one reference to process";
+                        }
+                        break;
                 }
             }
         }
@@ -191,14 +204,11 @@ namespace Xarial.CadPlus.Batch.InApp
                     IXDocument[] docs = null;
                     var rootDoc = m_Data.Input.Document;
 
-                    switch (m_Data.Input.Scope) 
+                    switch (m_Data.Input.Scope)
                     {
                         case InputScope_e.AllReferences:
-                            docs = m_Data.Input.AllDocuments.AllReferences;
-                            break;
-
-                        case InputScope_e.TopLevelReferences:
-                            docs = m_Data.Input.AllDocuments.TopLevelReferences;
+                            docs = m_Data.Input.AllDocuments.References
+                                    .Where(d => d.IsChecked).Select(d => d.Document).ToArray();
                             break;
 
                         case InputScope_e.Selection:
@@ -215,7 +225,7 @@ namespace Xarial.CadPlus.Batch.InApp
                     ProcessInput?.Invoke(m_Host.Extension.Application, input);
 
                     var exec = new AssemblyBatchRunJobExecutor(m_Host.Extension.Application, m_MacroRunnerSvc,
-                        input.ToArray(), m_Data.Macros.Macros.Macros,
+                        input.ToArray(), m_Logger, m_Data.Macros.Macros.Macros,
                         m_Data.Options.ActivateDocuments, m_Data.Options.AllowReadOnly, m_Data.Options.AllowRapid);
 
                     var vm = new JobResultVM(rootDoc.Title, exec);
@@ -267,7 +277,10 @@ namespace Xarial.CadPlus.Batch.InApp
                 case Commands_e.RunInApp:
                     var activeDoc = m_Host.Extension.Application.Documents.Active;
                     m_Data.Input.Document = activeDoc;
-                    m_Data.Input.AllDocuments.SetScope(m_Data.Input.Scope);
+                    if (m_Data.Input.Scope == InputScope_e.AllReferences)
+                    {
+                        m_Data.Input.AllDocuments.UpdateReferences();
+                    }
                     m_Page.Show(m_Data);
                     break;
             }

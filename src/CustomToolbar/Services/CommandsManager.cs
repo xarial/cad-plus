@@ -76,6 +76,7 @@ namespace Xarial.CadPlus.CustomToolbar.Services
             }
             catch(Exception ex)
             {
+                m_Logger.Log(ex);
                 m_Msg.ShowError(ex, "Failed to load toolbar specification");
             }
         }

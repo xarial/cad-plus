@@ -12,6 +12,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Xarial.CadPlus.Common.Services;
 using Xarial.XCad;
+using Xarial.XCad.Base;
 using Xarial.XCad.Documents;
 using Xarial.XCad.SolidWorks;
 using Xarial.XCad.SolidWorks.Documents;
@@ -24,7 +25,7 @@ namespace Xarial.CadPlus.Common.Sw.Services
         protected override object GetAppDispatch(IXApplication app) => ((ISwApplication)app).Sw;
         protected override object GetDocumentDispatch(IXDocument doc) => ((ISwDocument)doc).Model;
 
-        public SwMacroExecutor(IXCadMacroProvider xCadMacroProvider) : base(xCadMacroProvider)
+        public SwMacroExecutor(IXCadMacroProvider xCadMacroProvider, IXLogger logger) : base(xCadMacroProvider, logger)
         {
         }
     }

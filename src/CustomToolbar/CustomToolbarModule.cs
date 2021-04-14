@@ -164,6 +164,7 @@ namespace Xarial.CadPlus.CustomToolbar
                             }
                             catch (Exception ex)
                             {
+                                m_Logger.Log(ex);
                                 m_Msg.ShowError(ex, "Failed to save toolbar specification");
                             }
                         }
@@ -172,6 +173,7 @@ namespace Xarial.CadPlus.CustomToolbar
             }
             catch (Exception ex)
             {
+                m_Logger.Log(ex);
                 m_Msg.ShowError(ex, "Unknown error");
                 m_Logger.Log(ex);
             }

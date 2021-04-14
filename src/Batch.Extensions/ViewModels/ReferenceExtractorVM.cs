@@ -12,10 +12,12 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Data;
 using Xarial.CadPlus.Batch.Extensions.Services;
 using Xarial.CadPlus.Plus.Services;
+using Xarial.XCad.Base;
 using Xarial.XCad.Base.Attributes;
 using Xarial.XCad.Documents;
 using Xarial.XToolkit.Wpf.Extensions;
@@ -125,17 +127,27 @@ namespace Xarial.CadPlus.Batch.Extensions.ViewModels
         private readonly IXDocument[] m_InputDocs;
         private readonly ReferenceExtractor m_RefsExtractor;
 
+        private readonly IXLogger m_Logger;
+        private readonly IMessageService m_MsgSvc;
+
         private int m_CheckedReferencesCount;
         private int m_CheckedDrawingsCount;
 
         private object m_Lock = new object();
 
+        private readonly CancellationToken m_CancellationToken;
+
         public ReferenceExtractorVM(ReferenceExtractor refsExtractor,
-            IXDocument[] docs, ICadDescriptor cadEntDesc,
-            ReferencesScope_e scope, bool findDrws) 
+            IXDocument[] docs, ICadDescriptor cadEntDesc, IXLogger logger, IMessageService msgSvc,
+            ReferencesScope_e scope, bool findDrws, CancellationToken cancellationToken) 
         {
             m_InputDocs = docs;
             m_RefsExtractor = refsExtractor;
+
+            m_CancellationToken = cancellationToken;
+
+            m_Logger = logger;
+            m_MsgSvc = msgSvc;
 
             m_ReferencesScope = scope;
             m_FindDrawings = findDrws;
@@ -158,9 +170,10 @@ namespace Xarial.CadPlus.Batch.Extensions.ViewModels
             {
                 await CollectDrawingsAsync();
             }
-            catch
+            catch(Exception ex)
             {
-                //TODO: show error
+                m_Logger.Log(ex);
+                m_MsgSvc.ShowError(ex);
             }
         }
 
@@ -170,9 +183,10 @@ namespace Xarial.CadPlus.Batch.Extensions.ViewModels
             {
                 await CollectReferencesAsync();
             }
-            catch
+            catch(Exception ex)
             {
-                //TODO: show error
+                m_Logger.Log(ex);
+                m_MsgSvc.ShowError(ex);
             }
         }
 
@@ -182,9 +196,10 @@ namespace Xarial.CadPlus.Batch.Extensions.ViewModels
             {
                 await CollectDrawingsAsync();
             }
-            catch
+            catch(Exception ex)
             {
-                //TODO: show error
+                m_Logger.Log(ex);
+                m_MsgSvc.ShowError(ex);
             }
         }
 
@@ -202,6 +217,11 @@ namespace Xarial.CadPlus.Batch.Extensions.ViewModels
                 
                 foreach (var doc in docs)
                 {
+                    if (m_CancellationToken.IsCancellationRequested)
+                    {
+                        break;
+                    }
+
                     var refVm = new ReferenceVM(doc);
                     refVm.CheckedChanged += OnReferenceCheckedChanged;
 
@@ -242,7 +262,7 @@ namespace Xarial.CadPlus.Batch.Extensions.ViewModels
                     var allRefs = References.Select(r => r.Document).ToArray();
 
                     drawings = await Task.Run(() => m_RefsExtractor.FindAllDrawings(allRefs,
-                        AdditionalDrawingFolders.ToArray(), p => Progress = p));
+                        AdditionalDrawingFolders.ToArray(), p => Progress = p, m_CancellationToken));
                 }
                 else 
                 {
@@ -254,6 +274,11 @@ namespace Xarial.CadPlus.Batch.Extensions.ViewModels
 
                 foreach (var reference in References)
                 {
+                    if (m_CancellationToken.IsCancellationRequested)
+                    {
+                        break;
+                    }
+
                     reference.Drawings.Clear();
 
                     drawings.TryGetValue(reference.Document, out IXDrawing[] refDrws);

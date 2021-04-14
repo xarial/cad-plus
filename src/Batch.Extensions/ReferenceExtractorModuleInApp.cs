@@ -24,6 +24,7 @@ using Xarial.CadPlus.Plus.UI;
 using Xarial.XCad;
 using Xarial.XCad.Documents;
 using Xarial.CadPlus.Plus.Extensions;
+using Xarial.XCad.Base;
 
 namespace Xarial.CadPlus.Batch.Extensions
 {
@@ -35,6 +36,8 @@ namespace Xarial.CadPlus.Batch.Extensions
         private IBatchInAppModule m_BatchInAppModule;
         private bool m_FindDrawings;
         private ICadDescriptor m_EntDesc;
+        private IXLogger m_Logger;
+        private IMessageService m_MsgSvc;
 
         public void Init(IHost host)
         {
@@ -46,6 +49,9 @@ namespace Xarial.CadPlus.Batch.Extensions
         private void OnInitialized(IApplication app, IServiceContainer svcProvider, IModule[] modules)
         {
             m_BatchInAppModule = modules.OfType<IBatchInAppModule>().FirstOrDefault();
+
+            m_Logger = svcProvider.GetService<IXLogger>();
+            m_MsgSvc = svcProvider.GetService<IMessageService>();
 
             if (m_BatchInAppModule != null)
             {
@@ -72,9 +78,9 @@ namespace Xarial.CadPlus.Batch.Extensions
             {
                 var cts = new CancellationTokenSource();
                 var cancellationToken = cts.Token;
-
+                
                 var vm = new ReferenceExtractorVM(new ReferenceExtractor(app, m_EntDesc.DrawingFileFilter.Extensions),
-                    input.ToArray(), m_EntDesc, ReferencesScope_e.SourceDocumentsOnly, true);
+                    input.ToArray(), m_EntDesc, m_Logger, m_MsgSvc, ReferencesScope_e.SourceDocumentsOnly, true, cancellationToken);
 
                 input.Clear();
 

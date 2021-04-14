@@ -22,6 +22,7 @@
                 <sys:Boolean>True</sys:Boolean>
             </xconv:BooleanUniversalConverter.FalseValue>
         </xconv:BooleanUniversalConverter>
+        <xconv:ImageToImageSourceConverter x:Key="imgSrcConv"/>
     </Window.Resources>
     <Grid Margin="5">
         <Grid.RowDefinitions>

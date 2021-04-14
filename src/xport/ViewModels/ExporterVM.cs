@@ -24,6 +24,7 @@ using Xarial.CadPlus.Plus.Shared.Services;
 using Xarial.CadPlus.Xport.Core;
 using Xarial.CadPlus.Xport.Models;
 using Xarial.CadPlus.Xport.Properties;
+using Xarial.XCad.Base;
 using Xarial.XToolkit.Reflection;
 using Xarial.XToolkit.Wpf;
 using Xarial.XToolkit.Wpf.Dialogs;
@@ -132,15 +133,17 @@ namespace Xarial.CadPlus.Xport.ViewModels
 
         private readonly IExporterModel m_Model;
         private readonly IMessageService m_MsgSvc;
+        private readonly IXLogger m_Logger;
 
         private readonly object m_Lock;
 
         private readonly IAboutService m_AboutSvc;
 
-        public ExporterVM(IExporterModel model, IMessageService msgSvc, IAboutService aboutSvc)
+        public ExporterVM(IExporterModel model, IMessageService msgSvc, IXLogger logger, IAboutService aboutSvc)
         {
             m_Model = model;
             m_MsgSvc = msgSvc;
+            m_Logger = logger;
 
             m_AboutSvc = aboutSvc;
 
@@ -194,8 +197,9 @@ namespace Xarial.CadPlus.Xport.ViewModels
 
                 m_MsgSvc.ShowInformation("Operation completed");
             }
-            catch
+            catch(Exception ex)
             {
+                m_Logger.Log(ex);
                 m_MsgSvc.ShowError("Processing error");
             }
             finally

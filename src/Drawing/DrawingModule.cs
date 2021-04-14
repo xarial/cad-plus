@@ -30,6 +30,7 @@ using Xarial.CadPlus.Plus.Extensions;
 using Xarial.CadPlus.Drawing.Data;
 using System.ComponentModel;
 using Xarial.CadPlus.Plus.Modules;
+using Xarial.XCad.Base;
 
 namespace Xarial.CadPlus.Drawing
 {
@@ -61,6 +62,9 @@ namespace Xarial.CadPlus.Drawing
         private ISettingsProvider m_SettsProvider;
         private IServiceProvider m_SvcProvider;
 
+        private IXLogger m_Logger;
+        private IMessageService m_MsgSvc;
+
         public void Init(IHost host)
         {
             m_Host = (IHostExtension)host;
@@ -71,6 +75,9 @@ namespace Xarial.CadPlus.Drawing
         private void OnHostInitialized(IApplication app, IServiceContainer svcProvider, IModule[] modules)
         {
             m_SvcProvider = svcProvider;
+
+            m_Logger = m_SvcProvider.GetService<IXLogger>();
+            m_MsgSvc = m_SvcProvider.GetService<IMessageService>();
         }
 
         private void OnConnect()
@@ -103,6 +110,7 @@ namespace Xarial.CadPlus.Drawing
                 }
                 catch (Exception ex)
                 {
+                    m_Logger.Log(ex);
                     arg.Cancel = true;
                     arg.ErrorMessage = ex.ParseUserError(out _);
                 }
@@ -119,9 +127,10 @@ namespace Xarial.CadPlus.Drawing
                 {
                     InsertQrCode();
                 }
-                catch 
+                catch (Exception ex)
                 {
-                    //TODO: show error message
+                    m_Logger.Log(ex);
+                    m_MsgSvc.ShowError(ex);
                 }
             }
         }

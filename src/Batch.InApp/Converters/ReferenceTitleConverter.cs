@@ -26,11 +26,13 @@ namespace Xarial.CadPlus.Batch.InApp.Converters
                 var doc = value as IXDocument;
                 
                 var title = doc.Title;
-                
+
                 if (string.IsNullOrEmpty(title))
                 {
-                    title = Path.GetFileName(doc.Path);
+                    title = doc.Path;
                 }
+
+                title = Path.GetFileNameWithoutExtension(title);
 
                 return title;
             }

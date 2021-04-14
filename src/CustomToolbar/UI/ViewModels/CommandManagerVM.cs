@@ -19,6 +19,7 @@ using Xarial.CadPlus.CustomToolbar.UI.Base;
 using Xarial.CadPlus.Plus;
 using Xarial.CadPlus.Plus.Modules;
 using Xarial.CadPlus.Plus.Services;
+using Xarial.XCad.Base;
 using Xarial.XToolkit.Wpf;
 using Xarial.XToolkit.Wpf.Extensions;
 using Xarial.XToolkit.Wpf.Utils;
@@ -44,6 +45,8 @@ namespace Xarial.CadPlus.CustomToolbar.UI.ViewModels
         private readonly IToolbarConfigurationProvider m_ConfsProvider;
         private readonly ISettingsProvider m_SettsProvider;
         private readonly IMessageService m_MsgService;
+        private readonly IXLogger m_Logger;
+
         private bool m_IsEditable;
 
         private readonly IIconsProvider[] m_IconsProviders;
@@ -52,12 +55,13 @@ namespace Xarial.CadPlus.CustomToolbar.UI.ViewModels
 
         public CommandManagerVM(IToolbarConfigurationProvider confsProvider,
             ISettingsProvider settsProvider, 
-            IMessageService msgService, IIconsProvider[] iconsProviders,
+            IMessageService msgService, IXLogger logger, IIconsProvider[] iconsProviders,
             ICadDescriptor cadEntDesc)
         {
             m_ConfsProvider = confsProvider;
             m_SettsProvider = settsProvider;
             m_MsgService = msgService;
+            m_Logger = logger;
 
             HelpCommand = new RelayCommand(Help);
 
@@ -95,8 +99,9 @@ namespace Xarial.CadPlus.CustomToolbar.UI.ViewModels
             {
                 ToolbarInfo = m_ConfsProvider.GetToolbar(out isReadOnly, ToolbarSpecificationPath);
             }
-            catch
+            catch(Exception ex)
             {
+                m_Logger.Log(ex);
                 isReadOnly = true;
                 m_MsgService.ShowError("Failed to load the toolbar from the specification file. Make sure that you have access to the specification file");
             }
@@ -220,6 +225,7 @@ namespace Xarial.CadPlus.CustomToolbar.UI.ViewModels
                         }
                         catch(Exception ex)
                         {
+                            m_Logger.Log(ex);
                             m_MsgService.ShowError(ex, "Failed to move command to this position");
                         }
                     });
@@ -243,6 +249,7 @@ namespace Xarial.CadPlus.CustomToolbar.UI.ViewModels
                         }
                         catch (Exception ex)
                         {
+                            m_Logger.Log(ex);
                             m_MsgService.ShowError(ex, "Failed to move command to this position");
                         }
                     });
@@ -266,6 +273,7 @@ namespace Xarial.CadPlus.CustomToolbar.UI.ViewModels
                         }
                         catch (Exception ex)
                         {
+                            m_Logger.Log(ex);
                             m_MsgService.ShowError(ex, "Failed to move insert new command in this position");
                         }
                     });
@@ -289,6 +297,7 @@ namespace Xarial.CadPlus.CustomToolbar.UI.ViewModels
                         }
                         catch (Exception ex)
                         {
+                            m_Logger.Log(ex);
                             m_MsgService.ShowError(ex, "Failed to move insert new command in this position");
                         }
                     });
@@ -312,6 +321,7 @@ namespace Xarial.CadPlus.CustomToolbar.UI.ViewModels
                         }
                         catch (Exception ex)
                         {
+                            m_Logger.Log(ex);
                             m_MsgService.ShowError(ex, "Failed to remove command");
                         }
                     });
