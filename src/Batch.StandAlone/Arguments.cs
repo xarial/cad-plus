@@ -37,7 +37,7 @@ namespace Xarial.CadPlus.XBatch.Base
     [Verb("job", HelpText = "Accessing job files")]
     public class JobOptions : BatchArguments
     {
-        [Option('r', "run", Required = true, HelpText = "Full path to *.batchplus file to run")]
+        [Option('r', "run", Required = true, HelpText = "Full path to *.bpj file to run")]
         public string JobFilePath 
         {
             set 

@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Xarial.CadPlus.Batch.Extensions.Services;
 using Xarial.CadPlus.Batch.Extensions.ViewModels;
@@ -75,7 +76,7 @@ namespace Xarial.CadPlus.Batch.Extensions.Services
         }
 
         public Dictionary<IXDocument, IXDrawing[]> FindAllDrawings(
-            IXDocument[] docs, string[] additionalFolders, Action<double> prgHandler)
+            IXDocument[] docs, string[] additionalFolders, Action<double> prgHandler, CancellationToken cancellationToken)
         {
             var workDirs = GetDocumentsWorkingDirectories(docs);
 
@@ -90,14 +91,18 @@ namespace Xarial.CadPlus.Batch.Extensions.Services
                 {
                     if (Directory.Exists(searchDir))
                     {
-                        searchDrawings.AddRange(Directory.GetFiles(searchDir, filter,
-                            SearchOption.AllDirectories));
+                        searchDrawings.AddRange(TryGetAllFiles(searchDir, filter, cancellationToken));
                     }
                 }
             }
 
             for (int i = 0; i < searchDrawings.Count; i++)
             {
+                if (cancellationToken.IsCancellationRequested) 
+                {
+                    break;
+                }
+
                 var drwFile = searchDrawings[i];
 
                 var drw = m_App.Documents.PreCreate<IXDrawing>();
@@ -135,5 +140,49 @@ namespace Xarial.CadPlus.Batch.Extensions.Services
         private string[] GetDocumentsWorkingDirectories(IXDocument[] docs)
             => docs.Select(d => Path.GetDirectoryName(d.Path))
             .Distinct(StringComparer.CurrentCultureIgnoreCase).ToArray();
+
+        private IEnumerable<string> TryGetAllFiles(string dir, string pattern, CancellationToken cancellationToken) 
+        {
+            if (!cancellationToken.IsCancellationRequested)
+            {
+                string[] subDirs = null;
+                string[] files = null;
+
+                try
+                {
+                    subDirs = Directory.GetDirectories(dir, "*.*", SearchOption.TopDirectoryOnly);
+                }
+                catch
+                {
+                }
+
+                try
+                {
+                    files = Directory.GetFiles(dir, pattern, SearchOption.TopDirectoryOnly);
+                }
+                catch
+                {
+                }
+
+                if (files != null)
+                {
+                    foreach (var file in files)
+                    {
+                        yield return file;
+                    }
+                }
+
+                if (subDirs != null)
+                {
+                    foreach (var subDir in subDirs)
+                    {
+                        foreach (var file in TryGetAllFiles(subDir, pattern, cancellationToken))
+                        {
+                            yield return file;
+                        }
+                    }
+                }
+            }
+        }
     }
 }

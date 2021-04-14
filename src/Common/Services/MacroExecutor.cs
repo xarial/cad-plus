@@ -29,9 +29,12 @@ namespace Xarial.CadPlus.Common.Services
         private readonly IMacroRunner m_Runner;
         private readonly IXCadMacroProvider m_XCadMacroProvider;
         private readonly Dictionary<string, IXCadMacro> m_XCadMacrosCache;
-            
-        public MacroExecutor(IXCadMacroProvider xCadMacroProvider)
+        private readonly IXLogger m_Logger;
+
+        public MacroExecutor(IXCadMacroProvider xCadMacroProvider, IXLogger logger)
         {
+            m_Logger = logger;
+
             m_Runner = TryCreateMacroRunner();
             m_XCadMacroProvider = xCadMacroProvider;
             m_XCadMacrosCache = new Dictionary<string, IXCadMacro>(StringComparer.CurrentCultureIgnoreCase);
@@ -43,8 +46,9 @@ namespace Xarial.CadPlus.Common.Services
             {
                 return (IMacroRunner)Activator.CreateInstance(Type.GetTypeFromProgID(MacroRunnerProgId));
             }
-            catch 
+            catch (Exception ex)
             {
+                m_Logger.Log(ex);
                 return null;
             }
         }

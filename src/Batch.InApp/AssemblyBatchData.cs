@@ -65,89 +65,9 @@ namespace Xarial.CadPlus.Batch.InApp
     {
         [Title("Selected Components")]
         Selection,
-
-        [Title("Top Level Referenced Documents")]
-        TopLevelReferences,
-
+        
         [Title("All Referenced Documents")]
         AllReferences
-    }
-
-    public class ReferenceDocumentsVM : INotifyPropertyChanged
-    {
-        public ICadDescriptor EntityDescriptor { get; }
-        
-        public IXDocument[] AllReferences 
-        {
-            get => m_AllReferences;
-            private set 
-            {
-                m_AllReferences = value;
-                this.NotifyChanged();
-            }
-        }
-
-        public IXDocument[] TopLevelReferences
-        {
-            get => m_TopLevelReferences;
-            private set
-            {
-                m_TopLevelReferences = value;
-                this.NotifyChanged();
-            }
-        }
-
-        private IXDocument[] m_AllReferences;
-        private IXDocument[] m_TopLevelReferences;
-        private bool m_TopLevelOnly;
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        public bool TopLevelOnly 
-        {
-            get => m_TopLevelOnly;
-            set 
-            {
-                m_TopLevelOnly = value;
-                this.NotifyChanged();
-            }
-        }
-
-        private IXDocument m_Doc;
-
-        public void SetDocument(IXDocument doc) 
-        {
-            m_Doc = doc;
-            m_AllReferences = null;
-            m_TopLevelReferences = null;
-        }
-
-        public void SetScope(InputScope_e scope)
-        {
-            switch (scope) 
-            {
-                case InputScope_e.AllReferences:
-                    if (m_AllReferences == null)
-                    {
-                        AllReferences = new IXDocument[] { m_Doc }.Union(m_Doc.GetAllDependencies()).ToArray();
-                    }
-                    break;
-
-                case InputScope_e.TopLevelReferences:
-                    if (m_TopLevelReferences == null)
-                    {
-                        TopLevelReferences = new IXDocument[] { m_Doc }.Union(m_Doc.Dependencies).ToArray();
-                    }
-                    break;
-            }
-
-            TopLevelOnly = (scope == InputScope_e.TopLevelReferences);
-        }
-
-        public ReferenceDocumentsVM(ICadDescriptor cadEntDesc) 
-        {
-            EntityDescriptor = cadEntDesc;
-        }
     }
 
     [IconEx(typeof(Resources), nameof(Resources.batch_plus_assm_vector), nameof(Resources.batch_plus_assm_icon))]
@@ -162,7 +82,7 @@ namespace Xarial.CadPlus.Batch.InApp
             [Description("List of components to run macros on")]
             public List<IXComponent> Components { get; set; }
 
-            [ControlOptions(height: 100)]
+            [ControlOptions(height: 110)]
             [DependentOn(typeof(ReferencesScopeDependencyHandler), nameof(Scope))]
             [Description("All referenced docyments")]
             [StandardControlIcon(BitmapLabelType_e.SelectComponent)]
@@ -179,7 +99,10 @@ namespace Xarial.CadPlus.Batch.InApp
                 {
                     m_Scope = value;
 
-                    AllDocuments.SetScope(value);
+                    if (m_Scope == InputScope_e.AllReferences) 
+                    {
+                        AllDocuments.UpdateReferences();
+                    }
                 }
             }
 
@@ -208,7 +131,7 @@ namespace Xarial.CadPlus.Batch.InApp
         public class MacrosGroup 
         {
             [CustomControl(typeof(MacrosList))]
-            [ControlOptions(height: 100)]
+            [ControlOptions(height: 80)]
             [IconEx(typeof(Resources), nameof(Resources.macros_vector), nameof(Resources.macros_icon))]
             public MacrosVM Macros { get; set; }
 

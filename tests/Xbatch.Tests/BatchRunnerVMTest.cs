@@ -23,6 +23,7 @@ using Xarial.CadPlus.XBatch.Base.Core;
 using Xarial.CadPlus.XBatch.Base.Models;
 using Xarial.CadPlus.XBatch.Base.ViewModels;
 using Xarial.XCad;
+using Xarial.XCad.Base;
 using Xarial.XCad.SolidWorks;
 using Xarial.XCad.SolidWorks.Enums;
 using Xarial.XToolkit.Wpf.Utils;
@@ -32,8 +33,8 @@ namespace Xbatch.Tests
 
     public class BatchDocumentMockVM : BatchDocumentVM
     {
-        public BatchDocumentMockVM(string name, BatchJob job, ICadApplicationInstanceProvider[] appProviders, IMessageService msgSvc, Func<BatchJob, IBatchRunJobExecutor> execFact, IBatchApplicationProxy batchAppProxy, MainWindow parentWnd, IRibbonButtonCommand[] backstageCmds) 
-            : base(name, job, appProviders, msgSvc, execFact, batchAppProxy, parentWnd, backstageCmds)
+        public BatchDocumentMockVM(string name, BatchJob job, ICadApplicationInstanceProvider[] appProviders, IMessageService msgSvc, IXLogger logger, Func<BatchJob, IBatchRunJobExecutor> execFact, IBatchApplicationProxy batchAppProxy, MainWindow parentWnd, IRibbonButtonCommand[] backstageCmds) 
+            : base(name, job, appProviders, msgSvc, logger, execFact, batchAppProxy, parentWnd, backstageCmds)
         {
         }
 
@@ -126,7 +127,7 @@ namespace Xbatch.Tests
             var modelMock = mock.Object;
             var msgSvcMock = new Mock<IMessageService>().Object;
             
-            var docVm = new BatchDocumentMockVM("", new BatchJob(), new ICadApplicationInstanceProvider[] { appProviderMock.Object }, msgSvcMock,
+            var docVm = new BatchDocumentMockVM("", new BatchJob(), new ICadApplicationInstanceProvider[] { appProviderMock.Object }, msgSvcMock, new Mock<IXLogger>().Object,
                 j =>
                 {
                     opts = j;

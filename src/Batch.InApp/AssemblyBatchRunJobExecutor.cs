@@ -16,6 +16,7 @@ using Xarial.CadPlus.Common.Services;
 using Xarial.CadPlus.Plus.Services;
 using Xarial.CadPlus.XBatch.Base.Core;
 using Xarial.XCad;
+using Xarial.XCad.Base;
 using Xarial.XCad.Documents;
 using Xarial.XCad.Documents.Enums;
 using Xarial.XCad.Exceptions;
@@ -39,11 +40,13 @@ namespace Xarial.CadPlus.Batch.InApp
         private readonly bool m_ActivateDocs;
         private readonly bool m_AllowReadOnly;
         private readonly bool m_AllowRapid;
+        private readonly IXLogger m_Logger;
 
         internal AssemblyBatchRunJobExecutor(IXApplication app, IMacroExecutor macroRunnerSvc,
-            IXDocument[] documents, IEnumerable<MacroData> macros, bool activateDocs, bool allowReadOnly, bool allowRapid) 
+            IXDocument[] documents, IXLogger logger, IEnumerable<MacroData> macros, bool activateDocs, bool allowReadOnly, bool allowRapid) 
         {
             m_App = app;
+            m_Logger = logger;
 
             m_MacroRunner = macroRunnerSvc;
             m_Docs = documents;
@@ -88,8 +91,9 @@ namespace Xarial.CadPlus.Batch.InApp
 
                 return Task.FromResult(true);
             }
-            catch
+            catch(Exception ex)
             {
+                m_Logger.Log(ex);
                 return Task.FromResult(false);
             }
             finally 

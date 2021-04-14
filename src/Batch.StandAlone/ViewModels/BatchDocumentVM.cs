@@ -31,6 +31,7 @@ using Xarial.CadPlus.XBatch.Base.Core;
 using Xarial.CadPlus.XBatch.Base.Exceptions;
 using Xarial.CadPlus.XBatch.Base.Models;
 using Xarial.XCad;
+using Xarial.XCad.Base;
 using Xarial.XToolkit.Services.UserSettings;
 using Xarial.XToolkit.Wpf;
 using Xarial.XToolkit.Wpf.Extensions;
@@ -143,12 +144,14 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
 
         private readonly MainWindow m_ParentWnd;
 
+        private readonly IXLogger m_Logger;
+
         public BatchDocumentVM(FileInfo file, BatchJob job, ICadApplicationInstanceProvider[] appProviders, 
-            IMessageService msgSvc,
+            IMessageService msgSvc, IXLogger logger,
             Func<BatchJob, IBatchRunJobExecutor> execFact,
             IBatchApplicationProxy batchAppProxy, MainWindow parentWnd, IRibbonButtonCommand[] backstageCmds)
             : this(Path.GetFileNameWithoutExtension(file.FullName), job, appProviders, 
-                  msgSvc, execFact, batchAppProxy, parentWnd, backstageCmds)
+                  msgSvc, logger, execFact, batchAppProxy, parentWnd, backstageCmds)
         {
             m_FilePath = file.FullName;
             IsDirty = false;
@@ -156,13 +159,14 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
 
         public BatchDocumentVM(string name, BatchJob job,
             ICadApplicationInstanceProvider[] appProviders,
-            IMessageService msgSvc, Func<BatchJob, IBatchRunJobExecutor> execFact,
+            IMessageService msgSvc, IXLogger logger, Func<BatchJob, IBatchRunJobExecutor> execFact,
             IBatchApplicationProxy batchAppProxy, MainWindow parentWnd, IRibbonButtonCommand[] backstageCmds)
         {
             m_ExecFact = execFact;
             m_AppProvider = job.FindApplicationProvider(appProviders);
             m_Job = job;
             m_MsgSvc = msgSvc;
+            m_Logger = logger;
             m_BatchAppProxy = batchAppProxy;
             m_ParentWnd = parentWnd;
 
@@ -181,7 +185,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
             FilterEditEndingCommand = new RelayCommand<DataGridCellEditEndingEventArgs>(FilterEditEnding);
 
             Name = name;
-            Settings = new BatchDocumentSettingsVM(m_Job, m_AppProvider);
+            Settings = new BatchDocumentSettingsVM(m_Job, m_AppProvider, m_Logger);
             Settings.Modified += OnSettingsModified;
             Results = new JobResultsVM(m_Job, m_ExecFact);
 
@@ -370,8 +374,9 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
                 Save?.Invoke(this, m_Job, m_FilePath);
                 IsDirty = false;
             }
-            catch
+            catch(Exception ex)
             {
+                m_Logger.Log(ex);
                 m_MsgSvc.ShowError("Failed to save document");
             }
         }

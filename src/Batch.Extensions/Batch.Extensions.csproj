@@ -76,7 +76,6 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="ReferenceExtractorModuleStandAlone.cs" />
-    <Compile Include="Services\DrawingsFinder.cs" />
     <Compile Include="Services\TopologicalReferencesSorter.cs" />
     <Compile Include="UI\InputsSorterWindow.xaml.cs">
       <DependentUpon>InputsSorterWindow.xaml</DependentUpon>

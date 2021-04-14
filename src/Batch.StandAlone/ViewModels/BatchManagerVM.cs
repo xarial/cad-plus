@@ -35,6 +35,7 @@ using System.Windows.Interop;
 using Xarial.CadPlus.XBatch.Base;
 using Xarial.CadPlus.Plus.UI;
 using Xarial.CadPlus.Plus.Shared;
+using Xarial.XCad.Base;
 
 namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
 {
@@ -59,6 +60,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
 
         private readonly IBatchRunnerModel m_Model;
         private readonly IMessageService m_MsgSvc;
+        private readonly IXLogger m_Logger;
 
         public ICadApplicationInstanceProvider[] AppProviders { get; }
 
@@ -68,13 +70,14 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
         private readonly IAboutService m_AboutSvc;
 
         public BatchManagerVM(ICadApplicationInstanceProvider[] appProviders,
-            IBatchRunnerModel model, IMessageService msgSvc, 
+            IBatchRunnerModel model, IMessageService msgSvc, IXLogger logger,
             Func<System.IO.FileInfo, BatchJob, MainWindow, IRibbonButtonCommand[], BatchDocumentVM> openDocFunc,
             Func<string, BatchJob, MainWindow, IRibbonButtonCommand[], BatchDocumentVM> newDocFunc, IAboutService aboutSvc)
         {
             AppProviders = appProviders;
             m_Model = model;
             m_MsgSvc = msgSvc;
+            m_Logger = logger;
             m_OpenDocFunc = openDocFunc;
             m_NewDocFunc = newDocFunc;
 
@@ -86,6 +89,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
 
         private void NewDocument()
         {
+            //TODO: replace this with the service
             var newDocWnd = new NewDocumentWindow();
             newDocWnd.Owner = ParentWindow;
             newDocWnd.DataContext = this;
@@ -156,8 +160,9 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
                     }
                 }
             }
-            catch 
+            catch (Exception ex)
             {
+                m_Logger.Log(ex);
                 m_MsgSvc.ShowError("Failed to open document");
             }
         }
@@ -220,8 +225,9 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
                 var prcStartInfo = new ProcessStartInfo(appPath, args);
                 Process.Start(prcStartInfo);
             }
-            catch 
+            catch (Exception ex)
             {
+                m_Logger.Log(ex);
                 m_MsgSvc.ShowError("Failed to start new instance of the application");
             }
         }

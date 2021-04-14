@@ -66,7 +66,6 @@
     <Compile Include="AssemblyBatchRunJobExecutor.cs" />
     <Compile Include="Controls\BaseControlDescriptor.cs" />
     <Compile Include="Converters\ReferenceIconConverter.cs" />
-    <Compile Include="Converters\ReferenceScopeConverter.cs" />
     <Compile Include="Converters\ReferenceTitleConverter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
@@ -84,6 +83,8 @@
       <DependentUpon>ResultsWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="ViewModels\MacrosVM.cs" />
+    <Compile Include="ViewModels\ReferenceDocumentsVM.cs" />
+    <Compile Include="ViewModels\DocumentVM.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
@@ -130,6 +131,9 @@
   <ItemGroup>
     <None Include="Resources\batch-plus-vector.svg" />
     <None Include="Resources\macros-icon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\top-level-only.png" />
   </ItemGroup>
   <Import Project="$(SolutionDir)common\common.module.props" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

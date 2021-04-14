@@ -24,6 +24,7 @@ using Xarial.XCad;
 using Xarial.XCad.Documents;
 using Xarial.CadPlus.Plus.Extensions;
 using Xarial.CadPlus.Batch.Extensions.Services;
+using Xarial.XCad.Base;
 
 namespace Xarial.CadPlus.Batch.Extensions
 {
@@ -33,6 +34,9 @@ namespace Xarial.CadPlus.Batch.Extensions
     {
         private IHostWpf m_Host;
         private IBatchApplication m_App;
+
+        private IXLogger m_Logger;
+        private IMessageService m_MsgSvc;
 
         private bool m_ExtractReferences;
         
@@ -46,6 +50,9 @@ namespace Xarial.CadPlus.Batch.Extensions
         private void OnHostInitialized(IApplication app, IServiceContainer svcProvider, IModule[] modules)
         {
             m_App = (IBatchApplication)app;
+
+            m_Logger = svcProvider.GetService<IXLogger>();
+            m_MsgSvc = svcProvider.GetService<IMessageService>();
         }
 
         private void OnConnect()
@@ -78,12 +85,12 @@ namespace Xarial.CadPlus.Batch.Extensions
         {
             if (m_ExtractReferences)
             {
-                var vm = new ReferenceExtractorVM(new ReferenceExtractor(app, instProvider.EntityDescriptor.DrawingFileFilter.Extensions),
-                    input.ToArray(), instProvider.EntityDescriptor, ReferencesScope_e.AllDependencies, true);
-                
                 var cts = new CancellationTokenSource();
                 var cancellationToken = cts.Token;
 
+                var vm = new ReferenceExtractorVM(new ReferenceExtractor(app, instProvider.EntityDescriptor.DrawingFileFilter.Extensions),
+                    input.ToArray(), instProvider.EntityDescriptor, m_Logger, m_MsgSvc, ReferencesScope_e.AllDependencies, true, cancellationToken);
+                
                 input.Clear();
 
                 m_Host.WpfApplication.Dispatcher.Invoke(() =>

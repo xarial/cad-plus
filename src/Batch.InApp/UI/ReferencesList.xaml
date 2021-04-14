@@ -4,62 +4,75 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:conv="clr-namespace:Xarial.CadPlus.Batch.InApp.Converters"
+             xmlns:xconv="clr-namespace:Xarial.XToolkit.Wpf.Converters;assembly=Xarial.XToolkit.Wpf"
              xmlns:local="clr-namespace:Xarial.CadPlus.Batch.InApp.UI"
-             mc:Ignorable="d" 
+             mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
         <conv:ReferenceTitleConverter x:Key="refTitleConv"/>
         <conv:ReferenceIconConverter x:Key="refIconConv"/>
-        <conv:ReferenceScopeConverter x:Key="refScopeConv"/>
+        <xconv:ImageToImageSourceConverter x:Key="imgSrcConv"/>
     </UserControl.Resources>
-    <ListBox>
-        <ListBox.ItemsSource>
-            <MultiBinding Converter="{StaticResource refScopeConv}">
-                <Binding Path="TopLevelOnly"/>
-                <Binding Path="TopLevelReferences"/>
-                <Binding Path="AllReferences"/>
-            </MultiBinding>
-        </ListBox.ItemsSource>
-        <ListBox.ItemTemplate>
-            <DataTemplate>
-                <Grid IsEnabled="{Binding Path=IsCommitted}" ToolTip="{Binding Path=Path}">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-                    <Image Grid.Column="0" Margin="2"
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <ListBox Grid.Row="0" ItemsSource="{Binding Path=References}">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <Grid IsEnabled="{Binding Path=Document.IsCommitted}" ToolTip="{Binding Path=Document.Path}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <CheckBox IsChecked="{Binding Path=IsChecked}" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2"/>
+                        <Image Grid.Column="1" Margin="2"
                            Width="14" Height="14" VerticalAlignment="Center" HorizontalAlignment="Center"
                            Stretch="Uniform">
-                        <Image.Source>
-                            <MultiBinding Converter="{StaticResource refIconConv}">
-                                <Binding Path="."/>
-                                <Binding Path="DataContext.EntityDescriptor" RelativeSource="{RelativeSource AncestorType={x:Type local:ReferencesList}}"/>
-                            </MultiBinding>
-                        </Image.Source>
-                        <Image.Style>
-                            <Style TargetType="{x:Type Image}">
-                                <Style.Triggers>
-                                    <Trigger Property="IsEnabled" Value="False">
-                                        <Setter Property="Opacity" Value="0.5" />
-                                    </Trigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Image.Style>
-                    </Image>
-                    <TextBlock Text="{Binding Path=., Converter={StaticResource refTitleConv}}"
-                           Grid.Column="1">
-                        <TextBlock.Style>
-                            <Style TargetType="{x:Type TextBlock}">
-                                <Style.Triggers>
-                                    <Trigger Property="IsEnabled" Value="False">
-                                        <Setter Property="Foreground" Value="Gray" />
-                                    </Trigger>
-                                </Style.Triggers>
-                            </Style>
-                        </TextBlock.Style>
-                    </TextBlock>
-                </Grid>
-            </DataTemplate>
-        </ListBox.ItemTemplate>
-    </ListBox>
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource refIconConv}">
+                                    <Binding Path="Document"/>
+                                    <Binding Path="DataContext.EntityDescriptor" RelativeSource="{RelativeSource AncestorType={x:Type local:ReferencesList}}"/>
+                                </MultiBinding>
+                            </Image.Source>
+                            <Image.Style>
+                                <Style TargetType="{x:Type Image}">
+                                    <Style.Triggers>
+                                        <Trigger Property="IsEnabled" Value="False">
+                                            <Setter Property="Opacity" Value="0.5" />
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Image.Style>
+                        </Image>
+                        <TextBlock Text="{Binding Path=Document, Converter={StaticResource refTitleConv}}"
+                           Grid.Column="2">
+                            <TextBlock.Style>
+                                <Style TargetType="{x:Type TextBlock}">
+                                    <Style.Triggers>
+                                        <Trigger Property="IsEnabled" Value="False">
+                                            <Setter Property="Foreground" Value="Gray" />
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                    </Grid>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+        <StackPanel Orientation="Horizontal" Grid.Row="1" HorizontalAlignment="Right">
+            <ToggleButton Margin="0 2 2 0" IsChecked="{Binding Path=TopLevelOnly}" ToolTip="Top Level References Only">
+                <Image Width="20" Source="/Batch.InApp.Module;component/Resources/top-level-only.png" RenderOptions.BitmapScalingMode="Fant"/>
+            </ToggleButton>
+            <Button Margin="0 2 2 0" Command="{Binding Path=TogglePartFilterCommand}" ToolTip="Select/Deselect Parts">
+                <Image Source="{Binding Path=EntityDescriptor.PartIcon, Converter={StaticResource imgSrcConv}}" RenderOptions.BitmapScalingMode="Fant" Width="20"/>
+            </Button>
+            <Button Margin="0 2 0 0" Command="{Binding Path=ToggleAssemblyFilterCommand}" ToolTip="Select/Deselect Assemblies">
+                <Image Source="{Binding Path=EntityDescriptor.AssemblyIcon, Converter={StaticResource imgSrcConv}}" RenderOptions.BitmapScalingMode="Fant" Width="20"/>
+            </Button>
+        </StackPanel>
+    </Grid>
 </UserControl>

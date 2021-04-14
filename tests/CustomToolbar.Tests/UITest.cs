@@ -128,7 +128,7 @@ namespace CustomToolbar.Tests
                 .Returns(new ToolbarSettings());
 
             var vm = new CommandManagerVM(confProviderMock.Object, settsProviderMock.Object,
-                new Mock<IMessageService>().Object, 
+                new Mock<IMessageService>().Object, new Mock<IXLogger>().Object,
                 new Xarial.CadPlus.Plus.Modules.IIconsProvider[0], 
                 new Mock<ICadDescriptor>().Object);
 
