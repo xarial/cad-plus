@@ -11,6 +11,7 @@
                       AutoGenerateColumns="False"
                       ItemsSource="{Binding Path=ItemsSource, RelativeSource={RelativeSource AncestorType={x:Type local:JobItemsDataGrid}}}"
                       ColumnsSource="{Binding Path=MacroColumns, RelativeSource={RelativeSource AncestorType={x:Type local:JobItemsDataGrid}}}"
+                      EnableColumnVirtualization="True" EnableRowVirtualization="True"
                       VirtualizingPanel.VirtualizationMode="Standard"
                       VirtualizingPanel.IsVirtualizing="True"
                       ScrollViewer.CanContentScroll="True" ColumnsPreCreated="OnColumnsPreCreated"

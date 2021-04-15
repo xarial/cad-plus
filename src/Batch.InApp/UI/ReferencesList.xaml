@@ -21,7 +21,7 @@
         <ListBox Grid.Row="0" ItemsSource="{Binding Path=References}">
             <ListBox.ItemTemplate>
                 <DataTemplate>
-                    <Grid IsEnabled="{Binding Path=Document.IsCommitted}" ToolTip="{Binding Path=Document.Path}">
+                    <Grid ToolTip="{Binding Path=Document.Path}">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto"/>
                             <ColumnDefinition Width="Auto"/>
@@ -40,21 +40,21 @@
                             <Image.Style>
                                 <Style TargetType="{x:Type Image}">
                                     <Style.Triggers>
-                                        <Trigger Property="IsEnabled" Value="False">
+                                        <DataTrigger Binding="{Binding Path=Document.IsCommitted}" Value="False">
                                             <Setter Property="Opacity" Value="0.5" />
-                                        </Trigger>
+                                        </DataTrigger>
                                     </Style.Triggers>
                                 </Style>
                             </Image.Style>
                         </Image>
                         <TextBlock Text="{Binding Path=Document, Converter={StaticResource refTitleConv}}"
-                           Grid.Column="2">
+                           Grid.Column="2" VerticalAlignment="Center">
                             <TextBlock.Style>
                                 <Style TargetType="{x:Type TextBlock}">
                                     <Style.Triggers>
-                                        <Trigger Property="IsEnabled" Value="False">
+                                        <DataTrigger Binding="{Binding Path=Document.IsCommitted}" Value="False">
                                             <Setter Property="Foreground" Value="Gray" />
-                                        </Trigger>
+                                        </DataTrigger>
                                     </Style.Triggers>
                                 </Style>
                             </TextBlock.Style>
