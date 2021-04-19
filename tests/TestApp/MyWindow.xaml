@@ -4,9 +4,14 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:TestApp"
+             xmlns:sharedctrls="clr-namespace:Xarial.CadPlus.Plus.Shared.Controls;assembly=Xarial.CadPlusPlus.Shared"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <Grid>
+    <StackPanel Orientation="Vertical">
         <TextBlock Text="Hello World" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-    </Grid>
+        <sharedctrls:CadObjectLabelControl HorizontalAlignment="Stretch" Object="{Binding Path=ObjectLabel.Document}" Descriptor="{Binding Path=ObjectLabel.Descriptor}"/>
+        <sharedctrls:CadObjectLabelControl HorizontalAlignment="Stretch" Object="{Binding Path=ObjectLabel.Document}" DocumentTitleDisplayType="Path" Descriptor="{Binding Path=ObjectLabel.Descriptor}"/>
+        <sharedctrls:CadObjectLabelControl HorizontalAlignment="Stretch" Object="{Binding Path=ObjectLabel.Configuration}" Descriptor="{Binding Path=ObjectLabel.Descriptor}"/>
+        <sharedctrls:CadObjectLabelControl HorizontalAlignment="Stretch" Object="{Binding Path=ObjectLabel.CutList}" Descriptor="{Binding Path=ObjectLabel.Descriptor}"/>
+    </StackPanel>
 </Window>

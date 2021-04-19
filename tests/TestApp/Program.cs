@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Xarial.CadPlus.Plus;
 using Xarial.CadPlus.Plus.Services;
 using Xarial.CadPlus.Plus.Shared;
+using Xarial.XCad.Base;
 
 namespace TestApp
 {
@@ -111,6 +112,9 @@ namespace TestApp
         }
 
         private static void OnConfigureServices(ContainerBuilder builder, MyAppArgs args)
-            => m_Logger.Log("2 - Configure Services");
+        {
+            builder.RegisterType<AppLogger>().As<IXLogger>();
+            m_Logger.Log("2 - Configure Services");
+        }
     }
 }

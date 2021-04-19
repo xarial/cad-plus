@@ -8,11 +8,6 @@
 using System;
 using System.Windows;
 
-[assembly: ThemeInfo(
-        ResourceDictionaryLocation.None,
-        ResourceDictionaryLocation.SourceAssembly
-    )]
-
 namespace Xarial.CadPlus.Plus.Shared.Styles
 {
     public static class ApplicationExtension

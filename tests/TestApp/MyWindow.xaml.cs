@@ -21,6 +21,7 @@ namespace TestApp
         public MyWindow()
         {
             InitializeComponent();
+            this.DataContext = new TestVM();
         }
     }
 }
