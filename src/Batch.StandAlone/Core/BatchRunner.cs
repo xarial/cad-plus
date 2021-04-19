@@ -258,8 +258,27 @@ namespace Xarial.CadPlus.XBatch.Base.Core
 
             var inputDocs = inputFiles.Select(f =>
             {
-                var doc = app.Documents.PreCreate<IXDocument>();
+                IXDocument doc;
+
+                if (MatchesExtension(f, m_AppProvider.EntityDescriptor.PartFileFilter.Extensions))
+                {
+                    doc = app.Documents.PreCreate<IXPart>();
+                }
+                else if (MatchesExtension(f, m_AppProvider.EntityDescriptor.AssemblyFileFilter.Extensions))
+                {
+                    doc = app.Documents.PreCreate<IXAssembly>();
+                }
+                else if (MatchesExtension(f, m_AppProvider.EntityDescriptor.DrawingFileFilter.Extensions))
+                {
+                    doc = app.Documents.PreCreate<IXDrawing>();
+                }
+                else 
+                {
+                    doc = app.Documents.PreCreate<IXDocument>();
+                }
+                
                 doc.Path = f;
+
                 return doc;
             }).ToList();
 
@@ -268,6 +287,19 @@ namespace Xarial.CadPlus.XBatch.Base.Core
             return inputDocs
                 .Select(d => new JobItemDocument(d, macros.Select(m => new JobItemMacro(m)).ToArray()))
                 .ToArray();
+        }
+
+        private bool MatchesExtension(string path, string[] exts)
+        {
+            try
+            {
+                var ext = Path.GetExtension(path);
+                return exts.Any(e => Path.GetExtension(e).Equals(ext, StringComparison.CurrentCultureIgnoreCase));
+            }
+            catch
+            {
+                return false;
+            }
         }
 
         private void TryCloseDocument(IXDocument doc)
