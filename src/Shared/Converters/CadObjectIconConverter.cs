@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -58,6 +59,21 @@ namespace Xarial.CadPlus.Plus.Shared.Converters
                     {
                         return icons.Drawing ?? (icons.Drawing = cadDesc.DrawingIcon.ToBitmapImage());
                     }
+                    else if (ent is IXDocument) 
+                    {
+                        if (MatchesExtension(ent as IXDocument, cadDesc.PartFileFilter.Extensions))
+                        {
+                            return icons.Part ?? (icons.Part = cadDesc.PartIcon.ToBitmapImage());
+                        }
+                        else if (MatchesExtension(ent as IXDocument, cadDesc.AssemblyFileFilter.Extensions))
+                        {
+                            return icons.Assembly ?? (icons.Assembly = cadDesc.AssemblyIcon.ToBitmapImage());
+                        }
+                        else if (MatchesExtension(ent as IXDocument, cadDesc.DrawingFileFilter.Extensions))
+                        {
+                            return icons.Drawing ?? (icons.Drawing = cadDesc.DrawingIcon.ToBitmapImage());
+                        }
+                    }
                     else if (ent is IXConfiguration)
                     {
                         return icons.Configuration ?? (icons.Configuration = cadDesc.ConfigurationIcon.ToBitmapImage());
@@ -78,6 +94,19 @@ namespace Xarial.CadPlus.Plus.Shared.Converters
         public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
         {
             throw new NotImplementedException();
+        }
+        
+        private bool MatchesExtension(IXDocument doc, string[] exts)
+        {
+            try
+            {
+                var ext = Path.GetExtension(doc.Path);
+                return exts.Any(e => Path.GetExtension(e).Equals(ext, StringComparison.CurrentCultureIgnoreCase));
+            }
+            catch
+            {
+                return false;
+            }
         }
     }
 }
