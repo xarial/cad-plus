@@ -2,6 +2,7 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:conv="clr-namespace:Xarial.CadPlus.Plus.Shared.Converters"
+    xmlns:xconv="clr-namespace:Xarial.XToolkit.Wpf.Converters;assembly=Xarial.XToolkit.Wpf"
     xmlns:local="clr-namespace:Xarial.CadPlus.Plus.Shared.Controls">
 
     <conv:CadObjectIconConverter x:Key="objIconConv"/>
@@ -9,7 +10,8 @@
     <conv:CadObjectTitleConverter x:Key="objTitleConv"/>
     <conv:CadObjectTooltipTitleConverter x:Key="objTooltipTitleConv"/>
     <conv:CadObjectContextMenuVisibilityConverter x:Key="ctxMenuVisConv"/>
-    
+    <xconv:BooleanVisibilityConverter x:Key="boolToVisConv"/>
+
     <Style TargetType="{x:Type local:CadObjectLabelControl}">
         <Setter Property="Template">
             <Setter.Value>
@@ -38,15 +40,16 @@
                             </TextBlock.Text>
                         </TextBlock>
                         <Grid.ToolTip>
-                            <Grid>
+                            <Grid Width="250">
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="Auto"/>
                                     <RowDefinition Height="*"/>
                                 </Grid.RowDefinitions>
                                 <TextBlock Text="{Binding Path=Object, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource objTooltipTitleConv}}"
-                                           Grid.Row="0" TextWrapping="Wrap" FontWeight="Bold"/>
+                                           Grid.Row="0" TextWrapping="Wrap" FontWeight="Bold" Margin="5"/>
                                 <Image Grid.Row="1" Source="{Binding Path=Object, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource objPreviewConv}}"
-                                       RenderOptions.BitmapScalingMode="Fant" Width="200" Height="200" Stretch="Uniform"/>
+                                           RenderOptions.BitmapScalingMode="Fant" MaxHeight="250" Stretch="Uniform" Margin="5"
+                                           Visibility="{Binding Path=ShowPreview, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource boolToVisConv}}"/>
                             </Grid>
                         </Grid.ToolTip>
                         <Grid.ContextMenu>

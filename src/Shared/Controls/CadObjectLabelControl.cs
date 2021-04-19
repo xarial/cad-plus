@@ -63,6 +63,17 @@ namespace Xarial.CadPlus.Plus.Shared.Controls
             set { SetValue(ObjectProperty, value); }
         }
 
+        public static readonly DependencyProperty ShowPreviewProperty =
+            DependencyProperty.Register(
+            nameof(ShowPreview), typeof(bool),
+            typeof(CadObjectLabelControl), new PropertyMetadata(true));
+
+        public bool ShowPreview
+        {
+            get { return (bool)GetValue(ShowPreviewProperty); }
+            set { SetValue(ShowPreviewProperty, value); }
+        }
+
         public static readonly DependencyProperty DocumentTitleDisplayTypeProperty =
             DependencyProperty.Register(
             nameof(DocumentTitleDisplayType), typeof(DocumentTitleDisplayType_e),

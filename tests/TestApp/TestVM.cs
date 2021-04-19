@@ -65,7 +65,7 @@ namespace TestApp
 
             var partMock = new Mock<IXPart>();
             partMock.Setup(x => x.Configurations).Returns(confsMock.Object);
-            partMock.Setup(x => x.Path).Returns(@"D:\MockPart.sldprt");
+            partMock.Setup(x => x.Path).Returns(@"D:\SubFolder\SubFolder\SubFolder\SubFolder\SubFolder\SubFolder\MockPart.sldprt");
 
             Document = partMock.Object;
         }
