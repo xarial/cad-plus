@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Windows.Data;
 using System.Windows.Media;
 using Xarial.CadPlus.Plus.Services;
+using Xarial.CadPlus.Plus.Shared.Properties;
 using Xarial.XCad.Documents;
 using Xarial.XCad.Features;
 using Xarial.XToolkit.Wpf.Extensions;
@@ -26,6 +27,8 @@ namespace Xarial.CadPlus.Plus.Shared.Converters
         }
 
         private static readonly Dictionary<string, CadObjectIcons> m_Icons;
+
+        private static ImageSource m_DefaultIcon;
 
         static CadObjectIconConverter() 
         {
@@ -88,7 +91,7 @@ namespace Xarial.CadPlus.Plus.Shared.Converters
             {
             }
 
-            return null;
+            return m_DefaultIcon ?? (m_DefaultIcon = Resources.file_icon.ToBitmapImage());
         }
 
         public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
