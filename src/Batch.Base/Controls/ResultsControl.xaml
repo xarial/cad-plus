@@ -59,12 +59,14 @@
             <Grid Visibility="{Binding Converter={StaticResource objIsNotNullToVisConv}}"
                                   DataContext="{Binding Path=Summary}">
                 <local:JobItemsDataGrid DataGridStyle="{Binding Path=JobItemsDataGridStyle, RelativeSource={RelativeSource AncestorType={x:Type local:ResultsControl}}}"
-                                        ItemsSource="{Binding Path=JobItemFiles}" Grid.Row="1" Margin="5"/>
+                                        ItemsSource="{Binding Path=JobItemFiles}"
+                                        CadDescriptor="{Binding Path=DataContext.CadDescriptor, RelativeSource={RelativeSource AncestorType={x:Type local:ResultsControl}}}"
+                                        Grid.Row="1" Margin="5"/>
             </Grid>
         </TabItem>
-        <TabItem Header="Log">
+        <TabItem Header="Journal">
             <Grid Visibility="{Binding Converter={StaticResource objIsNotNullToVisConv}}"
-                                  DataContext="{Binding Path=Log}">
+                                  DataContext="{Binding Path=Journal}">
                 <ListBox VirtualizingStackPanel.IsVirtualizing="True"
                                          Margin="2" Grid.ColumnSpan="2" ItemsSource="{Binding Path=Output}" />
             </Grid>

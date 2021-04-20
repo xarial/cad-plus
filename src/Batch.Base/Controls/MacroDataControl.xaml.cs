@@ -20,6 +20,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Xarial.CadPlus.Batch.Base.Core;
+using Xarial.XToolkit;
 
 namespace Xarial.CadPlus.Batch.Base.Controls
 {
@@ -49,6 +51,26 @@ namespace Xarial.CadPlus.Batch.Base.Controls
 				Process.Start("https://cadplus.xarial.com/macro-arguments/");
 			}
 			catch 
+			{
+			}
+		}
+
+		private void OnOpenInFileExplorer(object sender, RoutedEventArgs e)
+		{
+			try
+			{
+				var path = (this.DataContext as MacroData).FilePath;
+
+				if (System.IO.Directory.Exists(path))
+				{
+					FileSystemUtils.BrowseFolderInExplorer(path);
+				}
+				else if (System.IO.File.Exists(path))
+				{
+					FileSystemUtils.BrowseFileInExplorer(path);
+				}
+			}
+			catch
 			{
 			}
 		}

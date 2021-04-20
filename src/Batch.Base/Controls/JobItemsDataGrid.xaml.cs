@@ -21,7 +21,8 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Xarial.CadPlus.Batch.Base.Controls;
-using Xarial.CadPlus.XBatch.Base.ViewModels;
+using Xarial.CadPlus.Plus.Services;
+using Xarial.CadPlus.Batch.Base.ViewModels;
 using Xarial.XToolkit.Wpf.Controls;
 
 namespace Xarial.CadPlus.Batch.Base.Controls
@@ -42,7 +43,7 @@ namespace Xarial.CadPlus.Batch.Base.Controls
 	{
 		public object SelectContent(object dataItem, DataGridColumn column, DataGridCell cell)
 		{
-			var jobItem = dataItem as JobItemFileVM;
+			var jobItem = dataItem as JobItemDocumentVM;
 			var macroColumn = (MacroColumnHeaderVM)column.Header;
 
 			return jobItem.Macros[macroColumn.MacroIndex];
@@ -72,6 +73,17 @@ namespace Xarial.CadPlus.Batch.Base.Controls
 			nameof(ItemsSource), typeof(IEnumerable),
 			typeof(JobItemsDataGrid), new PropertyMetadata(OnItemsSourceChanged));
 
+		public static readonly DependencyProperty CadDescriptorProperty =
+			DependencyProperty.Register(
+			nameof(CadDescriptor), typeof(ICadDescriptor),
+			typeof(JobItemsDataGrid));
+
+		public ICadDescriptor CadDescriptor
+		{
+			get { return (ICadDescriptor)GetValue(CadDescriptorProperty); }
+			set { SetValue(CadDescriptorProperty, value); }
+		}
+
 		public IEnumerable ItemsSource
 		{
 			get { return (IEnumerable)GetValue(ItemsSourceProperty); }
@@ -97,7 +109,7 @@ namespace Xarial.CadPlus.Batch.Base.Controls
 		{
 			var grd = d as JobItemsDataGrid;
 
-			var jobItems = (e.NewValue as IEnumerable<JobItemFileVM>)?.ToArray();
+			var jobItems = (e.NewValue as IEnumerable<JobItemDocumentVM>)?.ToArray();
 
 			if (jobItems?.Any() == true)
 			{

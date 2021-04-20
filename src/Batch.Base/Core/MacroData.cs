@@ -11,7 +11,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Xarial.CadPlus.XBatch.Base.Core
+namespace Xarial.CadPlus.Batch.Base.Core
 {
     public class MacroData
     {

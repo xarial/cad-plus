@@ -32,7 +32,7 @@ using Xarial.XCad.Documents.Enums;
 using Xarial.CadPlus.Common;
 using Xarial.CadPlus.Common.Attributes;
 using Xarial.CadPlus.Plus.Attributes;
-using Xarial.CadPlus.XBatch.Base.ViewModels;
+using Xarial.CadPlus.Batch.Base.ViewModels;
 using Xarial.CadPlus.Plus.Services;
 using Xarial.CadPlus.Plus.Extensions;
 using Xarial.CadPlus.Plus.Modules;
@@ -94,7 +94,7 @@ namespace Xarial.CadPlus.Batch.InApp
         private IMessageService m_Msg;
         private IXLogger m_Logger;
 
-        private IServiceProvider m_SvcProvider;
+        private ICadDescriptor m_CadDesc;
 
         public void Init(IHost host)
         {
@@ -110,16 +110,17 @@ namespace Xarial.CadPlus.Batch.InApp
 
         private void OnHostInitialized(IApplication app, IServiceContainer svcProvider, IModule[] modules)
         {
-            m_SvcProvider = svcProvider;
-            m_Data = new AssemblyBatchData(m_SvcProvider.GetService<ICadDescriptor>());
+            m_MacroRunnerSvc = svcProvider.GetService<IMacroExecutor>();
+            m_Msg = svcProvider.GetService<IMessageService>();
+            m_Logger = svcProvider.GetService<IXLogger>();
+
+            m_CadDesc = svcProvider.GetService<ICadDescriptor>();
+
+            m_Data = new AssemblyBatchData(m_CadDesc);
         }
 
         private void OnConnect()
         {
-            m_MacroRunnerSvc = m_SvcProvider.GetService<IMacroExecutor>();
-            m_Msg = m_SvcProvider.GetService<IMessageService>();
-            m_Logger = m_SvcProvider.GetService<IXLogger>();
-
             m_Host.RegisterCommands<Commands_e>(OnCommandClick);
             m_Page = m_Host.Extension.CreatePage<AssemblyBatchData>(CreateDynamicPageControls);
             m_Page.Closing += OnPageClosing;
@@ -228,7 +229,7 @@ namespace Xarial.CadPlus.Batch.InApp
                         input.ToArray(), m_Logger, m_Data.Macros.Macros.Macros,
                         m_Data.Options.ActivateDocuments, m_Data.Options.AllowReadOnly, m_Data.Options.AllowRapid);
 
-                    var vm = new JobResultVM(rootDoc.Title, exec);
+                    var vm = new JobResultVM(rootDoc.Title, exec, m_CadDesc);
 
                     exec.ExecuteAsync().Wait();
 

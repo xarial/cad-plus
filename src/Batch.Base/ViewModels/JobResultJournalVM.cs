@@ -16,9 +16,9 @@ using System.Windows.Data;
 using Xarial.CadPlus.Batch.Base.Models;
 using Xarial.XToolkit.Wpf.Extensions;
 
-namespace Xarial.CadPlus.XBatch.Base.ViewModels
+namespace Xarial.CadPlus.Batch.Base.ViewModels
 {
-    public class JobResultLogVM : INotifyPropertyChanged
+    public class JobResultJournalVM : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -28,7 +28,7 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
 
         private object m_Lock;
 
-        public JobResultLogVM(IBatchRunJobExecutor executor) 
+        public JobResultJournalVM(IBatchRunJobExecutor executor) 
         {
             m_Lock = new object();
 

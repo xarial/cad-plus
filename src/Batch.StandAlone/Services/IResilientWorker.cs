@@ -14,7 +14,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Xarial.CadPlus.XBatch.Base.Services
+namespace Xarial.CadPlus.Batch.Base.Services
 {
     public interface IResilientWorker<TContext>
     {

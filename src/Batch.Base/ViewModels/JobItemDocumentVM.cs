@@ -11,19 +11,24 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Xarial.CadPlus.Batch.Base.Core;
 using Xarial.CadPlus.Batch.Base.ViewModels;
 using Xarial.CadPlus.Common.Services;
+using Xarial.XCad.Documents;
 using Xarial.XToolkit.Wpf.Extensions;
 
-namespace Xarial.CadPlus.XBatch.Base.ViewModels
+namespace Xarial.CadPlus.Batch.Base.ViewModels
 {
-    public class JobItemFileVM : JobItemVM
+    public class JobItemDocumentVM : JobItemVM
     {
-        private readonly IJobItemDocument m_JobItemFile;
+        private readonly JobItemDocument m_JobItemFile;
 
         public JobItemMacroVM[] Macros { get; }
 
-        public JobItemFileVM(IJobItemDocument jobItemFile) : base(jobItemFile)
+        public IXDocument Document
+            => m_JobItemFile.Document;
+
+        public JobItemDocumentVM(JobItemDocument jobItemFile) : base(jobItemFile)
         {
             m_JobItemFile = jobItemFile;
             Macros = m_JobItemFile.Operations.Select(o => new JobItemMacroVM(o)).ToArray();

@@ -89,5 +89,10 @@
                 </Grid>
             </Grid>
         </Popup>
+        <Grid.ContextMenu>
+            <ContextMenu>
+                <MenuItem Header="Open In File Explorer" Click="OnOpenInFileExplorer"/>
+            </ContextMenu>
+        </Grid.ContextMenu>
     </Grid>
 </UserControl>

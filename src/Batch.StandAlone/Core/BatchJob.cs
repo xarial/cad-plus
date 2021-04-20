@@ -18,7 +18,7 @@ using Xarial.XCad;
 using Xarial.XToolkit.Services.UserSettings;
 using Xarial.XToolkit.Services.UserSettings.Attributes;
 
-namespace Xarial.CadPlus.XBatch.Base.Core
+namespace Xarial.CadPlus.Batch.Base.Core
 {
     public class BatchJobVersionTransformer : BaseUserSettingsVersionsTransformer
     {

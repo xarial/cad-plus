@@ -20,8 +20,8 @@ using Xarial.CadPlus.Plus.Exceptions;
 using Xarial.CadPlus.Plus.Services;
 using Xarial.CadPlus.Plus.Shared.Services;
 using Xarial.CadPlus.Batch.StandAlone;
-using Xarial.CadPlus.XBatch.Base.Exceptions;
-using Xarial.CadPlus.XBatch.Base.Services;
+using Xarial.CadPlus.Batch.Base.Exceptions;
+using Xarial.CadPlus.Batch.Base.Services;
 using Xarial.XCad;
 using Xarial.XCad.Base;
 using Xarial.XCad.Documents;
@@ -33,7 +33,7 @@ using Xarial.XToolkit.Reporting;
 using Xarial.CadPlus.Batch.StandAlone.Exceptions;
 using Xarial.CadPlus.Common.Utils;
 
-namespace Xarial.CadPlus.XBatch.Base.Core
+namespace Xarial.CadPlus.Batch.Base.Core
 {
     public class BatchJobContext 
     {
@@ -611,9 +611,14 @@ namespace Xarial.CadPlus.XBatch.Base.Core
             {
                 try
                 {
-                    if (app.Version.Compare(doc.Version) == VersionEquality_e.Newer)
+                    if (FileHelper.MatchesFilter(doc.Path, m_AppProvider.EntityDescriptor.PartFileFilter.Extensions)
+                        || FileHelper.MatchesFilter(doc.Path, m_AppProvider.EntityDescriptor.AssemblyFileFilter.Extensions)
+                        || FileHelper.MatchesFilter(doc.Path, m_AppProvider.EntityDescriptor.DrawingFileFilter.Extensions))
                     {
-                        return true;
+                        if (app.Version.Compare(doc.Version) == VersionEquality_e.Newer)
+                        {
+                            return true;
+                        }
                     }
                 }
                 catch (Exception ex)

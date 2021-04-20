@@ -186,13 +186,13 @@ namespace Xarial.CadPlus.Common.Controls
             m_ListBox = (ListBox)this.Template.FindName("PART_ListBox", this);
             m_AddFileButton = (Button)this.Template.FindName("PART_AddFilesButton", this);
             m_AddFolderButton = (Button)this.Template.FindName("PART_AddFoldersButton", this);
-
+            
             m_ListBox.AllowDrop = true;
 
             m_ListBox.DragEnter += OnDragEnter;
             m_ListBox.DragOver += OnDragOver;
             m_ListBox.Drop += OnDrop;
-            
+
             m_ListBox.KeyUp += OnListBoxKeyUp;
             m_AddFileButton.Click += OnAddFilesButtonClick;
             m_AddFolderButton.Click += OnAddFoldersButtonClick;

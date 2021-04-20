@@ -8,7 +8,7 @@
 using System.IO;
 using Xarial.CadPlus.Common.Services;
 
-namespace Xarial.CadPlus.XBatch.Base.Core
+namespace Xarial.CadPlus.Batch.Base.Core
 {
     public class JobItemMacro : JobItem, IJobItemOperation
     {

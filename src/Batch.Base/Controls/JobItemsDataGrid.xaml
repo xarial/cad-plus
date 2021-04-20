@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:xctrls="clr-namespace:Xarial.XToolkit.Wpf.Controls;assembly=Xarial.XToolkit.Wpf"
+             xmlns:sctrls="clr-namespace:Xarial.CadPlus.Plus.Shared.Controls;assembly=Xarial.CadPlusPlus.Shared"
              xmlns:local="clr-namespace:Xarial.CadPlus.Batch.Base.Controls"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
@@ -47,7 +48,14 @@
                     </DataTemplate>
                 </DataGridTemplateColumn.CellTemplate>
             </DataGridTemplateColumn>
-            <DataGridTextColumn Header="File" Binding="{Binding Path=Name}"/>
+            <DataGridTemplateColumn IsReadOnly="True" Header="File">
+                <DataGridTemplateColumn.CellTemplate>
+                    <DataTemplate>
+                        <sctrls:CadObjectLabelControl Object="{Binding Path=Document}"
+                                                      Descriptor="{Binding Path=CadDescriptor, RelativeSource={RelativeSource AncestorType={x:Type local:JobItemsDataGrid}}}"/>
+                    </DataTemplate>
+                </DataGridTemplateColumn.CellTemplate>
+            </DataGridTemplateColumn>
         </xctrls:XDataGrid.StaticColumns>
     </xctrls:XDataGrid>
 </UserControl>

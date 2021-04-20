@@ -22,8 +22,7 @@ using Xarial.CadPlus.Plus.Exceptions;
 using Xarial.CadPlus.Plus.Services;
 using Xarial.CadPlus.Plus.Shared.Services;
 using Xarial.CadPlus.Batch.StandAlone.Properties;
-using Xarial.CadPlus.XBatch.Base.Core;
-using Xarial.CadPlus.XBatch.Base.Models;
+using Xarial.CadPlus.Batch.Base.Core;
 using Xarial.XToolkit.Services.UserSettings;
 using Xarial.XToolkit.Wpf;
 using Xarial.XToolkit.Wpf.Dialogs;
@@ -32,10 +31,11 @@ using Xarial.XToolkit.Wpf.Utils;
 using Xarial.CadPlus.Batch.StandAlone.Controls;
 using System.Windows;
 using System.Windows.Interop;
-using Xarial.CadPlus.XBatch.Base;
+using Xarial.CadPlus.Batch.Base;
 using Xarial.CadPlus.Plus.UI;
 using Xarial.CadPlus.Plus.Shared;
 using Xarial.XCad.Base;
+using Xarial.XToolkit;
 
 namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
 {
@@ -57,6 +57,8 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
 
         public ICommand CreateDocumentCommand { get; }
         public ICommand OpenDocumentCommand { get; }
+
+        public ICommand OpenInFileExplorerCommand { get; }
 
         private readonly IBatchRunnerModel m_Model;
         private readonly IMessageService m_MsgSvc;
@@ -85,6 +87,8 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
 
             CreateDocumentCommand = new RelayCommand<string>(CreateDocument);
             OpenDocumentCommand = new RelayCommand<string>(OpenDocument);
+
+            OpenInFileExplorerCommand = new RelayCommand<string>(OpenInFileExplorer);
         }
 
         private void NewDocument()
@@ -94,6 +98,24 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
             newDocWnd.Owner = ParentWindow;
             newDocWnd.DataContext = this;
             newDocWnd.ShowDialog();
+        }
+
+        private void OpenInFileExplorer(string path)
+        {
+            try
+            {
+                if (System.IO.Directory.Exists(path))
+                {
+                    FileSystemUtils.BrowseFolderInExplorer(path);
+                }
+                else if (System.IO.File.Exists(path))
+                {
+                    FileSystemUtils.BrowseFileInExplorer(path);
+                }
+            }
+            catch
+            {
+            }
         }
 
         public ObservableCollection<string> RecentFiles => m_Model.RecentFiles;

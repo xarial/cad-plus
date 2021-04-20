@@ -13,15 +13,16 @@ using System.Text;
 using System.Threading.Tasks;
 using Xarial.CadPlus.Batch.Base.Models;
 using Xarial.CadPlus.Common.Services;
+using Xarial.CadPlus.Batch.Base.Core;
 using Xarial.XToolkit.Wpf.Extensions;
 
-namespace Xarial.CadPlus.XBatch.Base.ViewModels
+namespace Xarial.CadPlus.Batch.Base.ViewModels
 {
     public class JobResultSummaryVM : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
-        private JobItemFileVM[] m_JobItemFiles;
+        private JobItemDocumentVM[] m_JobItemFiles;
         private int m_ProcessedFiles;
         private int m_FailedFiles;
         private DateTime? m_StartTime;
@@ -50,7 +51,7 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
             }
         }
 
-        public JobItemFileVM[] JobItemFiles 
+        public JobItemDocumentVM[] JobItemFiles 
         {
             get => m_JobItemFiles;
             set 
@@ -117,7 +118,7 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
 
         private void OnJobSet(IJobItem[] files, DateTime startTime)
         {
-            JobItemFiles = files.Select(f => new JobItemFileVM((IJobItemDocument)f)).ToArray();
+            JobItemFiles = files.Select(f => new JobItemDocumentVM((JobItemDocument)f)).ToArray();
             StartTime = startTime;
         }
 

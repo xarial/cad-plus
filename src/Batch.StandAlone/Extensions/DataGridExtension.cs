@@ -14,7 +14,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 
-namespace Xarial.CadPlus.XBatch.Base.Extensions
+namespace Xarial.CadPlus.Batch.Base.Extensions
 {
     public class DataGridExtension
     {

@@ -15,7 +15,7 @@ using Xarial.CadPlus.Plus;
 using Xarial.CadPlus.Plus.Hosts;
 using Xarial.XCad.Base;
 
-namespace Xarial.CadPlus.XBatch.Base.Services
+namespace Xarial.CadPlus.Batch.Base.Services
 {
     public interface IRecentFilesManager 
     {

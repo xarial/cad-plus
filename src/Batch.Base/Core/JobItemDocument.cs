@@ -10,7 +10,7 @@ using System.IO;
 using Xarial.CadPlus.Common.Services;
 using Xarial.XCad.Documents;
 
-namespace Xarial.CadPlus.XBatch.Base.Core
+namespace Xarial.CadPlus.Batch.Base.Core
 {
     public class JobItemDocument : JobItem, IJobItemDocument
     {
