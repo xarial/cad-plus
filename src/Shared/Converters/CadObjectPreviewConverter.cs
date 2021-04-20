@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 using System.Windows.Data;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using Xarial.CadPlus.Plus.Shared.Properties;
 using Xarial.XCad.Documents;
 using Xarial.XCad.Features;
 using Xarial.XCad.UI;
@@ -19,8 +18,6 @@ namespace Xarial.CadPlus.Plus.Shared.Converters
 {
     public class CadObjectPreviewConverter : IValueConverter
     {
-        private BitmapImage m_NoPreview;
-
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             try
@@ -48,7 +45,7 @@ namespace Xarial.CadPlus.Plus.Shared.Converters
             {
             }
 
-            return m_NoPreview ?? (m_NoPreview = Resources.no_preview.ToBitmapImage());
+            return null;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

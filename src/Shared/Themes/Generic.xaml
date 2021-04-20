@@ -11,7 +11,8 @@
     <conv:CadObjectTooltipTitleConverter x:Key="objTooltipTitleConv"/>
     <conv:CadObjectContextMenuVisibilityConverter x:Key="ctxMenuVisConv"/>
     <xconv:BooleanVisibilityConverter x:Key="boolToVisConv"/>
-
+    <xconv:ObjectIsNotNullVisibilityConverter x:Key="objIsNotNullToVisConv"/>
+    
     <Style TargetType="{x:Type local:CadObjectLabelControl}">
         <Setter Property="Template">
             <Setter.Value>
@@ -40,7 +41,7 @@
                             </TextBlock.Text>
                         </TextBlock>
                         <Grid.ToolTip>
-                            <Grid Width="250">
+                            <Grid MaxWidth="250">
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="Auto"/>
                                     <RowDefinition Height="*"/>
@@ -48,8 +49,8 @@
                                 <TextBlock Text="{Binding Path=Object, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource objTooltipTitleConv}}"
                                            Grid.Row="0" TextWrapping="Wrap" FontWeight="Bold" Margin="5"/>
                                 <Image Grid.Row="1" Source="{Binding Path=Object, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource objPreviewConv}}"
-                                           RenderOptions.BitmapScalingMode="Fant" MaxHeight="250" Stretch="Uniform" Margin="5"
-                                           Visibility="{Binding Path=ShowPreview, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource boolToVisConv}}"/>
+                                       RenderOptions.BitmapScalingMode="Fant" MaxHeight="250" Stretch="Uniform" Margin="5"
+                                       Visibility="{Binding Path=Source, RelativeSource={RelativeSource Self}, Converter={StaticResource objIsNotNullToVisConv}}"/>
                             </Grid>
                         </Grid.ToolTip>
                         <Grid.ContextMenu>
