@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows.Data;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using Xarial.CadPlus.Plus.Shared.Controls;
 using Xarial.XCad.Documents;
 using Xarial.XCad.Features;
 using Xarial.XCad.UI;
@@ -39,6 +40,9 @@ namespace Xarial.CadPlus.Plus.Shared.Converters
                     case IXCutListItem cutList:
                         //no preview
                         break;
+
+                    case ICustomObject custom:
+                        return custom.Preview;
                 }
             }
             catch

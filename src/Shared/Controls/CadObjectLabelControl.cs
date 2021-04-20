@@ -27,6 +27,16 @@ namespace Xarial.CadPlus.Plus.Shared.Controls
         FileNameWithoutExtension
     }
 
+    public interface ICustomObject 
+    {
+        string Title { get; }
+        string Tooltip { get; }
+        string Path { get; }
+        ImageSource Preview { get; }
+        ImageSource Icon { get; }
+        bool CanOpenInExplorer { get; }
+    }
+
     public class CadObjectLabelControl : Control
     {
         static CadObjectLabelControl()
@@ -84,6 +94,10 @@ namespace Xarial.CadPlus.Plus.Shared.Controls
                 {
                     case IXDocument doc:
                         path = doc.Path;
+                        break;
+
+                    case ICustomObject customObj:
+                        path = customObj.Path;
                         break;
                 }
 

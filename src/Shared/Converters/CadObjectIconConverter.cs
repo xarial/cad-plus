@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Windows.Data;
 using System.Windows.Media;
 using Xarial.CadPlus.Plus.Services;
+using Xarial.CadPlus.Plus.Shared.Controls;
 using Xarial.CadPlus.Plus.Shared.Properties;
 using Xarial.XCad.Documents;
 using Xarial.XCad.Features;
@@ -62,7 +63,7 @@ namespace Xarial.CadPlus.Plus.Shared.Converters
                     {
                         return icons.Drawing ?? (icons.Drawing = cadDesc.DrawingIcon.ToBitmapImage());
                     }
-                    else if (ent is IXDocument) 
+                    else if (ent is IXDocument)
                     {
                         if (MatchesExtension(ent as IXDocument, cadDesc.PartFileFilter.Extensions))
                         {
@@ -84,6 +85,10 @@ namespace Xarial.CadPlus.Plus.Shared.Converters
                     else if (ent is IXCutListItem)
                     {
                         return icons.CutList ?? (icons.CutList = cadDesc.CutListIcon.ToBitmapImage());
+                    }
+                    else if (ent is ICustomObject)
+                    {
+                        return ((ICustomObject)ent).Icon;
                     }
                 }
             }

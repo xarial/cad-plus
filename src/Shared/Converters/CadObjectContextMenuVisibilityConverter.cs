@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Data;
+using Xarial.CadPlus.Plus.Shared.Controls;
 using Xarial.XCad.Documents;
 
 namespace Xarial.CadPlus.Plus.Shared.Converters
@@ -14,7 +15,7 @@ namespace Xarial.CadPlus.Plus.Shared.Converters
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value is IXDocument)
+            if (value is IXDocument || (value is ICustomObject && ((ICustomObject)value).CanOpenInExplorer))
             {
                 return Visibility.Visible;
             }

@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Data;
+using Xarial.CadPlus.Plus.Shared.Controls;
 using Xarial.XCad.Documents;
 using Xarial.XCad.Features;
 
@@ -30,6 +31,9 @@ namespace Xarial.CadPlus.Plus.Shared.Converters
 
                     case IXCutListItem cutList:
                         return cutList.Name;
+
+                    case ICustomObject custom:
+                        return custom.Tooltip;
                 }
             }
             catch 
