@@ -17,6 +17,7 @@ namespace Xarial.CadPlus.Plus.Services
     public interface IMessageService
     {
         void ShowError(string error);
+        void ShowWarning(string warn);
         void ShowInformation(string msg);
         bool? ShowQuestion(string question);
     }

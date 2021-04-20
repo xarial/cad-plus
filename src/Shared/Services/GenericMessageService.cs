@@ -14,6 +14,7 @@ namespace Xarial.CadPlus.Plus.Shared.Services
     {
         public void ShowError(string error) => ShowMessage(error, MessageBoxImage.Error);
         public void ShowInformation(string msg) => ShowMessage(msg, MessageBoxImage.Information);
+        public void ShowWarning(string warn) => ShowMessage(warn, MessageBoxImage.Warning);
 
         public bool? ShowQuestion(string question)
         {
