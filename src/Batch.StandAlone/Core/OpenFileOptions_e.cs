@@ -8,7 +8,7 @@
 using System;
 using Xarial.XCad.Base.Attributes;
 
-namespace Xarial.CadPlus.XBatch.Base.Core
+namespace Xarial.CadPlus.Batch.Base.Core
 {
     [Flags]
     public enum OpenFileOptions_e 

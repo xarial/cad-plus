@@ -26,12 +26,12 @@ using Xarial.CadPlus.Plus.Exceptions;
 using Xarial.CadPlus.Plus.Services;
 using Xarial.CadPlus.Plus.Shared.Services;
 using Xarial.CadPlus.Plus.UI;
-using Xarial.CadPlus.XBatch.Base;
-using Xarial.CadPlus.XBatch.Base.Core;
-using Xarial.CadPlus.XBatch.Base.Exceptions;
-using Xarial.CadPlus.XBatch.Base.Models;
+using Xarial.CadPlus.Batch.Base;
+using Xarial.CadPlus.Batch.Base.Core;
+using Xarial.CadPlus.Batch.Base.Exceptions;
 using Xarial.XCad;
 using Xarial.XCad.Base;
+using Xarial.XToolkit;
 using Xarial.XToolkit.Services.UserSettings;
 using Xarial.XToolkit.Wpf;
 using Xarial.XToolkit.Wpf.Extensions;
@@ -187,7 +187,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
             Name = name;
             Settings = new BatchDocumentSettingsVM(m_Job, m_AppProvider, m_Logger);
             Settings.Modified += OnSettingsModified;
-            Results = new JobResultsVM(m_Job, m_ExecFact);
+            Results = new JobResultsVM(m_Job, m_ExecFact, m_AppProvider.EntityDescriptor);
 
             Filters = new ObservableCollection<FilterVM>((m_Job.Filters ?? Enumerable.Empty<string>()).Select(f => new FilterVM(f)));
             Filters.CollectionChanged += OnFiltersCollectionChanged;

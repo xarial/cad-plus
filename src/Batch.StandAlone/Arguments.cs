@@ -12,9 +12,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Xarial.CadPlus.Plus.Applications;
-using Xarial.CadPlus.XBatch.Base.Core;
+using Xarial.CadPlus.Batch.Base.Core;
 
-namespace Xarial.CadPlus.XBatch.Base
+namespace Xarial.CadPlus.Batch.Base
 {
     [Verb("file", HelpText = "Managing Batch+ files")]
     public class FileOptions

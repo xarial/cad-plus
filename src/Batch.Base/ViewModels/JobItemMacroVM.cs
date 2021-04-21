@@ -15,7 +15,7 @@ using Xarial.CadPlus.Batch.Base.ViewModels;
 using Xarial.CadPlus.Common.Services;
 using Xarial.XToolkit.Wpf.Extensions;
 
-namespace Xarial.CadPlus.XBatch.Base.ViewModels
+namespace Xarial.CadPlus.Batch.Base.ViewModels
 {
     public class JobItemMacroVM : JobItemVM
     {

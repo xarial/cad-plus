@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 using Xarial.XCad.Base;
 using Xarial.XCad.Base.Enums;
 
-namespace Xarial.CadPlus.XBatch.Base.Services
+namespace Xarial.CadPlus.Batch.Base.Services
 {
     public interface IJobManager : IDisposable 
     {

@@ -3,14 +3,12 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:conv="clr-namespace:Xarial.CadPlus.Batch.InApp.Converters"
              xmlns:xconv="clr-namespace:Xarial.XToolkit.Wpf.Converters;assembly=Xarial.XToolkit.Wpf"
+             xmlns:sctrls="clr-namespace:Xarial.CadPlus.Plus.Shared.Controls;assembly=Xarial.CadPlusPlus.Shared"
              xmlns:local="clr-namespace:Xarial.CadPlus.Batch.InApp.UI"
              mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
-        <conv:ReferenceTitleConverter x:Key="refTitleConv"/>
-        <conv:ReferenceIconConverter x:Key="refIconConv"/>
         <xconv:ImageToImageSourceConverter x:Key="imgSrcConv"/>
     </UserControl.Resources>
     <Grid>
@@ -24,41 +22,21 @@
                     <Grid ToolTip="{Binding Path=Document.Path}">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="Auto"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
                         <CheckBox IsChecked="{Binding Path=IsChecked}" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2"/>
-                        <Image Grid.Column="1" Margin="2"
-                           Width="14" Height="14" VerticalAlignment="Center" HorizontalAlignment="Center"
-                           Stretch="Uniform">
-                            <Image.Source>
-                                <MultiBinding Converter="{StaticResource refIconConv}">
-                                    <Binding Path="Document"/>
-                                    <Binding Path="DataContext.EntityDescriptor" RelativeSource="{RelativeSource AncestorType={x:Type local:ReferencesList}}"/>
-                                </MultiBinding>
-                            </Image.Source>
-                            <Image.Style>
-                                <Style TargetType="{x:Type Image}">
+                        <sctrls:CadObjectLabelControl Object="{Binding Path=Document}" Grid.Column="1" Margin="2"
+                                                      Descriptor="{Binding Path=DataContext.EntityDescriptor, RelativeSource={RelativeSource AncestorType={x:Type local:ReferencesList}}}">
+                            <sctrls:CadObjectLabelControl.Style>
+                                <Style TargetType="{x:Type sctrls:CadObjectLabelControl}">
                                     <Style.Triggers>
                                         <DataTrigger Binding="{Binding Path=Document.IsCommitted}" Value="False">
-                                            <Setter Property="Opacity" Value="0.5" />
+                                            <Setter Property="Opacity" Value="0.5"/>
                                         </DataTrigger>
                                     </Style.Triggers>
                                 </Style>
-                            </Image.Style>
-                        </Image>
-                        <TextBlock Text="{Binding Path=Document, Converter={StaticResource refTitleConv}}"
-                           Grid.Column="2" VerticalAlignment="Center">
-                            <TextBlock.Style>
-                                <Style TargetType="{x:Type TextBlock}">
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding Path=Document.IsCommitted}" Value="False">
-                                            <Setter Property="Foreground" Value="Gray" />
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </TextBlock.Style>
-                        </TextBlock>
+                            </sctrls:CadObjectLabelControl.Style>
+                        </sctrls:CadObjectLabelControl>
                     </Grid>
                 </DataTemplate>
             </ListBox.ItemTemplate>

@@ -21,10 +21,9 @@ using Xarial.CadPlus.Plus.Applications;
 using Xarial.CadPlus.Plus.Services;
 using Xarial.CadPlus.Plus.Shared;
 using Xarial.CadPlus.Plus.Shared.Services;
-using Xarial.CadPlus.XBatch.Base;
-using Xarial.CadPlus.XBatch.Base.Core;
-using Xarial.CadPlus.XBatch.Base.Models;
-using Xarial.CadPlus.XBatch.Base.Services;
+using Xarial.CadPlus.Batch.Base;
+using Xarial.CadPlus.Batch.Base.Core;
+using Xarial.CadPlus.Batch.Base.Services;
 using Xarial.CadPlus.Batch.StandAlone.ViewModels;
 using Xarial.XCad.Base;
 using Xarial.XToolkit.Reporting;
@@ -38,7 +37,7 @@ namespace Xarial.CadPlus.Batch.StandAlone
     {
         private const int MAX_RETRIES = 2;
         
-        private static XBatch.Base.FileOptions m_StartupOptions;
+        private static Base.FileOptions m_StartupOptions;
 
         private static ApplicationLauncher<BatchApplication, BatchArguments, MainWindow> m_AppLauncher;
 
@@ -175,7 +174,7 @@ namespace Xarial.CadPlus.Batch.StandAlone
                 CreateParserResult(parser, input)
                     .WithParsed<RunOptions>(a => { argsLocal = a; createConsoleLocal = true; })
                     .WithParsed<JobOptions>(a => { argsLocal = a; createConsoleLocal = true; })
-                    .WithParsed<XBatch.Base.FileOptions>(a => m_StartupOptions = a)
+                    .WithParsed<Base.FileOptions>(a => m_StartupOptions = a)
                     .WithNotParsed(err => { hasError = true; createConsoleLocal = true; });
 
                 args = argsLocal;
@@ -191,6 +190,6 @@ namespace Xarial.CadPlus.Batch.StandAlone
         }
 
         private static ParserResult<object> CreateParserResult(Parser parser, string[] args)
-            => parser.ParseArguments<XBatch.Base.FileOptions, RunOptions, JobOptions>(args);
+            => parser.ParseArguments<Base.FileOptions, RunOptions, JobOptions>(args);
     }
 }

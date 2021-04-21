@@ -20,8 +20,8 @@ using Xarial.CadPlus.Plus.Exceptions;
 using Xarial.CadPlus.Plus.Services;
 using Xarial.CadPlus.Plus.Shared.Services;
 using Xarial.CadPlus.Batch.StandAlone;
-using Xarial.CadPlus.XBatch.Base.Exceptions;
-using Xarial.CadPlus.XBatch.Base.Services;
+using Xarial.CadPlus.Batch.Base.Exceptions;
+using Xarial.CadPlus.Batch.Base.Services;
 using Xarial.XCad;
 using Xarial.XCad.Base;
 using Xarial.XCad.Documents;
@@ -33,7 +33,7 @@ using Xarial.XToolkit.Reporting;
 using Xarial.CadPlus.Batch.StandAlone.Exceptions;
 using Xarial.CadPlus.Common.Utils;
 
-namespace Xarial.CadPlus.XBatch.Base.Core
+namespace Xarial.CadPlus.Batch.Base.Core
 {
     public class BatchJobContext 
     {
@@ -97,7 +97,6 @@ namespace Xarial.CadPlus.XBatch.Base.Core
         private void OnPopupNotClosed(Process prc, IntPtr hwnd)
         {
             m_UserLogger.WriteLine("Failed to close the blocking popup window");
-            TryShutDownApplication(prc);
         }
 
         public async Task<bool> BatchRunAsync(CancellationToken cancellationToken = default)
@@ -258,8 +257,27 @@ namespace Xarial.CadPlus.XBatch.Base.Core
 
             var inputDocs = inputFiles.Select(f =>
             {
-                var doc = app.Documents.PreCreate<IXDocument>();
+                IXDocument doc;
+
+                if (MatchesExtension(f, m_AppProvider.EntityDescriptor.PartFileFilter.Extensions))
+                {
+                    doc = app.Documents.PreCreate<IXPart>();
+                }
+                else if (MatchesExtension(f, m_AppProvider.EntityDescriptor.AssemblyFileFilter.Extensions))
+                {
+                    doc = app.Documents.PreCreate<IXAssembly>();
+                }
+                else if (MatchesExtension(f, m_AppProvider.EntityDescriptor.DrawingFileFilter.Extensions))
+                {
+                    doc = app.Documents.PreCreate<IXDrawing>();
+                }
+                else 
+                {
+                    doc = app.Documents.PreCreate<IXDocument>();
+                }
+                
                 doc.Path = f;
+
                 return doc;
             }).ToList();
 
@@ -268,6 +286,19 @@ namespace Xarial.CadPlus.XBatch.Base.Core
             return inputDocs
                 .Select(d => new JobItemDocument(d, macros.Select(m => new JobItemMacro(m)).ToArray()))
                 .ToArray();
+        }
+
+        private bool MatchesExtension(string path, string[] exts)
+        {
+            try
+            {
+                var ext = Path.GetExtension(path);
+                return exts.Any(e => Path.GetExtension(e).Equals(ext, StringComparison.CurrentCultureIgnoreCase));
+            }
+            catch
+            {
+                return false;
+            }
         }
 
         private void TryCloseDocument(IXDocument doc)
@@ -579,9 +610,14 @@ namespace Xarial.CadPlus.XBatch.Base.Core
             {
                 try
                 {
-                    if (app.Version.Compare(doc.Version) == VersionEquality_e.Newer)
+                    if (FileHelper.MatchesFilter(doc.Path, m_AppProvider.EntityDescriptor.PartFileFilter.Extensions)
+                        || FileHelper.MatchesFilter(doc.Path, m_AppProvider.EntityDescriptor.AssemblyFileFilter.Extensions)
+                        || FileHelper.MatchesFilter(doc.Path, m_AppProvider.EntityDescriptor.DrawingFileFilter.Extensions))
                     {
-                        return true;
+                        if (app.Version.Compare(doc.Version) == VersionEquality_e.Newer)
+                        {
+                            return true;
+                        }
                     }
                 }
                 catch (Exception ex)

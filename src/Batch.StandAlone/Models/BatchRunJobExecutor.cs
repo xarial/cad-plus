@@ -13,12 +13,12 @@ using System.Threading.Tasks;
 using Xarial.CadPlus.Batch.Base.Models;
 using Xarial.CadPlus.Common.Services;
 using Xarial.CadPlus.Plus.Applications;
-using Xarial.CadPlus.XBatch.Base.Core;
-using Xarial.CadPlus.XBatch.Base.Exceptions;
+using Xarial.CadPlus.Batch.Base.Core;
+using Xarial.CadPlus.Batch.Base.Exceptions;
 using Xarial.XCad;
 using Xarial.XToolkit.Reporting;
 
-namespace Xarial.CadPlus.XBatch.Base.Models
+namespace Xarial.CadPlus.Batch.Base.Models
 {
     public class BatchRunJobExecutor : IBatchRunJobExecutor, IDisposable
     {

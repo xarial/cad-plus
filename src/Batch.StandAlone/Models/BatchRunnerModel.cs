@@ -11,19 +11,19 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Xarial.CadPlus.Batch.Base.Core;
 using Xarial.CadPlus.Batch.Base.Models;
 using Xarial.CadPlus.Common.Exceptions;
 using Xarial.CadPlus.Common.Services;
 using Xarial.CadPlus.Plus.Applications;
 using Xarial.CadPlus.Plus.Exceptions;
-using Xarial.CadPlus.XBatch.Base.Core;
-using Xarial.CadPlus.XBatch.Base.Exceptions;
-using Xarial.CadPlus.XBatch.Base.Services;
+using Xarial.CadPlus.Batch.Base.Exceptions;
 using Xarial.XCad;
 using Xarial.XToolkit.Services.UserSettings;
 using Xarial.XToolkit.Wpf.Utils;
+using Xarial.CadPlus.Batch.Base.Services;
 
-namespace Xarial.CadPlus.XBatch.Base.Models
+namespace Xarial.CadPlus.Batch.Base.Models
 {
     public interface IBatchRunnerModel 
     {

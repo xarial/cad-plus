@@ -13,11 +13,12 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using Xarial.CadPlus.Batch.Base.Models;
-using Xarial.CadPlus.XBatch.Base.Exceptions;
+using Xarial.CadPlus.Plus.Services;
+using Xarial.CadPlus.Batch.Base.Exceptions;
 using Xarial.XToolkit.Wpf;
 using Xarial.XToolkit.Wpf.Extensions;
 
-namespace Xarial.CadPlus.XBatch.Base.ViewModels
+namespace Xarial.CadPlus.Batch.Base.ViewModels
 {
     public enum JobState_e 
     {
@@ -32,7 +33,7 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
     {
         public event PropertyChangedEventHandler PropertyChanged;
         
-        public JobResultLogVM Log { get; }
+        public JobResultJournalVM Journal { get; }
         public JobResultSummaryVM Summary { get; }
 
         public string Name { get; }
@@ -67,13 +68,16 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
             }
         }
 
-        public JobResultVM(string name, IBatchRunJobExecutor executor)
+        public ICadDescriptor CadDescriptor { get; }
+
+        public JobResultVM(string name, IBatchRunJobExecutor executor, ICadDescriptor cadDesc)
         {
             m_Executor = executor;
-
+            CadDescriptor = cadDesc;
+            
             Name = name;
-            Summary = new JobResultSummaryVM(m_Executor);
-            Log = new JobResultLogVM(m_Executor);
+            Summary = new JobResultSummaryVM(m_Executor, CadDescriptor);
+            Journal = new JobResultJournalVM(m_Executor);
         }
 
         public void CancelJob()
