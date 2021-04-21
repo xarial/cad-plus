@@ -82,10 +82,11 @@ namespace Xarial.CadPlus.AddIn.Base
             m_Specs = new List<CommandGroupSpec>();
 
             m_Initiator = initiator;
-            m_Initiator.Init(this);
 
             try
             {
+                m_Initiator.Init(this);
+
                 Extension = m_App.Extension;
 
                 m_NextId = ROOT_GROUP_ID + 1;

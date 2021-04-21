@@ -12,6 +12,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using Xarial.CadPlus.Common.Services;
 using Xarial.CadPlus.CustomToolbar.Base;
@@ -149,6 +150,19 @@ namespace Xarial.CadPlus.CustomToolbar.Services
             {
                 m_Logger.Log($"Toggle state code compilation errors", XCad.Base.Enums.LoggerMessageSeverity_e.Error);
                 m_Logger.Log(ex);
+
+                if (ex is ReflectionTypeLoadException) 
+                {
+                    var loaderExs = (ex as ReflectionTypeLoadException).LoaderExceptions;
+
+                    if (loaderExs != null) 
+                    {
+                        foreach (var loaderEx in loaderExs) 
+                        {
+                            m_Logger.Log(loaderEx);
+                        }
+                    }
+                }
 
                 m_Msg.ShowError($"Failed to compile the toggle state code");
             }
