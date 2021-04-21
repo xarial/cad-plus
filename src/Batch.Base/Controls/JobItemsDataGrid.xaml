@@ -51,7 +51,7 @@
             <DataGridTemplateColumn IsReadOnly="True" Header="File">
                 <DataGridTemplateColumn.CellTemplate>
                     <DataTemplate>
-                        <sctrls:CadObjectLabelControl Object="{Binding Path=Document}"
+                        <sctrls:CadObjectLabelControl Object="{Binding Path=DisplayObject}"
                                                       Descriptor="{Binding Path=CadDescriptor, RelativeSource={RelativeSource AncestorType={x:Type local:JobItemsDataGrid}}}"/>
                     </DataTemplate>
                 </DataGridTemplateColumn.CellTemplate>

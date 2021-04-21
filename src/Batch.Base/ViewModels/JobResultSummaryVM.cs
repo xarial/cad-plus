@@ -15,6 +15,7 @@ using Xarial.CadPlus.Batch.Base.Models;
 using Xarial.CadPlus.Common.Services;
 using Xarial.CadPlus.Batch.Base.Core;
 using Xarial.XToolkit.Wpf.Extensions;
+using Xarial.CadPlus.Plus.Services;
 
 namespace Xarial.CadPlus.Batch.Base.ViewModels
 {
@@ -105,11 +106,14 @@ namespace Xarial.CadPlus.Batch.Base.ViewModels
         private double m_Progress;
         private bool m_IsInitializing;
 
-        public JobResultSummaryVM(IBatchRunJobExecutor executor)
+        private readonly ICadDescriptor m_CadDesc;
+
+        public JobResultSummaryVM(IBatchRunJobExecutor executor, ICadDescriptor cadDesc)
         {
             IsInitializing = true;
 
             m_Executor = executor;
+            m_CadDesc = cadDesc;
 
             m_Executor.JobSet += OnJobSet;
             m_Executor.ProgressChanged += OnProgressChanged;
@@ -118,7 +122,7 @@ namespace Xarial.CadPlus.Batch.Base.ViewModels
 
         private void OnJobSet(IJobItem[] files, DateTime startTime)
         {
-            JobItemFiles = files.Select(f => new JobItemDocumentVM((JobItemDocument)f)).ToArray();
+            JobItemFiles = files.Select(f => new JobItemDocumentVM((JobItemDocument)f, m_CadDesc)).ToArray();
             StartTime = startTime;
         }
 

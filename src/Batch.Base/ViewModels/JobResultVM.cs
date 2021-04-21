@@ -76,7 +76,7 @@ namespace Xarial.CadPlus.Batch.Base.ViewModels
             CadDescriptor = cadDesc;
             
             Name = name;
-            Summary = new JobResultSummaryVM(m_Executor);
+            Summary = new JobResultSummaryVM(m_Executor, CadDescriptor);
             Journal = new JobResultJournalVM(m_Executor);
         }
 
