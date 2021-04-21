@@ -46,24 +46,28 @@
                 </GroupBox>
                 <GroupBox Grid.Row="1" Header="Input" Margin="5">
                     <ListView ItemsSource="{Binding Path=InputView}" Margin="5"
-                          VirtualizingPanel.VirtualizationMode="Standard"
-                          VirtualizingPanel.IsVirtualizing="True">
-                    <ListView.ItemTemplate>
-                        <DataTemplate>
+                              VirtualizingStackPanel.VirtualizationMode="Recycling">
+                        <ListView.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <VirtualizingStackPanel/>
+                            </ItemsPanelTemplate>
+                        </ListView.ItemsPanel>
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
                                 <sctrls:CadObjectLabelControl Object="{Binding Path=Document}" DocumentTitleDisplayType="Path"
-                                                              Descriptor="{Binding Path=DataContext.EntityDescriptor, RelativeSource={RelativeSource AncestorType={x:Type local:InputsSorterWindow}}}"/>
+                                                            Descriptor="{Binding Path=DataContext.EntityDescriptor, RelativeSource={RelativeSource AncestorType={x:Type local:InputsSorterWindow}}}"/>
                             </DataTemplate>
-                    </ListView.ItemTemplate>
-                    <ListView.GroupStyle>
-                        <GroupStyle>
-                            <GroupStyle.HeaderTemplate>
-                                <DataTemplate>
-                                    <TextBlock FontWeight="Bold" Text="{Binding Name}"/>
-                                </DataTemplate>
-                            </GroupStyle.HeaderTemplate>
-                        </GroupStyle>
-                    </ListView.GroupStyle>
-                </ListView>
+                        </ListView.ItemTemplate>
+                        <ListView.GroupStyle>
+                            <GroupStyle>
+                                <GroupStyle.HeaderTemplate>
+                                    <DataTemplate>
+                                        <TextBlock FontWeight="Bold" Text="{Binding Name}"/>
+                                    </DataTemplate>
+                                </GroupStyle.HeaderTemplate>
+                            </GroupStyle>
+                        </ListView.GroupStyle>
+                    </ListView>
                 </GroupBox>
             </Grid>
         </xctrls:ProgressPanel>

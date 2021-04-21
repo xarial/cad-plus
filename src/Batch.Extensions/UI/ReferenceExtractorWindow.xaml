@@ -72,6 +72,11 @@
                     <ListView ItemsSource="{Binding Path=References}"
                               VirtualizingPanel.VirtualizationMode="Standard"
                               VirtualizingPanel.IsVirtualizing="True">
+                        <ListView.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <VirtualizingStackPanel/>
+                            </ItemsPanelTemplate>
+                        </ListView.ItemsPanel>
                         <ListView.Resources>
                             <DataTemplate x:Key="ReferenceTemplate">
                                 <Grid ToolTip="{Binding Path=Document.Path}" Margin="2">
