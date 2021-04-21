@@ -14,6 +14,23 @@
     <xconv:ObjectIsNotNullVisibilityConverter x:Key="objIsNotNullToVisConv"/>
     
     <Style TargetType="{x:Type local:CadObjectLabelControl}">
+        <Setter Property="ToolTip">
+            <Setter.Value>
+                <ToolTip DataContext="{Binding Path=PlacementTarget, RelativeSource={RelativeSource Self}}">
+                    <Grid MaxWidth="250">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Text="{Binding Path=Object, Converter={StaticResource objTooltipTitleConv}}"
+                                               Grid.Row="0" TextWrapping="Wrap" FontWeight="Bold" Margin="5"/>
+                        <Image Grid.Row="1" Source="{Binding Path=Object, Converter={StaticResource objPreviewConv}}"
+                                           RenderOptions.BitmapScalingMode="Fant" MaxHeight="250" Stretch="Uniform" Margin="5"
+                                           Visibility="{Binding Path=Source, RelativeSource={RelativeSource Self}, Converter={StaticResource objIsNotNullToVisConv}}"/>
+                    </Grid>
+                </ToolTip>
+            </Setter.Value>
+        </Setter>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type local:CadObjectLabelControl}">
@@ -40,19 +57,6 @@
                                 </MultiBinding>
                             </TextBlock.Text>
                         </TextBlock>
-                        <Grid.ToolTip>
-                            <Grid MaxWidth="250">
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="*"/>
-                                </Grid.RowDefinitions>
-                                <TextBlock Text="{Binding Path=Object, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource objTooltipTitleConv}}"
-                                           Grid.Row="0" TextWrapping="Wrap" FontWeight="Bold" Margin="5"/>
-                                <Image Grid.Row="1" Source="{Binding Path=Object, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource objPreviewConv}}"
-                                       RenderOptions.BitmapScalingMode="Fant" MaxHeight="250" Stretch="Uniform" Margin="5"
-                                       Visibility="{Binding Path=Source, RelativeSource={RelativeSource Self}, Converter={StaticResource objIsNotNullToVisConv}}"/>
-                            </Grid>
-                        </Grid.ToolTip>
                         <Grid.ContextMenu>
                             <ContextMenu Visibility="{Binding Path=Object, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource ctxMenuVisConv}}">
                                 <MenuItem x:Name="PART_ContextMenu_OpenInExplorer" Header="Open In File Explorer"/>

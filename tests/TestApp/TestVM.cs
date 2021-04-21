@@ -53,7 +53,7 @@ namespace TestApp
 
             var confMock = new Mock<IXConfiguration>();
             confMock.Setup(x => x.Name).Returns("Default");
-            confMock.Setup(x => x.Preview).Returns(new MockImage(Resources.preview));
+            confMock.Setup(x => x.Preview).Returns(() => new MockImage(Resources.preview));
             Configuration = confMock.Object;
 
             var cutListMock = new Mock<IXCutListItem>();
