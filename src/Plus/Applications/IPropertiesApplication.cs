@@ -29,6 +29,6 @@ namespace Xarial.CadPlus.Plus.Applications
 
     public interface IPropertiesApplication : IDocumentConsumerApplication, IHasCommandManager
     {
-        void OpenFile(string filePath);
+        Task LoadPropertiesAsync(string filePath);
     }
 }
