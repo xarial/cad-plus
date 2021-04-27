@@ -14,10 +14,11 @@ using Xarial.XCad.Documents;
 
 namespace Xarial.CadPlus.Plus.Services
 {
-    public interface IDocumentAdapter
+    public interface IUnloadedDocumentAdapter
     {
-        IXDocument GetAdapter(IXDocument doc, bool allowReadOnly);
+        IXDocument GetDocumentReplacement(IXDocument doc, bool allowReadOnly);
         void DisposeDocument(IXDocument doc);
-        void ApplyChanged(IXDocument doc);
+        void ApplyChanges(IXDocument doc);
+        bool IsAdapted(IXDocument doc);
     }
 }
