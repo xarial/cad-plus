@@ -168,7 +168,7 @@ namespace Xarial.CadPlus.AddIn.Base
             builder.RegisterType<CadAppMessageService>()
                 .As<IMessageService>();
             builder.RegisterType<DefaultDocumentAdapter>()
-                .As<IDocumentAdapter>();
+                .As<IUnloadedDocumentAdapter>();
             builder.RegisterType<SettingsProvider>()
                 .As<ISettingsProvider>();
             builder.RegisterType<XCadMacroProvider>()
