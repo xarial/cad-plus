@@ -19,6 +19,6 @@ namespace Xarial.CadPlus.Plus.Services
         IXDocument GetDocumentReplacement(IXDocument doc, bool allowReadOnly);
         void DisposeDocument(IXDocument doc);
         void ApplyChanges(IXDocument doc);
-        bool IsAdapted(IXDocument doc);
+        bool IsReplaced(IXDocument doc);
     }
 }
