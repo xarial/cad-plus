@@ -17,7 +17,7 @@ namespace Xarial.CadPlus.AddIn.Base
 {
     public class DefaultDocumentAdapter : IDocumentAdapter
     {
-        public void ApplyChanged(IXDocument doc)
+        public void ApplyChanges(IXDocument doc)
         {
         }
 
@@ -25,7 +25,7 @@ namespace Xarial.CadPlus.AddIn.Base
         {
         }
 
-        public IXDocument GetAdapter(IXDocument doc, bool allowReadOnly)
+        public IXDocument GetDocumentReplacement(IXDocument doc, bool allowReadOnly)
             => doc;
     }
 }
