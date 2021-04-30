@@ -15,7 +15,7 @@ using Xarial.XCad.Documents;
 
 namespace Xarial.CadPlus.AddIn.Base
 {
-    public class DefaultDocumentAdapter : IUnloadedDocumentAdapter
+    public class DefaultDocumentAdapter : IDocumentAdapter
     {
         public void ApplyChanges(IXDocument doc)
         {
@@ -27,8 +27,5 @@ namespace Xarial.CadPlus.AddIn.Base
 
         public IXDocument GetDocumentReplacement(IXDocument doc, bool allowReadOnly)
             => doc;
-        
-        public bool IsReplaced(IXDocument doc)
-            => false;
     }
 }
