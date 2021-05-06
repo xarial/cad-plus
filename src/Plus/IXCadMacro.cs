@@ -11,12 +11,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Xarial.XCad;
+using Xarial.XCad.Base;
 using Xarial.XCad.Documents;
 
 namespace Xarial.CadPlus.Plus
 {
     public interface IXCadMacro
     {
-        void Run(IXApplication app, IXDocument doc, string[] args);
+        void Run(IXApplication app, IXDocument doc, IXLogger logger, string[] args);
     }
 }
