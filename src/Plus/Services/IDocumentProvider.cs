@@ -17,6 +17,6 @@ namespace Xarial.CadPlus.Plus.Services
     public interface IDocumentProvider
     {
         ICadDescriptor Descriptor { get; }
-        IXDocument GetDocument(string path, bool allowReadOnly);
+        IXDocument GetDocument(string path);
     }
 }
