@@ -100,13 +100,13 @@
     <Reference Include="WindowsBase" />
     <Reference Include="WindowsFormsIntegration" />
     <Reference Include="Xarial.CadPlusPlus, Version=0.2.0.0, Culture=neutral, PublicKeyToken=60dcaf351d4060db, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Xarial.CadPlusPlus.0.2.0-20210430.1\lib\net461\Xarial.CadPlusPlus.dll</HintPath>
+      <HintPath>..\..\packages\Xarial.CadPlusPlus.0.2.0-20210506.4\lib\net461\Xarial.CadPlusPlus.dll</HintPath>
     </Reference>
     <Reference Include="Xarial.CadPlusPlus.Shared, Version=0.1.0.0, Culture=neutral, PublicKeyToken=60dcaf351d4060db, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Xarial.CadPlusPlus.Shared.0.1.0-20210430.1\lib\net461\Xarial.CadPlusPlus.Shared.dll</HintPath>
+      <HintPath>..\..\packages\Xarial.CadPlusPlus.Shared.0.1.0-20210506.4\lib\net461\Xarial.CadPlusPlus.Shared.dll</HintPath>
     </Reference>
     <Reference Include="Xarial.XCad, Version=0.7.0.0, Culture=neutral, PublicKeyToken=60dcaf351d4060db, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Xarial.XCad.0.7.0-20210428.1\lib\net461\Xarial.XCad.dll</HintPath>
+      <HintPath>..\..\packages\Xarial.XCad.0.7.0\lib\net461\Xarial.XCad.dll</HintPath>
     </Reference>
     <Reference Include="Xarial.XToolkit, Version=0.2.19.0, Culture=neutral, PublicKeyToken=60dcaf351d4060db, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Xarial.XToolkit.0.2.19\lib\net461\Xarial.XToolkit.dll</HintPath>
@@ -126,11 +126,10 @@
     <Compile Include="Services\CadAppMessageService.cs" />
     <Compile Include="Services\XCadMacroProvider.cs" />
     <Compile Include="Services\ConsoleProgressWriter.cs" />
-    <Compile Include="Services\LogWirter.cs" />
+    <Compile Include="Services\JournalWirter.cs" />
     <Compile Include="Services\MacroExecutor.cs" />
     <Compile Include="Services\ProgressHandler.cs" />
     <Compile Include="Utils\CommandLineHelper.cs" />
-    <Compile Include="Utils\FileHelper.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

@@ -32,6 +32,7 @@ using Xarial.XCad.Exceptions;
 using Xarial.XToolkit.Reporting;
 using Xarial.CadPlus.Batch.StandAlone.Exceptions;
 using Xarial.CadPlus.Common.Utils;
+using Xarial.CadPlus.Plus.Shared.Helpers;
 
 namespace Xarial.CadPlus.Batch.Base.Core
 {
