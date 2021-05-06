@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -29,6 +30,7 @@ namespace Xarial.CadPlus.Plus.Applications
 
     public interface IPropertiesApplication : IDocumentConsumerApplication, IHasCommandManager
     {
-        Task LoadPropertiesAsync(string filePath);
+        Task LoadPropertiesAsync(FileInfo file);
+        Task LoadPropertiesAsync(DirectoryInfo dir);
     }
 }
