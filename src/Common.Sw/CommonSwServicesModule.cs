@@ -33,7 +33,7 @@ namespace Xarial.CadPlus.Common.Sw
         private void OnConfigureServices(IContainerBuilder contBuilder)
         {
             contBuilder.Register<SwMacroExecutor, IMacroExecutor>(CadApplicationIds.SolidWorks);
-            contBuilder.Register<SwEntityDescriptor, ICadDescriptor>(CadApplicationIds.SolidWorks);
+            contBuilder.Register<SwDescriptor, ICadDescriptor>(CadApplicationIds.SolidWorks);
         }
 
         public void Dispose()

@@ -78,7 +78,7 @@ namespace Xarial.CadPlus.Batch.Extensions.ViewModels
             }
         }
 
-        public ICadDescriptor EntityDescriptor { get; }
+        public ICadDescriptor Descriptor { get; }
 
         private bool m_IsInitializing;
         private double m_Progress;
@@ -105,7 +105,7 @@ namespace Xarial.CadPlus.Batch.Extensions.ViewModels
 
         public InputsSorterVM(ICadDescriptor cadEntDesc) 
         {
-            EntityDescriptor = cadEntDesc;
+            Descriptor = cadEntDesc;
             IsInitializing = true;
         }
 

@@ -87,7 +87,7 @@
                                     <CheckBox IsChecked="{Binding Path=IsChecked}" VerticalAlignment="Center"/>
                                     <sctrls:CadObjectLabelControl Grid.Column="1" 
                                                                   Object="{Binding Path=Document}"
-                                                                  Descriptor="{Binding Path=DataContext.EntityDescriptor, RelativeSource={RelativeSource AncestorType={x:Type local:ReferenceExtractorWindow}}}"/>
+                                                                  Descriptor="{Binding Path=DataContext.Descriptor, RelativeSource={RelativeSource AncestorType={x:Type local:ReferenceExtractorWindow}}}"/>
                                 </Grid>
                             </DataTemplate>
                         </ListView.Resources>

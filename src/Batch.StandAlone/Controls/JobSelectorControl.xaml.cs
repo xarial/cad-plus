@@ -57,7 +57,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.Controls
 		private void OnCreateDocumentClick(object sender, RoutedEventArgs e)
 		{
 			var appProvider = (sender as Button).DataContext as ICadApplicationInstanceProvider;
-			CreateDocumentCommand?.Execute(appProvider.EntityDescriptor.ApplicationId);
+			CreateDocumentCommand?.Execute(appProvider.Descriptor.ApplicationId);
 			Selected?.Invoke();
 		}
 	}

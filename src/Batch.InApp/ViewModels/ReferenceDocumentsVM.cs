@@ -22,7 +22,7 @@ namespace Xarial.CadPlus.Batch.InApp.ViewModels
 {
     public class ReferenceDocumentsVM : INotifyPropertyChanged
     {
-        public ICadDescriptor EntityDescriptor { get; }
+        public ICadDescriptor Descriptor { get; }
 
         private DocumentVM[] m_References;
 
@@ -62,7 +62,7 @@ namespace Xarial.CadPlus.Batch.InApp.ViewModels
 
         public ReferenceDocumentsVM(ICadDescriptor cadEntDesc)
         {
-            EntityDescriptor = cadEntDesc;
+            Descriptor = cadEntDesc;
 
             TogglePartFilterCommand = new RelayCommand(TogglePartFilter);
             ToggleAssemblyFilterCommand = new RelayCommand(ToggleAssemblyFilter);

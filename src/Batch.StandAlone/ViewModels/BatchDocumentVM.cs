@@ -172,8 +172,8 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
 
             CommandManager = LoadRibbonCommands(backstageCmds);
 
-            InputFilesFilter = GetFileFilters(m_AppProvider.EntityDescriptor);
-            MacroFilesFilter = m_AppProvider.EntityDescriptor.MacroFileFilters
+            InputFilesFilter = GetFileFilters(m_AppProvider.Descriptor);
+            MacroFilesFilter = m_AppProvider.Descriptor.MacroFileFilters
                 .Select(f => new FileFilter(f.Name, f.Extensions))
                 .Concat(new FileFilter[] { XCadMacroProvider.Filter, FileFilter.AllFiles })
                 .ToArray();
@@ -187,7 +187,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
             Name = name;
             Settings = new BatchDocumentSettingsVM(m_Job, m_AppProvider, m_Logger);
             Settings.Modified += OnSettingsModified;
-            Results = new JobResultsVM(m_Job, m_ExecFact, m_AppProvider.EntityDescriptor);
+            Results = new JobResultsVM(m_Job, m_ExecFact, m_AppProvider.Descriptor);
 
             Filters = new ObservableCollection<FilterVM>((m_Job.Filters ?? Enumerable.Empty<string>()).Select(f => new FilterVM(f)));
             Filters.CollectionChanged += OnFiltersCollectionChanged;
@@ -242,7 +242,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
                             () => m_ParentWnd.lstMacros.DeleteSelectedCommand.CanExecute(null)))),
                 new RibbonTab(BatchApplicationCommandManager.SettingsTab.Name, "Settings",
                     new RibbonGroup(BatchApplicationCommandManager.SettingsTab.StartupOptionsGroupName, "Startup Options",
-                        new RibbonDropDownButton("Version", m_AppProvider.EntityDescriptor.ApplicationIcon, "",
+                        new RibbonDropDownButton("Version", m_AppProvider.Descriptor.ApplicationIcon, "",
                             () => new VersionVM(Settings.Version),
                             v => Settings.Version = ((VersionVM)v).Version,
                             () => m_AppProvider.GetInstalledVersions().Select(v => new VersionVM(v))),

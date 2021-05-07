@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -18,7 +19,7 @@ using Xarial.CadPlus.Plus.Services;
 
 namespace Xarial.CadPlus.Common.Sw.Services
 {
-    public class SwEntityDescriptor : ICadDescriptor
+    public class SwDescriptor : ICadDescriptor
     {
         public string ApplicationId => CadApplicationIds.SolidWorks;
         public string ApplicationName => "SOLIDWORKS";
@@ -42,5 +43,14 @@ namespace Xarial.CadPlus.Common.Sw.Services
             new FileTypeFilter("VSTA Macros", "*.dll"),
             new FileTypeFilter("All Macros", "*.swp", "*.swb", "*.dll")
         };
+
+        public bool IsSystemFile(string filePath)
+        {
+            const string TEMP_SW_FILE_NAME = "~$";
+
+            var fileName = Path.GetFileName(filePath);
+
+            return fileName.StartsWith(TEMP_SW_FILE_NAME);
+        }
     }
 }
