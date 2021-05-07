@@ -33,5 +33,7 @@ namespace Xarial.CadPlus.Plus.Services
         FileTypeFilter DrawingFileFilter { get; }
 
         FileTypeFilter[] MacroFileFilters { get; }
+
+        bool IsSystemFile(string filePath);
     }
 }
