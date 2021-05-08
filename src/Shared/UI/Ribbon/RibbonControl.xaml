@@ -19,7 +19,7 @@
         <local:RibbonCommandTemplateSelector x:Key="ribbonGrpCmdTemplateSelector">
             <local:RibbonCommandTemplateSelector.Button>
                 <DataTemplate>
-                    <fluent:Button Header="{Binding Path=Title}" Width="60" Margin="1"
+                    <fluent:Button Header="{Binding Path=Title}" Margin="1"
                                    Icon="{Binding Path=Icon, Converter={StaticResource imgToSrcConv}}"
                                    LargeIcon="{Binding Path=Icon, Converter={StaticResource imgToSrcConv}}" 
                                    Command="{Binding Converter={StaticResource ribbonBtnToCmdConv}}"/>
@@ -27,7 +27,7 @@
             </local:RibbonCommandTemplateSelector.Button>
             <local:RibbonCommandTemplateSelector.Toggle>
                 <DataTemplate>
-                    <fluent:ToggleButton Width="60" Margin="1"
+                    <fluent:ToggleButton Margin="1"
                                          Icon="{Binding Path=Icon, Converter={StaticResource imgToSrcConv}}" 
                                          LargeIcon="{Binding Path=Icon, Converter={StaticResource imgToSrcConv}}"
                                          Header="{Binding Path=Title}"
@@ -83,7 +83,7 @@
             </local:RibbonCommandTemplateSelector.Switch>
             <local:RibbonCommandTemplateSelector.DropDownButton>
                 <DataTemplate>
-                    <fluent:DropDownButton Width="60" Margin="1"
+                    <fluent:DropDownButton Margin="1"
                                            LargeIcon="{Binding Path=Icon, Converter={StaticResource imgToSrcConv}}"
                                            Header="{Binding Path=Value, Converter={StaticResource itemHeaderConv}}" 
                                            ItemsSource="{Binding Path=ItemsSource}"
