@@ -60,19 +60,23 @@ namespace Xarial.CadPlus.Plus.Shared.UI
 				var backstageCtrl = new BackstageTabControl();
 				ctrlRibbon.Menu = new Backstage()
 				{
-					Content = backstageCtrl
+					Content = backstageCtrl,
 				};
 
 				foreach (var btn in cmdMgr.Backstage)
 				{
 					if (btn != null)
 					{
-						backstageCtrl.Items.Add(new Fluent.Button()
+						var btnItem = new Fluent.Button()
 						{
 							Header = btn.Title,
 							Command = new RelayCommand(btn.Handler, btn.CanExecuteHandler),
 							Icon = btn.Icon?.ToBitmapImage()
-						});
+						};
+
+						backstageCtrl.Items.Add(btnItem);
+
+						btnItem.AddHandler(Fluent.Button.ClickEvent, (RoutedEventHandler)OnBackstageButtonClicked);
 					}
 					else
 					{
@@ -114,6 +118,16 @@ namespace Xarial.CadPlus.Plus.Shared.UI
 			}
 
 			ctrlRibbon.SelectedTabIndex = 0;
+		}
+
+		private void OnBackstageButtonClicked(object sender, RoutedEventArgs e) 
+		{
+			var backstage = ctrlRibbon?.Menu as Backstage;
+
+			if (backstage != null)
+			{
+				backstage.IsOpen = false;
+			}
 		}
 	}
 }

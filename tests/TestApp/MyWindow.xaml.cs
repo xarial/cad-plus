@@ -16,10 +16,11 @@ using Xarial.CadPlus.Plus.Shared.Styles;
 
 namespace TestApp
 {
-    public partial class MyWindow : Window
+    public partial class MyWindow
     {
         public MyWindow()
         {
+            Application.Current.UsingMetroStyles();
             InitializeComponent();
             this.DataContext = new TestVM();
         }
