@@ -266,7 +266,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
                 null,
                 new RibbonButtonCommand("Close", null, "Close current batch job", CloseDocument, () => Document != null),
                 null,
-                new RibbonButtonCommand("Help", Resources.help_icon, "Open help page", OpenHelp, null),
+                new RibbonButtonCommand("Help...", Resources.help_icon, "Open help page", OpenHelp, null),
                 new RibbonButtonCommand("About...", Resources.about_icon, "About Batch+", ShowAbout, null)
             };
         }
