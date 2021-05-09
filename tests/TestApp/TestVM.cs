@@ -110,13 +110,13 @@ namespace TestApp
                         "DropDown1 Tooltip",
                         () => m_SelectedDropDown1Item, x => m_SelectedDropDown1Item = (DropDownItem)x, () => m_DropDown1Items)),
                     new RibbonGroup("Group2", "Group2",
-                        new RibbonToggleCommand("Toggle1", Resources.icon1, "Load properties for document", () => m_Toggle1, x => m_Toggle1 = x),
-                        new RibbonToggleCommand("Wide Toggle2", Resources.icon1, "Load properties for configurations", () => m_Toggle2, x => m_Toggle2 = x),
-                        new RibbonToggleCommand("Toggle3", Resources.icon4, "Load properties for cut-lists", () => m_Toggle3, x => m_Toggle3 = x)),
+                        new RibbonToggleCommand("Toggle1", Resources.icon1, "Some Toggle 1 Some Toggle 1 Some Toggle 1 Some Toggle 1 Some Toggle 1 Some Toggle 1 Some Toggle 1 Some Toggle 1 Some Toggle 1", () => m_Toggle1, x => m_Toggle1 = x),
+                        new RibbonToggleCommand("Wide Toggle2", Resources.icon1, "Wide Toggle 2", () => m_Toggle2, x => m_Toggle2 = x),
+                        new RibbonToggleCommand("Toggle3", Resources.icon4, "Some Toggle 3", () => m_Toggle3, x => m_Toggle3 = x)),
                     new RibbonGroup("Group3", "Group3",
-                        new RibbonButtonCommand("Button1", Resources.icon5, "", () => { }, null),
-                        new RibbonButtonCommand("Very Wide Button2", Resources.icon1, "", () => { }, null),
-                        new RibbonSwitchCommand("Switch1", Resources.icon3, "", "Toggle On", "Toggle Off", () => m_Switch1, x => m_Switch1 = x))));
+                        new RibbonButtonCommand("Button1", Resources.icon5, "Button1 Tooltip", () => { }, null),
+                        new RibbonButtonCommand("Very Wide Button2", Resources.icon1, "Button 2 Tooltip", () => { }, null),
+                        new RibbonSwitchCommand("Switch1", Resources.icon3, "Some toggle switch", "Toggle On", "Toggle Off", () => m_Switch1, x => m_Switch1 = x))));
         }
     }
 

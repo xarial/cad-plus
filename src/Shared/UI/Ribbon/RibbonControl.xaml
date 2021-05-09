@@ -16,10 +16,20 @@
         <local:DropDownButtonItemCommandConverter x:Key="dropDownBtnItemCmdConv"/>
         <local:NumericSpinnerVisibilityConverter x:Key="numSpinVisConv"/>
         <xconv:ImageToImageSourceConverter x:Key="imgToSrcConv"/>
+        <Style x:Key="RibbonCommandStyle" TargetType="FrameworkElement">
+            <Setter Property="ToolTip">
+                <Setter.Value>
+                    <fluent:ScreenTip Title="{Binding Path=Title}"
+                                      Text="{Binding Path=Description}"
+                                      Image="{Binding Path=Icon, Converter={StaticResource imgToSrcConv}}" 
+                                      IsRibbonAligned="True" />
+                </Setter.Value>
+            </Setter>
+        </Style>
         <local:RibbonCommandTemplateSelector x:Key="ribbonGrpCmdTemplateSelector">
             <local:RibbonCommandTemplateSelector.Button>
                 <DataTemplate>
-                    <fluent:Button Header="{Binding Path=Title}" Margin="1"
+                    <fluent:Button Header="{Binding Path=Title}" Margin="1" Style="{StaticResource RibbonCommandStyle}"
                                    Icon="{Binding Path=Icon, Converter={StaticResource imgToSrcConv}}"
                                    LargeIcon="{Binding Path=Icon, Converter={StaticResource imgToSrcConv}}" 
                                    Command="{Binding Converter={StaticResource ribbonBtnToCmdConv}}"/>
@@ -27,7 +37,7 @@
             </local:RibbonCommandTemplateSelector.Button>
             <local:RibbonCommandTemplateSelector.Toggle>
                 <DataTemplate>
-                    <fluent:ToggleButton Margin="1"
+                    <fluent:ToggleButton Margin="1" Style="{StaticResource RibbonCommandStyle}"
                                          Icon="{Binding Path=Icon, Converter={StaticResource imgToSrcConv}}" 
                                          LargeIcon="{Binding Path=Icon, Converter={StaticResource imgToSrcConv}}"
                                          Header="{Binding Path=Title}"
@@ -41,18 +51,15 @@
                             <ColumnDefinition Width="Auto"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
-                        <metro:ToggleSwitch Grid.Column="0" VerticalAlignment="Center" 
+                        <metro:ToggleSwitch Grid.Column="0" 
+                                            Style="{StaticResource RibbonCommandStyle}"
+                                            VerticalAlignment="Center" 
                                             OnContent="{Binding Path=OnText}" 
                                             OffContent="{Binding Path=OffText}"
-                                            IsOn="{Binding Path=Value}">
-                            <metro:ToggleSwitch.ToolTip>
-                                <fluent:ScreenTip Title="{Binding Path=Title}"
-                                          Text="{Binding Path=Description}"
-                                          Width="190"
-                                          IsRibbonAligned="True" />
-                            </metro:ToggleSwitch.ToolTip>
-                        </metro:ToggleSwitch>
-                        <fluent:Spinner Value="{Binding Path=NumericValue}" Grid.Column="1"
+                                            IsOn="{Binding Path=Value}"/>
+
+                        <fluent:Spinner Value="{Binding Path=NumericValue}" Style="{StaticResource RibbonCommandStyle}"
+                                        Grid.Column="1"
                                         Minimum="{Binding Path=Options.Minimum}" Maximum="{Binding Path=Options.Maximum}"
                                         Format="{Binding Path=Options.Format}" Width="75" Margin="-20 0 0 0"
                                         Header="" IsEnabled="{Binding Path=Value}">
@@ -68,22 +75,17 @@
             </local:RibbonCommandTemplateSelector.NumericSwitch>
             <local:RibbonCommandTemplateSelector.Switch>
                 <DataTemplate>
-                    <metro:ToggleSwitch Margin="2" VerticalAlignment="Center"
+                    <metro:ToggleSwitch Margin="2" Style="{StaticResource RibbonCommandStyle}"
+                                        VerticalAlignment="Center"
                                         OnContent="{Binding Path=OnText}" 
                                         OffContent="{Binding Path=OffText}"
                                         IsOn="{Binding Path=Value}">
-                        <metro:ToggleSwitch.ToolTip>
-                            <fluent:ScreenTip Title="{Binding Path=Title}"
-                                          Text="{Binding Path=Description}"
-                                          Width="190"
-                                          IsRibbonAligned="True" />
-                        </metro:ToggleSwitch.ToolTip>
                     </metro:ToggleSwitch>
                 </DataTemplate>
             </local:RibbonCommandTemplateSelector.Switch>
             <local:RibbonCommandTemplateSelector.DropDownButton>
                 <DataTemplate>
-                    <fluent:DropDownButton Margin="1"
+                    <fluent:DropDownButton Margin="1" Style="{StaticResource RibbonCommandStyle}"
                                            LargeIcon="{Binding Path=Icon, Converter={StaticResource imgToSrcConv}}"
                                            Header="{Binding Path=Value, Converter={StaticResource itemHeaderConv}}" 
                                            ItemsSource="{Binding Path=ItemsSource}"
@@ -107,7 +109,8 @@
             </local:RibbonCommandTemplateSelector.DropDownButton>
             <local:RibbonCommandTemplateSelector.Custom>
                 <DataTemplate>
-                    <ContentControl Content="{Binding Path=Content}" ContentTemplate="{Binding Path=Template}"/>
+                    <ContentControl Style="{StaticResource RibbonCommandStyle}"
+                                    Content="{Binding Path=Content}" ContentTemplate="{Binding Path=Template}"/>
                 </DataTemplate>
             </local:RibbonCommandTemplateSelector.Custom>
         </local:RibbonCommandTemplateSelector>
