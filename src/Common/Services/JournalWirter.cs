@@ -14,13 +14,22 @@ using System.Threading.Tasks;
 
 namespace Xarial.CadPlus.Common.Services
 {
-    public class LogWriter : TextWriter
+    public class JournalWriter : TextWriter
     {
         public event Action<string> Log;
 
+        private readonly bool m_AddTimeStamp;
+
+        public JournalWriter(bool addTimeStamp) 
+        {
+            m_AddTimeStamp = addTimeStamp;
+        }
+
         public override void WriteLine(string value)
         {
-            Log?.Invoke(value);
+            var timeStamp = m_AddTimeStamp ? $" [{DateTime.Now.ToString("hh:mm:ss")}]" : "";
+
+            Log?.Invoke($"{value}{timeStamp}");
         }
 
         public override Encoding Encoding => Encoding.Default;

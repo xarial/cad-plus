@@ -76,7 +76,7 @@ namespace Xarial.CadPlus.Batch.Extensions
             }
 
             group.Commands.Add(new RibbonToggleCommand("Extract References",
-                Resources.extract_references, "",
+                Resources.extract_references, "Extract the referenced documents and include to the scope",
                 () => m_ExtractReferences,
                 x => m_ExtractReferences = x));
         }
@@ -88,8 +88,8 @@ namespace Xarial.CadPlus.Batch.Extensions
                 var cts = new CancellationTokenSource();
                 var cancellationToken = cts.Token;
 
-                var vm = new ReferenceExtractorVM(new ReferenceExtractor(app, instProvider.EntityDescriptor.DrawingFileFilter.Extensions),
-                    input.ToArray(), instProvider.EntityDescriptor, m_Logger, m_MsgSvc, ReferencesScope_e.AllDependencies, true, cancellationToken);
+                var vm = new ReferenceExtractorVM(new ReferenceExtractor(app, instProvider.Descriptor.DrawingFileFilter.Extensions),
+                    input.ToArray(), instProvider.Descriptor, m_Logger, m_MsgSvc, ReferencesScope_e.AllDependencies, true, cancellationToken);
                 
                 input.Clear();
 

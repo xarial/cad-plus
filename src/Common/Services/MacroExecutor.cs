@@ -15,6 +15,7 @@ using Xarial.CadPlus.MacroRunner;
 using Xarial.CadPlus.Plus;
 using Xarial.CadPlus.Plus.Exceptions;
 using Xarial.CadPlus.Plus.Services;
+using Xarial.CadPlus.Plus.Shared.Helpers;
 using Xarial.XCad;
 using Xarial.XCad.Base;
 using Xarial.XCad.Documents;
@@ -115,7 +116,7 @@ namespace Xarial.CadPlus.Common.Services
                 }
                 else 
                 {
-                    xCadMacro.Run(app, doc ?? app.Documents.Active, argsArr);
+                    xCadMacro.Run(app, doc ?? app.Documents.Active, m_Logger, argsArr);
                 }
             }
             catch (MacroUserInterruptException) //do not consider this as an error

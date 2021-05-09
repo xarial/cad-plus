@@ -118,7 +118,7 @@ namespace Xbatch.Tests
             cadEntDescMock.Setup(m => m.MacroFileFilters).Returns(new FileTypeFilter[0]);
 
             var appProviderMock = new Mock<ICadApplicationInstanceProvider>();
-            appProviderMock.Setup(m => m.EntityDescriptor)
+            appProviderMock.Setup(m => m.Descriptor)
                 .Returns(cadEntDescMock.Object);
             appProviderMock.Setup(m => m.GetVersionId(It.IsAny<IXVersion>())).Returns("Sw2020");
             appProviderMock.Setup(m => m.ParseVersion(It.IsAny<string>())).Returns(new Mock<IXVersion>().Object);

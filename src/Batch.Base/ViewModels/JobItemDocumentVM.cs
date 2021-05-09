@@ -22,6 +22,7 @@ using Xarial.CadPlus.Common.Services;
 using Xarial.CadPlus.Common.Utils;
 using Xarial.CadPlus.Plus.Services;
 using Xarial.CadPlus.Plus.Shared.Controls;
+using Xarial.CadPlus.Plus.Shared.Helpers;
 using Xarial.XCad.Documents;
 using Xarial.XCad.UI;
 using Xarial.XToolkit.Wpf.Extensions;

@@ -26,7 +26,7 @@
                         </Grid.ColumnDefinitions>
                         <CheckBox IsChecked="{Binding Path=IsChecked}" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2"/>
                         <sctrls:CadObjectLabelControl Object="{Binding Path=Document}" Grid.Column="1" Margin="2"
-                                                      Descriptor="{Binding Path=DataContext.EntityDescriptor, RelativeSource={RelativeSource AncestorType={x:Type local:ReferencesList}}}">
+                                                      Descriptor="{Binding Path=DataContext.Descriptor, RelativeSource={RelativeSource AncestorType={x:Type local:ReferencesList}}}">
                             <sctrls:CadObjectLabelControl.Style>
                                 <Style TargetType="{x:Type sctrls:CadObjectLabelControl}">
                                     <Style.Triggers>
@@ -46,10 +46,10 @@
                 <Image Width="20" Source="/Batch.InApp.Module;component/Resources/top-level-only.png" RenderOptions.BitmapScalingMode="Fant"/>
             </ToggleButton>
             <Button Margin="0 2 2 0" Command="{Binding Path=TogglePartFilterCommand}" ToolTip="Select/Deselect Parts">
-                <Image Source="{Binding Path=EntityDescriptor.PartIcon, Converter={StaticResource imgSrcConv}}" RenderOptions.BitmapScalingMode="Fant" Width="20"/>
+                <Image Source="{Binding Path=Descriptor.PartIcon, Converter={StaticResource imgSrcConv}}" RenderOptions.BitmapScalingMode="Fant" Width="20"/>
             </Button>
             <Button Margin="0 2 0 0" Command="{Binding Path=ToggleAssemblyFilterCommand}" ToolTip="Select/Deselect Assemblies">
-                <Image Source="{Binding Path=EntityDescriptor.AssemblyIcon, Converter={StaticResource imgSrcConv}}" RenderOptions.BitmapScalingMode="Fant" Width="20"/>
+                <Image Source="{Binding Path=Descriptor.AssemblyIcon, Converter={StaticResource imgSrcConv}}" RenderOptions.BitmapScalingMode="Fant" Width="20"/>
             </Button>
         </StackPanel>
     </Grid>

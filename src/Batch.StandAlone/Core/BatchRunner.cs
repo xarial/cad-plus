@@ -32,6 +32,7 @@ using Xarial.XCad.Exceptions;
 using Xarial.XToolkit.Reporting;
 using Xarial.CadPlus.Batch.StandAlone.Exceptions;
 using Xarial.CadPlus.Common.Utils;
+using Xarial.CadPlus.Plus.Shared.Helpers;
 
 namespace Xarial.CadPlus.Batch.Base.Core
 {
@@ -228,7 +229,7 @@ namespace Xarial.CadPlus.Batch.Base.Core
                     {
                         if (FileHelper.MatchesFilter(file, filters))
                         {
-                            if (m_AppProvider.CanProcessFile(file))
+                            if (!m_AppProvider.Descriptor.IsSystemFile(file))
                             {
                                 if (!inputFiles.Contains(input, StringComparer.CurrentCultureIgnoreCase))
                                 {
@@ -259,15 +260,15 @@ namespace Xarial.CadPlus.Batch.Base.Core
             {
                 IXDocument doc;
 
-                if (MatchesExtension(f, m_AppProvider.EntityDescriptor.PartFileFilter.Extensions))
+                if (MatchesExtension(f, m_AppProvider.Descriptor.PartFileFilter.Extensions))
                 {
                     doc = app.Documents.PreCreate<IXPart>();
                 }
-                else if (MatchesExtension(f, m_AppProvider.EntityDescriptor.AssemblyFileFilter.Extensions))
+                else if (MatchesExtension(f, m_AppProvider.Descriptor.AssemblyFileFilter.Extensions))
                 {
                     doc = app.Documents.PreCreate<IXAssembly>();
                 }
-                else if (MatchesExtension(f, m_AppProvider.EntityDescriptor.DrawingFileFilter.Extensions))
+                else if (MatchesExtension(f, m_AppProvider.Descriptor.DrawingFileFilter.Extensions))
                 {
                     doc = app.Documents.PreCreate<IXDrawing>();
                 }
@@ -610,9 +611,9 @@ namespace Xarial.CadPlus.Batch.Base.Core
             {
                 try
                 {
-                    if (FileHelper.MatchesFilter(doc.Path, m_AppProvider.EntityDescriptor.PartFileFilter.Extensions)
-                        || FileHelper.MatchesFilter(doc.Path, m_AppProvider.EntityDescriptor.AssemblyFileFilter.Extensions)
-                        || FileHelper.MatchesFilter(doc.Path, m_AppProvider.EntityDescriptor.DrawingFileFilter.Extensions))
+                    if (FileHelper.MatchesFilter(doc.Path, m_AppProvider.Descriptor.PartFileFilter.Extensions)
+                        || FileHelper.MatchesFilter(doc.Path, m_AppProvider.Descriptor.AssemblyFileFilter.Extensions)
+                        || FileHelper.MatchesFilter(doc.Path, m_AppProvider.Descriptor.DrawingFileFilter.Extensions))
                     {
                         if (app.Version.Compare(doc.Version) == VersionEquality_e.Newer)
                         {

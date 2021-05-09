@@ -25,8 +25,8 @@
                                 <RowDefinition Height="*"/>
                                 <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
-                            <Image Source="{Binding Path=EntityDescriptor.ApplicationIcon, Converter={StaticResource imgSrcConv}}"/>
-                            <TextBlock Text="{Binding Path=EntityDescriptor.ApplicationName, StringFormat={}{0} Batch}"
+                            <Image Source="{Binding Path=Descriptor.ApplicationIcon, Converter={StaticResource imgSrcConv}}"/>
+                            <TextBlock Text="{Binding Path=Descriptor.ApplicationName, StringFormat={}{0} Batch}"
                                        Grid.Row="1" FontWeight="Normal" FontSize="12"
                            TextWrapping="Wrap" TextAlignment="Center"/>
                         </Grid>

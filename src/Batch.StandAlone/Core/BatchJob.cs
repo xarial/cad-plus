@@ -107,7 +107,7 @@ namespace Xarial.CadPlus.Batch.Base.Core
         public static ICadApplicationInstanceProvider FindApplicationProvider(this BatchJob job, ICadApplicationInstanceProvider[] appProviders)
         {
             var appProvider = appProviders.FirstOrDefault(
-                p => string.Equals(p.EntityDescriptor.ApplicationId, job.ApplicationId,
+                p => string.Equals(p.Descriptor.ApplicationId, job.ApplicationId,
                 StringComparison.CurrentCultureIgnoreCase));
 
             if (appProvider == null)

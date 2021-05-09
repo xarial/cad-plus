@@ -35,14 +35,14 @@ namespace Xarial.CadPlus.Batch.Sw
         private readonly IXServiceCollection m_CustomServices;
 
         public IMacroExecutor MacroRunnerService { get; }
-        public ICadDescriptor EntityDescriptor { get; }
+        public ICadDescriptor Descriptor { get; }
 
         public SwApplicationProvider(IXLogger logger, IMacroExecutor svc, ICadDescriptor entDesc)
         {
             m_Logger = logger;
 
             MacroRunnerService = svc;
-            EntityDescriptor = entDesc;
+            Descriptor = entDesc;
             m_CustomServices = new ServiceCollection();
             m_CustomServices.AddOrReplace<IXLogger>(() => m_Logger);
 
@@ -182,15 +182,6 @@ namespace Xarial.CadPlus.Batch.Sw
                 m_Logger.Log(ex);
                 guids = null;
             }
-        }
-
-        public bool CanProcessFile(string filePath)
-        {
-            const string TEMP_SW_FILE_NAME = "~$";
-
-            var fileName = Path.GetFileName(filePath);
-
-            return !fileName.StartsWith(TEMP_SW_FILE_NAME);
         }
 
         public void Dispose()

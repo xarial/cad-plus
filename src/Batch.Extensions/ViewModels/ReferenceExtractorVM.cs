@@ -122,7 +122,7 @@ namespace Xarial.CadPlus.Batch.Extensions.ViewModels
             }
         }
 
-        public ICadDescriptor EntityDescriptor { get; }
+        public ICadDescriptor Descriptor { get; }
 
         private readonly IXDocument[] m_InputDocs;
         private readonly ReferenceExtractor m_RefsExtractor;
@@ -152,7 +152,7 @@ namespace Xarial.CadPlus.Batch.Extensions.ViewModels
             m_ReferencesScope = scope;
             m_FindDrawings = findDrws;
 
-            EntityDescriptor = cadEntDesc;
+            Descriptor = cadEntDesc;
 
             m_DrawingVms = new List<DocumentVM>();
 

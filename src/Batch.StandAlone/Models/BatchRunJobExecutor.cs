@@ -32,7 +32,7 @@ namespace Xarial.CadPlus.Batch.Base.Models
 
         private readonly BatchJob m_Job;
         
-        private readonly LogWriter m_LogWriter;
+        private readonly JournalWriter m_LogWriter;
         private readonly ProgressHandler m_PrgHander;
         
         private bool m_IsExecuting;
@@ -44,7 +44,7 @@ namespace Xarial.CadPlus.Batch.Base.Models
         {
             m_Job = job;
 
-            m_LogWriter = new LogWriter();
+            m_LogWriter = new JournalWriter(true);
             m_PrgHander = new ProgressHandler();
 
             m_BatchRunnerFact = batchRunnerFact;

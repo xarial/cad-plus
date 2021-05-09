@@ -39,7 +39,7 @@ namespace Xarial.CadPlus.Xport.Models
         {
             m_CurrentCancellationToken = new CancellationTokenSource();
 
-            var logWriter = new LogWriter();
+            var logWriter = new JournalWriter(true);
             var prgHander = new ProgressHandler();
 
             logWriter.Log += OnLog;
