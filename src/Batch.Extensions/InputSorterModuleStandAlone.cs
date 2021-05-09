@@ -74,7 +74,7 @@ namespace Xarial.CadPlus.Batch.Extensions
             }
 
             group.Commands.Add(new RibbonToggleCommand("Order By Dependencies",
-                Resources.order_dependencies, "",
+                Resources.order_dependencies, "Order input files based on the hierarchical dependency",
                 () => m_EnableOrdering,
                 x => m_EnableOrdering = x));
         }

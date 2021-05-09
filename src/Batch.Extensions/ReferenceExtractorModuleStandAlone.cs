@@ -76,7 +76,7 @@ namespace Xarial.CadPlus.Batch.Extensions
             }
 
             group.Commands.Add(new RibbonToggleCommand("Extract References",
-                Resources.extract_references, "",
+                Resources.extract_references, "Extract the referenced documents and include to the scope",
                 () => m_ExtractReferences,
                 x => m_ExtractReferences = x));
         }
