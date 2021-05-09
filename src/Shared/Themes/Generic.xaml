@@ -67,4 +67,14 @@
             </Setter.Value>
         </Setter>
     </Style>
+
+    <Style TargetType="{x:Type local:BackstageButton}">
+        <Setter Property="ToolTip">
+            <Setter.Value>
+                <ToolTip DataContext="{Binding Path=PlacementTarget.DataContext, RelativeSource={x:Static RelativeSource.Self}}">
+                    <TextBlock Text="{Binding Path=Description}" TextWrapping="Wrap" MaxWidth="400"/>
+                </ToolTip>
+            </Setter.Value>
+        </Setter>
+    </Style>
 </ResourceDictionary>

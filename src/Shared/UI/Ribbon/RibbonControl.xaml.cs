@@ -20,6 +20,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Xarial.CadPlus.Plus.Shared.Controls;
 using Xarial.CadPlus.Plus.UI;
 using Xarial.XToolkit.Wpf;
 using Xarial.XToolkit.Wpf.Extensions;
@@ -67,16 +68,17 @@ namespace Xarial.CadPlus.Plus.Shared.UI
 				{
 					if (btn != null)
 					{
-						var btnItem = new Fluent.Button()
+						var btnItem = new BackstageButton()
 						{
 							Header = btn.Title,
 							Command = new RelayCommand(btn.Handler, btn.CanExecuteHandler),
-							Icon = btn.Icon?.ToBitmapImage()
+							Icon = btn.Icon?.ToBitmapImage(),
+							DataContext = btn,
 						};
 
 						backstageCtrl.Items.Add(btnItem);
 
-						btnItem.AddHandler(Fluent.Button.ClickEvent, (RoutedEventHandler)OnBackstageButtonClicked);
+						btnItem.AddHandler(BackstageButton.ClickEvent, (RoutedEventHandler)OnBackstageButtonClicked);
 					}
 					else
 					{

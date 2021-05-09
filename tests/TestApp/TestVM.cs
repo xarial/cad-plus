@@ -99,10 +99,10 @@ namespace TestApp
             CommandManager = new RibbonCommandManager(
                 new IRibbonButtonCommand[]
                 {
-                    new RibbonButtonCommand("Comman1", Resources.icon1, "", () => MessageBox.Show("Command1 is clicked"), () => true),
+                    new RibbonButtonCommand("Command1", Resources.icon1, "Backstage Command 1 Backstage Command 1 Backstage Command 1 Backstage Command 1 Backstage Command 1 Backstage Command 1 Backstage Command 1", () => MessageBox.Show("Command1 is clicked"), () => true),
                     null,
-                    new RibbonButtonCommand("Command2", null, "", () => Debug.Print("Command 2 is clicked"), null),
-                    new RibbonButtonCommand("Command3", Resources.icon2, "", () => { }, null),
+                    new RibbonButtonCommand("Command2", null, "Backstage Command 2", () => Debug.Print("Command 2 is clicked"), null),
+                    new RibbonButtonCommand("Command3", Resources.icon2, "Backstage Command 3", () => { }, null),
                 },
                 new RibbonTab("Tab1", "Tab1",
                     new RibbonGroup("Group1", "Group1",
