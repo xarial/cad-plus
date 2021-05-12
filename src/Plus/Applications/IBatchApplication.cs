@@ -81,6 +81,7 @@ namespace Xarial.CadPlus.Plus.Applications
             public const string Name = "Job";
 
             public const string ExecutionGroupName = "Execution";
+            public const string ResultsGroupName = "Results";
         }
     }
 
