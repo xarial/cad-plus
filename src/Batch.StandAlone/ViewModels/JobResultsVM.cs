@@ -16,7 +16,6 @@ using Xarial.CadPlus.Batch.Base.Models;
 using Xarial.CadPlus.Plus.Applications;
 using Xarial.CadPlus.Plus.Services;
 using Xarial.CadPlus.Batch.Base.Core;
-using Xarial.CadPlus.Batch.Base.Models;
 using Xarial.CadPlus.Batch.Base.ViewModels;
 using Xarial.XToolkit.Wpf.Extensions;
 
