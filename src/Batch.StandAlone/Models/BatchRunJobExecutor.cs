@@ -38,7 +38,9 @@ namespace Xarial.CadPlus.Batch.Base.Models
         private bool m_IsExecuting;
 
         private readonly Func<BatchJob, TextWriter, IProgressHandler, BatchRunner> m_BatchRunnerFact;
-        
+
+        private BatchRunner m_CurrentBatchRunner;
+
         public BatchRunJobExecutor(BatchJob job,
             Func<BatchJob, TextWriter, IProgressHandler, BatchRunner> batchRunnerFact) 
         {
@@ -69,9 +71,9 @@ namespace Xarial.CadPlus.Batch.Base.Models
                 {
                     var cancellationToken = m_CurrentCancellationToken.Token;
 
-                    using (var batchRunner = m_BatchRunnerFact.Invoke(m_Job, m_LogWriter, m_PrgHander))
+                    using (m_CurrentBatchRunner = m_BatchRunnerFact.Invoke(m_Job, m_LogWriter, m_PrgHander))
                     {
-                        return await batchRunner.BatchRunAsync(cancellationToken).ConfigureAwait(false);
+                        return await m_CurrentBatchRunner.BatchRunAsync(cancellationToken).ConfigureAwait(false);
                     }
                 }
                 catch (Exception ex)
@@ -98,6 +100,7 @@ namespace Xarial.CadPlus.Batch.Base.Models
         public void Cancel()
         {
             m_CurrentCancellationToken?.Cancel();
+            m_CurrentBatchRunner.TryCancel();
         }
 
         private void OnLog(string line)

@@ -50,10 +50,17 @@ namespace Xarial.CadPlus.Batch.Base.Services
 
         public void DoWork(Action<TContext, CancellationToken> action, TContext context, CancellationToken cancellationToken)
         {
-            m_Policy.Execute((Context ctx, CancellationToken token) => 
+            try
             {
-                action.Invoke(GetContext(ctx), token);
-            }, new Dictionary<string, object>() { { CONTEXT_PARAM_NAME, context } }, cancellationToken);
+                m_Policy.Execute((Context ctx, CancellationToken token) =>
+                {
+                    action.Invoke(GetContext(ctx), token);
+                }, new Dictionary<string, object>() { { CONTEXT_PARAM_NAME, context } }, cancellationToken);
+            }
+            catch (TimeoutRejectedException ex) 
+            {
+                throw new TimeoutException("Timeout", ex);
+            }
         }
 
         private TContext GetContext(Context ctx) => (TContext)ctx[CONTEXT_PARAM_NAME];

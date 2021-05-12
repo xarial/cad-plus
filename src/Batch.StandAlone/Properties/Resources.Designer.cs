@@ -173,6 +173,26 @@ namespace Xarial.CadPlus.Batch.StandAlone.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap export_log {
+            get {
+                object obj = ResourceManager.GetObject("export_log", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap export_summary {
+            get {
+                object obj = ResourceManager.GetObject("export_summary", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap file_icon {
             get {
                 object obj = ResourceManager.GetObject("file_icon", resourceCulture);
