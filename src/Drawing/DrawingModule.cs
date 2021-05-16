@@ -34,6 +34,8 @@ using Xarial.XCad.Base;
 using Xarial.XCad.UI.Commands;
 using Xarial.XCad.Base.Enums;
 using SolidWorks.Interop.swconst;
+using System.Linq;
+using Xarial.XCad.SolidWorks.Features;
 
 namespace Xarial.CadPlus.Drawing
 {
@@ -53,9 +55,11 @@ namespace Xarial.CadPlus.Drawing
     public enum PictureContextMenuCommands_e 
     {
         [Title("Edit")]
+        [CommandItemInfo(WorkspaceTypes_e.Drawing)]
         EditQrCode,
 
         [Title("Update")]
+        [CommandItemInfo(WorkspaceTypes_e.Drawing)]
         UpdateQrCode
     }
 
@@ -188,7 +192,7 @@ namespace Xarial.CadPlus.Drawing
         
         private void UpdatePreview()
         {
-            m_CurPreviewer.Preview(null,
+            m_CurPreviewer.Preview(
                 m_CurPageData.Location.Dock,
                 m_CurPageData.Location.Size,
                 m_CurPageData.Location.OffsetX,
@@ -210,6 +214,32 @@ namespace Xarial.CadPlus.Drawing
 
         private void OnPictureContextMenuCommandClick(PictureContextMenuCommands_e spec)
         {
+            try
+            {
+                switch (spec)
+                {
+                    case PictureContextMenuCommands_e.EditQrCode:
+                        break;
+
+                    case PictureContextMenuCommands_e.UpdateQrCode:
+                        var drw = (ISwDrawing)m_Host.Extension.Application.Documents.Active;
+                        var pict = (ISwObject)drw.Selections.Last();
+                        
+                        if (pict is ISwFeature) 
+                        {
+                            pict = SwObjectFactory.FromDispatch<ISwObject>(
+                                ((ISwFeature)pict).Feature.GetSpecificFeature2(), drw);
+                        }
+
+                        m_QrCodeManager.Update(pict, drw);
+                        break;
+                }
+            }
+            catch (Exception ex)
+            {
+                m_Logger.Log(ex);
+                m_MsgSvc.ShowError(ex);
+            }
         }
 
         public void Dispose()

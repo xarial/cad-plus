@@ -1,5 +1,6 @@
 ﻿using QRCoder;
 using SolidWorks.Interop.sldworks;
+using SolidWorks.Interop.swconst;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -33,61 +34,15 @@ namespace Xarial.CadPlus.Drawing.Services
 
         public IXObject Insert(IXDrawing drw, LocationData location, SourceData data)
         {
-            var tempFileName = "";
+            CalculateLocation(drw, location.Dock,
+                location.Size, location.OffsetX,
+                location.OffsetY,
+                out Point centerPt, out double scale);
 
-            var model = (drw as ISwDrawing).Model;
+            var x = centerPt.X / scale - location.Size / 2;
+            var y = centerPt.Y / scale - location.Size / 2;
 
-            try
-            {
-                var qrCodeData = m_QrGenerator.CreateQrCode(m_QrCodeProvider.GetData(drw, data),
-                    QRCodeGenerator.ECCLevel.Q);
-
-                var qrCode = new QRCode(qrCodeData);
-                var qrCodeImage = qrCode.GetGraphic(20, System.Drawing.Color.Black, System.Drawing.Color.White, false);
-
-                tempFileName = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString() + ".png");
-                qrCodeImage.Save(tempFileName);
-
-                var pict = model.SketchManager.InsertSketchPicture(tempFileName);
-
-                if (pict != null)
-                {
-                    CalculateLocation(drw, location.Dock,
-                        location.Size, location.OffsetX,
-                        location.OffsetY,
-                        out Point centerPt, out double scale);
-
-                    var x = centerPt.X / scale - location.Size / 2;
-                    var y = centerPt.Y / scale - location.Size / 2;
-                    pict.SetOrigin(x, y);
-                    pict.SetSize(location.Size, location.Size, true);
-
-                    //Picture PMPage stays open after inserting the picture
-                    const int swCommands_PmOK = -2;
-                    (m_App as ISwApplication).Sw.RunCommand(swCommands_PmOK, "");
-
-                    return SwObjectFactory.FromDispatch<ISwObject>(pict, (ISwDocument)drw);
-                }
-                else
-                {
-                    throw new UserException("Failed to insert picture");
-                }
-            }
-            finally
-            {
-                model.IActiveView.EnableGraphicsUpdate = true;
-
-                if (File.Exists(tempFileName))
-                {
-                    try
-                    {
-                        File.Delete(tempFileName);
-                    }
-                    catch
-                    {
-                    }
-                }
-            }
+            return InsertAt(drw, data, location.Size, location.Size, x, y);
         }
 
         public void CalculateLocation(IXDrawing drawing, Dock_e dock,
@@ -144,6 +99,120 @@ namespace Xarial.CadPlus.Drawing.Services
             }
 
             centerPt = new Point(x + offsetX * offsetXDir * scale, y + offsetY * offsetYDir * scale, 0);
+        }
+
+        public void Update(IXObject pict, IXDrawing drw) 
+        {
+            var handler = m_App.Documents.GetHandler<QrCodeDrawingHandler>(drw);
+            var qrCode = handler.QrCodes.FirstOrDefault(d => d.Picture.Equals(pict));
+
+            if (qrCode == null)
+            {
+                throw new UserException("This picture does not contain QR code data");
+            }
+
+            var skPict = (ISketchPicture)((ISwObject)pict).Dispatch;
+
+            var data = GetSourceData(qrCode);
+
+            double width = -1;
+            double height = -1;
+            double x = -1;
+            double y = -1;
+
+            skPict.GetSize(ref width, ref height);
+            skPict.GetOrigin(ref x, ref y);
+
+            (drw as ISwDrawing).Model.IActiveView.EnableGraphicsUpdate = false;
+
+            try
+            {
+                if (skPict.GetFeature().Select2(false, -1))
+                {
+                    if (((ISwDrawing)drw).Model.Extension.DeleteSelection2((int)swDeleteSelectionOptions_e.swDelete_Absorbed))
+                    {
+                        qrCode.Picture = InsertAt(drw, data, width, height, x, y);
+                    }
+                    else
+                    {
+                        throw new UserException("Failed to update QR code", new Exception("Failed to remove sketch picture"));
+                    }
+                }
+                else
+                {
+                    throw new UserException("Failed to update QR code", new Exception("Failed to select sketch picture"));
+                }
+            }
+            finally 
+            {
+                (drw as ISwDrawing).Model.IActiveView.EnableGraphicsUpdate = true;
+            }
+        }
+
+        private SourceData GetSourceData(QrCodeData data) 
+        {
+            return new SourceData()
+            {
+                Source = data.Source,
+                ReferencedDocument = data.RefDocumentSource,
+                CustomPropertyName = data.Source == Source_e.CustomProperty ? data.Argument : "",
+                PdmWeb2Server = data.Source == Source_e.PdmWeb2Url ? data.Argument : "",
+                CustomValue = data.Source == Source_e.Custom ? data.Argument : ""
+            };
+        }
+
+        private IXObject InsertAt(IXDrawing drw, SourceData data, double width, double height, double origX, double origY)
+        {
+            var tempFileName = "";
+
+            var model = (drw as ISwDrawing).Model;
+
+            model.IActiveView.EnableGraphicsUpdate = false;
+
+            try
+            {
+                var qrCodeData = m_QrGenerator.CreateQrCode(m_QrCodeProvider.GetData(drw, data),
+                    QRCodeGenerator.ECCLevel.Q);
+
+                var qrCode = new QRCode(qrCodeData);
+                var qrCodeImage = qrCode.GetGraphic(20, System.Drawing.Color.Black, System.Drawing.Color.White, false);
+
+                tempFileName = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString() + ".png");
+                qrCodeImage.Save(tempFileName);
+
+                var pict = model.SketchManager.InsertSketchPicture(tempFileName);
+
+                if (pict != null)
+                {
+                    pict.SetOrigin(origX, origY);
+                    pict.SetSize(width, height, true);
+
+                    //Picture PMPage stays open after inserting the picture
+                    const int swCommands_PmOK = -2;
+                    (m_App as ISwApplication).Sw.RunCommand(swCommands_PmOK, "");
+
+                    return SwObjectFactory.FromDispatch<ISwObject>(pict, (ISwDocument)drw);
+                }
+                else
+                {
+                    throw new UserException("Failed to insert picture");
+                }
+            }
+            finally
+            {
+                model.IActiveView.EnableGraphicsUpdate = true;
+
+                if (File.Exists(tempFileName))
+                {
+                    try
+                    {
+                        File.Delete(tempFileName);
+                    }
+                    catch
+                    {
+                    }
+                }
+            }
         }
     }
 }

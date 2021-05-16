@@ -40,7 +40,7 @@ namespace Xarial.CadPlus.Drawing.Services
             m_View.BufferSwapNotify += OnBufferSwapNotify;
         }
 
-        public void Preview(byte[] data, Dock_e dock, double size, double offsetX, double offsetY) 
+        public void Preview(Dock_e dock, double size, double offsetX, double offsetY) 
         {
             m_Dock = dock;
             m_Size = size;
