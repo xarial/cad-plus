@@ -87,6 +87,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Data\Dock_e.cs" />
+    <Compile Include="Data\QrCodeData.cs" />
     <Compile Include="Data\Source_e.cs" />
     <Compile Include="DrawingModule.cs" />
     <Compile Include="InsertQrCodeData.cs" />
@@ -97,6 +98,8 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="QrCodeDrawingHandler.cs" />
+    <Compile Include="Services\QrCodeManager.cs" />
     <Compile Include="Services\QrCodePreviewer.cs" />
     <Compile Include="Services\QrDataProvider.cs" />
   </ItemGroup>
