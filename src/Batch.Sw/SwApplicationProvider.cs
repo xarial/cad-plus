@@ -1,4 +1,11 @@
-﻿using System;
+﻿//*********************************************************************
+//CAD+ Toolset
+//Copyright(C) 2020 Xarial Pty Limited
+//Product URL: https://cadplus.xarial.com
+//License: https://cadplus.xarial.com/license/
+//*********************************************************************
+
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
@@ -7,8 +14,6 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Xarial.CadPlus.Batch.Sw.Properties;
-using Xarial.CadPlus.Common.Sw.Services;
 using Xarial.CadPlus.Plus.Applications;
 using Xarial.CadPlus.Plus.Data;
 using Xarial.CadPlus.Plus.Services;
@@ -21,37 +26,23 @@ using Xarial.XCad.Toolkit;
 
 namespace Xarial.CadPlus.Batch.Sw
 {
-    public class SwApplicationProvider : IApplicationProvider
+    public class SwApplicationProvider : ICadApplicationInstanceProvider
     {
-        public FileTypeFilter[] InputFilesFilter { get; }
-
-        public string DisplayName => "SOLIDWORKS";
-        public string ApplicationId => "DsSolidWorks";
-        public Image ApplicationIcon => Resources.sw_application;
-
-        public IMacroFileFilterProvider MacroFileFiltersProvider => new SwMacroFileFilterProvider();
-
-        public IMacroRunnerExService MacroRunnerService => new SwMacroRunnerExService();
-
         private readonly Dictionary<Process, List<string>> m_ForceDisabledAddIns;
 
         private readonly IXLogger m_Logger;
 
         private readonly IXServiceCollection m_CustomServices;
-        
-        public SwApplicationProvider(IXLogger logger)
-        {
-            InputFilesFilter = new FileTypeFilter[]
-            {
-                new FileTypeFilter("SOLIDWORKS Parts", "*.sldprt"),
-                new FileTypeFilter("SOLIDWORKS Assemblies", "*.sldasm"),
-                new FileTypeFilter("SOLIDWORKS Drawings", "*.slddrw"),
-                new FileTypeFilter("SOLIDWORKS Files", "*.sldprt", "*.sldasm", "*.slddrw"),
-                new FileTypeFilter("All Files", "*.*"),
-            };
 
+        public IMacroExecutor MacroRunnerService { get; }
+        public ICadDescriptor Descriptor { get; }
+
+        public SwApplicationProvider(IXLogger logger, IMacroExecutor svc, ICadDescriptor entDesc)
+        {
             m_Logger = logger;
 
+            MacroRunnerService = svc;
+            Descriptor = entDesc;
             m_CustomServices = new ServiceCollection();
             m_CustomServices.AddOrReplace<IXLogger>(() => m_Logger);
 
@@ -93,9 +84,11 @@ namespace Xarial.CadPlus.Batch.Sw
         }
 
         public IXApplication StartApplication(IXVersion vers, StartupOptions_e opts,
-            CancellationToken cancellationToken)
+            Action<Process> startingHandler, CancellationToken cancellationToken)
         {
             var app = SwApplicationFactory.PreCreate();
+            app.Starting += (s, p) => startingHandler.Invoke(p);
+
             app.State = ApplicationState_e.Default;
             app.Version = (ISwVersion)vers;
 
@@ -147,7 +140,7 @@ namespace Xarial.CadPlus.Batch.Sw
 
             return app;
         }
-
+        
         private void OnProcessExited(object sender, EventArgs e)
         {
             var prc = sender as Process;
@@ -191,18 +184,10 @@ namespace Xarial.CadPlus.Batch.Sw
             }
         }
 
-        public bool CanProcessFile(string filePath)
-        {
-            const string TEMP_SW_FILE_NAME = "~$";
-
-            var fileName = Path.GetFileName(filePath);
-
-            return !fileName.StartsWith(TEMP_SW_FILE_NAME);
-        }
-
         public void Dispose()
         {
-            var guids = m_ForceDisabledAddIns.SelectMany(x => x.Value).Distinct();
+            var guids = m_ForceDisabledAddIns.Where(x => x.Value != null)
+                .SelectMany(x => x.Value).Distinct();
 
             TryEnableAddIns(guids.ToList());
         }

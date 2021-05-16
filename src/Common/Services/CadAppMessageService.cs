@@ -30,6 +30,9 @@ namespace Xarial.CadPlus.Common.Services
         public void ShowInformation(string msg)
             => m_App.ShowMessageBox(msg, MessageBoxIcon_e.Info, MessageBoxButtons_e.Ok);
 
+        public void ShowWarning(string warn)
+            => m_App.ShowMessageBox(warn, MessageBoxIcon_e.Warning, MessageBoxButtons_e.Ok);
+
         public bool? ShowQuestion(string question)
         {
             var res = m_App.ShowMessageBox(question, MessageBoxIcon_e.Question, MessageBoxButtons_e.YesNoCancel);

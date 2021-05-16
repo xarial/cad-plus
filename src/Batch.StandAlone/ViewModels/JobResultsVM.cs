@@ -14,11 +14,12 @@ using System.Text;
 using System.Threading.Tasks;
 using Xarial.CadPlus.Batch.Base.Models;
 using Xarial.CadPlus.Plus.Applications;
-using Xarial.CadPlus.XBatch.Base.Core;
-using Xarial.CadPlus.XBatch.Base.Models;
+using Xarial.CadPlus.Plus.Services;
+using Xarial.CadPlus.Batch.Base.Core;
+using Xarial.CadPlus.Batch.Base.ViewModels;
 using Xarial.XToolkit.Wpf.Extensions;
 
-namespace Xarial.CadPlus.XBatch.Base.ViewModels
+namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
 {
     public class JobResultsVM : INotifyPropertyChanged
     {
@@ -40,15 +41,16 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
 
         private readonly BatchJob m_Job;
 
-        private readonly Func<BatchJob, IApplicationProvider, IBatchRunJobExecutor> m_ExecFact;
+        private readonly Func<BatchJob, IBatchRunJobExecutor> m_ExecFact;
 
-        private readonly IApplicationProvider m_AppProvider;
+        private readonly ICadDescriptor m_CadDesc;
 
-        public JobResultsVM(BatchJob job, IApplicationProvider appProvider, 
-            Func<BatchJob, IApplicationProvider, IBatchRunJobExecutor> execFact) 
+        public JobResultsVM(BatchJob job, 
+            Func<BatchJob, IBatchRunJobExecutor> execFact, ICadDescriptor cadDesc) 
         {
             m_Job = job;
-            m_AppProvider = appProvider;
+
+            m_CadDesc = cadDesc;
 
             m_ExecFact = execFact;
             Items = new ObservableCollection<JobResultVM>();
@@ -56,7 +58,7 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
 
         public void StartNewJob()
         {
-            var newRes = new JobResultVM($"Job #{Items.Count + 1}", m_ExecFact.Invoke(m_Job, m_AppProvider));
+            var newRes = new JobResultVM($"Job #{Items.Count + 1}", m_ExecFact.Invoke(m_Job), m_CadDesc);
             Items.Add(newRes);
             Selected = newRes;
             newRes.RunBatchAsync();

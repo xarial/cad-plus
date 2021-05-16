@@ -1,4 +1,11 @@
-﻿using Polly;
+﻿//*********************************************************************
+//CAD+ Toolset
+//Copyright(C) 2020 Xarial Pty Limited
+//Product URL: https://cadplus.xarial.com
+//License: https://cadplus.xarial.com/license/
+//*********************************************************************
+
+using Polly;
 using Polly.Timeout;
 using System;
 using System.Collections.Generic;
@@ -7,7 +14,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Xarial.CadPlus.XBatch.Base.Services
+namespace Xarial.CadPlus.Batch.Base.Services
 {
     public interface IResilientWorker<TContext>
     {
@@ -43,10 +50,17 @@ namespace Xarial.CadPlus.XBatch.Base.Services
 
         public void DoWork(Action<TContext, CancellationToken> action, TContext context, CancellationToken cancellationToken)
         {
-            m_Policy.Execute((Context ctx, CancellationToken token) => 
+            try
             {
-                action.Invoke(GetContext(ctx), token);
-            }, new Dictionary<string, object>() { { CONTEXT_PARAM_NAME, context } }, cancellationToken);
+                m_Policy.Execute((Context ctx, CancellationToken token) =>
+                {
+                    action.Invoke(GetContext(ctx), token);
+                }, new Dictionary<string, object>() { { CONTEXT_PARAM_NAME, context } }, cancellationToken);
+            }
+            catch (TimeoutRejectedException ex) 
+            {
+                throw new TimeoutException("Timeout", ex);
+            }
         }
 
         private TContext GetContext(Context ctx) => (TContext)ctx[CONTEXT_PARAM_NAME];

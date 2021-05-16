@@ -7,6 +7,7 @@
 
 using System.Drawing;
 using System.IO;
+using Xarial.CadPlus.Plus.Extensions;
 using Xarial.XCad.UI;
 
 namespace Xarial.CadPlus.CustomToolbar.Base
@@ -17,16 +18,7 @@ namespace Xarial.CadPlus.CustomToolbar.Base
 
         internal ImageIcon(Image icon)
         {
-            Buffer = ImageToByteArray(icon);
-        }
-
-        internal static byte[] ImageToByteArray(Image img) 
-        {
-            using (var ms = new MemoryStream())
-            {
-                img.Save(ms, img.RawFormat);
-                return ms.ToArray();
-            }
+            Buffer = icon.GetBytes(icon.RawFormat);
         }
     }
 }

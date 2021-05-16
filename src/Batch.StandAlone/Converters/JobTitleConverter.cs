@@ -1,4 +1,11 @@
-﻿using System;
+﻿//*********************************************************************
+//CAD+ Toolset
+//Copyright(C) 2020 Xarial Pty Limited
+//Product URL: https://cadplus.xarial.com
+//License: https://cadplus.xarial.com/license/
+//*********************************************************************
+
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -6,15 +13,16 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Data;
 
-namespace Xarial.CadPlus.XBatch.Base.Converters
+namespace Xarial.CadPlus.Batch.StandAlone.Converters
 {
     public class JobTitleConverter : IMultiValueConverter
     {
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {
-            if (values[0] is string && values[1] is int && values[2] is int && values[3] is int)
+            var jobName = values[0] as string;
+
+            if (values[1] is int && values[2] is int && values[3] is int)
             {
-                var jobName = (string)values[0];
                 var procFilesCount = (int)values[1];
                 var failedFilesCount = (int)values[2];
                 var totalFilesCount = (int)values[3];
@@ -30,7 +38,7 @@ namespace Xarial.CadPlus.XBatch.Base.Converters
             }
             else 
             {
-                return "";
+                return jobName;
             }
         }
 

@@ -49,6 +49,12 @@
         <Style TargetType="TextBox" BasedOn="{StaticResource ErrorTemplate}" />
         <Style TargetType="CheckBox" BasedOn="{StaticResource ErrorTemplate}" />
         <Style TargetType="ComboBox" BasedOn="{StaticResource ErrorTemplate}" />
+        <Style TargetType="{x:Type Button}"
+                                   x:Key="ToolbarButton"
+                                   BasedOn="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
+            <Setter Property="Width" Value="24"/>
+            <Setter Property="Height" Value="24"/>
+        </Style>
     </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
@@ -101,14 +107,6 @@
                                 </Style.Triggers>
                             </Style>
                         </StackPanel.Style>
-                        <StackPanel.Resources>
-                            <Style TargetType="{x:Type Button}"
-                                   x:Key="ToolbarButton"
-                                   BasedOn="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
-                                <Setter Property="Width" Value="24"/>
-                                <Setter Property="Height" Value="24"/>
-                            </Style>
-                        </StackPanel.Resources>
                         <Button Style="{StaticResource ToolbarButton}" Focusable="False"
                                 ToolTip="{Binding Path=SelectedElement, Converter={StaticResource menuTitleConv}, ConverterParameter={x:Static conv:CommandContextMenu_e.MoveUp}}"
                                 Command="{Binding Path=MoveCommandUpCommand}" CommandParameter="{Binding Path=SelectedElement}">
@@ -181,14 +179,21 @@
         </GroupBox>
         <Grid Grid.Row="2" HorizontalAlignment="Stretch">
             <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="100" />
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="100" />
             </Grid.ColumnDefinitions>
-            <Button Grid.Column="0" HorizontalAlignment="Right" Margin="2" Width="50" Click="OnOk">
+            <Button Grid.Column="1" HorizontalAlignment="Right" Margin="2" Width="50" Click="OnOk">
                 <TextBlock Text="OK" Margin="2" />
             </Button>
-            <Button Grid.Column="1" HorizontalAlignment="Left" Margin="2" Width="50" Click="OnCancel">
+            <Button Grid.Column="2" HorizontalAlignment="Left" Margin="2" Width="50" Click="OnCancel">
                 <TextBlock Text="Cancel" Margin="2" />
+            </Button>
+            <Button Style="{StaticResource ToolbarButton}" Focusable="False" Grid.Column="3" HorizontalAlignment="Right"
+                    ToolTip="About Toolbar+"
+                    Command="{Binding Path=HelpCommand}">
+                <Image Source="/Xarial.CadPlus.Toolbar.Module;component/Resources/help-icon.png"/>
             </Button>
         </Grid>
     </Grid>

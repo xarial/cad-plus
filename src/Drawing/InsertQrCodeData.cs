@@ -1,4 +1,11 @@
-﻿using System;
+﻿//*********************************************************************
+//CAD+ Toolset
+//Copyright(C) 2020 Xarial Pty Limited
+//Product URL: https://cadplus.xarial.com
+//License: https://cadplus.xarial.com/license/
+//*********************************************************************
+
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -18,6 +25,7 @@ namespace Xarial.CadPlus.Drawing
 {
     [IconEx(typeof(Resources), nameof(Resources.qrcode_vector), nameof(Resources.qrcode_icon))]
     [Title("Insert QR Code")]
+    [Help("https://cadplus.xarial.com/drawing/qr-code/")]
     public class InsertQrCodeData
     {
         public SourceData Source { get; set; }
@@ -39,6 +47,14 @@ namespace Xarial.CadPlus.Drawing
         }
     }
 
+    public class PdmWeb2ServerDependencyHandler : IDependencyHandler
+    {
+        public void UpdateState(IXApplication app, IControl source, IControl[] dependencies)
+        {
+            source.Visible = (Source_e)dependencies.First()?.GetValue() == Source_e.PdmWeb2Url;
+        }
+    }
+
     public class CustomValueDependencyHandler : IDependencyHandler
     {
         public void UpdateState(IXApplication app, IControl source, IControl[] dependencies)
@@ -57,6 +73,11 @@ namespace Xarial.CadPlus.Drawing
         [ControlOptions(align: ControlLeftAlign_e.Indent)]
         [Description("Custom property name")]
         public string CustomPropertyName { get; set; }
+
+        [DependentOn(typeof(PdmWeb2ServerDependencyHandler), nameof(Source))]
+        [ControlOptions(align: ControlLeftAlign_e.Indent)]
+        [Description("PDM Web2 Server")]
+        public string PdmWeb2Server { get; set; }
 
         [DependentOn(typeof(CustomValueDependencyHandler), nameof(Source))]
         [ControlOptions(align: ControlLeftAlign_e.Indent)]

@@ -5,6 +5,7 @@
 //License: https://cadplus.xarial.com/license/
 //*********************************************************************
 
+using System.Diagnostics;
 using System.Windows.Controls;
 
 namespace Xarial.CadPlus.CustomToolbar.UI.Views
@@ -14,6 +15,17 @@ namespace Xarial.CadPlus.CustomToolbar.UI.Views
         public CommandMacroView()
         {
             InitializeComponent();
+        }
+
+        private void OnHelpClicked(object sender, System.Windows.RoutedEventArgs e)
+        {
+            try
+            {
+                Process.Start("https://cadplus.xarial.com/macro-arguments/");
+            }
+            catch 
+            {
+            }
         }
     }
 }

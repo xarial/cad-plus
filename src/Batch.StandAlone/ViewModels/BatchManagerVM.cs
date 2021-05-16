@@ -11,7 +11,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -22,16 +21,23 @@ using Xarial.CadPlus.Plus.Applications;
 using Xarial.CadPlus.Plus.Exceptions;
 using Xarial.CadPlus.Plus.Services;
 using Xarial.CadPlus.Plus.Shared.Services;
-using Xarial.CadPlus.StandAlone.Properties;
-using Xarial.CadPlus.XBatch.Base.Core;
-using Xarial.CadPlus.XBatch.Base.Models;
+using Xarial.CadPlus.Batch.StandAlone.Properties;
+using Xarial.CadPlus.Batch.Base.Core;
 using Xarial.XToolkit.Services.UserSettings;
 using Xarial.XToolkit.Wpf;
 using Xarial.XToolkit.Wpf.Dialogs;
 using Xarial.XToolkit.Wpf.Extensions;
 using Xarial.XToolkit.Wpf.Utils;
+using Xarial.CadPlus.Batch.StandAlone.Controls;
+using System.Windows;
+using System.Windows.Interop;
+using Xarial.CadPlus.Batch.Base;
+using Xarial.CadPlus.Plus.UI;
+using Xarial.CadPlus.Plus.Shared;
+using Xarial.XCad.Base;
+using Xarial.XToolkit;
 
-namespace Xarial.CadPlus.XBatch.Base.ViewModels
+namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
 {
     public class BatchManagerVM : INotifyPropertyChanged
     {
@@ -49,41 +55,72 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
 
         private BatchDocumentVM m_Document;
 
-        public ICommand NewDocumentCommand { get; }
+        public ICommand CreateDocumentCommand { get; }
         public ICommand OpenDocumentCommand { get; }
-        public ICommand CloseDocumentCommand { get; }
-        public ICommand AboutCommand { get; }
-        public ICommand HelpCommand { get; }
+
+        public ICommand OpenInFileExplorerCommand { get; }
 
         private readonly IBatchRunnerModel m_Model;
         private readonly IMessageService m_MsgSvc;
+        private readonly IXLogger m_Logger;
 
-        public IApplicationProvider[] AppProviders { get; }
+        public ICadApplicationInstanceProvider[] AppProviders { get; }
 
-        private readonly Func<FileInfo, BatchJob, IApplicationProvider, BatchDocumentVM> m_OpenDocFunc;
-        private readonly Func<string, BatchJob, IApplicationProvider, BatchDocumentVM> m_NewDocFunc;
+        private readonly Func<System.IO.FileInfo, BatchJob, MainWindow, IRibbonButtonCommand[], BatchDocumentVM> m_OpenDocFunc;
+        private readonly Func<string, BatchJob, MainWindow, IRibbonButtonCommand[], BatchDocumentVM> m_NewDocFunc;
 
-        public BatchManagerVM(IApplicationProvider[] appProviders,
-            IBatchRunnerModel model, IMessageService msgSvc, 
-            Func<FileInfo, BatchJob, IApplicationProvider, BatchDocumentVM> openDocFunc,
-            Func<string, BatchJob, IApplicationProvider, BatchDocumentVM> newDocFunc)
+        private readonly IAboutService m_AboutSvc;
+
+        public BatchManagerVM(ICadApplicationInstanceProvider[] appProviders,
+            IBatchRunnerModel model, IMessageService msgSvc, IXLogger logger,
+            Func<System.IO.FileInfo, BatchJob, MainWindow, IRibbonButtonCommand[], BatchDocumentVM> openDocFunc,
+            Func<string, BatchJob, MainWindow, IRibbonButtonCommand[], BatchDocumentVM> newDocFunc, IAboutService aboutSvc)
         {
             AppProviders = appProviders;
             m_Model = model;
             m_MsgSvc = msgSvc;
+            m_Logger = logger;
             m_OpenDocFunc = openDocFunc;
             m_NewDocFunc = newDocFunc;
 
-            NewDocumentCommand = new RelayCommand<string>(NewDocument);
+            m_AboutSvc = aboutSvc;
+
+            CreateDocumentCommand = new RelayCommand<string>(CreateDocument);
             OpenDocumentCommand = new RelayCommand<string>(OpenDocument);
-            CloseDocumentCommand = new RelayCommand(CloseDocument, () => Document != null);
-            AboutCommand = new RelayCommand(ShowAbout);
-            HelpCommand = new RelayCommand(OpenHelp);
+
+            OpenInFileExplorerCommand = new RelayCommand<string>(OpenInFileExplorer);
+        }
+
+        private void NewDocument()
+        {
+            //TODO: replace this with the service
+            var newDocWnd = new NewDocumentWindow();
+            newDocWnd.Owner = ParentWindow;
+            newDocWnd.DataContext = this;
+            newDocWnd.ShowDialog();
+        }
+
+        private void OpenInFileExplorer(string path)
+        {
+            try
+            {
+                if (System.IO.Directory.Exists(path))
+                {
+                    FileSystemUtils.BrowseFolderInExplorer(path);
+                }
+                else if (System.IO.File.Exists(path))
+                {
+                    FileSystemUtils.BrowseFileInExplorer(path);
+                }
+            }
+            catch
+            {
+            }
         }
 
         public ObservableCollection<string> RecentFiles => m_Model.RecentFiles;
 
-        internal IntPtr ParentWindowHandle { get; set; }
+        internal MainWindow ParentWindow { get; set; }
 
         internal bool CanClose()
         {
@@ -124,7 +161,9 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
                         if (Document == null)
                         {
                             var batchJob = m_Model.LoadJobFromFile(filePath);
-                            Document = m_OpenDocFunc.Invoke(new FileInfo(filePath), batchJob, GetApplicationProviderForJob(batchJob));
+                            Document = m_OpenDocFunc.Invoke(new System.IO.FileInfo(filePath),
+                                batchJob, ParentWindow,
+                                GetBackstageCommands());
                             Document.Save += OnSaveDocument;
                         }
                         else
@@ -143,8 +182,9 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
                     }
                 }
             }
-            catch 
+            catch (Exception ex)
             {
+                m_Logger.Log(ex);
                 m_MsgSvc.ShowError("Failed to open document");
             }
         }
@@ -152,14 +192,14 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
         private void OnSaveDocument(BatchDocumentVM sender, BatchJob job, string filePath)
                     => m_Model.SaveJobToFile(job, filePath);
 
-        internal void NewDocument(string appId)
+        internal void CreateDocument(string appId)
         {
             if (Document == null)
             {
                 var job = m_Model.CreateNewJobDocument(appId);
 
-                var provider = GetApplicationProviderForJob(job);
-                Document = m_NewDocFunc.Invoke($"{provider.DisplayName} Batch+ Document", job, provider);
+                Document = m_NewDocFunc.Invoke($"Batch+ Document",
+                    job, ParentWindow, GetBackstageCommands());
                 Document.Save += OnSaveDocument;
             }
             else
@@ -171,20 +211,6 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
                 });
                 StartNewInstance(args);
             }
-        }
-
-        private IApplicationProvider GetApplicationProviderForJob(BatchJob job) 
-        {
-            var appProvider = AppProviders.FirstOrDefault(
-                p => string.Equals(p.ApplicationId, job.ApplicationId, 
-                StringComparison.CurrentCultureIgnoreCase));
-
-            if (appProvider == null) 
-            {
-                throw new UserException("Failed to find the application provider for this job file");
-            }
-
-            return appProvider;
         }
 
         private void CloseDocument() 
@@ -199,11 +225,8 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
             }
         }
 
-        private void ShowAbout() 
-        {
-            AboutDialog.Show(this.GetType().Assembly, Resources.batch_plus_icon,
-                        ParentWindowHandle);
-        }
+        private void ShowAbout()
+            => m_AboutSvc.ShowAbout(this.GetType().Assembly, Resources.batch_plus_icon);
 
         private void OpenHelp() 
         {
@@ -224,10 +247,28 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
                 var prcStartInfo = new ProcessStartInfo(appPath, args);
                 Process.Start(prcStartInfo);
             }
-            catch 
+            catch (Exception ex)
             {
+                m_Logger.Log(ex);
                 m_MsgSvc.ShowError("Failed to start new instance of the application");
             }
+        }
+
+        private IRibbonButtonCommand[] GetBackstageCommands() 
+        {
+            return new IRibbonButtonCommand[]
+            {
+                new RibbonButtonCommand("New", Resources._new, "Create new Batch job", NewDocument, null),
+                new RibbonButtonCommand("Open...", Resources.open, "Open existing batch job", () => OpenDocument(""), null),
+                null,
+                new RibbonButtonCommand("Save", Resources.save, "Save current batch job", () => Document.SaveDocument(), () => Document != null),
+                new RibbonButtonCommand("Save As...", null, "Save current batch job to a new file", () => Document.SaveAsDocument(), () => Document != null),
+                null,
+                new RibbonButtonCommand("Close", null, "Close current batch job", CloseDocument, () => Document != null),
+                null,
+                new RibbonButtonCommand("Help...", Resources.help_icon, "Open help page", OpenHelp, null),
+                new RibbonButtonCommand("About...", Resources.about_icon, "About Batch+", ShowAbout, null)
+            };
         }
     }
 }

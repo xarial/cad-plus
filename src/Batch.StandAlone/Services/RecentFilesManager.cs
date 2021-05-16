@@ -1,4 +1,11 @@
-﻿using System;
+﻿//*********************************************************************
+//CAD+ Toolset
+//Copyright(C) 2020 Xarial Pty Limited
+//Product URL: https://cadplus.xarial.com
+//License: https://cadplus.xarial.com/license/
+//*********************************************************************
+
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -6,8 +13,9 @@ using System.Text;
 using System.Threading.Tasks;
 using Xarial.CadPlus.Plus;
 using Xarial.CadPlus.Plus.Hosts;
+using Xarial.XCad.Base;
 
-namespace Xarial.CadPlus.XBatch.Base.Services
+namespace Xarial.CadPlus.Batch.Base.Services
 {
     public interface IRecentFilesManager 
     {
@@ -26,6 +34,8 @@ namespace Xarial.CadPlus.XBatch.Base.Services
 
         private readonly string m_RecentFilesPath = Path.Combine
             (Locations.AppDirectoryPath, "batchplusrecentfiles.txt");
+
+        private readonly IXLogger m_Logger;
 
         public void PushFile(string filePath)
         {
@@ -51,8 +61,10 @@ namespace Xarial.CadPlus.XBatch.Base.Services
             }
         }
 
-        public RecentFilesManager() 
+        public RecentFilesManager(IXLogger logger) 
         {
+            m_Logger = logger;
+
             m_RecentFiles = new List<string>(TryLoadRecentFiles());
             TruncateList();
         }
@@ -68,8 +80,9 @@ namespace Xarial.CadPlus.XBatch.Base.Services
                     recentFiles = File.ReadAllLines(m_RecentFilesPath);
                 }
             }
-            catch 
+            catch (Exception ex)
             {
+                m_Logger.Log(ex);
             }
 
             return recentFiles ?? new string[0];
@@ -79,10 +92,18 @@ namespace Xarial.CadPlus.XBatch.Base.Services
         {
             try
             {
+                var dir = Path.GetDirectoryName(m_RecentFilesPath);
+
+                if (!Directory.Exists(dir)) 
+                {
+                    Directory.CreateDirectory(dir);
+                }
+
                 File.WriteAllLines(m_RecentFilesPath, m_RecentFiles);
             }
-            catch 
+            catch (Exception ex)
             {
+                m_Logger.Log(ex);
             }
         }
 

@@ -1,4 +1,11 @@
-﻿using QRCoder;
+﻿//*********************************************************************
+//CAD+ Toolset
+//Copyright(C) 2020 Xarial Pty Limited
+//Product URL: https://cadplus.xarial.com
+//License: https://cadplus.xarial.com/license/
+//*********************************************************************
+
+using QRCoder;
 using System;
 using System.Drawing;
 using System.IO;
@@ -22,10 +29,13 @@ using Xarial.XToolkit.Reporting;
 using Xarial.CadPlus.Plus.Extensions;
 using Xarial.CadPlus.Drawing.Data;
 using System.ComponentModel;
+using Xarial.CadPlus.Plus.Modules;
+using Xarial.XCad.Base;
 
 namespace Xarial.CadPlus.Drawing
 {
     [Title("Drawing+")]
+    [IconEx(typeof(Resources), nameof(Resources.drawing_vector), nameof(Resources.drawing_icon))]
     public enum Commands_e 
     {
         [CommandItemInfo(WorkspaceTypes_e.Drawing)]
@@ -36,11 +46,9 @@ namespace Xarial.CadPlus.Drawing
     }
 
     //TODO: remove the dependency on application once the common APIs are used
-    [Module(typeof(IHostExtension), ApplicationIds.SolidWorksAddIn)]
+    [Module(typeof(IHostExtension), typeof(ISwAddInApplication))]
     public class DrawingModule : IModule
     {
-        public Guid Id => Guid.Parse("83F7DE7C-8E7E-46C8-AAC0-966B45159E68");
-
         private IHostExtension m_Host;
 
         private IXPropertyPage<InsertQrCodeData> m_Page;
@@ -52,23 +60,35 @@ namespace Xarial.CadPlus.Drawing
         private IXDrawing m_CurDrawing;
         private string m_CurQrCodeData;
         private ISettingsProvider m_SettsProvider;
+        private IServiceProvider m_SvcProvider;
+
+        private IXLogger m_Logger;
+        private IMessageService m_MsgSvc;
 
         public void Init(IHost host)
         {
             m_Host = (IHostExtension)host;
+            m_Host.Initialized += OnHostInitialized;
             m_Host.Connect += OnConnect;
+        }
+
+        private void OnHostInitialized(IApplication app, IServiceContainer svcProvider, IModule[] modules)
+        {
+            m_SvcProvider = svcProvider;
+
+            m_Logger = m_SvcProvider.GetService<IXLogger>();
+            m_MsgSvc = m_SvcProvider.GetService<IMessageService>();
         }
 
         private void OnConnect()
         {
             m_Host.RegisterCommands<Commands_e>(OnCommandClick);
-            m_Page = m_Host.CreatePage<InsertQrCodeData>();
+            m_Page = m_Host.Extension.CreatePage<InsertQrCodeData>();
             m_CurPageData = new InsertQrCodeData();
 
-            m_SettsProvider = m_Host.Services.GetService<ISettingsProvider>();
+            m_SettsProvider = m_SvcProvider.GetService<ISettingsProvider>();
 
-            m_QrDataProvider = new QrDataProvider(m_Host.Extension.Application,
-                m_SettsProvider.ReadSettings<DrawingSettings>());
+            m_QrDataProvider = new QrDataProvider(m_Host.Extension.Application);
 
             m_Page.DataChanged += OnPageDataChanged;
             m_Page.Closed += OnPageClosed;
@@ -90,6 +110,7 @@ namespace Xarial.CadPlus.Drawing
                 }
                 catch (Exception ex)
                 {
+                    m_Logger.Log(ex);
                     arg.Cancel = true;
                     arg.ErrorMessage = ex.ParseUserError(out _);
                 }
@@ -106,9 +127,10 @@ namespace Xarial.CadPlus.Drawing
                 {
                     InsertQrCode();
                 }
-                catch 
+                catch (Exception ex)
                 {
-                    //TODO: show error message
+                    m_Logger.Log(ex);
+                    m_MsgSvc.ShowError(ex);
                 }
             }
         }

@@ -1,4 +1,11 @@
-﻿using System;
+﻿//*********************************************************************
+//CAD+ Toolset
+//Copyright(C) 2020 Xarial Pty Limited
+//Product URL: https://cadplus.xarial.com
+//License: https://cadplus.xarial.com/license/
+//*********************************************************************
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,7 +20,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Xarial.CadPlus.XBatch.Base.Controls
+namespace Xarial.CadPlus.Batch.Base.Controls
 {
     public partial class ResultsControl : UserControl
     {
@@ -21,5 +28,16 @@ namespace Xarial.CadPlus.XBatch.Base.Controls
         {
             InitializeComponent();
         }
-    }
+
+		public static readonly DependencyProperty JobItemsDataGridStyleProperty =
+			DependencyProperty.Register(
+			nameof(JobItemsDataGridStyle), typeof(Style),
+			typeof(ResultsControl));
+
+		public Style JobItemsDataGridStyle
+		{
+			get { return (Style)GetValue(JobItemsDataGridStyleProperty); }
+			set { SetValue(JobItemsDataGridStyleProperty, value); }
+		}
+	}
 }

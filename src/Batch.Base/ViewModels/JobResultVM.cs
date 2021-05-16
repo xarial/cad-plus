@@ -13,11 +13,12 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using Xarial.CadPlus.Batch.Base.Models;
-using Xarial.CadPlus.XBatch.Base.Exceptions;
+using Xarial.CadPlus.Plus.Services;
+using Xarial.CadPlus.Batch.Base.Exceptions;
 using Xarial.XToolkit.Wpf;
 using Xarial.XToolkit.Wpf.Extensions;
 
-namespace Xarial.CadPlus.XBatch.Base.ViewModels
+namespace Xarial.CadPlus.Batch.Base.ViewModels
 {
     public enum JobState_e 
     {
@@ -32,7 +33,7 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
     {
         public event PropertyChangedEventHandler PropertyChanged;
         
-        public JobResultLogVM Log { get; }
+        public JobResultJournalVM Journal { get; }
         public JobResultSummaryVM Summary { get; }
 
         public string Name { get; }
@@ -67,19 +68,20 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
             }
         }
 
-        public JobResultVM(string name, IBatchRunJobExecutor executor)
+        public ICadDescriptor CadDescriptor { get; }
+
+        public JobResultVM(string name, IBatchRunJobExecutor executor, ICadDescriptor cadDesc)
         {
             m_Executor = executor;
-
+            CadDescriptor = cadDesc;
+            
             Name = name;
-            Summary = new JobResultSummaryVM(m_Executor);
-            Log = new JobResultLogVM(m_Executor);
+            Summary = new JobResultSummaryVM(m_Executor, CadDescriptor);
+            Journal = new JobResultJournalVM(m_Executor);
         }
 
-        private void CancelJob()
-        {
-            m_Executor.Cancel();
-        }
+        public void CancelJob()
+            => m_Executor.Cancel();
 
         public async void RunBatchAsync()
         {
@@ -91,8 +93,18 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
 
                 if (await m_Executor.ExecuteAsync().ConfigureAwait(false))
                 {
-                    Status = Summary.JobItemFiles.Any(i => i.Status != Common.Services.JobItemStatus_e.Succeeded)
-                        ? JobState_e.CompletedWithWarning : JobState_e.Succeeded;
+                    if (Summary.JobItemFiles.All(f => f.Status == Common.Services.JobItemStatus_e.Succeeded))
+                    {
+                        Status = JobState_e.Succeeded;
+                    }
+                    else if (Summary.JobItemFiles.Any(f => f.Status == Common.Services.JobItemStatus_e.Succeeded))
+                    {
+                        Status = JobState_e.CompletedWithWarning;
+                    }
+                    else 
+                    {
+                        Status = JobState_e.Failed;
+                    }
                 }
                 else
                 {

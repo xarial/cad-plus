@@ -8,11 +8,12 @@
 using System;
 using Xarial.CadPlus.Common.Services;
 
-namespace Xarial.CadPlus.XBatch.Base.Core
+namespace Xarial.CadPlus.Batch.Base.Core
 {
     public class JobItem : IJobItem
     {
         public event Action<IJobItem, JobItemStatus_e> StatusChanged;
+        public event Action<IJobItem, Exception> ErrorReported;
 
         public string DisplayName { get; protected set; }
         
@@ -28,11 +29,23 @@ namespace Xarial.CadPlus.XBatch.Base.Core
             }
         }
 
+        public Exception Error 
+        {
+            get => m_Error;
+            set 
+            {
+                m_Error = value;
+                ErrorReported?.Invoke(this, value);
+            }
+        }
+
         private JobItemStatus_e m_Status;
+        private Exception m_Error;
 
         internal JobItem(string filePath) 
         {
             FilePath = filePath;
+            DisplayName = filePath;
             m_Status = JobItemStatus_e.AwaitingProcessing;
         }
     }

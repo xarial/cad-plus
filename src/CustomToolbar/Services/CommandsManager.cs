@@ -12,6 +12,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using Xarial.CadPlus.Common.Services;
 using Xarial.CadPlus.CustomToolbar.Base;
@@ -76,6 +77,7 @@ namespace Xarial.CadPlus.CustomToolbar.Services
             }
             catch(Exception ex)
             {
+                m_Logger.Log(ex);
                 m_Msg.ShowError(ex, "Failed to load toolbar specification");
             }
         }
@@ -121,7 +123,7 @@ namespace Xarial.CadPlus.CustomToolbar.Services
                 {
                     var cmdGrp = new CommandGroupInfoSpec(grp, m_IconsProviders);
                     
-                    m_Logger.Log($"Adding command group: {cmdGrp.Title} [{cmdGrp.Id}]. Commands: {string.Join(", ", cmdGrp.Commands.Select(c => $"{c.Title} [{c.UserId}]").ToArray())}");
+                    m_Logger.Log($"Adding command group: {cmdGrp.Title} [{cmdGrp.Id}]. Commands: {string.Join(", ", cmdGrp.Commands.Select(c => $"{c.Title} [{c.UserId}]").ToArray())}", XCad.Base.Enums.LoggerMessageSeverity_e.Debug);
 
                     var cmdGrpCad = m_AddIn.CommandManager.AddCommandGroup(cmdGrp);
 
@@ -146,8 +148,21 @@ namespace Xarial.CadPlus.CustomToolbar.Services
             }
             catch (Exception ex)
             {
-                m_Logger.Log($"Toggle state code compilation errors");
+                m_Logger.Log($"Toggle state code compilation errors", XCad.Base.Enums.LoggerMessageSeverity_e.Error);
                 m_Logger.Log(ex);
+
+                if (ex is ReflectionTypeLoadException) 
+                {
+                    var loaderExs = (ex as ReflectionTypeLoadException).LoaderExceptions;
+
+                    if (loaderExs != null) 
+                    {
+                        foreach (var loaderEx in loaderExs) 
+                        {
+                            m_Logger.Log(loaderEx);
+                        }
+                    }
+                }
 
                 m_Msg.ShowError($"Failed to compile the toggle state code");
             }
@@ -248,7 +263,7 @@ namespace Xarial.CadPlus.CustomToolbar.Services
                 }
                 else
                 {
-                    m_Logger.Log("Skipped saving of read-only toolbar settings");
+                    m_Logger.Log("Skipped saving of read-only toolbar settings", XCad.Base.Enums.LoggerMessageSeverity_e.Debug);
                 }
             }
         }
@@ -286,7 +301,7 @@ namespace Xarial.CadPlus.CustomToolbar.Services
                             {
                                 var newId = GetAvailableGroupId();
                                 
-                                m_Logger.Log($"Changing id of the group from {curCmdGrp.Id} to {newId}");
+                                m_Logger.Log($"Changing id of the group from {curCmdGrp.Id} to {newId}", XCad.Base.Enums.LoggerMessageSeverity_e.Debug);
 
                                 curCmdGrp.Id = newId;
                             }

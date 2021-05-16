@@ -60,7 +60,7 @@ namespace Xarial.CadPlus.CustomToolbar
 
         private List<IIconsProvider> m_IconsProviders;
 
-        public Guid Id => Guid.Parse("A4C69B9C-3DA4-4D1B-B533-A2FF66E13457");
+        private IServiceProvider m_SvcProvider;
 
         public CustomToolbarModule() 
         {
@@ -77,7 +77,13 @@ namespace Xarial.CadPlus.CustomToolbar
             }
 
             m_Host = (IHostExtension)host;
+            m_Host.Initialized += OnHostInitialized;
             m_Host.Connect += OnConnect;
+        }
+
+        private void OnHostInitialized(IApplication app, IServiceContainer svcProvider, IModule[] modules)
+        {
+            m_SvcProvider = svcProvider;
         }
 
         private void OnConnect()
@@ -97,10 +103,7 @@ namespace Xarial.CadPlus.CustomToolbar
             builder.RegisterInstance(m_Host.Extension).ExternallyOwned();
             builder.RegisterInstance(m_Host.Extension.Application).ExternallyOwned();
             builder.RegisterInstance(m_Host.Extension.Logger);
-
-            builder.RegisterType<AppLogger>()
-                .As<IXLogger>();
-
+            
             builder.RegisterType<MacroEntryPointsExtractor>()
                 .As<IMacroEntryPointsExtractor>();
 
@@ -121,10 +124,10 @@ namespace Xarial.CadPlus.CustomToolbar
 
             builder.RegisterType<UserSettingsService>();
 
-            builder.RegisterFromServiceProvider<IMacroRunnerExService>(m_Host.Services);
-            builder.RegisterFromServiceProvider<IMessageService>(m_Host.Services);
-            builder.RegisterFromServiceProvider<IMacroFileFilterProvider>(m_Host.Services);
-            builder.RegisterFromServiceProvider<ISettingsProvider>(m_Host.Services);
+            builder.RegisterFromServiceProvider<IMacroExecutor>(m_SvcProvider);
+            builder.RegisterFromServiceProvider<IMessageService>(m_SvcProvider);
+            builder.RegisterFromServiceProvider<ICadDescriptor>(m_SvcProvider);
+            builder.RegisterFromServiceProvider<ISettingsProvider>(m_SvcProvider);
 
             builder.RegisterInstance(m_IconsProviders.ToArray());
 
@@ -161,6 +164,7 @@ namespace Xarial.CadPlus.CustomToolbar
                             }
                             catch (Exception ex)
                             {
+                                m_Logger.Log(ex);
                                 m_Msg.ShowError(ex, "Failed to save toolbar specification");
                             }
                         }
@@ -169,6 +173,7 @@ namespace Xarial.CadPlus.CustomToolbar
             }
             catch (Exception ex)
             {
+                m_Logger.Log(ex);
                 m_Msg.ShowError(ex, "Unknown error");
                 m_Logger.Log(ex);
             }

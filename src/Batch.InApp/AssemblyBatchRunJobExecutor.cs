@@ -1,4 +1,11 @@
-﻿using System;
+﻿//*********************************************************************
+//CAD+ Toolset
+//Copyright(C) 2020 Xarial Pty Limited
+//Product URL: https://cadplus.xarial.com
+//License: https://cadplus.xarial.com/license/
+//*********************************************************************
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,8 +14,9 @@ using System.Threading.Tasks;
 using Xarial.CadPlus.Batch.Base.Models;
 using Xarial.CadPlus.Common.Services;
 using Xarial.CadPlus.Plus.Services;
-using Xarial.CadPlus.XBatch.Base.Core;
+using Xarial.CadPlus.Batch.Base.Core;
 using Xarial.XCad;
+using Xarial.XCad.Base;
 using Xarial.XCad.Documents;
 using Xarial.XCad.Documents.Enums;
 using Xarial.XCad.Exceptions;
@@ -16,16 +24,6 @@ using Xarial.XToolkit.Reporting;
 
 namespace Xarial.CadPlus.Batch.InApp
 {
-    internal class JobItemDocument : JobItemFile
-    {
-        public IXDocument Document { get; }
-
-        public JobItemDocument(IXDocument doc, JobItemMacro[] macros) : base(doc.Path, macros)
-        {
-            Document = doc;
-        }
-    }
-
     public class AssemblyBatchRunJobExecutor : IBatchRunJobExecutor
     {
         public event Action<IJobItem[], DateTime> JobSet;
@@ -37,19 +35,26 @@ namespace Xarial.CadPlus.Batch.InApp
 
         private readonly IXDocument[] m_Docs;
 
-        private readonly IMacroRunnerExService m_MacroRunner;
+        private readonly IMacroExecutor m_MacroRunner;
         private readonly IEnumerable<MacroData> m_Macros;
         private readonly bool m_ActivateDocs;
+        private readonly bool m_AllowReadOnly;
+        private readonly bool m_AllowRapid;
+        private readonly IXLogger m_Logger;
 
-        internal AssemblyBatchRunJobExecutor(IXApplication app, IMacroRunnerExService macroRunnerSvc,
-            IXDocument[] documents, IEnumerable<MacroData> macros, bool activateDocs) 
+        internal AssemblyBatchRunJobExecutor(IXApplication app, IMacroExecutor macroRunnerSvc,
+            IXDocument[] documents, IXLogger logger, IEnumerable<MacroData> macros, bool activateDocs, bool allowReadOnly, bool allowRapid) 
         {
             m_App = app;
+            m_Logger = logger;
 
             m_MacroRunner = macroRunnerSvc;
             m_Docs = documents;
             m_Macros = macros;
+
             m_ActivateDocs = activateDocs;
+            m_AllowReadOnly = allowReadOnly;
+            m_AllowRapid = allowRapid;
         }
 
         public void Cancel()
@@ -86,8 +91,9 @@ namespace Xarial.CadPlus.Batch.InApp
 
                 return Task.FromResult(true);
             }
-            catch
+            catch(Exception ex)
             {
+                m_Logger.Log(ex);
                 return Task.FromResult(false);
             }
             finally 
@@ -127,6 +133,16 @@ namespace Xarial.CadPlus.Batch.InApp
                     if (!m_ActivateDocs)
                     {
                         state |= DocumentState_e.Hidden;
+                    }
+
+                    if (m_AllowReadOnly) 
+                    {
+                        state |= DocumentState_e.ReadOnly;
+                    }
+
+                    if (m_AllowRapid) 
+                    {
+                        state |= DocumentState_e.Rapid;
                     }
 
                     doc.State = state;
@@ -202,7 +218,7 @@ namespace Xarial.CadPlus.Batch.InApp
                 }
                 else
                 {
-                    errorDesc = "Unknown error";
+                    errorDesc = ex.ParseUserError(out _, "Unknown error");
                 }
 
                 LogMessage($"Failed to run macro '{macro.FilePath}': {errorDesc}");

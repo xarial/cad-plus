@@ -28,7 +28,7 @@ namespace Xarial.CadPlus.MacroRunner
         
         public void Dispose()
         {
-            m_Logger.Log($"Unregistering object from ROT: {m_Id}");
+            m_Logger.Log($"Unregistering object from ROT: {m_Id}", XCad.Base.Enums.LoggerMessageSeverity_e.Debug);
             RotHelper.UnregisterComObject(m_Id);
         }
     }

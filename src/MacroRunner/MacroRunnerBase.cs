@@ -73,8 +73,9 @@ namespace Xarial.CadPlus.MacroRunner
                         {
                             m_Register.Dispose();
                         }
-                        catch
+                        catch(Exception ex)
                         {
+                            m_Logger.Log(ex);
                         }
                     }
 

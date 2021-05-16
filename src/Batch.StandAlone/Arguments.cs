@@ -12,9 +12,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Xarial.CadPlus.Plus.Applications;
-using Xarial.CadPlus.XBatch.Base.Core;
+using Xarial.CadPlus.Batch.Base.Core;
 
-namespace Xarial.CadPlus.XBatch.Base
+namespace Xarial.CadPlus.Batch.Base
 {
     [Verb("file", HelpText = "Managing Batch+ files")]
     public class FileOptions
@@ -37,7 +37,7 @@ namespace Xarial.CadPlus.XBatch.Base
     [Verb("job", HelpText = "Accessing job files")]
     public class JobOptions : BatchArguments
     {
-        [Option('r', "run", Required = true, HelpText = "Full path to *.batchplus file to run")]
+        [Option('r', "run", Required = true, HelpText = "Full path to *.bpj file to run")]
         public string JobFilePath 
         {
             set 
@@ -53,6 +53,9 @@ namespace Xarial.CadPlus.XBatch.Base
         public RunOptions() 
         {
             Job = new BatchJob();
+
+            //TODO: make this a parameter once more providers are implemented
+            Job.ApplicationId = Plus.CadApplicationIds.SolidWorks;
         }
         
         [Option('i', "input", Required = true, HelpText = "List of input directories or file paths to process")]
@@ -62,9 +65,9 @@ namespace Xarial.CadPlus.XBatch.Base
         }
 
         [Option('f', "filters", Required = false, HelpText = "Filters to extract input files, if input parameter contains directories. Default (all files): *.*")]
-        public string[] Filters
+        public IEnumerable<string> Filters
         {
-            set => Job.Filters = value;
+            set => Job.Filters = value.ToArray();
         }
 
         [Option('m', "macros", Required = true, HelpText = "List of macros to run")]
@@ -128,7 +131,7 @@ namespace Xarial.CadPlus.XBatch.Base
             }
         }
 
-        [Option('b', "batch", Required = false, HelpText = "maximum number of files to process in the single session of CAD application before restarting. Default: 25")]
+        [Option('b', "batch", Required = false, HelpText = "Maximum number of files to process in the single session of CAD application before restarting. Default: 25")]
         public int BatchSize
         {
             set => Job.BatchSize = value;

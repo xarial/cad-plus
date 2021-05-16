@@ -62,12 +62,8 @@ namespace Xarial.CadPlus.CustomToolbar.UI.ViewModels
                 {
                     m_BrowseMacroPathCommand = new RelayCommand(() =>
                     {
-                        var filters = m_FilterProvider.GetSupportedMacros()
-                                    .Select(f=>new FileFilter(f.Name, f.Extensions))
-                                    .Union(new FileFilter[] { FileFilter.AllFiles }).ToArray();
-
                         if (FileSystemBrowser.BrowseFileOpen(out string macroFile, 
-                            "Select macro file", FileSystemBrowser.BuildFilterString(filters)))
+                            "Select macro file", FileSystemBrowser.BuildFilterString(m_MacroFileFilters)))
                         {
                             MacroPath = macroFile;
                         }
@@ -148,7 +144,7 @@ namespace Xarial.CadPlus.CustomToolbar.UI.ViewModels
             }
         }
 
-        private readonly IMacroFileFilterProvider m_FilterProvider;
+        private readonly FileFilter[] m_MacroFileFilters;
 
         public CommandMacroVM() : this(new CommandMacroInfo(), CustomToolbarModule.Resolve<IIconsProvider[]>())
         {
@@ -156,7 +152,9 @@ namespace Xarial.CadPlus.CustomToolbar.UI.ViewModels
 
         public CommandMacroVM(CommandMacroInfo cmd, IIconsProvider[] providers) : base(cmd, providers)
         {
-            m_FilterProvider = CustomToolbarModule.Resolve<IMacroFileFilterProvider>();
+            m_MacroFileFilters = CustomToolbarModule.Resolve<ICadDescriptor>().MacroFileFilters
+                .Select(f => new FileFilter(f.Name, f.Extensions))
+                .Union(new FileFilter[] { XCadMacroProvider.Filter, FileFilter.AllFiles }).ToArray();
         }
     }
 }

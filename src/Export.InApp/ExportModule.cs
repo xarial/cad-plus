@@ -1,4 +1,11 @@
-﻿using System;
+﻿//*********************************************************************
+//CAD+ Toolset
+//Copyright(C) 2020 Xarial Pty Limited
+//Product URL: https://cadplus.xarial.com
+//License: https://cadplus.xarial.com/license/
+//*********************************************************************
+
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
@@ -36,12 +43,12 @@ namespace Xarial.CadPlus.Export.InApp
             RunStandAlone,
         }
 
-        public Guid Id => Guid.Parse("961248D6-FB9B-442C-B7ED-16C113E48AEF");
-
         private IHostExtension m_Host;
 
         private IMessageService m_Msg;
         private IXLogger m_Logger;
+
+        private IServiceProvider m_SvcProvider;
 
         public void Init(IHost host)
         {
@@ -51,13 +58,19 @@ namespace Xarial.CadPlus.Export.InApp
             }
 
             m_Host = (IHostExtension)host;
+            m_Host.Initialized += OnHostInitialized;
             m_Host.Connect += OnConnect;
+        }
+
+        private void OnHostInitialized(IApplication app, IServiceContainer svcProvider, IModule[] modules)
+        {
+            m_SvcProvider = svcProvider;
         }
 
         private void OnConnect()
         {
-            m_Msg = m_Host.Services.GetService<IMessageService>();
-            m_Logger = m_Host.Services.GetService<IXLogger>();
+            m_Msg = m_SvcProvider.GetService<IMessageService>();
+            m_Logger = m_SvcProvider.GetService<IXLogger>();
 
             m_Host.RegisterCommands<Commands_e>(OnCommandClick);
         }

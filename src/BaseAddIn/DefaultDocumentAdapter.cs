@@ -1,4 +1,11 @@
-﻿using System;
+﻿//*********************************************************************
+//CAD+ Toolset
+//Copyright(C) 2020 Xarial Pty Limited
+//Product URL: https://cadplus.xarial.com
+//License: https://cadplus.xarial.com/license/
+//*********************************************************************
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,7 +17,7 @@ namespace Xarial.CadPlus.AddIn.Base
 {
     public class DefaultDocumentAdapter : IDocumentAdapter
     {
-        public void ApplyChanged(IXDocument doc)
+        public void ApplyChanges(IXDocument doc)
         {
         }
 
@@ -18,7 +25,7 @@ namespace Xarial.CadPlus.AddIn.Base
         {
         }
 
-        public IXDocument GetAdapter(IXDocument doc, bool allowReadOnly)
+        public IXDocument GetDocumentReplacement(IXDocument doc, bool allowReadOnly)
             => doc;
     }
 }

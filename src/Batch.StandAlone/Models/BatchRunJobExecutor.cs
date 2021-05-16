@@ -13,12 +13,12 @@ using System.Threading.Tasks;
 using Xarial.CadPlus.Batch.Base.Models;
 using Xarial.CadPlus.Common.Services;
 using Xarial.CadPlus.Plus.Applications;
-using Xarial.CadPlus.XBatch.Base.Core;
-using Xarial.CadPlus.XBatch.Base.Exceptions;
+using Xarial.CadPlus.Batch.Base.Core;
+using Xarial.CadPlus.Batch.Base.Exceptions;
 using Xarial.XCad;
 using Xarial.XToolkit.Reporting;
 
-namespace Xarial.CadPlus.XBatch.Base.Models
+namespace Xarial.CadPlus.Batch.Base.Models
 {
     public class BatchRunJobExecutor : IBatchRunJobExecutor, IDisposable
     {
@@ -32,22 +32,21 @@ namespace Xarial.CadPlus.XBatch.Base.Models
 
         private readonly BatchJob m_Job;
         
-        private readonly LogWriter m_LogWriter;
+        private readonly JournalWriter m_LogWriter;
         private readonly ProgressHandler m_PrgHander;
         
         private bool m_IsExecuting;
 
-        private readonly Func<TextWriter, IProgressHandler, IApplicationProvider, BatchRunner> m_BatchRunnerFact;
+        private readonly Func<BatchJob, TextWriter, IProgressHandler, BatchRunner> m_BatchRunnerFact;
 
-        private readonly IApplicationProvider m_AppProvider;
+        private BatchRunner m_CurrentBatchRunner;
 
-        public BatchRunJobExecutor(BatchJob job, IApplicationProvider appProvider,
-            Func<TextWriter, IProgressHandler, IApplicationProvider, BatchRunner> batchRunnerFact) 
+        public BatchRunJobExecutor(BatchJob job,
+            Func<BatchJob, TextWriter, IProgressHandler, BatchRunner> batchRunnerFact) 
         {
             m_Job = job;
-            m_AppProvider = appProvider;
 
-            m_LogWriter = new LogWriter();
+            m_LogWriter = new JournalWriter(true);
             m_PrgHander = new ProgressHandler();
 
             m_BatchRunnerFact = batchRunnerFact;
@@ -72,9 +71,9 @@ namespace Xarial.CadPlus.XBatch.Base.Models
                 {
                     var cancellationToken = m_CurrentCancellationToken.Token;
 
-                    using (var batchRunner = m_BatchRunnerFact.Invoke(m_LogWriter, m_PrgHander, m_AppProvider))
+                    using (m_CurrentBatchRunner = m_BatchRunnerFact.Invoke(m_Job, m_LogWriter, m_PrgHander))
                     {
-                        return await batchRunner.BatchRun(m_Job, cancellationToken).ConfigureAwait(false);
+                        return await m_CurrentBatchRunner.BatchRunAsync(cancellationToken).ConfigureAwait(false);
                     }
                 }
                 catch (Exception ex)
@@ -101,6 +100,7 @@ namespace Xarial.CadPlus.XBatch.Base.Models
         public void Cancel()
         {
             m_CurrentCancellationToken?.Cancel();
+            m_CurrentBatchRunner.TryCancel();
         }
 
         private void OnLog(string line)

@@ -13,15 +13,18 @@ using System.Text;
 using System.Threading.Tasks;
 using Xarial.CadPlus.Batch.Base.Models;
 using Xarial.CadPlus.Common.Services;
+using Xarial.CadPlus.Batch.Base.Core;
 using Xarial.XToolkit.Wpf.Extensions;
+using Xarial.CadPlus.Plus.Services;
+using System.Diagnostics;
 
-namespace Xarial.CadPlus.XBatch.Base.ViewModels
+namespace Xarial.CadPlus.Batch.Base.ViewModels
 {
     public class JobResultSummaryVM : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
-        private JobItemFileVM[] m_JobItemFiles;
+        private JobItemDocumentVM[] m_JobItemFiles;
         private int m_ProcessedFiles;
         private int m_FailedFiles;
         private DateTime? m_StartTime;
@@ -50,7 +53,7 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
             }
         }
 
-        public JobItemFileVM[] JobItemFiles 
+        public JobItemDocumentVM[] JobItemFiles 
         {
             get => m_JobItemFiles;
             set 
@@ -104,11 +107,14 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
         private double m_Progress;
         private bool m_IsInitializing;
 
-        public JobResultSummaryVM(IBatchRunJobExecutor executor)
+        private readonly ICadDescriptor m_CadDesc;
+
+        public JobResultSummaryVM(IBatchRunJobExecutor executor, ICadDescriptor cadDesc)
         {
             IsInitializing = true;
 
             m_Executor = executor;
+            m_CadDesc = cadDesc;
 
             m_Executor.JobSet += OnJobSet;
             m_Executor.ProgressChanged += OnProgressChanged;
@@ -117,7 +123,7 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
 
         private void OnJobSet(IJobItem[] files, DateTime startTime)
         {
-            JobItemFiles = files.Select(f => new JobItemFileVM((IJobItemFile)f)).ToArray();
+            JobItemFiles = files.Select(f => new JobItemDocumentVM((JobItemDocument)f, m_CadDesc)).ToArray();
             StartTime = startTime;
         }
 
@@ -143,6 +149,15 @@ namespace Xarial.CadPlus.XBatch.Base.ViewModels
             }
 
             Progress = (ProcessedFiles + FailedFiles) / (double)JobItemFiles.Length;
+
+            if (StartTime.HasValue)
+            {
+                Duration = DateTime.Now - StartTime.Value;
+            }
+            else 
+            {
+                Debug.Assert(false, "Start time must be set before progress");
+            }
         }
     }
 }
