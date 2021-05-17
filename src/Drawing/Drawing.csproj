@@ -70,7 +70,7 @@
     <Reference Include="WindowsBase" />
     <Reference Include="WindowsFormsIntegration" />
     <Reference Include="Xarial.CadPlusPlus, Version=0.2.0.0, Culture=neutral, PublicKeyToken=60dcaf351d4060db, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Xarial.CadPlusPlus.0.2.0-20210509.2\lib\net461\Xarial.CadPlusPlus.dll</HintPath>
+      <HintPath>..\..\packages\Xarial.CadPlusPlus.0.2.0-20210512.1\lib\net461\Xarial.CadPlusPlus.dll</HintPath>
     </Reference>
     <Reference Include="Xarial.XCad, Version=0.7.0.0, Culture=neutral, PublicKeyToken=60dcaf351d4060db, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Xarial.XCad.0.7.0\lib\net461\Xarial.XCad.dll</HintPath>
@@ -87,9 +87,15 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Data\Dock_e.cs" />
+    <Compile Include="Data\EditQrCodeData.cs" />
+    <Compile Include="Data\LocationData.cs" />
+    <Compile Include="Data\QrCodeData.cs" />
+    <Compile Include="Data\SourceData.cs" />
     <Compile Include="Data\Source_e.cs" />
     <Compile Include="DrawingModule.cs" />
-    <Compile Include="InsertQrCodeData.cs" />
+    <Compile Include="Data\InsertQrCodeData.cs" />
+    <Compile Include="Features\EditQrCodeFeature.cs" />
+    <Compile Include="Features\InsertQrCodeFeature.cs" />
     <Compile Include="OpenGL.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
@@ -97,6 +103,8 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="QrCodeDrawingHandler.cs" />
+    <Compile Include="Services\QrCodeManager.cs" />
     <Compile Include="Services\QrCodePreviewer.cs" />
     <Compile Include="Services\QrDataProvider.cs" />
   </ItemGroup>
@@ -139,6 +147,18 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\drawing-vector.svg" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\qr-code-edit.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\qr-code-edit-vector.svg" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\qr-code-update.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\qr-code-update-vector.svg" />
   </ItemGroup>
   <Import Project="$(SolutionDir)common\common.module.props" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -16,6 +16,7 @@ using Xarial.CadPlus.Common.Services;
 using Xarial.CadPlus.Batch.Base.Core;
 using Xarial.XToolkit.Wpf.Extensions;
 using Xarial.CadPlus.Plus.Services;
+using System.Diagnostics;
 
 namespace Xarial.CadPlus.Batch.Base.ViewModels
 {
@@ -148,6 +149,15 @@ namespace Xarial.CadPlus.Batch.Base.ViewModels
             }
 
             Progress = (ProcessedFiles + FailedFiles) / (double)JobItemFiles.Length;
+
+            if (StartTime.HasValue)
+            {
+                Duration = DateTime.Now - StartTime.Value;
+            }
+            else 
+            {
+                Debug.Assert(false, "Start time must be set before progress");
+            }
         }
     }
 }

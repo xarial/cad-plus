@@ -36,6 +36,8 @@ using Xarial.XToolkit.Services.UserSettings;
 using Xarial.XToolkit.Wpf;
 using Xarial.XToolkit.Wpf.Extensions;
 using Xarial.XToolkit.Wpf.Utils;
+using Xarial.CadPlus.Batch.Base.Services;
+using Xarial.CadPlus.Plus.Shared.Helpers;
 
 namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
 {
@@ -146,13 +148,20 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
 
         private readonly IXLogger m_Logger;
 
-        public BatchDocumentVM(FileInfo file, BatchJob job, ICadApplicationInstanceProvider[] appProviders, 
+        private readonly IJournalExporter[] m_JournalExporters;
+        private readonly IResultsSummaryExcelExporter[] m_ResultsExporters;
+
+        public BatchDocumentVM(FileInfo file, BatchJob job, ICadApplicationInstanceProvider[] appProviders,
+            IJournalExporter[] journalExporters, IResultsSummaryExcelExporter[] resultsExporters,
             IMessageService msgSvc, IXLogger logger,
             Func<BatchJob, IBatchRunJobExecutor> execFact,
             IBatchApplicationProxy batchAppProxy, MainWindow parentWnd, IRibbonButtonCommand[] backstageCmds)
             : this(Path.GetFileNameWithoutExtension(file.FullName), job, appProviders, 
                   msgSvc, logger, execFact, batchAppProxy, parentWnd, backstageCmds)
         {
+            m_JournalExporters = journalExporters;
+            m_ResultsExporters = resultsExporters;
+
             m_FilePath = file.FullName;
             IsDirty = false;
         }
@@ -280,7 +289,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
                             () => Settings.AutoSaveDocuments,
                             v => Settings.AutoSaveDocuments = v)),
                     new RibbonGroup(BatchApplicationCommandManager.SettingsTab.ResilienceGroupName, "Resilience",
-                        new RibbonNumericSwitchCommand("Timeout", null, $"Restarts the {m_AppProvider.Descriptor.ApplicationName} if the file failed to process within the specified period of time", "Timeout On", "Timeout Off",
+                        new RibbonNumericSwitchCommand("Timeout (seconds)", null, $"Restarts the {m_AppProvider.Descriptor.ApplicationName} if the file failed to process within the specified period of time", "Timeout On", "Timeout Off",
                             () => Settings.IsTimeoutEnabled,
                             v => Settings.IsTimeoutEnabled = v,
                             () => Convert.ToDouble(Settings.Timeout),
@@ -315,7 +324,26 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
                                 return false;
                             }
 
-                        }))
+                        })),
+                    new RibbonGroup(BatchApplicationCommandManager.JobTab.ResultsGroupName, "Results",
+                        new RibbonButtonCommand("Export Summary Results", Resources.export_summary, "Export results statuses",
+                        () =>
+                        {
+                            if (Results?.Selected != null)
+                            {
+                                TryExportResults();
+                            }
+                        },
+                        () => Results?.Selected != null),
+                        new RibbonButtonCommand("Export Journal", Resources.export_log, "Export journal to a text file",
+                        () =>
+                        {
+                            if (Results?.Selected != null)
+                            {
+                                TryExportJournal();
+                            }
+                        },
+                        () => Results?.Selected != null))
                 ));
             
             m_BatchAppProxy.CreateCommandManager(cmdMgr);
@@ -348,6 +376,62 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
         private void OnSettingsModified()
         {
             IsDirty = true;
+        }
+
+        private void TryExportResults()
+        {
+            try
+            {
+                if (FileSystemBrowser.BrowseFileSave(out string filePath,
+                    $"Select file to export journal for job '{Results.Selected.Name}'",
+                    FileSystemBrowser.BuildFilterString(
+                        m_ResultsExporters.Select(e => e.Filter).Concat(new FileFilter[] { FileFilter.AllFiles }).ToArray())))
+                {
+                    var exp = m_ResultsExporters.FirstOrDefault(j => FileHelper.MatchesFilter(filePath, j.Filter.Extensions));
+
+                    if (exp != null)
+                    {
+                        exp.Export(Results.Selected.Name, Results.Selected.Summary, filePath);
+                    }
+                    else
+                    {
+                        throw new UserException("Unrecognized file format");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                m_Logger.Log(ex);
+                m_MsgSvc.ShowError(ex);
+            }
+        }
+
+        private void TryExportJournal()
+        {
+            try
+            {
+                if (FileSystemBrowser.BrowseFileSave(out string filePath,
+                    $"Select file to export journal for job '{Results.Selected.Name}'",
+                    FileSystemBrowser.BuildFilterString(
+                        m_JournalExporters.Select(e => e.Filter).Concat(new FileFilter[] { FileFilter.AllFiles }).ToArray())))
+                {
+                    var exp = m_JournalExporters.FirstOrDefault(j => FileHelper.MatchesFilter(filePath, j.Filter.Extensions));
+
+                    if (exp != null)
+                    {
+                        exp.Export(Results.Selected.Journal, filePath);
+                    }
+                    else
+                    {
+                        throw new UserException("Unrecognized file format");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                m_Logger.Log(ex);
+                m_MsgSvc.ShowError(ex);
+            }
         }
 
         internal void SaveAsDocument()

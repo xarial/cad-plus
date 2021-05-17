@@ -110,6 +110,9 @@ namespace Xarial.CadPlus.Batch.StandAlone
             builder.RegisterType<JobManager>().As<IJobManager>()
                 .SingleInstance()
                 .OnActivating(x => x.Instance.Init());
+
+            builder.RegisterType<JournalTextExporter>().As<IJournalExporter>();
+            builder.RegisterType<ResultsSummaryExcelExporter>().As<IResultsSummaryExcelExporter>();
         }
 
         private static void OnWindowCreated(MainWindow window, BatchArguments args)

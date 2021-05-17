@@ -18,11 +18,27 @@ namespace Xarial.CadPlus.Batch.Base.Converters
 {
     public class ExceptionToErrorConverter : IValueConverter
     {
+        public static string Convert(Exception ex) 
+        {
+            if (ex is OperationCanceledException)
+            {
+                return "Operation cancelled";
+            }
+            else if (ex is TimeoutException)
+            {
+                return "Timeout";
+            }
+            else
+            {
+                return ex.ParseUserError(out _);
+            }
+        }
+
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value is Exception) 
+            if (value is Exception)
             {
-                return (value as Exception).ParseUserError(out _);
+                return Convert(value as Exception);
             }
 
             return null;
