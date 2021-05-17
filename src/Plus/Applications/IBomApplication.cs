@@ -28,6 +28,6 @@ namespace Xarial.CadPlus.Plus.Applications
 
     public interface IBomApplication : IDocumentConsumerApplication, IHasCommandManager
     {
-        Task ViewBomAsync(string filePath);
+        void ViewBom(string filePath);
     }
 }
