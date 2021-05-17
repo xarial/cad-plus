@@ -120,6 +120,8 @@ namespace Xarial.CadPlus.Drawing.Services
             skPict.GetSize(ref width, ref height);
             skPict.GetOrigin(ref x, ref y);
 
+            (drw as ISwDrawing).Model.FeatureManager.EnableFeatureTree = false;
+            (drw as ISwDrawing).Model.FeatureManager.EnableFeatureTreeWindow = false;
             (drw as ISwDrawing).Model.IActiveView.EnableGraphicsUpdate = false;
 
             try
@@ -142,6 +144,8 @@ namespace Xarial.CadPlus.Drawing.Services
             }
             finally 
             {
+                (drw as ISwDrawing).Model.FeatureManager.EnableFeatureTree = true;
+                (drw as ISwDrawing).Model.FeatureManager.EnableFeatureTreeWindow = true;
                 (drw as ISwDrawing).Model.IActiveView.EnableGraphicsUpdate = true;
             }
         }
@@ -152,6 +156,8 @@ namespace Xarial.CadPlus.Drawing.Services
 
             var model = (drw as ISwDrawing).Model;
 
+            model.FeatureManager.EnableFeatureTree = false;
+            model.FeatureManager.EnableFeatureTreeWindow = false;
             model.IActiveView.EnableGraphicsUpdate = false;
 
             try
@@ -185,6 +191,8 @@ namespace Xarial.CadPlus.Drawing.Services
             }
             finally
             {
+                model.FeatureManager.EnableFeatureTree = true;
+                model.FeatureManager.EnableFeatureTreeWindow =true;
                 model.IActiveView.EnableGraphicsUpdate = true;
 
                 if (File.Exists(tempFileName))
