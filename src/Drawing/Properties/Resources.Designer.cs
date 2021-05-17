@@ -143,6 +143,46 @@ namespace Xarial.CadPlus.Drawing.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap qr_code_edit {
+            get {
+                object obj = ResourceManager.GetObject("qr_code_edit", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] qr_code_edit_vector {
+            get {
+                object obj = ResourceManager.GetObject("qr_code_edit_vector", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap qr_code_update {
+            get {
+                object obj = ResourceManager.GetObject("qr_code_update", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] qr_code_update_vector {
+            get {
+                object obj = ResourceManager.GetObject("qr_code_update_vector", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap qrcode_icon {
             get {
                 object obj = ResourceManager.GetObject("qrcode_icon", resourceCulture);

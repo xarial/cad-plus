@@ -1,4 +1,11 @@
-﻿using System;
+﻿//*********************************************************************
+//CAD+ Toolset
+//Copyright(C) 2020 Xarial Pty Limited
+//Product URL: https://cadplus.xarial.com
+//License: https://cadplus.xarial.com/license/
+//*********************************************************************
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -23,7 +30,6 @@ namespace Xarial.CadPlus.Drawing.Data
         public event Action<QrCodeData> Changed;
 
         private IXObject m_Picture;
-        private Dock_e m_Dock;
         private Source_e m_Source;
         private string m_Argument;
         private bool m_RefDocumentSource;
@@ -34,16 +40,6 @@ namespace Xarial.CadPlus.Drawing.Data
             set 
             {
                 m_Picture = value;
-                this.Changed?.Invoke(this);
-            }
-        }
-
-        public Dock_e Dock
-        {
-            get => m_Dock;
-            set
-            {
-                m_Dock = value;
                 this.Changed?.Invoke(this);
             }
         }
@@ -76,6 +72,40 @@ namespace Xarial.CadPlus.Drawing.Data
                 m_Argument = value;
                 this.Changed?.Invoke(this);
             }
+        }
+
+        public SourceData ToSourceData()
+            => new SourceData()
+            {
+                Source = Source,
+                ReferencedDocument = RefDocumentSource,
+                CustomPropertyName = Source == Source_e.CustomProperty ? Argument : "",
+                PdmWeb2Server = Source == Source_e.PdmWeb2Url ? Argument : "",
+                CustomValue = Source == Source_e.Custom ? Argument : ""
+            };
+
+        public void Fill(SourceData srcData, IXObject pict)
+        {
+            var arg = "";
+            switch (srcData.Source)
+            {
+                case Source_e.CustomProperty:
+                    arg = srcData.CustomPropertyName;
+                    break;
+
+                case Source_e.PdmWeb2Url:
+                    arg = srcData.PdmWeb2Server;
+                    break;
+
+                case Source_e.Custom:
+                    arg = srcData.CustomValue;
+                    break;
+            }
+
+            Picture = pict;
+            Source = srcData.Source;
+            RefDocumentSource = srcData.ReferencedDocument;
+            Argument = arg;
         }
     }
 }

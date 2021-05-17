@@ -1,4 +1,11 @@
-﻿using QRCoder;
+﻿//*********************************************************************
+//CAD+ Toolset
+//Copyright(C) 2020 Xarial Pty Limited
+//Product URL: https://cadplus.xarial.com
+//License: https://cadplus.xarial.com/license/
+//*********************************************************************
+
+using QRCoder;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
 using System;
@@ -101,19 +108,9 @@ namespace Xarial.CadPlus.Drawing.Services
             centerPt = new Point(x + offsetX * offsetXDir * scale, y + offsetY * offsetYDir * scale, 0);
         }
 
-        public void Update(IXObject pict, IXDrawing drw) 
+        public IXObject Update(IXObject pict, SourceData data, IXDrawing drw) 
         {
-            var handler = m_App.Documents.GetHandler<QrCodeDrawingHandler>(drw);
-            var qrCode = handler.QrCodes.FirstOrDefault(d => d.Picture.Equals(pict));
-
-            if (qrCode == null)
-            {
-                throw new UserException("This picture does not contain QR code data");
-            }
-
             var skPict = (ISketchPicture)((ISwObject)pict).Dispatch;
-
-            var data = GetSourceData(qrCode);
 
             double width = -1;
             double height = -1;
@@ -131,7 +128,7 @@ namespace Xarial.CadPlus.Drawing.Services
                 {
                     if (((ISwDrawing)drw).Model.Extension.DeleteSelection2((int)swDeleteSelectionOptions_e.swDelete_Absorbed))
                     {
-                        qrCode.Picture = InsertAt(drw, data, width, height, x, y);
+                        return InsertAt(drw, data, width, height, x, y);
                     }
                     else
                     {
@@ -147,18 +144,6 @@ namespace Xarial.CadPlus.Drawing.Services
             {
                 (drw as ISwDrawing).Model.IActiveView.EnableGraphicsUpdate = true;
             }
-        }
-
-        private SourceData GetSourceData(QrCodeData data) 
-        {
-            return new SourceData()
-            {
-                Source = data.Source,
-                ReferencedDocument = data.RefDocumentSource,
-                CustomPropertyName = data.Source == Source_e.CustomProperty ? data.Argument : "",
-                PdmWeb2Server = data.Source == Source_e.PdmWeb2Url ? data.Argument : "",
-                CustomValue = data.Source == Source_e.Custom ? data.Argument : ""
-            };
         }
 
         private IXObject InsertAt(IXDrawing drw, SourceData data, double width, double height, double origX, double origY)

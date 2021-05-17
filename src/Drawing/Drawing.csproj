@@ -87,10 +87,15 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Data\Dock_e.cs" />
+    <Compile Include="Data\EditQrCodeData.cs" />
+    <Compile Include="Data\LocationData.cs" />
     <Compile Include="Data\QrCodeData.cs" />
+    <Compile Include="Data\SourceData.cs" />
     <Compile Include="Data\Source_e.cs" />
     <Compile Include="DrawingModule.cs" />
-    <Compile Include="InsertQrCodeData.cs" />
+    <Compile Include="Data\InsertQrCodeData.cs" />
+    <Compile Include="Features\EditQrCodeFeature.cs" />
+    <Compile Include="Features\InsertQrCodeFeature.cs" />
     <Compile Include="OpenGL.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
@@ -142,6 +147,18 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\drawing-vector.svg" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\qr-code-edit.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\qr-code-edit-vector.svg" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\qr-code-update.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\qr-code-update-vector.svg" />
   </ItemGroup>
   <Import Project="$(SolutionDir)common\common.module.props" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
