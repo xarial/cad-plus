@@ -52,7 +52,7 @@ namespace Xarial.CadPlus.Drawing.Services
         private int OnBufferSwapNotify()
         {
             m_QrCodeMgr.CalculateLocation(m_Drw, m_Dock, m_Size, m_OffsetX, m_OffsetY, out Point centerPt, out double scale);
-            RenderQrCodeTemplate(centerPt, m_Size * scale);
+            RenderQrCodeTemplate(centerPt, m_Size);
             return 0;
         }
 

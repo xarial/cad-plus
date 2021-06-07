@@ -46,10 +46,10 @@ namespace Xarial.CadPlus.Drawing.Services
                 location.OffsetY,
                 out Point centerPt, out double scale);
 
-            var x = centerPt.X / scale - location.Size / 2;
-            var y = centerPt.Y / scale - location.Size / 2;
+            var x = (centerPt.X - location.Size / 2) / scale;
+            var y = (centerPt.Y - location.Size / 2) / scale;
 
-            return InsertAt(drw, data, location.Size, location.Size, x, y);
+            return InsertAt(drw, data, location.Size / scale, location.Size / scale, x, y);
         }
 
         public void CalculateLocation(IXDrawing drawing, Dock_e dock,
@@ -62,9 +62,7 @@ namespace Xarial.CadPlus.Drawing.Services
 
             var sheetPrps = (double[])sheet.GetProperties2();
             scale = sheetPrps[2] / sheetPrps[3];
-
-            size *= scale;
-
+                        
             double x;
             double y;
 
@@ -105,7 +103,7 @@ namespace Xarial.CadPlus.Drawing.Services
                     throw new NotSupportedException();
             }
 
-            centerPt = new Point(x + offsetX * offsetXDir * scale, y + offsetY * offsetYDir * scale, 0);
+            centerPt = new Point(x + offsetX * offsetXDir, y + offsetY * offsetYDir, 0);
         }
 
         public IXObject Update(IXObject pict, SourceData data, IXDrawing drw) 
