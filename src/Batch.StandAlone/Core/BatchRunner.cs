@@ -1,6 +1,6 @@
 ﻿//*********************************************************************
 //CAD+ Toolset
-//Copyright(C) 2020 Xarial Pty Limited
+//Copyright(C) 2021 Xarial Pty Limited
 //Product URL: https://cadplus.xarial.com
 //License: https://cadplus.xarial.com/license/
 //*********************************************************************
@@ -446,10 +446,18 @@ namespace Xarial.CadPlus.Batch.Base.Core
             try
             {
                 context.CurrentMacro.Status = JobItemStatus_e.InProgress;
-                
+
+                IXDocument macroDoc = null;
+
+                if (!string.IsNullOrEmpty(context.CurrentMacro.Macro.Arguments)
+                    || context.Job.OpenFileOptions.HasFlag(OpenFileOptions_e.Invisible))
+                {
+                    macroDoc = context.CurrentDocument;
+                }
+
                 m_MacroRunnerSvc.RunMacro(context.CurrentApplication, context.CurrentMacro.FilePath, null,
                     XCad.Enums.MacroRunOptions_e.UnloadAfterRun,
-                    context.CurrentMacro.Macro.Arguments, context.CurrentDocument);
+                    context.CurrentMacro.Macro.Arguments, macroDoc);
 
                 context.CurrentMacro.Status = JobItemStatus_e.Succeeded;
             }
