@@ -1,6 +1,6 @@
 ﻿//*********************************************************************
 //CAD+ Toolset
-//Copyright(C) 2020 Xarial Pty Limited
+//Copyright(C) 2021 Xarial Pty Limited
 //Product URL: https://cadplus.xarial.com
 //License: https://cadplus.xarial.com/license/
 //*********************************************************************
@@ -13,6 +13,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Xarial.CadPlus.Batch.Base.Converters;
 using Xarial.CadPlus.Batch.Base.ViewModels;
+using Xarial.CadPlus.Plus.Exceptions;
 using Xarial.XToolkit.Reporting;
 using Xarial.XToolkit.Wpf.Utils;
 
@@ -35,28 +36,35 @@ namespace Xarial.CadPlus.Batch.Base.Services
 
         public void Export(string name, JobResultSummaryVM summary, string filePath)
         {
-            using (var workbook = new XLWorkbook())
+            try
             {
-                var worksheet = workbook.Worksheets.Add(name);
-
-                WriteHeader(worksheet, summary.JobItemFiles.FirstOrDefault());
-
-                var nextRow = 2;
-
-                foreach (var item in summary.JobItemFiles) 
+                using (var workbook = new XLWorkbook())
                 {
-                    WriteItem(worksheet, item, ref nextRow);
-                    nextRow++;
+                    var worksheet = workbook.Worksheets.Add(name);
+
+                    WriteHeader(worksheet, summary.JobItemFiles.FirstOrDefault());
+
+                    var nextRow = 2;
+
+                    foreach (var item in summary.JobItemFiles)
+                    {
+                        WriteItem(worksheet, item, ref nextRow);
+                        nextRow++;
+                    }
+
+                    var range = worksheet.Range(worksheet.FirstCellUsed().Address, worksheet.LastCellUsed().Address);
+
+                    var table = range.CreateTable("Results");
+                    table.ShowHeaderRow = true;
+
+                    worksheet.Columns().AdjustToContents();
+
+                    workbook.SaveAs(filePath);
                 }
-                
-                var range = worksheet.Range(worksheet.FirstCellUsed().Address, worksheet.LastCellUsed().Address);
-
-                var table = range.CreateTable("Results");
-                table.ShowHeaderRow = true;
-
-                worksheet.Columns().AdjustToContents();
-
-                workbook.SaveAs(filePath);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                throw new UserException(ex.Message, ex);
             }
         }
 

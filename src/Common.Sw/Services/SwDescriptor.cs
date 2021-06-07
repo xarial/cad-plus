@@ -1,6 +1,6 @@
 ﻿//*********************************************************************
 //CAD+ Toolset
-//Copyright(C) 2020 Xarial Pty Limited
+//Copyright(C) 2021 Xarial Pty Limited
 //Product URL: https://cadplus.xarial.com
 //License: https://cadplus.xarial.com/license/
 //*********************************************************************
@@ -32,9 +32,9 @@ namespace Xarial.CadPlus.Common.Sw.Services
         public Image SheetIcon => Resources.sheet_icon;
         public Image CutListIcon => Resources.cutlist_icon;
 
-        public FileTypeFilter PartFileFilter => new FileTypeFilter("SOLIDWORKS Parts", "*.sldprt");
-        public FileTypeFilter AssemblyFileFilter => new FileTypeFilter("SOLIDWORKS Assemblies", "*.sldasm");
-        public FileTypeFilter DrawingFileFilter => new FileTypeFilter("SOLIDWORKS Drawings", "*.slddrw");
+        public FileTypeFilter PartFileFilter => new FileTypeFilter("SOLIDWORKS Parts", "*.sldprt", "*.sldlfp", "*.sldblk", "*.prtdot");
+        public FileTypeFilter AssemblyFileFilter => new FileTypeFilter("SOLIDWORKS Assemblies", "*.sldasm", "*.asmdot");
+        public FileTypeFilter DrawingFileFilter => new FileTypeFilter("SOLIDWORKS Drawings", "*.slddrw", "*.drwdot");
 
         public FileTypeFilter[] MacroFileFilters => new FileTypeFilter[]
         {

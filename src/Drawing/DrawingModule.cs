@@ -1,6 +1,6 @@
 ﻿//*********************************************************************
 //CAD+ Toolset
-//Copyright(C) 2020 Xarial Pty Limited
+//Copyright(C) 2021 Xarial Pty Limited
 //Product URL: https://cadplus.xarial.com
 //License: https://cadplus.xarial.com/license/
 //*********************************************************************
@@ -56,14 +56,22 @@ namespace Xarial.CadPlus.Drawing
     public enum PictureContextMenuCommands_e 
     {
         [Title("Edit")]
+        [Description("Edits the QR code data of this QR code feature")]
         [CommandItemInfo(WorkspaceTypes_e.Drawing)]
         [IconEx(typeof(Resources), nameof(Resources.qr_code_edit_vector), nameof(Resources.qr_code_edit))]
         EditQrCode,
 
-        [Title("Update")]
+        [Title("Update In Place")]
+        [Description("Updates QR code in the current location")]
+        [CommandItemInfo(WorkspaceTypes_e.Drawing)]
+        [IconEx(typeof(Resources), nameof(Resources.qr_code_update_in_place_vector), nameof(Resources.qr_code_update_in_place))]
+        UpdateQrCodeInPlace,
+
+        [Title("Reload")]
+        [Description("Reloads QR code and updates the location and size")]
         [CommandItemInfo(WorkspaceTypes_e.Drawing)]
         [IconEx(typeof(Resources), nameof(Resources.qr_code_update_vector), nameof(Resources.qr_code_update))]
-        UpdateQrCode
+        Reload
     }
 
     //TODO: remove the dependency on application once the common APIs are used
@@ -72,12 +80,9 @@ namespace Xarial.CadPlus.Drawing
     {
         private IHostExtension m_Host;
 
-        private IXPropertyPage<EditQrCodeData> m_EditQrCodePage;
-
         private IInsertQrCodeFeature m_InsertQrCodeFeature;
         private IEditQrCodeFeature m_EditQrCodeFeature;
 
-        private ISettingsProvider m_SettsProvider;
         private IServiceProvider m_SvcProvider;
 
         private IXLogger m_Logger;
@@ -108,8 +113,6 @@ namespace Xarial.CadPlus.Drawing
             m_InsertQrCodeFeature = new InsertQrCodeFeature(m_Host.Extension, m_MsgSvc, m_Logger);
             m_EditQrCodeFeature = new EditQrCodeFeature(m_Host.Extension, m_MsgSvc, m_Logger);
 
-            m_SettsProvider = m_SvcProvider.GetService<ISettingsProvider>();
-
             m_Host.Extension.Application.Documents.RegisterHandler(() => new QrCodeDrawingHandler(m_Logger));
         }
 
@@ -137,11 +140,19 @@ namespace Xarial.CadPlus.Drawing
                         }
                         break;
 
-                    case PictureContextMenuCommands_e.UpdateQrCode:
+                    case PictureContextMenuCommands_e.UpdateQrCodeInPlace:
                         {
                             var drw = (ISwDrawing)m_Host.Extension.Application.Documents.Active;
                             var pict = GetSelectedPicture(drw);
-                            m_EditQrCodeFeature.Update(pict, drw);
+                            m_EditQrCodeFeature.UpdateInPlace(pict, drw);
+                        }
+                        break;
+
+                    case PictureContextMenuCommands_e.Reload:
+                        {
+                            var drw = (ISwDrawing)m_Host.Extension.Application.Documents.Active;
+                            var pict = GetSelectedPicture(drw);
+                            m_EditQrCodeFeature.Reload(pict, drw);
                         }
                         break;
                 }
