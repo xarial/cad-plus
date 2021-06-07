@@ -29,9 +29,9 @@ namespace Xarial.CadPlus.Drawing.Services
         private double m_OffsetX;
         private double m_OffsetY;
 
-        private readonly QrCodeManager m_QrCodeMgr;
+        private readonly QrCodePictureManager m_QrCodeMgr;
 
-        public QrCodePreviewer(IXDrawing drw, QrCodeManager qrCodeMgr)
+        public QrCodePreviewer(IXDrawing drw, QrCodePictureManager qrCodeMgr)
         {
             m_Drw = drw;
             m_QrCodeMgr = qrCodeMgr;

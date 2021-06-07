@@ -87,13 +87,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Data\Dock_e.cs" />
-    <Compile Include="Data\EditQrCodeData.cs" />
     <Compile Include="Data\LocationData.cs" />
-    <Compile Include="Data\QrCodeData.cs" />
+    <Compile Include="Data\QrCodeInfo.cs" />
     <Compile Include="Data\SourceData.cs" />
     <Compile Include="Data\Source_e.cs" />
     <Compile Include="DrawingModule.cs" />
-    <Compile Include="Data\InsertQrCodeData.cs" />
+    <Compile Include="Data\QrCodeData.cs" />
     <Compile Include="Features\EditQrCodeFeature.cs" />
     <Compile Include="Features\InsertQrCodeFeature.cs" />
     <Compile Include="OpenGL.cs" />
@@ -104,7 +103,7 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="QrCodeDrawingHandler.cs" />
-    <Compile Include="Services\QrCodeManager.cs" />
+    <Compile Include="Services\QrCodePictureManager.cs" />
     <Compile Include="Services\QrCodePreviewer.cs" />
     <Compile Include="Services\QrDataProvider.cs" />
   </ItemGroup>

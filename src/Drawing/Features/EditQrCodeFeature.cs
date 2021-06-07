@@ -5,6 +5,8 @@
 //License: https://cadplus.xarial.com/license/
 //*********************************************************************
 
+using SolidWorks.Interop.sldworks;
+using SolidWorks.Interop.swconst;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,21 +31,22 @@ namespace Xarial.CadPlus.Drawing.Features
 {
     public interface IEditQrCodeFeature : IDisposable
     {
-        void Update(ISwObject pict, ISwDrawing drw);
+        void UpdateInPlace(ISwObject pict, ISwDrawing drw);
+        void Reload(ISwObject pict, ISwDrawing drw);
         void Edit(ISwObject pict, ISwDrawing drw);
     }
 
     public class EditQrCodeFeature : IEditQrCodeFeature
     {
-        private readonly IXPropertyPage<EditQrCodeData> m_EditQrCodePage;
+        private readonly IXPropertyPage<QrCodeData> m_EditQrCodePage;
         private readonly QrDataProvider m_QrDataProvider;
-        private readonly QrCodeManager m_QrCodeManager;
+        private readonly QrCodePictureManager m_QrCodeManager;
 
-        private readonly EditQrCodeData m_CurEditQrCodePageData;
+        private QrCodeData m_CurEditQrCodePageData;
 
         private IXDrawing m_CurDrawing;
         private ISwObject m_CurPict;
-        private QrCodeData m_CurrentData;
+        private QrCodeInfo m_CurrentData;
 
         private readonly IXApplication m_App;
 
@@ -56,12 +59,12 @@ namespace Xarial.CadPlus.Drawing.Features
             m_MsgSvc = msgSvc;
             m_Logger = logger;
 
-            m_EditQrCodePage = ext.CreatePage<EditQrCodeData>();
+            m_EditQrCodePage = ext.CreatePage<QrCodeData>();
 
-            m_CurEditQrCodePageData = new EditQrCodeData();
+            m_CurEditQrCodePageData = new QrCodeData();
 
             m_QrDataProvider = new QrDataProvider(m_App);
-            m_QrCodeManager = new QrCodeManager(m_App, m_QrDataProvider);
+            m_QrCodeManager = new QrCodePictureManager(m_App, m_QrDataProvider);
 
             m_EditQrCodePage.Closed += OnEditQrCodePageClosed;
             m_EditQrCodePage.Closing += OnEditQrCodePageClosing;
@@ -93,8 +96,9 @@ namespace Xarial.CadPlus.Drawing.Features
             {
                 try
                 {
-                    var pict = m_QrCodeManager.Update(m_CurPict, m_CurEditQrCodePageData.Source, m_CurDrawing);
-                    m_CurrentData.Fill(m_CurEditQrCodePageData.Source, pict);
+                    //TODO: delete 
+                    var pict = m_QrCodeManager.Insert(m_CurDrawing, m_CurEditQrCodePageData.Location, m_CurEditQrCodePageData.Source);
+                    m_CurrentData.Fill(m_CurEditQrCodePageData, pict);
                 }
                 catch (Exception ex)
                 {
@@ -102,27 +106,42 @@ namespace Xarial.CadPlus.Drawing.Features
                     m_MsgSvc.ShowError(ex);
                 }
             }
+            else if(reason == PageCloseReasons_e.Cancel)
+            {
+                HidePicture(m_CurPict, false);
+            }
         }
 
         public void Edit(ISwObject pict, ISwDrawing drw)
         {
             m_CurPict = pict;
             m_CurDrawing = drw;
-            m_CurrentData = FindData(pict, drw);
+            m_CurrentData = FindInfo(pict, drw);
 
-            m_CurEditQrCodePageData.Source = m_CurrentData.ToSourceData();
+            m_CurEditQrCodePageData = m_CurrentData.ToData();
+
+            HidePicture(m_CurPict, true);
 
             m_EditQrCodePage.Show(m_CurEditQrCodePageData);
         }
 
-        public void Update(ISwObject pict, ISwDrawing drw)
+        public void Reload(ISwObject pict, ISwDrawing drw)
         {
-            var data = FindData(pict, drw);
+            var info = FindInfo(pict, drw);
 
-            data.Picture = m_QrCodeManager.Update(pict, data.ToSourceData(), drw);
+            var data = info.ToData();
+
+            info.Picture = m_QrCodeManager.Reload(pict, data.Location, data.Source, drw);
         }
 
-        private QrCodeData FindData(ISwObject pict, ISwDrawing drw) 
+        public void UpdateInPlace(ISwObject pict, ISwDrawing drw)
+        {
+            var data = FindInfo(pict, drw);
+
+            data.Picture = m_QrCodeManager.UpdateInPlace(pict, data.ToData().Source, drw);
+        }
+
+        private QrCodeInfo FindInfo(ISwObject pict, ISwDrawing drw) 
         {
             var handler = m_App.Documents.GetHandler<QrCodeDrawingHandler>(drw);
             var qrCode = handler.QrCodes.FirstOrDefault(d => d.Picture.Equals(pict));
@@ -133,6 +152,34 @@ namespace Xarial.CadPlus.Drawing.Features
             }
 
             return qrCode;
+        }
+
+        private Tuple<int, double, int, double> m_CurPictTrans;
+
+        private void HidePicture(ISwObject pict, bool hide)
+        {
+            var skPict = (ISketchPicture)pict.Dispatch;
+
+            if (hide)
+            {
+                int style = -1;
+                double trans = -1;
+                int matchColor = -1;
+                double matchTol = -1;
+                
+                skPict.GetTransparency(ref style, ref trans, ref matchColor, ref matchTol);
+                m_CurPictTrans = new Tuple<int, double, int, double>(style, trans, matchColor, matchTol);
+
+                const int TRANSPARENT = 1;
+                const int COLOR_IGNORE = 0;
+                const int COLOR_EXACT_MATCH = 0;
+                skPict.SetTransparency((int)swSketchPictureTransparencyStyle_e.swSketchPictureTransparencyFullImage,
+                    TRANSPARENT, COLOR_IGNORE, COLOR_EXACT_MATCH);
+            }
+            else 
+            {
+                skPict.SetTransparency(m_CurPictTrans.Item1, m_CurPictTrans.Item2, m_CurPictTrans.Item3, m_CurPictTrans.Item4);
+            }
         }
 
         public void Dispose()
