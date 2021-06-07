@@ -64,7 +64,7 @@ namespace Xarial.CadPlus.Drawing
         [Title("Update In Place")]
         [Description("Updates QR code in the current location")]
         [CommandItemInfo(WorkspaceTypes_e.Drawing)]
-        [IconEx(typeof(Resources), nameof(Resources.qr_code_update_vector), nameof(Resources.qr_code_update))]
+        [IconEx(typeof(Resources), nameof(Resources.qr_code_update_in_place_vector), nameof(Resources.qr_code_update_in_place))]
         UpdateQrCodeInPlace,
 
         [Title("Reload")]

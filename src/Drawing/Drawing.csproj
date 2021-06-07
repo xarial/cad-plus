@@ -159,6 +159,12 @@
   <ItemGroup>
     <None Include="Resources\qr-code-update-vector.svg" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\qr-code-update-in-place.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\qr-code-update-in-place-vector.svg" />
+  </ItemGroup>
   <Import Project="$(SolutionDir)common\common.module.props" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\..\packages\Xarial.XCad.SolidWorks.0.7.1-20210606.3\build\Xarial.XCad.SolidWorks.targets" Condition="Exists('..\..\packages\Xarial.XCad.SolidWorks.0.7.1-20210606.3\build\Xarial.XCad.SolidWorks.targets')" />

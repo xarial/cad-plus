@@ -36,93 +36,44 @@ namespace Xarial.CadPlus.Drawing.Features
         void Edit(ISwObject pict, ISwDrawing drw);
     }
 
-    public class EditQrCodeFeature : IEditQrCodeFeature
+    public class EditQrCodeFeature : InsertQrCodeFeature, IEditQrCodeFeature
     {
-        private readonly IXPropertyPage<QrCodeData> m_EditQrCodePage;
-        private readonly QrDataProvider m_QrDataProvider;
-        private readonly QrCodePictureManager m_QrCodeManager;
-
-        private QrCodeData m_CurEditQrCodePageData;
-
-        private IXDrawing m_CurDrawing;
         private ISwObject m_CurPict;
-        private QrCodeInfo m_CurrentData;
+        private QrCodeInfo m_CurInfo;
 
-        private readonly IXApplication m_App;
-
-        private readonly IMessageService m_MsgSvc;
-        private readonly IXLogger m_Logger;
+        private Tuple<int, double, int, double> m_CurPictTrans;
 
         public EditQrCodeFeature(IXExtension ext, IMessageService msgSvc, IXLogger logger) 
+            : base(ext, msgSvc, logger)
         {
-            m_App = ext.Application;
-            m_MsgSvc = msgSvc;
-            m_Logger = logger;
+        }
+        
+        protected override void OnInsertQrCode()
+        {
+            var pict = m_QrCodeManager.Reload(m_CurPict,
+                m_CurInsertQrCodePageData.Location,
+                m_CurInsertQrCodePageData.Source,
+                m_CurDrawing);
 
-            m_EditQrCodePage = ext.CreatePage<QrCodeData>();
-
-            m_CurEditQrCodePageData = new QrCodeData();
-
-            m_QrDataProvider = new QrDataProvider(m_App);
-            m_QrCodeManager = new QrCodePictureManager(m_App, m_QrDataProvider);
-
-            m_EditQrCodePage.Closed += OnEditQrCodePageClosed;
-            m_EditQrCodePage.Closing += OnEditQrCodePageClosing;
+            m_CurInfo.Fill(m_CurInsertQrCodePageData, pict);
         }
 
-        private void OnEditQrCodePageClosing(PageCloseReasons_e reason, PageClosingArg arg)
+        protected override void OnCancelInsertQrCode()
         {
-            if (reason == PageCloseReasons_e.Okay)
-            {
-                try
-                {
-                    if (string.IsNullOrEmpty(m_QrDataProvider.GetData(m_CurDrawing, m_CurEditQrCodePageData.Source)))
-                    {
-                        throw new UserException("Data for QR code is empty");
-                    }
-                }
-                catch (Exception ex)
-                {
-                    m_Logger.Log(ex);
-                    arg.Cancel = true;
-                    arg.ErrorMessage = ex.ParseUserError(out _);
-                }
-            }
-        }
-
-        private void OnEditQrCodePageClosed(PageCloseReasons_e reason)
-        {
-            if (reason == PageCloseReasons_e.Okay)
-            {
-                try
-                {
-                    //TODO: delete 
-                    var pict = m_QrCodeManager.Insert(m_CurDrawing, m_CurEditQrCodePageData.Location, m_CurEditQrCodePageData.Source);
-                    m_CurrentData.Fill(m_CurEditQrCodePageData, pict);
-                }
-                catch (Exception ex)
-                {
-                    m_Logger.Log(ex);
-                    m_MsgSvc.ShowError(ex);
-                }
-            }
-            else if(reason == PageCloseReasons_e.Cancel)
-            {
-                HidePicture(m_CurPict, false);
-            }
+            base.OnCancelInsertQrCode();
+            HidePicture(m_CurPict, false);
         }
 
         public void Edit(ISwObject pict, ISwDrawing drw)
         {
             m_CurPict = pict;
-            m_CurDrawing = drw;
-            m_CurrentData = FindInfo(pict, drw);
+            m_CurInfo = FindInfo(pict, drw);
 
-            m_CurEditQrCodePageData = m_CurrentData.ToData();
+            m_CurInsertQrCodePageData = m_CurInfo.ToData();
 
             HidePicture(m_CurPict, true);
 
-            m_EditQrCodePage.Show(m_CurEditQrCodePageData);
+            base.Insert(drw);
         }
 
         public void Reload(ISwObject pict, ISwDrawing drw)
@@ -154,8 +105,6 @@ namespace Xarial.CadPlus.Drawing.Features
             return qrCode;
         }
 
-        private Tuple<int, double, int, double> m_CurPictTrans;
-
         private void HidePicture(ISwObject pict, bool hide)
         {
             var skPict = (ISketchPicture)pict.Dispatch;
@@ -180,10 +129,6 @@ namespace Xarial.CadPlus.Drawing.Features
             {
                 skPict.SetTransparency(m_CurPictTrans.Item1, m_CurPictTrans.Item2, m_CurPictTrans.Item3, m_CurPictTrans.Item4);
             }
-        }
-
-        public void Dispose()
-        {
         }
     }
 }

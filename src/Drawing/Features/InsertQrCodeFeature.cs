@@ -34,14 +34,14 @@ namespace Xarial.CadPlus.Drawing.Features
     {
         private readonly IXPropertyPage<QrCodeData> m_InsertQrCodePage;
         private readonly QrDataProvider m_QrDataProvider;
-        private readonly QrCodePictureManager m_QrCodeManager;
+        protected readonly QrCodePictureManager m_QrCodeManager;
 
-        private readonly QrCodeData m_CurInsertQrCodePageData;
+        protected QrCodeData m_CurInsertQrCodePageData;
         private QrCodePreviewer m_CurPreviewer;
 
-        private IXDrawing m_CurDrawing;
+        protected IXDrawing m_CurDrawing;
 
-        private readonly IXApplication m_App;
+        protected readonly IXApplication m_App;
 
         private readonly IMessageService m_MsgSvc;
         private readonly IXLogger m_Logger;
@@ -86,28 +86,41 @@ namespace Xarial.CadPlus.Drawing.Features
 
         private void OnInserQrCodePageClosed(PageCloseReasons_e reason)
         {
-            m_CurPreviewer.Dispose();
-            m_CurPreviewer = null;
-
-            if (reason == PageCloseReasons_e.Okay)
+            try
             {
-                try
+                m_CurPreviewer.Dispose();
+                m_CurPreviewer = null;
+
+                if (reason == PageCloseReasons_e.Okay)
                 {
-                    var pict = m_QrCodeManager.Insert(m_CurDrawing, m_CurInsertQrCodePageData.Location, m_CurInsertQrCodePageData.Source);
-
-                    var data = new QrCodeInfo();
-                    data.Fill(m_CurInsertQrCodePageData, pict);
-
-                    var handler = m_App.Documents.GetHandler<QrCodeDrawingHandler>(m_CurDrawing);
-
-                    handler.QrCodes.Add(data);
+                    OnInsertQrCode();
                 }
-                catch (Exception ex)
+                else if (reason == PageCloseReasons_e.Cancel)
                 {
-                    m_Logger.Log(ex);
-                    m_MsgSvc.ShowError(ex);
+                    OnCancelInsertQrCode();
                 }
             }
+            catch (Exception ex)
+            {
+                m_Logger.Log(ex);
+                m_MsgSvc.ShowError(ex);
+            }
+        }
+
+        protected virtual void OnInsertQrCode() 
+        {
+            var pict = m_QrCodeManager.Insert(m_CurDrawing, m_CurInsertQrCodePageData.Location, m_CurInsertQrCodePageData.Source);
+
+            var data = new QrCodeInfo();
+            data.Fill(m_CurInsertQrCodePageData, pict);
+
+            var handler = m_App.Documents.GetHandler<QrCodeDrawingHandler>(m_CurDrawing);
+
+            handler.QrCodes.Add(data);
+        }
+
+        protected virtual void OnCancelInsertQrCode() 
+        {
         }
 
         public void Insert(IXDrawing drw)
