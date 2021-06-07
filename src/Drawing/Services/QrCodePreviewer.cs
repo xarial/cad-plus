@@ -29,9 +29,9 @@ namespace Xarial.CadPlus.Drawing.Services
         private double m_OffsetX;
         private double m_OffsetY;
 
-        private readonly QrCodeManager m_QrCodeMgr;
+        private readonly QrCodePictureManager m_QrCodeMgr;
 
-        public QrCodePreviewer(IXDrawing drw, QrCodeManager qrCodeMgr)
+        public QrCodePreviewer(IXDrawing drw, QrCodePictureManager qrCodeMgr)
         {
             m_Drw = drw;
             m_QrCodeMgr = qrCodeMgr;
@@ -52,7 +52,7 @@ namespace Xarial.CadPlus.Drawing.Services
         private int OnBufferSwapNotify()
         {
             m_QrCodeMgr.CalculateLocation(m_Drw, m_Dock, m_Size, m_OffsetX, m_OffsetY, out Point centerPt, out double scale);
-            RenderQrCodeTemplate(centerPt, m_Size * scale);
+            RenderQrCodeTemplate(centerPt, m_Size);
             return 0;
         }
 

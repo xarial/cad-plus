@@ -171,6 +171,26 @@ namespace Xarial.CadPlus.Drawing.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap qr_code_update_in_place {
+            get {
+                object obj = ResourceManager.GetObject("qr_code_update_in_place", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] qr_code_update_in_place_vector {
+            get {
+                object obj = ResourceManager.GetObject("qr_code_update_in_place_vector", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
         internal static byte[] qr_code_update_vector {

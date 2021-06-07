@@ -109,11 +109,11 @@ namespace Xarial.CadPlus.Drawing
     {
         private const string STREAM_NAME = "_Xarial_CadPlus_QRCodeData_";
 
-        public ObservableCollection<QrCodeData> QrCodes => m_QrCodesLazy.Value;
+        public ObservableCollection<QrCodeInfo> QrCodes => m_QrCodesLazy.Value;
 
         private bool m_HasChanges;
 
-        private Lazy<ObservableCollection<QrCodeData>> m_QrCodesLazy;
+        private Lazy<ObservableCollection<QrCodeInfo>> m_QrCodesLazy;
         private IXDrawing m_Drawing;
 
         private readonly IXLogger m_Logger;
@@ -133,13 +133,13 @@ namespace Xarial.CadPlus.Drawing
             {
                 m_Drawing = (IXDrawing)model;
                 m_Drawing.StreamWriteAvailable += OnStreamWriteAvailable;
-                m_QrCodesLazy = new Lazy<ObservableCollection<QrCodeData>>(ReadQrCodeData);
+                m_QrCodesLazy = new Lazy<ObservableCollection<QrCodeInfo>>(ReadQrCodeData);
             }
         }
 
-        private ObservableCollection<QrCodeData> ReadQrCodeData()
+        private ObservableCollection<QrCodeInfo> ReadQrCodeData()
         {
-            ObservableCollection<QrCodeData> data = null;
+            ObservableCollection<QrCodeInfo> data = null;
 
             try
             {
@@ -151,7 +151,7 @@ namespace Xarial.CadPlus.Drawing
 
                         using (var reader = new StreamReader(stream))
                         {
-                            data = m_Serializer.ReadSettings<ObservableCollection<QrCodeData>>(
+                            data = m_Serializer.ReadSettings<ObservableCollection<QrCodeInfo>>(
                                 reader, new SelObjectValueSerializer(m_Logger, m_Drawing));
                         }
                     }
@@ -175,7 +175,7 @@ namespace Xarial.CadPlus.Drawing
             }
             else 
             {
-                data = new ObservableCollection<QrCodeData>();
+                data = new ObservableCollection<QrCodeInfo>();
             }
 
             data.CollectionChanged += OnDataCollectionChanged;
@@ -188,10 +188,10 @@ namespace Xarial.CadPlus.Drawing
         private void OnDataCollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
             m_HasChanges = true;
-            Init((IEnumerable<QrCodeData>)sender);
+            Init((IEnumerable<QrCodeInfo>)sender);
         }
 
-        private void Init(IEnumerable<QrCodeData> qrCodes)
+        private void Init(IEnumerable<QrCodeInfo> qrCodes)
         {
             foreach (var qrCode in qrCodes)
             {
@@ -226,7 +226,7 @@ namespace Xarial.CadPlus.Drawing
             }
         }
 
-        private void OnQrCodeChanged(QrCodeData qrCode)
+        private void OnQrCodeChanged(QrCodeInfo qrCode)
         {
             m_HasChanges = true;
         }

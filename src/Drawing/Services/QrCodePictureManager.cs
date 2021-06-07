@@ -26,13 +26,34 @@ using Xarial.XCad.SolidWorks.Features;
 
 namespace Xarial.CadPlus.Drawing.Services
 {
-    public class QrCodeManager
+    public class QrCodePictureManager
     {
+        private class ViewFreeze : IDisposable
+        {
+            private readonly IModelDoc2 m_Model;
+
+            internal ViewFreeze(IXDocument doc)
+            {
+                m_Model = ((ISwDocument)doc).Model;
+
+                m_Model.FeatureManager.EnableFeatureTree = false;
+                m_Model.FeatureManager.EnableFeatureTreeWindow = false;
+                m_Model.IActiveView.EnableGraphicsUpdate = false;
+            }
+
+            public void Dispose()
+            {
+                m_Model.FeatureManager.EnableFeatureTree = true;
+                m_Model.FeatureManager.EnableFeatureTreeWindow = true;
+                m_Model.IActiveView.EnableGraphicsUpdate = true;
+            }
+        }
+
         private readonly IXApplication m_App;
         private readonly QrDataProvider m_QrCodeProvider;
         private readonly QRCodeGenerator m_QrGenerator;
 
-        public QrCodeManager(IXApplication app, QrDataProvider dataProvider) 
+        public QrCodePictureManager(IXApplication app, QrDataProvider dataProvider) 
         {
             m_App = app;
             m_QrCodeProvider = dataProvider;
@@ -41,15 +62,39 @@ namespace Xarial.CadPlus.Drawing.Services
 
         public IXObject Insert(IXDrawing drw, LocationData location, SourceData data)
         {
-            CalculateLocation(drw, location.Dock,
-                location.Size, location.OffsetX,
-                location.OffsetY,
-                out Point centerPt, out double scale);
+            using (var freeze = new ViewFreeze(drw))
+            {
+                return CalculateLocationAndInsert(drw, location, data);
+            }
+        }
 
-            var x = centerPt.X / scale - location.Size / 2;
-            var y = centerPt.Y / scale - location.Size / 2;
+        public IXObject Reload(IXObject pict, LocationData location, SourceData data, IXDrawing drw) 
+        {
+            using (var freeze = new ViewFreeze(drw)) 
+            {
+                DeletePicture(pict, drw);
+                return CalculateLocationAndInsert(drw, location, data);
+            }
+        }
 
-            return InsertAt(drw, data, location.Size, location.Size, x, y);
+        public IXObject UpdateInPlace(IXObject pict, SourceData data, IXDrawing drw) 
+        {   
+            var skPict = (ISketchPicture)((ISwObject)pict).Dispatch;
+            
+            double width = -1;
+            double height = -1;
+            double x = -1;
+            double y = -1;
+
+            skPict.GetSize(ref width, ref height);
+            skPict.GetOrigin(ref x, ref y);
+
+            using (var freeze = new ViewFreeze(drw)) 
+            {
+                DeletePicture(pict, drw);
+
+                return InsertAt(drw, data, width, height, x, y);
+            }
         }
 
         public void CalculateLocation(IXDrawing drawing, Dock_e dock,
@@ -62,8 +107,6 @@ namespace Xarial.CadPlus.Drawing.Services
 
             var sheetPrps = (double[])sheet.GetProperties2();
             scale = sheetPrps[2] / sheetPrps[3];
-
-            size *= scale;
 
             double x;
             double y;
@@ -105,63 +148,47 @@ namespace Xarial.CadPlus.Drawing.Services
                     throw new NotSupportedException();
             }
 
-            centerPt = new Point(x + offsetX * offsetXDir * scale, y + offsetY * offsetYDir * scale, 0);
+            centerPt = new Point(x + offsetX * offsetXDir, y + offsetY * offsetYDir, 0);
         }
 
-        public IXObject Update(IXObject pict, SourceData data, IXDrawing drw) 
+        private void DeletePicture(IXObject pict, IXDocument doc)
         {
             var skPict = (ISketchPicture)((ISwObject)pict).Dispatch;
-
-            double width = -1;
-            double height = -1;
-            double x = -1;
-            double y = -1;
-
-            skPict.GetSize(ref width, ref height);
-            skPict.GetOrigin(ref x, ref y);
-
-            (drw as ISwDrawing).Model.FeatureManager.EnableFeatureTree = false;
-            (drw as ISwDrawing).Model.FeatureManager.EnableFeatureTreeWindow = false;
-            (drw as ISwDrawing).Model.IActiveView.EnableGraphicsUpdate = false;
-
-            try
+            
+            if (skPict.GetFeature().Select2(false, -1))
             {
-                if (skPict.GetFeature().Select2(false, -1))
+                if (!((ISwDocument)doc).Model.Extension.DeleteSelection2((int)swDeleteSelectionOptions_e.swDelete_Absorbed))
                 {
-                    if (((ISwDrawing)drw).Model.Extension.DeleteSelection2((int)swDeleteSelectionOptions_e.swDelete_Absorbed))
-                    {
-                        return InsertAt(drw, data, width, height, x, y);
-                    }
-                    else
-                    {
-                        throw new UserException("Failed to update QR code", new Exception("Failed to remove sketch picture"));
-                    }
-                }
-                else
-                {
-                    throw new UserException("Failed to update QR code", new Exception("Failed to select sketch picture"));
+                    throw new UserException("Failed to update QR code", new Exception("Failed to remove sketch picture"));
                 }
             }
-            finally 
+            else
             {
-                (drw as ISwDrawing).Model.FeatureManager.EnableFeatureTree = true;
-                (drw as ISwDrawing).Model.FeatureManager.EnableFeatureTreeWindow = true;
-                (drw as ISwDrawing).Model.IActiveView.EnableGraphicsUpdate = true;
+                throw new UserException("Failed to update QR code", new Exception("Failed to select sketch picture"));
             }
+        }
+
+        private IXObject CalculateLocationAndInsert(IXDrawing drw, LocationData location, SourceData data)
+        {
+            CalculateLocation(drw, location.Dock,
+                            location.Size, location.OffsetX,
+                            location.OffsetY,
+                            out Point centerPt, out double scale);
+
+            var x = (centerPt.X - location.Size / 2) / scale;
+            var y = (centerPt.Y - location.Size / 2) / scale;
+
+            return InsertAt(drw, data, location.Size / scale, location.Size / scale, x, y);
         }
 
         private IXObject InsertAt(IXDrawing drw, SourceData data, double width, double height, double origX, double origY)
         {
             var tempFileName = "";
 
-            var model = (drw as ISwDrawing).Model;
-
-            model.FeatureManager.EnableFeatureTree = false;
-            model.FeatureManager.EnableFeatureTreeWindow = false;
-            model.IActiveView.EnableGraphicsUpdate = false;
-
             try
             {
+                var model = (drw as ISwDrawing).Model;
+
                 var qrCodeData = m_QrGenerator.CreateQrCode(m_QrCodeProvider.GetData(drw, data),
                     QRCodeGenerator.ECCLevel.Q);
 
@@ -178,7 +205,7 @@ namespace Xarial.CadPlus.Drawing.Services
                     pict.SetOrigin(origX, origY);
                     pict.SetSize(width, height, true);
 
-                    //Picture PMPage stays open after inserting the picture
+                    //picture PMPage stays open after inserting the picture
                     const int swCommands_PmOK = -2;
                     (m_App as ISwApplication).Sw.RunCommand(swCommands_PmOK, "");
 
@@ -191,10 +218,6 @@ namespace Xarial.CadPlus.Drawing.Services
             }
             finally
             {
-                model.FeatureManager.EnableFeatureTree = true;
-                model.FeatureManager.EnableFeatureTreeWindow =true;
-                model.IActiveView.EnableGraphicsUpdate = true;
-
                 if (File.Exists(tempFileName))
                 {
                     try

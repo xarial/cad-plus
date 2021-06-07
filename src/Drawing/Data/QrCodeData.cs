@@ -7,105 +7,34 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Xarial.CadPlus.Drawing.Data;
+using Xarial.CadPlus.Drawing.Properties;
+using Xarial.CadPlus.Plus.Attributes;
 using Xarial.XCad;
-using Xarial.XCad.Features;
-using Xarial.XToolkit.Services.UserSettings;
-using Xarial.XToolkit.Services.UserSettings.Attributes;
+using Xarial.XCad.Base.Attributes;
+using Xarial.XCad.UI.PropertyPage.Attributes;
+using Xarial.XCad.UI.PropertyPage.Base;
+using Xarial.XCad.UI.PropertyPage.Services;
 
 namespace Xarial.CadPlus.Drawing.Data
 {
-    public class QrCodeDataVersionTransformer : BaseUserSettingsVersionsTransformer
-    {
-        public QrCodeDataVersionTransformer()
-        {
-        }
-    }
-
-    [UserSettingVersion("1.0", typeof(QrCodeDataVersionTransformer))]
+    [IconEx(typeof(Resources), nameof(Resources.qrcode_vector), nameof(Resources.qrcode_icon))]
+    [Title("Insert QR Code")]
+    [Help("https://cadplus.xarial.com/drawing/qr-code/")]
     public class QrCodeData
     {
-        public event Action<QrCodeData> Changed;
+        public SourceData Source { get; set; }
 
-        private IXObject m_Picture;
-        private Source_e m_Source;
-        private string m_Argument;
-        private bool m_RefDocumentSource;
+        public LocationData Location { get; set; }
 
-        public IXObject Picture 
+        public QrCodeData() 
         {
-            get => m_Picture;
-            set 
-            {
-                m_Picture = value;
-                this.Changed?.Invoke(this);
-            }
-        }
-
-        public Source_e Source
-        {
-            get => m_Source;
-            set
-            {
-                m_Source = value;
-                this.Changed?.Invoke(this);
-            }
-        }
-
-        public bool RefDocumentSource 
-        {
-            get => m_RefDocumentSource;
-            set 
-            {
-                m_RefDocumentSource = value;
-                this.Changed?.Invoke(this);
-            }
-        }
-
-        public string Argument
-        {
-            get => m_Argument;
-            set
-            {
-                m_Argument = value;
-                this.Changed?.Invoke(this);
-            }
-        }
-
-        public SourceData ToSourceData()
-            => new SourceData()
-            {
-                Source = Source,
-                ReferencedDocument = RefDocumentSource,
-                CustomPropertyName = Source == Source_e.CustomProperty ? Argument : "",
-                PdmWeb2Server = Source == Source_e.PdmWeb2Url ? Argument : "",
-                CustomValue = Source == Source_e.Custom ? Argument : ""
-            };
-
-        public void Fill(SourceData srcData, IXObject pict)
-        {
-            var arg = "";
-            switch (srcData.Source)
-            {
-                case Source_e.CustomProperty:
-                    arg = srcData.CustomPropertyName;
-                    break;
-
-                case Source_e.PdmWeb2Url:
-                    arg = srcData.PdmWeb2Server;
-                    break;
-
-                case Source_e.Custom:
-                    arg = srcData.CustomValue;
-                    break;
-            }
-
-            Picture = pict;
-            Source = srcData.Source;
-            RefDocumentSource = srcData.ReferencedDocument;
-            Argument = arg;
+            Source = new SourceData();
+            Location = new LocationData();
         }
     }
 }
