@@ -116,7 +116,14 @@ namespace Xarial.CadPlus.Common.Services
                 }
                 else 
                 {
-                    xCadMacro.Run(app, doc ?? app.Documents.Active, m_Logger, argsArr);
+                    var macroDoc = doc ?? app.Documents.Active;
+
+                    if (macroDoc is IXUnknownDocument) 
+                    {
+                        macroDoc = ((IXUnknownDocument)macroDoc).GetSpecific();
+                    }
+
+                    xCadMacro.Run(app, macroDoc, m_Logger, argsArr);
                 }
             }
             catch (MacroUserInterruptException) //do not consider this as an error
