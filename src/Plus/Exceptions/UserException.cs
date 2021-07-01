@@ -10,11 +10,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Xarial.XCad.Exceptions;
 using Xarial.XToolkit.Reporting;
 
 namespace Xarial.CadPlus.Plus.Exceptions
 {
-    public class UserException : Exception, IUserMessageException
+    /// <summary>
+    /// Default user friendly exception
+    /// </summary>
+    public class UserException : Exception, IUserMessageException, IUserException
     {
         public UserException(string userMessage) : base(userMessage)
         {
