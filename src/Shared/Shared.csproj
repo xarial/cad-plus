@@ -34,7 +34,7 @@
     <PackageReference Include="CommandLineParser" Version="2.8.0" />
     <PackageReference Include="Fluent.Ribbon" Version="8.0.0" />
     <PackageReference Include="MahApps.Metro" Version="2.2.0" />
-    <PackageReference Include="Xarial.XToolkit.Wpf" Version="0.2.19" />
+    <PackageReference Include="Xarial.XToolkit.Wpf" Version="0.2.20" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Plus\Plus.csproj" />
