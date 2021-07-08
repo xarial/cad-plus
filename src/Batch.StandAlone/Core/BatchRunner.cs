@@ -473,7 +473,11 @@ namespace Xarial.CadPlus.Batch.Base.Core
                 {
                     throw new UserException($"Failed to run macro '{context.CurrentMacro.DisplayName}': {ex.Message}", ex);
                 }
-                else 
+                else if (ex is INoRetryMacroRunException) 
+                {
+                    context.CurrentMacro.Error = ex;
+                }
+                else
                 {
                     throw;
                 }
