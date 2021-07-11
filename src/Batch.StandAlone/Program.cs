@@ -67,9 +67,9 @@ namespace Xarial.CadPlus.Batch.StandAlone
                 using (var batchRunner = m_AppLauncher.Container.Resolve<BatchRunner>(
                     new TypedParameter[]
                     {
-                    new TypedParameter(typeof(BatchJob), args.Job),
-                    new TypedParameter(typeof(TextWriter), Console.Out),
-                    new TypedParameter(typeof(IProgressHandler), new ConsoleProgressWriter())
+                        new TypedParameter(typeof(BatchJob), args.Job),
+                        new TypedParameter(typeof(TextWriter), Console.Out),
+                        new TypedParameter(typeof(IProgressHandler), new ConsoleProgressWriter())
                     }))
                 {
                     await batchRunner.BatchRunAsync().ConfigureAwait(false);
