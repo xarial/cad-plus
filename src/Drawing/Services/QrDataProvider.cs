@@ -52,7 +52,7 @@ namespace Xarial.CadPlus.Drawing.Services
                 
                 if (drwView.ReferencedDocument == null) 
                 {
-                    throw new UserException("View does not have a loded document");
+                    throw new UserException("View does not have a loaded document");
                 }
 
                 doc = (m_App as ISwApplication).Documents[drwView.ReferencedDocument];
@@ -60,36 +60,38 @@ namespace Xarial.CadPlus.Drawing.Services
                 conf = ((IXDocument3D)doc).Configurations[drwView.ReferencedConfiguration];
             }
 
-            IEdmVault5 vault = null;
-            string vaultRelPath = "";
+            IEdmVault5 vault;
 
-            switch (src) 
+            switch (src)
             {
                 case Source_e.FilePath:
                     return doc.Path;
 
                 case Source_e.PartNumber:
-                    if (conf == null) 
+                    if (conf == null)
                     {
                         throw new UserException("Part number can only be extracted from the configuration of part or assembly");
                     }
                     return conf.PartNumber;
 
                 case Source_e.CustomProperty:
-                    IXProperty prp;
+                    IXProperty prp = null;
 
                     if (conf != null)
                     {
                         conf.Properties.TryGet(srcData.CustomPropertyName, out prp);
-                     }
+                    }
 
-                    doc.Properties.TryGet(srcData.CustomPropertyName, out prp);
+                    if (prp == null)
+                    {
+                        doc.Properties.TryGet(srcData.CustomPropertyName, out prp);
+                    }
 
                     if (prp != null)
                     {
                         return prp.Value?.ToString();
                     }
-                    else 
+                    else
                     {
                         throw new UserException("Specified custom property does not exist");
                     }
@@ -101,12 +103,12 @@ namespace Xarial.CadPlus.Drawing.Services
                     return $"conisio://{vault.Name}/{CONISIO_URL_ACTION}?projectid={folder.ID}&documentid={file.ID}&objecttype={(int)file.ObjectType}";
 
                 case Source_e.PdmWeb2Url:
-                    if (string.IsNullOrEmpty(srcData.PdmWeb2Server)) 
+                    if (string.IsNullOrEmpty(srcData.PdmWeb2Server))
                     {
                         throw new UserException("Url of Web2 server is not specified");
                     }
 
-                    vaultRelPath = FindRelativeVaultPath(doc.Path, out vault);
+                    var vaultRelPath = FindRelativeVaultPath(doc.Path, out vault);
                     return $"{srcData.PdmWeb2Server}/{vault.Name}/{Path.GetDirectoryName(vaultRelPath).Replace('\\', '/')}?view=bom&file={Path.GetFileName(vaultRelPath)}";
 
                 case Source_e.Custom:
