@@ -1,4 +1,11 @@
-﻿namespace Xarial.CadPlus.Plus.Bom
+﻿//*********************************************************************
+//CAD+ Toolset
+//Copyright(C) 2021 Xarial Pty Limited
+//Product URL: https://cadplus.xarial.com
+//License: https://cadplus.xarial.com/license/
+//*********************************************************************
+
+namespace Xarial.CadPlus.Plus.Bom
 {
     public enum ValueSource_e
     {
