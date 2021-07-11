@@ -33,6 +33,7 @@ using Xarial.XToolkit.Reporting;
 using Xarial.CadPlus.Batch.StandAlone.Exceptions;
 using Xarial.CadPlus.Common.Utils;
 using Xarial.CadPlus.Plus.Shared.Helpers;
+using Xarial.CadPlus.Plus.Shared.Extensions;
 
 namespace Xarial.CadPlus.Batch.Base.Core
 {
@@ -129,7 +130,7 @@ namespace Xarial.CadPlus.Batch.Base.Core
 
             try
             {
-                await Task.Run(() =>
+                await TaskEx.Run(() =>
                 {
                     m_JournalWriter.WriteLine($"Collecting files for processing");
 
@@ -182,7 +183,7 @@ namespace Xarial.CadPlus.Batch.Base.Core
                             curBatchSize = 0;
                         }
                     }
-                }).ConfigureAwait(false);
+                }, new StaTaskScheduler(m_Logger)).ConfigureAwait(false);
                 jobResult = true;
             }
             catch (OperationCanceledException)
