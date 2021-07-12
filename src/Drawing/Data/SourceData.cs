@@ -42,6 +42,14 @@ namespace Xarial.CadPlus.Drawing.Data
         }
     }
 
+    public class ReferencedDocumentDependencyHandler : IDependencyHandler
+    {
+        public void UpdateState(IXApplication app, IControl source, IControl[] dependencies)
+        {
+            source.Enabled = (Source_e)dependencies.First()?.GetValue() != Source_e.Custom;
+        }
+    }
+
     public class SourceData 
     {
         [IconEx(typeof(Resources), nameof(Resources.source_vector), nameof(Resources.source_icon))]
@@ -63,6 +71,7 @@ namespace Xarial.CadPlus.Drawing.Data
         [Description("Custom value")]
         public string CustomValue { get; set; }
 
+        [DependentOn(typeof(ReferencedDocumentDependencyHandler), nameof(Source))]
         [Title("Refereced Document")]
         [ControlOptions(align: ControlLeftAlign_e.Indent)]
         public bool ReferencedDocument { get; set; }
