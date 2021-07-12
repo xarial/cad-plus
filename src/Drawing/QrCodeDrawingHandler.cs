@@ -26,14 +26,18 @@ using Xarial.XToolkit.Services.UserSettings;
 
 namespace Xarial.CadPlus.Drawing
 {
-    public class SelObjectValueSerializer : IValueSerializer
+    /// <summary>
+    /// Sketch picture object does not provide persist references.
+    /// This serializer provides a workaround and saves the name of the feature (invisible) as a serialized value
+    /// </summary>
+    public class PictureValueSerializer : IValueSerializer
     {
         public Type Type => typeof(IXObject);
 
         private readonly IXLogger m_Logger;
         private readonly IXDrawing m_Draw;
 
-        public SelObjectValueSerializer(IXLogger logger, IXDrawing drw) 
+        public PictureValueSerializer(IXLogger logger, IXDrawing drw) 
         {
             m_Logger = logger;
             m_Draw = drw;
@@ -55,14 +59,6 @@ namespace Xarial.CadPlus.Drawing
                     {
                         throw new Exception("Failed to find the picture");
                     }
-                    //TODO: uncomment when new version of xCAD is released
-
-                    //var buffer = Convert.FromBase64String(val);
-
-                    //using (var stream = new MemoryStream(buffer))
-                    //{
-                    //    return m_Doc.DeserializeObject(stream);
-                    //}
                 }
                 else 
                 {
@@ -84,19 +80,6 @@ namespace Xarial.CadPlus.Drawing
 
                 var skPict = ((ISwObject)obj).Dispatch as ISketchPicture;
                 return skPict.GetFeature().Name;
-
-                //TODO: uncomment when new version of xCAD is released
-
-                //byte[] buffer;
-
-                //using (var memStr = new MemoryStream())
-                //{
-                //    obj.Serialize(memStr);
-                //    memStr.Seek(0, SeekOrigin.Begin);
-                //    buffer = memStr.ToArray();
-                //}
-
-                //return Convert.ToBase64String(buffer);
             }
             catch 
             {
@@ -152,7 +135,7 @@ namespace Xarial.CadPlus.Drawing
                         using (var reader = new StreamReader(stream))
                         {
                             data = m_Serializer.ReadSettings<ObservableCollection<QrCodeInfo>>(
-                                reader, new SelObjectValueSerializer(m_Logger, m_Drawing));
+                                reader, new PictureValueSerializer(m_Logger, m_Drawing));
                         }
                     }
                 }
@@ -164,12 +147,24 @@ namespace Xarial.CadPlus.Drawing
 
             if (data != null)
             {
+                var usedPictures = new List<IXObject>();
+
                 for (int i = data.Count - 1; i >= 0; i--) 
                 {
-                    if (data[i].Picture == null) 
+                    if (data[i].Picture == null)
                     {
                         data.RemoveAt(i);
                         m_Logger.Log($"Removed dangling QR code data at index {i}", LoggerMessageSeverity_e.Debug);
+                    }
+                    //As we serialize names of the features (removing and readding QR code may cause duplication in the data which is not recognized as dangling)
+                    else if (usedPictures.Find(p => p.Equals(data[i].Picture)) != null)
+                    {
+                        data.RemoveAt(i);
+                        m_Logger.Log($"Removed duplicate QR code data at index {i}", LoggerMessageSeverity_e.Debug);
+                    }
+                    else 
+                    {
+                        usedPictures.Add(data[i].Picture);
                     }
                 }
             }
@@ -213,7 +208,7 @@ namespace Xarial.CadPlus.Drawing
                         using (var writer = new StreamWriter(stream))
                         {
                             m_Serializer.StoreSettings(QrCodes,
-                                writer, new SelObjectValueSerializer(m_Logger, m_Drawing));
+                                writer, new PictureValueSerializer(m_Logger, m_Drawing));
                         }
                     }
 
