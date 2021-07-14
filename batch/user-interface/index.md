@@ -60,10 +60,13 @@ User can set the processing scope (files, folders, macros and filters) in this g
 
 1. Add files to existing scope. Multiple files can be selected. This button will open the file browse dialog
 1. Add folders to existing scope. Multiple folders can be selected. This button will open the folder browse dialog
+1. Add From File. Allows loading list of files and folders from text file. Each line of the file represents the file or folder path
 1. Remove files and folders. Removes the selected files or folders from the scope
 1. Folder filters. List of filters to use for selecting files from the folder items selected into the scope. You can use a * wildcard, e.g. \*.sld\* will filter all SOLIDWORKS files (.sldprt, .slddrw and .sldasm) and exclude all other files types. Multiple filters are supported. Click to add new filter. Select and hit **Del** button to remove filter from the list.
 1. Add macros. Adds macros to the current macro scope
 1. Remove macros. Removes selected macros from the current macro scope.
+1. Extract References option allows to additionally include all referenced documents of the input file. Refer [Extract References](/batch/extract-references/) article for more information
+1. Order by Dependencies option allows to order the input references based on the dependency (from children to parents or vice-versa). Refer [Order By Dependencies](/batch/order-by-dependencies/) article for more information.
 
 ### Settings
 
@@ -125,6 +128,8 @@ Jobs can be controlled in the Job group
 
 1. Run new job. Multiple jobs can be run per document
 1. Cancel selected job
+1. Export the [Status Tab](#status) results into the Excel File
+1. Export [Journal Tab](#journal) results into the Text file
 
 ## Files And Folders
 
@@ -177,10 +182,14 @@ Displays overview information about a job, such as start time, duration, total n
 
 Contains detailed breakdown for each file and macro. Icon corresponds to the status of the particular item: successfully processed, failed, processed with warnings, or queued to process.
 
+Files or macros which are failed to process will have a corresponding icon and the clickable **?** link. Click this link to get more information about the error.
+
+![Failed status information](failed-status.png)
+
 Each column of the grid can be sorted to quickly identify failed items if needed.
 
-### Log
+### Journal
 
-![Log tab](log-tab.png)
+![Log tab](journal-tab.png)
 
-List contains detailed log messages about the progress. Use this log to troubleshoot errors.
+Journal contains detailed log messages about the progress. Use this log to troubleshoot errors.

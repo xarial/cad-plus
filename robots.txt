@@ -1,8 +1,0 @@
-User-agent: *
-Disallow: /terms-of-use/
-Disallow: /privacy-policy/
-Disallow: /cookies-policy/
-Disallow: /license/
-Disallow: /search/
-Allow: /
-Sitemap: https://cadplus.xarial.com/sitemap.xml
