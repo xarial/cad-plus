@@ -22,3 +22,5 @@ Application can also be started directly from SOLIDWORKS menu
 ![Batch+ command in SOLIDWORKS menu](batch-sw-menu-start.png)
 
 > It is strongly recommended to backup your data before using the batch operation as it may irrevocably modify files
+
+{% youtube id: jpaOxtsZSKA %}

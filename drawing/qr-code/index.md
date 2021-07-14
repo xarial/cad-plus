@@ -41,3 +41,5 @@ QR Code can be edited or updated after the insertion by accessing the correspond
 * **Edit** - allows to edit the data of the current QR cod ein the Property Manager Page.
 * **Update In Place** - reloads the data of the QR code but keeps the current size and location of the QR code. This can be useful if the data has changed (e.g. custom property)
 * **Reload** - similar to the **Update In Place**, but ignores the current location and uses the location and size specified when QR code was first inserted. This option is useful of QR code is inserted into the template and needs to be updated. This option will ensure the proper sizing and location of QR code regardless of the sheet scale.
+
+{% youtube id: SQKL5UyFgEE %}
