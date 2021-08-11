@@ -183,7 +183,9 @@
     <Compile Include="ViewModels\BatchDocumentVM.cs" />
     <Compile Include="ViewModels\BatchDocumentSettingsVM.cs" />
     <Compile Include="ViewModels\BatchManagerVM.cs" />
+    <Compile Include="ViewModels\FilterVM.cs" />
     <Compile Include="ViewModels\JobResultsVM.cs" />
+    <Compile Include="ViewModels\MacroDataVM.cs" />
     <Compile Include="ViewModels\VersionVM.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
