@@ -1,6 +1,6 @@
 ﻿//*********************************************************************
 //CAD+ Toolset
-//Copyright(C) 2020 Xarial Pty Limited
+//Copyright(C) 2021 Xarial Pty Limited
 //Product URL: https://cadplus.xarial.com
 //License: https://cadplus.xarial.com/license/
 //*********************************************************************
@@ -33,6 +33,7 @@ using Xarial.XToolkit.Reporting;
 using Xarial.CadPlus.Batch.StandAlone.Exceptions;
 using Xarial.CadPlus.Common.Utils;
 using Xarial.CadPlus.Plus.Shared.Helpers;
+using Xarial.CadPlus.Plus.Shared.Extensions;
 
 namespace Xarial.CadPlus.Batch.Base.Core
 {
@@ -129,7 +130,7 @@ namespace Xarial.CadPlus.Batch.Base.Core
 
             try
             {
-                await Task.Run(() =>
+                await TaskEx.Run(() =>
                 {
                     m_JournalWriter.WriteLine($"Collecting files for processing");
 
@@ -182,7 +183,7 @@ namespace Xarial.CadPlus.Batch.Base.Core
                             curBatchSize = 0;
                         }
                     }
-                }).ConfigureAwait(false);
+                }, new StaTaskScheduler(m_Logger)).ConfigureAwait(false);
                 jobResult = true;
             }
             catch (OperationCanceledException)
@@ -446,10 +447,18 @@ namespace Xarial.CadPlus.Batch.Base.Core
             try
             {
                 context.CurrentMacro.Status = JobItemStatus_e.InProgress;
-                
+
+                IXDocument macroDoc = null;
+
+                if (!string.IsNullOrEmpty(context.CurrentMacro.Macro.Arguments)
+                    || context.Job.OpenFileOptions.HasFlag(OpenFileOptions_e.Invisible))
+                {
+                    macroDoc = context.CurrentDocument;
+                }
+
                 m_MacroRunnerSvc.RunMacro(context.CurrentApplication, context.CurrentMacro.FilePath, null,
                     XCad.Enums.MacroRunOptions_e.UnloadAfterRun,
-                    context.CurrentMacro.Macro.Arguments, context.CurrentDocument);
+                    context.CurrentMacro.Macro.Arguments, macroDoc);
 
                 context.CurrentMacro.Status = JobItemStatus_e.Succeeded;
             }
@@ -465,7 +474,11 @@ namespace Xarial.CadPlus.Batch.Base.Core
                 {
                     throw new UserException($"Failed to run macro '{context.CurrentMacro.DisplayName}': {ex.Message}", ex);
                 }
-                else 
+                else if (ex is INoRetryMacroRunException) 
+                {
+                    context.CurrentMacro.Error = ex;
+                }
+                else
                 {
                     throw;
                 }

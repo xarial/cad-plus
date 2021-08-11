@@ -1,6 +1,6 @@
 ﻿//*********************************************************************
 //CAD+ Toolset
-//Copyright(C) 2020 Xarial Pty Limited
+//Copyright(C) 2021 Xarial Pty Limited
 //Product URL: https://cadplus.xarial.com
 //License: https://cadplus.xarial.com/license/
 //*********************************************************************
@@ -29,14 +29,18 @@ namespace Xarial.CadPlus.Drawing.Services
         private double m_OffsetX;
         private double m_OffsetY;
 
-        public QrCodePreviewer(IXDrawing drw)
+        private readonly QrCodePictureManager m_QrCodeMgr;
+
+        public QrCodePreviewer(IXDrawing drw, QrCodePictureManager qrCodeMgr)
         {
             m_Drw = drw;
+            m_QrCodeMgr = qrCodeMgr;
+
             m_View = ((ISwDrawing)m_Drw).Model.IActiveView;
             m_View.BufferSwapNotify += OnBufferSwapNotify;
         }
 
-        public void Preview(byte[] data, Dock_e dock, double size, double offsetX, double offsetY) 
+        public void Preview(Dock_e dock, double size, double offsetX, double offsetY) 
         {
             m_Dock = dock;
             m_Size = size;
@@ -47,8 +51,8 @@ namespace Xarial.CadPlus.Drawing.Services
 
         private int OnBufferSwapNotify()
         {
-            CalculateLocation(m_Drw, m_Dock, m_Size, m_OffsetX, m_OffsetY, out Point centerPt, out double scale);
-            RenderQrCodeTemplate(centerPt, m_Size * scale);
+            m_QrCodeMgr.CalculateLocation(m_Drw, m_Dock, m_Size, m_OffsetX, m_OffsetY, out Point centerPt, out double scale);
+            RenderQrCodeTemplate(centerPt, m_Size);
             return 0;
         }
 
@@ -57,63 +61,7 @@ namespace Xarial.CadPlus.Drawing.Services
             m_View.BufferSwapNotify -= OnBufferSwapNotify;
             ((ISwDrawing)m_Drw).Model.GraphicsRedraw2();
         }
-
-        public void CalculateLocation(IXDrawing drawing, Dock_e dock, 
-            double size, double offsetX, double offsetY, out Point centerPt, out double scale) 
-        {
-            var sheet = (drawing.Sheets.Active as ISwSheet).Sheet;
-            double sheetWidth = -1;
-            double sheetHeight = -1;
-            sheet.GetSize(ref sheetWidth, ref sheetHeight);
-
-            var sheetPrps = (double[])sheet.GetProperties2();
-            scale = sheetPrps[2] / sheetPrps[3];
-
-            size *= scale;
-
-            double x = 0;
-            double y = 0;
-
-            double offsetXDir = 1;
-            double offsetYDir = 1;
-
-            switch (dock) 
-            {
-                case Dock_e.BottomLeft:
-                    x = size / 2;
-                    y = size / 2;
-                    offsetXDir = 1;
-                    offsetYDir = 1;
-                    break;
-
-                case Dock_e.TopLeft:
-                    x = size / 2;
-                    y = sheetHeight - size / 2;
-                    offsetXDir = 1;
-                    offsetYDir = -1;
-                    break;
-
-                case Dock_e.TopRight:
-                    x = sheetWidth - size / 2;
-                    y = sheetHeight - size / 2;
-                    offsetXDir = -1;
-                    offsetYDir = -1;
-                    break;
-
-                case Dock_e.BottomRight:
-                    x = sheetWidth - size / 2;
-                    y = size / 2;
-                    offsetXDir = -1;
-                    offsetYDir = 1;
-                    break;
-
-                default:
-                    throw new NotSupportedException();
-            }
-
-            centerPt = new Point(x + offsetX * offsetXDir * scale, y + offsetY * offsetYDir * scale, 0);
-        }
-
+        
         private void RenderQrCodeTemplate(Point centerPt, double size)
         {
             glDisable(GL_LIGHTING);

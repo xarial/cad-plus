@@ -1,6 +1,6 @@
 ﻿//*********************************************************************
 //CAD+ Toolset
-//Copyright(C) 2020 Xarial Pty Limited
+//Copyright(C) 2021 Xarial Pty Limited
 //Product URL: https://cadplus.xarial.com
 //License: https://cadplus.xarial.com/license/
 //*********************************************************************
@@ -238,8 +238,6 @@ namespace Xarial.CadPlus.CustomToolbar.Services
         private void SaveSettingChanges(ToolbarSettings toolbarSets, CustomToolbarInfo toolbarConf,
             bool isEditable, out bool isToolbarChanged)
         {
-            isToolbarChanged = false;
-
             var oldToolbarSetts = m_SettsProvider.ReadSettings<ToolbarSettings>();
 
             if (!DeepCompare(toolbarSets, oldToolbarSetts))
@@ -247,10 +245,8 @@ namespace Xarial.CadPlus.CustomToolbar.Services
                 m_SettsProvider.WriteSettings(toolbarSets);
             }
             
-            bool isReadOnly;
-
             var oldToolbarConf = m_ToolbarConfProvider
-                .GetToolbar(out isReadOnly, oldToolbarSetts.SpecificationFile);
+                .GetToolbar(out _, oldToolbarSetts.SpecificationFile);
 
             isToolbarChanged = !DeepCompare(toolbarConf, oldToolbarConf);
 
@@ -324,7 +320,7 @@ namespace Xarial.CadPlus.CustomToolbar.Services
 
         private bool TryResolveState(CommandMacroInfo macroInfo) 
         {
-            bool isChecked = false;
+            bool isChecked;
 
             try
             {

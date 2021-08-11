@@ -1,6 +1,6 @@
 ﻿//*********************************************************************
 //CAD+ Toolset
-//Copyright(C) 2020 Xarial Pty Limited
+//Copyright(C) 2021 Xarial Pty Limited
 //Product URL: https://cadplus.xarial.com
 //License: https://cadplus.xarial.com/license/
 //*********************************************************************
@@ -31,6 +31,12 @@ using Xarial.CadPlus.Drawing.Data;
 using System.ComponentModel;
 using Xarial.CadPlus.Plus.Modules;
 using Xarial.XCad.Base;
+using Xarial.XCad.UI.Commands;
+using Xarial.XCad.Base.Enums;
+using SolidWorks.Interop.swconst;
+using System.Linq;
+using Xarial.XCad.SolidWorks.Features;
+using Xarial.CadPlus.Drawing.Features;
 
 namespace Xarial.CadPlus.Drawing
 {
@@ -45,21 +51,38 @@ namespace Xarial.CadPlus.Drawing
         InsertQrCode
     }
 
+    [CommandGroupInfo(2000)]
+    [Title("Drawing+ QR Code")]
+    public enum PictureContextMenuCommands_e 
+    {
+        [Title("Edit")]
+        [Description("Edits the QR code data of this QR code feature")]
+        [CommandItemInfo(WorkspaceTypes_e.Drawing)]
+        [IconEx(typeof(Resources), nameof(Resources.qr_code_edit_vector), nameof(Resources.qr_code_edit))]
+        EditQrCode,
+
+        [Title("Update In Place")]
+        [Description("Updates QR code in the current location")]
+        [CommandItemInfo(WorkspaceTypes_e.Drawing)]
+        [IconEx(typeof(Resources), nameof(Resources.qr_code_update_in_place_vector), nameof(Resources.qr_code_update_in_place))]
+        UpdateQrCodeInPlace,
+
+        [Title("Reload")]
+        [Description("Reloads QR code and updates the location and size")]
+        [CommandItemInfo(WorkspaceTypes_e.Drawing)]
+        [IconEx(typeof(Resources), nameof(Resources.qr_code_update_vector), nameof(Resources.qr_code_update))]
+        Reload
+    }
+
     //TODO: remove the dependency on application once the common APIs are used
     [Module(typeof(IHostExtension), typeof(ISwAddInApplication))]
     public class DrawingModule : IModule
     {
         private IHostExtension m_Host;
 
-        private IXPropertyPage<InsertQrCodeData> m_Page;
-        
-        private QrDataProvider m_QrDataProvider;
+        private IInsertQrCodeFeature m_InsertQrCodeFeature;
+        private IEditQrCodeFeature m_EditQrCodeFeature;
 
-        private InsertQrCodeData m_CurPageData;
-        private QrCodePreviewer m_CurPreviewer;
-        private IXDrawing m_CurDrawing;
-        private string m_CurQrCodeData;
-        private ISettingsProvider m_SettsProvider;
         private IServiceProvider m_SvcProvider;
 
         private IXLogger m_Logger;
@@ -82,128 +105,18 @@ namespace Xarial.CadPlus.Drawing
 
         private void OnConnect()
         {
+            m_Host.Extension.CommandManager.AddContextMenu<PictureContextMenuCommands_e>(
+                (SelectType_e)swSelectType_e.swSelSKETCHBITMAP).CommandClick += OnPictureContextMenuCommandClick;
+
             m_Host.RegisterCommands<Commands_e>(OnCommandClick);
-            m_Page = m_Host.Extension.CreatePage<InsertQrCodeData>();
-            m_CurPageData = new InsertQrCodeData();
 
-            m_SettsProvider = m_SvcProvider.GetService<ISettingsProvider>();
+            var docAdapter = m_SvcProvider.GetService<IDocumentAdapter>();
 
-            m_QrDataProvider = new QrDataProvider(m_Host.Extension.Application);
+            m_InsertQrCodeFeature = new InsertQrCodeFeature(m_Host.Extension, m_MsgSvc, m_Logger, docAdapter);
 
-            m_Page.DataChanged += OnPageDataChanged;
-            m_Page.Closed += OnPageClosed;
-            m_Page.Closing += OnPageClosing;
-        }
+            m_EditQrCodeFeature = new EditQrCodeFeature(m_Host.Extension, m_MsgSvc, m_Logger, docAdapter);
 
-        private void OnPageClosing(PageCloseReasons_e reason, PageClosingArg arg)
-        {
-            if (reason == PageCloseReasons_e.Okay) 
-            {
-                try
-                {
-                    m_CurQrCodeData = m_QrDataProvider.GetData(m_CurDrawing, m_CurPageData.Source);
-
-                    if (string.IsNullOrEmpty(m_CurQrCodeData)) 
-                    {
-                        throw new UserException("Data for QR code is empty");
-                    }
-                }
-                catch (Exception ex)
-                {
-                    m_Logger.Log(ex);
-                    arg.Cancel = true;
-                    arg.ErrorMessage = ex.ParseUserError(out _);
-                }
-            }
-        }
-
-        private void OnPageClosed(PageCloseReasons_e reason)
-        {
-            m_CurPreviewer.Dispose();
-
-            if (reason == PageCloseReasons_e.Okay) 
-            {
-                try
-                {
-                    InsertQrCode();
-                }
-                catch (Exception ex)
-                {
-                    m_Logger.Log(ex);
-                    m_MsgSvc.ShowError(ex);
-                }
-            }
-        }
-
-        private void OnPageDataChanged()
-        {
-            UpdatePreview();
-        }
-
-        private void InsertQrCode() 
-        {
-            var tempFileName = "";
-
-            var model = (m_CurDrawing as ISwDrawing).Model;
-
-            try
-            {
-                var qrGenerator = new QRCodeGenerator();
-                var qrCodeData = qrGenerator.CreateQrCode(m_CurQrCodeData,
-                    QRCodeGenerator.ECCLevel.Q);
-                var qrCode = new QRCode(qrCodeData);
-                var qrCodeImage = qrCode.GetGraphic(20, Color.Black, Color.White, false);
-
-                tempFileName = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString() + ".png");
-                qrCodeImage.Save(tempFileName);
-
-                var pict = model.SketchManager.InsertSketchPicture(tempFileName);
-                
-                if (pict != null)
-                {
-                    m_CurPreviewer.CalculateLocation(m_CurDrawing, m_CurPageData.Location.Dock, 
-                        m_CurPageData.Location.Size, m_CurPageData.Location.OffsetX, 
-                        m_CurPageData.Location.OffsetY, 
-                        out XCad.Geometry.Structures.Point centerPt, out double scale);
-
-                    var x = centerPt.X / scale - m_CurPageData.Location.Size / 2;
-                    var y = centerPt.Y / scale - m_CurPageData.Location.Size / 2;
-                    pict.SetOrigin(x, y);
-                    pict.SetSize(m_CurPageData.Location.Size, m_CurPageData.Location.Size, true);
-
-                    //Picture PMPage stays open after inserting the picture
-                    const int swCommands_PmOK = -2;
-                    (m_Host.Extension.Application as ISwApplication).Sw.RunCommand(swCommands_PmOK, "");
-                }
-                else 
-                {
-                    throw new UserException("Failed to insert picture");
-                }
-            }
-            finally
-            {
-                model.IActiveView.EnableGraphicsUpdate = true;
-
-                if (File.Exists(tempFileName)) 
-                {
-                    try
-                    {
-                        File.Delete(tempFileName);
-                    }
-                    catch 
-                    {
-                    }
-                }
-            }
-        }
-
-        private void UpdatePreview()
-        {
-            m_CurPreviewer.Preview(null,
-                m_CurPageData.Location.Dock,
-                m_CurPageData.Location.Size,
-                m_CurPageData.Location.OffsetX,
-                m_CurPageData.Location.OffsetY);
+            m_Host.Extension.Application.Documents.RegisterHandler(() => new QrCodeDrawingHandler(m_Logger));
         }
 
         private void OnCommandClick(Commands_e cmd) 
@@ -211,17 +124,65 @@ namespace Xarial.CadPlus.Drawing
             switch (cmd) 
             {
                 case Commands_e.InsertQrCode:
-                    m_CurDrawing = (IXDrawing)m_Host.Extension.Application.Documents.Active;
-                    m_CurPreviewer = new QrCodePreviewer(m_CurDrawing);
-                    m_Page.Show(m_CurPageData);
-                    UpdatePreview();
+                    m_InsertQrCodeFeature.Insert((IXDrawing)m_Host.Extension.Application.Documents.Active);
                     break;
             }
         }
 
+        private void OnPictureContextMenuCommandClick(PictureContextMenuCommands_e spec)
+        {
+            try
+            {
+                switch (spec)
+                {
+                    case PictureContextMenuCommands_e.EditQrCode:
+                        {
+                            var drw = (ISwDrawing)m_Host.Extension.Application.Documents.Active;
+                            var pict = GetSelectedPicture(drw);
+                            m_EditQrCodeFeature.Edit(pict, drw);
+                        }
+                        break;
+
+                    case PictureContextMenuCommands_e.UpdateQrCodeInPlace:
+                        {
+                            var drw = (ISwDrawing)m_Host.Extension.Application.Documents.Active;
+                            var pict = GetSelectedPicture(drw);
+                            m_EditQrCodeFeature.UpdateInPlace(pict, drw);
+                        }
+                        break;
+
+                    case PictureContextMenuCommands_e.Reload:
+                        {
+                            var drw = (ISwDrawing)m_Host.Extension.Application.Documents.Active;
+                            var pict = GetSelectedPicture(drw);
+                            m_EditQrCodeFeature.Reload(pict, drw);
+                        }
+                        break;
+                }
+            }
+            catch (Exception ex)
+            {
+                m_Logger.Log(ex);
+                m_MsgSvc.ShowError(ex);
+            }
+        }
+
+        private ISwObject GetSelectedPicture(ISwDrawing drw)
+        {   
+            var pict = (ISwObject)drw.Selections.Last();
+
+            if (pict is ISwFeature)
+            {
+                pict = SwObjectFactory.FromDispatch<ISwObject>(
+                    ((ISwFeature)pict).Feature.GetSpecificFeature2(), drw);
+            }
+
+            return pict;
+        }
 
         public void Dispose()
         {
+            m_InsertQrCodeFeature.Dispose();
         }
     }
 }

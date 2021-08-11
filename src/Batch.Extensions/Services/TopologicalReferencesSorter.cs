@@ -1,6 +1,6 @@
 ﻿//*********************************************************************
 //CAD+ Toolset
-//Copyright(C) 2020 Xarial Pty Limited
+//Copyright(C) 2021 Xarial Pty Limited
 //Product URL: https://cadplus.xarial.com
 //License: https://cadplus.xarial.com/license/
 //*********************************************************************
@@ -20,19 +20,7 @@ namespace Xarial.CadPlus.Batch.Extensions.Services
     {
         public ItemVM[] Sort(IXDocument[] src, Action<double> prgHandler, CancellationToken cancellationToken) 
         {
-            var groups = GroupTopological(src, doc =>
-            {
-                try
-                {
-                    return doc.Dependencies;
-                }
-                catch
-                {
-                    return null;
-                }
-            }, new DocumentComparer(),
-                prgHandler,
-                cancellationToken);
+            var groups = GroupTopological(src, prgHandler, cancellationToken);
 
             var items = new List<ItemVM>();
 
@@ -57,66 +45,61 @@ namespace Xarial.CadPlus.Batch.Extensions.Services
             return items.ToArray();
         }
 
-        //function code based on https://www.codeproject.com/Articles/869059/Topological-sorting-in-Csharp with minor modifications
-        private List<List<T>> GroupTopological<T>(T[] source,
-            Func<T, IEnumerable<T>> getDependenciesFunc, IEqualityComparer<T> comparer,
-            Action<double> prgHandler,
+        private List<List<IXDocument>> GroupTopological(IXDocument[] docs, Action<double> prgHandler,
             CancellationToken cancellationToken)
         {
-            var sorted = new List<List<T>>();
-            var visited = new Dictionary<T, int>(comparer);
+            var grouped = new List<List<IXDocument>>();
+            var processed = new Dictionary<IXDocument, int>(new DocumentComparer());
 
-            int curInst = 0;
-
-            foreach (var item in source)
+            for (int i = 0; i < docs.Length; i++)
             {
-                Visit(item, getDependenciesFunc, sorted, visited, cancellationToken);
-                prgHandler.Invoke((double)++curInst / (double)source.Length);
+                var doc = docs[i];
+
+                Process(doc, grouped, processed, cancellationToken);
+
+                prgHandler.Invoke((double)(i + 1) / (double)docs.Length);
             }
 
-            return sorted;
+            return grouped;
         }
 
-        private int Visit<T>(T item, Func<T, IEnumerable<T>> getDependenciesFunc,
-            List<List<T>> sorted, Dictionary<T, int> visited, CancellationToken cancellationToken)
+        private int Process(IXDocument doc,
+            List<List<IXDocument>> grouped, Dictionary<IXDocument, int> processed,
+            CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            const int curLevel = -1;
-            int level;
-            var hasVisited = visited.TryGetValue(item, out level);
-
-            if (hasVisited)
+            if (!processed.TryGetValue(doc, out int level))
             {
-                if (level == curLevel)
-                {
-                    //throw new ArgumentException("Cyclic dependency found.");
-                }
-            }
-            else
-            {
-                level = curLevel;
-                visited[item] = level;
+                level = -1;
+                processed[doc] = level;
 
-                var dependencies = getDependenciesFunc.Invoke(item);
-
-                if (dependencies?.Any() == true)
+                try
                 {
-                    foreach (var dependency in dependencies)
+                    var dependencies = doc.Dependencies;
+
+                    if (dependencies?.Any() == true)
                     {
-                        var depLevel = Visit(dependency, getDependenciesFunc, sorted, visited, cancellationToken);
-                        level = Math.Max(level, depLevel);
+                        foreach (var dependency in dependencies)
+                        {
+                            var depLevel = Process(dependency, grouped, processed, cancellationToken);
+                            level = Math.Max(level, depLevel);
+                        }
                     }
                 }
-
-                visited[item] = ++level;
-
-                while (sorted.Count <= level)
+                catch 
                 {
-                    sorted.Add(new List<T>());
                 }
 
-                sorted[level].Add(item);
+                processed[doc] = ++level;
+
+                if (level >= grouped.Count) 
+                {
+                    grouped.AddRange(Enumerable.Repeat(new List<IXDocument>(), 
+                        level - grouped.Count + 1));
+                }
+                
+                grouped[level].Add(doc);
             }
 
             return level;

@@ -1,6 +1,6 @@
 ﻿//*********************************************************************
 //CAD+ Toolset
-//Copyright(C) 2020 Xarial Pty Limited
+//Copyright(C) 2021 Xarial Pty Limited
 //Product URL: https://cadplus.xarial.com
 //License: https://cadplus.xarial.com/license/
 //*********************************************************************
@@ -84,7 +84,7 @@ namespace Xarial.CadPlus.Batch.Extensions
             if (m_EnableOrdering)
             {
                 var vm = new InputsSorterVM(instProvider.Descriptor);
-
+                
                 var cts = new CancellationTokenSource();
                 var cancellationToken = cts.Token;
 

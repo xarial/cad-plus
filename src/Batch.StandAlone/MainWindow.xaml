@@ -32,18 +32,12 @@
                                             TrueValue="{x:Static win:Visibility.Visible}"
                                             FalseValue="{x:Static win:Visibility.Collapsed}"/>
 
-        <xconv:ObjectIsNotNullUniversalConverter x:Key="objIsNotNullToVisConv" 
-                                            TrueValue="{x:Static win:Visibility.Visible}"
-                                            FalseValue="{x:Static win:Visibility.Collapsed}"/>
-        
-        <xconv:ObjectIsNotNullUniversalConverter x:Key="objIsNullToVisConv" 
-                                            TrueValue="{x:Static win:Visibility.Collapsed}"
-                                            FalseValue="{x:Static win:Visibility.Visible}"/>
-        
+        <xconv:ObjectIsNotNullVisibilityConverter x:Key="objIsNotNullToVisConv"/>
+        <xconv:ObjectIsNotNullVisibilityConverter x:Key="objIsNullToVisConv" Reverse="True"/>
+
         <xconv:ObjectIsNotNullUniversalConverter x:Key="objIsNotNullConv"/>
-        <xconv:BooleanUniversalConverter x:Key="boolToVisConv" 
-                                         TrueValue="{x:Static win:Visibility.Visible}"
-                                         FalseValue="{x:Static win:Visibility.Collapsed}"/>
+        <xconv:BooleanVisibilityConverter x:Key="boolToVisConv"/>
+        
         <xconv:ImageToImageSourceConverter x:Key="imgToSrcConv"/>
         <DataTemplate x:Key="folderFilterGridTemplate">
             <DataGrid ItemsSource="{Binding Path=Filters}" AutoGenerateColumns="False" Width="100"
@@ -234,16 +228,22 @@
                         </Grid>
                     </GroupBox>
                     <GridSplitter Height="5" Background="Gray" Grid.Row="1"/>
-                    <Grid Grid.Row="2" DataContext="{Binding Path=Results.Selected}">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="*"/>
-                            <RowDefinition Height="Auto"/>
-                        </Grid.RowDefinitions>
-                        <ctrlsbase:ResultsControl JobItemsDataGridStyle="{StaticResource MahApps.Styles.DataGrid}"  Grid.Row="0"/>
-                        <metro:MetroProgressBar Grid.Row="1" IsIndeterminate="{Binding Path=Summary.IsInitializing}"
+                    <TextBlock Grid.Row="2" Visibility="{Binding Path=Results.Selected, Converter={StaticResource objIsNullToVisConv}}"
+                               Text="Select job result to see more details"
+                               VerticalAlignment="Center" HorizontalAlignment="Center" Margin="5" TextWrapping="Wrap"
+                               FontSize="16" TextTrimming="CharacterEllipsis" TextAlignment="Center" Foreground="Gray" IsHitTestVisible="False"/>
+                    <Grid Grid.Row="2" Visibility="{Binding Path=Results.Selected, Converter={StaticResource objIsNotNullToVisConv}}">
+                        <Grid DataContext="{Binding Path=Results.Selected}">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <ctrlsbase:ResultsControl JobItemsDataGridStyle="{StaticResource MahApps.Styles.DataGrid}"  Grid.Row="0"/>
+                            <metro:MetroProgressBar Grid.Row="1" IsIndeterminate="{Binding Path=Summary.IsInitializing}"
                                                 Margin="0,5"
                                                 Visibility="{Binding Path=IsBatchInProgress, Converter={StaticResource boolToVisConv}}"
                                                 Value="{Binding Path=Summary.Progress}" Minimum="0" Maximum="1"/>
+                        </Grid>
                     </Grid>
                 </Grid>
             </Grid>
