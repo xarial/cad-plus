@@ -6,7 +6,7 @@
     <SignAssembly>false</SignAssembly>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <PackageId>Xarial.CadPlusPlus</PackageId>
-    <VersionPrefix>0.2.0</VersionPrefix>
+    <VersionPrefix>0.2.1</VersionPrefix>
     <Authors>Xarial</Authors>
     <Product>CAD+</Product>
     <Copyright>© 2021 Xarial Pty Limited</Copyright>
@@ -18,11 +18,15 @@
     <Description>CAD+ Toolset API</Description>
     <RepositoryType>git</RepositoryType>
     <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
-    <!--<PackageIcon>icon.png</PackageIcon>
-    <PackageIconUrl>https://cadplus.xarial.com/icon.png</PackageIconUrl>-->
+    <PackageIcon>icon.png</PackageIcon>
+    <PackageIconUrl>https://cadplus.xarial.com/icon-api.png</PackageIconUrl>
   </PropertyGroup>
   <ItemGroup>
     <None Include="..\..\LICENSE.md">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+    <None Include="..\..\data\icon.png">
       <Pack>True</Pack>
       <PackagePath></PackagePath>
     </None>
