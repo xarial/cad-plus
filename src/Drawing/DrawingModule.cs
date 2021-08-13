@@ -173,8 +173,8 @@ namespace Xarial.CadPlus.Drawing
 
             if (pict is ISwFeature)
             {
-                pict = SwObjectFactory.FromDispatch<ISwObject>(
-                    ((ISwFeature)pict).Feature.GetSpecificFeature2(), drw);
+                pict = drw.CreateObjectFromDispatch<ISwObject>(
+                    ((ISwFeature)pict).Feature.GetSpecificFeature2());
             }
 
             return pict;

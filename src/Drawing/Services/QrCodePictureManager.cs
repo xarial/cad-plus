@@ -209,7 +209,7 @@ namespace Xarial.CadPlus.Drawing.Services
                     const int swCommands_PmOK = -2;
                     (m_App as ISwApplication).Sw.RunCommand(swCommands_PmOK, "");
 
-                    return SwObjectFactory.FromDispatch<ISwObject>(pict, (ISwDocument)drw);
+                    return ((ISwDocument)drw).CreateObjectFromDispatch<ISwObject>(pict);
                 }
                 else
                 {

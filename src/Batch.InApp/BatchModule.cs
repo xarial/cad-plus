@@ -215,7 +215,7 @@ namespace Xarial.CadPlus.Batch.InApp
                         case InputScope_e.Selection:
                             docs = m_Data.Input.Components
                                 .Distinct(new ComponentDocumentSafeEqualityComparer())
-                                .Select(c => c.Document).ToArray();
+                                .Select(c => c.ReferencedDocument).ToArray();
                             break;
 
                         default:
