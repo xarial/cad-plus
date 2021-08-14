@@ -328,13 +328,6 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
             {
                 Version = InstalledVersions.FirstOrDefault();
             }
-
-            //SelectVersionCommand = new RelayCommand<IXVersion>(SelectVersion);
         }
-
-        //private void SelectVersion(IXVersion versInfo) 
-        //{
-        //    Version = versInfo;
-        //}
     }
 }

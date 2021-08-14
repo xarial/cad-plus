@@ -56,8 +56,8 @@ namespace Xbatch.Tests
                     d.Input.Add("D:\\folder2");
                     d.Filters.Clear();
                     d.Filters.Add(new FilterVM("*.sld*"));
-                    d.Macros.Add(new MacroData() { FilePath = "C:\\macro1.swp" });
-                    d.Macros.Add(new MacroData() { FilePath = "C:\\macro2.swp" });
+                    d.Macros.Add(new MacroDataVM(new MacroData() { FilePath = "C:\\macro1.swp" }));
+                    d.Macros.Add(new MacroDataVM( new MacroData() { FilePath = "C:\\macro2.swp" }));
                     d.Settings.IsTimeoutEnabled = true;
                     d.Settings.Timeout = 30;
                     d.Settings.OpenFileOptionSilent = true;
@@ -84,7 +84,7 @@ namespace Xbatch.Tests
             d =>
             {
                 d.Input.Add("abc");
-                d.Macros.Add(new MacroData() { FilePath = "xyz" });
+                d.Macros.Add(new MacroDataVM(new MacroData() { FilePath = "xyz" }));
                 d.Settings.Version = SwApplicationFactory.CreateVersion(SwVersion_e.Sw2019);
                 
                 d.Settings.Timeout = 300;
@@ -101,7 +101,7 @@ namespace Xbatch.Tests
             var opts = WithDocumentMock(d =>
             {
                 d.Input.Add("abc");
-                d.Macros.Add(new MacroData() { FilePath = "xyz" });
+                d.Macros.Add(new MacroDataVM(new MacroData() { FilePath = "xyz" }));
                 d.Settings.Version = SwApplicationFactory.CreateVersion(SwVersion_e.Sw2019);
                 d.Settings.IsTimeoutEnabled = false;
             });

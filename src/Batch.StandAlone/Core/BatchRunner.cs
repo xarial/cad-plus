@@ -34,6 +34,7 @@ using Xarial.CadPlus.Batch.StandAlone.Exceptions;
 using Xarial.CadPlus.Common.Utils;
 using Xarial.CadPlus.Plus.Shared.Helpers;
 using Xarial.CadPlus.Plus.Shared.Extensions;
+using Xarial.XCad.Base.Enums;
 
 namespace Xarial.CadPlus.Batch.Base.Core
 {
@@ -57,6 +58,8 @@ namespace Xarial.CadPlus.Batch.Base.Core
 
     public class BatchRunner : IDisposable
     {
+        private const double POPUP_KILLER_PING_SECS = 2;
+
         private readonly TextWriter m_JournalWriter;
         private readonly IProgressHandler m_ProgressHandler;
         private readonly ICadApplicationInstanceProvider m_AppProvider;
@@ -98,9 +101,30 @@ namespace Xarial.CadPlus.Batch.Base.Core
             m_JobMgr = jobMgr;
         }
 
-        private void OnPopupNotClosed(Process prc, IntPtr hwnd)
+        private void OnPopupNotClosed(Process prc, IntPtr hWnd)
         {
-            m_JournalWriter.WriteLine("Failed to close the blocking popup window");
+            using (var vbaErrPopup = new VbaErrorPopup(hWnd))
+            {
+                if (vbaErrPopup.IsVbaErrorPopup)
+                {
+                    var curMacro = m_CurrentContext.CurrentMacro;
+
+                    if (curMacro != null)
+                    {
+                        curMacro.InternalMacroException = new VbaMacroException(vbaErrPopup.ErrorText);
+                    }
+
+                    m_Logger.Log($"Closing VBA Error popup window: {hWnd}", LoggerMessageSeverity_e.Debug);
+
+                    vbaErrPopup.Close();
+                }
+                else
+                {
+                    m_Logger.Log($"Blocking popup window is not closed: {hWnd}", LoggerMessageSeverity_e.Debug);
+
+                    m_JournalWriter.WriteLine("Failed to close the blocking popup window");
+                }
+            }
         }
 
         public async Task<bool> BatchRunAsync(CancellationToken cancellationToken = default)
@@ -460,6 +484,13 @@ namespace Xarial.CadPlus.Batch.Base.Core
                     XCad.Enums.MacroRunOptions_e.UnloadAfterRun,
                     context.CurrentMacro.Macro.Arguments, macroDoc);
 
+                if (context.CurrentMacro.InternalMacroException != null) 
+                {
+                    var ex = context.CurrentMacro.InternalMacroException;
+                    context.CurrentMacro.InternalMacroException = null;
+                    throw ex;
+                }
+
                 context.CurrentMacro.Status = JobItemStatus_e.Succeeded;
             }
             catch (Exception ex)
@@ -530,7 +561,7 @@ namespace Xarial.CadPlus.Batch.Base.Core
 
                 if (opts.HasFlag(StartupOptions_e.Silent)) 
                 {
-                    m_PopupKiller.Start(app.Process, TimeSpan.FromSeconds(2));
+                    m_PopupKiller.Start(app.Process, TimeSpan.FromSeconds(POPUP_KILLER_PING_SECS));
                 }
             }
             catch (Exception ex)
