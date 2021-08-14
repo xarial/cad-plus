@@ -111,10 +111,13 @@ namespace TestApp
                         () => m_SelectedDropDown1Item, x => m_SelectedDropDown1Item = (DropDownItem)x, () => m_DropDown1Items)),
                     new RibbonGroup("Group2", "Group2",
                         new RibbonToggleCommand("Toggle1", Resources.icon1, "Some Toggle 1 Some Toggle 1 Some Toggle 1 Some Toggle 1 Some Toggle 1 Some Toggle 1 Some Toggle 1 Some Toggle 1 Some Toggle 1", () => m_Toggle1, x => m_Toggle1 = x),
+                        null,
                         new RibbonToggleCommand("Wide Toggle2", Resources.icon1, "Wide Toggle 2", () => m_Toggle2, x => m_Toggle2 = x),
+                        null,
                         new RibbonToggleCommand("Toggle3", Resources.icon4, "Some Toggle 3", () => m_Toggle3, x => m_Toggle3 = x)),
                     new RibbonGroup("Group3", "Group3",
                         new RibbonButtonCommand("Button1", Resources.icon5, "Button1 Tooltip", () => { }, null),
+                        null,
                         new RibbonButtonCommand("Very Wide Button2", Resources.icon1, "Button 2 Tooltip", () => { }, null),
                         new RibbonSwitchCommand("Switch1", Resources.icon3, "Some toggle switch", "Toggle On", "Toggle Off", () => m_Switch1, x => m_Switch1 = x))));
         }
