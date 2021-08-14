@@ -12,7 +12,9 @@ using System.Reflection;
 using Xarial.CadPlus.Plus;
 using Xarial.CadPlus.Plus.Services;
 using Xarial.XCad.Base;
+using Xarial.XCad.Exceptions;
 using Xarial.XToolkit.Reflection;
+using Xarial.XToolkit.Reporting;
 
 namespace Xarial.CadPlus.Init
 {
@@ -34,6 +36,8 @@ namespace Xarial.CadPlus.Init
 
         private void OnConfigureServices(IContainerBuilder builder)
         {
+            ExceptionExtension.GlobalUserExceptionTypes.Add(typeof(IUserException));
+
             builder.Register<AppLogger, IXLogger>();
         }
     }
