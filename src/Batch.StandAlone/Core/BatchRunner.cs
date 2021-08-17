@@ -491,6 +491,27 @@ namespace Xarial.CadPlus.Batch.Base.Core
                     throw ex;
                 }
 
+                if (context.Job.Actions.HasFlag(Actions_e.AutoSaveDocuments))
+                {
+                    if (!context.ForbidSaving.Value)
+                    {
+                        m_JournalWriter.WriteLine("Saving the document");
+
+                        if (context.CurrentDocument.IsAlive)
+                        {
+                            context.CurrentDocument.Save();
+                        }
+                        else 
+                        {
+                            throw new UserException("Failed to automatically save the document as it has been closed or disconnected");
+                        }
+                    }
+                    else
+                    {
+                        throw new SaveForbiddenException();
+                    }
+                }
+
                 context.CurrentMacro.Status = JobItemStatus_e.Succeeded;
             }
             catch (Exception ex)
@@ -512,20 +533,6 @@ namespace Xarial.CadPlus.Batch.Base.Core
                 else
                 {
                     throw;
-                }
-            }
-
-            if (context.Job.Actions.HasFlag(Actions_e.AutoSaveDocuments))
-            {
-                if (!context.ForbidSaving.Value)
-                {
-                    m_JournalWriter.WriteLine("Saving the document");
-                    context.CurrentDocument.Save();
-                }
-                else
-                {
-                    context.CurrentMacro.Status = JobItemStatus_e.Failed;
-                    throw new SaveForbiddenException();
                 }
             }
         }
