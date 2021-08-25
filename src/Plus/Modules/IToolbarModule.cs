@@ -39,7 +39,7 @@ namespace Xarial.CadPlus.Plus.Modules
         Rebuild,
     }
 
-    public class TriggerInvokingArguments
+    public class MacroRunArguments
     {
         public string MacroPath { get; set; }
         public IMacroStartFunction EntryPoint { get; set; }
@@ -54,11 +54,11 @@ namespace Xarial.CadPlus.Plus.Modules
         string SubName { get; set; }
     }
 
-    public delegate void TriggerInvokingDelegate(TriggerType_e triggerType, TriggerInvokingArguments args);
+    public delegate void RunMacroDelegate(TriggerType_e triggerType, MacroRunArguments args);
 
     public interface IToolbarModule : IModule
     {
-        event TriggerInvokingDelegate TriggerInvoking;
+        event RunMacroDelegate RunMacro;
 
         void RegisterIconsProvider(IIconsProvider provider);
     }
