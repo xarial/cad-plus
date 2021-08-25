@@ -18,7 +18,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Common\Common.csproj" />
-    <ProjectReference Include="..\..\src\CustomToolbar\CustomToolbar.csproj" />
+    <ProjectReference Include="..\..\src\Toolbar.Base\Toolbar.Base.csproj" />
   </ItemGroup>
 
   <ItemGroup>
