@@ -25,10 +25,10 @@ namespace Xarial.CadPlus.Plus.Modules
         IXImage GetIcon(string filePath);
     }
 
-    public enum TriggerType_e
+    public enum EventType_e
     {
-        Button,
-        ToggleButton,
+        ButtonClick,
+        ToggleButtonCheck,
         ApplicationStart,
         DocumentNew,
         DocumentOpen,
@@ -37,30 +37,42 @@ namespace Xarial.CadPlus.Plus.Modules
         DocumentClose,
         NewSelection,
         ConfigurationChange,
-        Rebuild,
+        Rebuild
     }
 
-    public class MacroRunArguments
+    public interface ICommandMacroInfo
     {
-        public string MacroPath { get; set; }
-        public IMacroStartFunction EntryPoint { get; set; }
-        public IXDocument TargetDocument { get; set; }
-        public bool UnloadAfterRun { get; set; }
-        public string Arguments { get; set; }
+        string Title { get; }
+        string Description { get; }
+        bool UnloadAfterRun { get; }
+        IMacroStartFunction EntryPoint { get; }
+        string Arguments { get; }
+    }
+
+    public class MacroRunningArguments
+    {
+        public ICommandMacroInfo MacroInfo { get; }
+        public IXDocument TargetDocument { get; }
         public bool Cancel { get; set; }
+
+        public MacroRunningArguments(ICommandMacroInfo macroInfo, IXDocument targetDoc) 
+        {
+            MacroInfo = macroInfo;
+            TargetDocument = targetDoc;
+        }
     }
 
     public interface IMacroStartFunction
     {
-        string ModuleName { get; set; }
-        string SubName { get; set; }
+        string ModuleName { get; }
+        string SubName { get; }
     }
 
-    public delegate void RunMacroDelegate(TriggerType_e triggerType, MacroRunArguments args);
+    public delegate void MacroRunningDelegate(EventType_e eventType, MacroRunningArguments args);
 
     public interface IToolbarModule : IModule
     {
-        event RunMacroDelegate RunMacro;
+        event MacroRunningDelegate MacroRunning;
 
         void RegisterIconsProvider(IIconsProvider provider);
     }
