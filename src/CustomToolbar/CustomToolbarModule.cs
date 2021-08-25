@@ -36,6 +36,8 @@ namespace Xarial.CadPlus.CustomToolbar
     [Module(typeof(IHostExtension))]
     public class CustomToolbarModule : IToolbarModule
     {
+        public event RunMacroDelegate RunMacro;
+
         [Title("Toolbar+")]
         [Description("Toolbar+ configuration")]
         public enum Commands_e
@@ -61,6 +63,7 @@ namespace Xarial.CadPlus.CustomToolbar
         private List<IIconsProvider> m_IconsProviders;
 
         private IServiceProvider m_SvcProvider;
+        private IToolbarModuleProxy m_ToolbarProxy;
 
         public CustomToolbarModule() 
         {
@@ -93,8 +96,14 @@ namespace Xarial.CadPlus.CustomToolbar
             m_Msg = Resolve<IMessageService>();
             m_Logger = Resolve<IXLogger>();
 
+            m_ToolbarProxy = Resolve<IToolbarModuleProxy>();
+            m_ToolbarProxy.RequestRunMacro += OnRequestRunMacro;
+
             LoadCommands();
         }
+
+        private void OnRequestRunMacro(TriggerType_e triggerType, MacroRunArguments args)
+            => RunMacro?.Invoke(triggerType, args);
 
         protected virtual void CreateContainer()
         {
@@ -108,7 +117,10 @@ namespace Xarial.CadPlus.CustomToolbar
                 .As<IMacroEntryPointsExtractor>();
 
             builder.RegisterType<MacroRunner>()
-                .As<IMacroRunner>();
+                .As<IMacroRunner>().SingleInstance();
+
+            builder.RegisterType<ToolbarModuleProxy>()
+                .As<IToolbarModuleProxy>().SingleInstance();
 
             builder.RegisterType<ToolbarConfigurationProvider>()
                 .As<IToolbarConfigurationProvider>();
@@ -179,8 +191,26 @@ namespace Xarial.CadPlus.CustomToolbar
             }
         }
 
-        public void Dispose() => m_Container.Dispose();
+        public void Dispose()
+        {
+            m_ToolbarProxy.RequestRunMacro -= OnRequestRunMacro;
+            m_Container.Dispose();
+        }
 
         public void RegisterIconsProvider(IIconsProvider provider) => m_IconsProviders.Add(provider);
+    }
+    
+    public interface IToolbarModuleProxy 
+    {
+        event RunMacroDelegate RequestRunMacro;
+        void RunMacro(TriggerType_e trigger, MacroRunArguments args);
+    }
+
+    internal class ToolbarModuleProxy : IToolbarModuleProxy
+    {
+        public event RunMacroDelegate RequestRunMacro;
+
+        public void RunMacro(TriggerType_e trigger, MacroRunArguments args)
+            => RequestRunMacro?.Invoke(trigger, args);
     }
 }

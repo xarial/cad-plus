@@ -31,17 +31,15 @@ namespace Xarial.CadPlus.CustomToolbar.Services
         private readonly IXApplication m_App;
         private readonly Dictionary<Triggers_e, CommandMacroInfo[]> m_Triggers;
         private readonly IMacroRunner m_MacroRunner;
-        private readonly IMessageService m_Msg;
         private readonly IXLogger m_Logger;
         private readonly ICommandsManager m_CmdMgr;
 
         public TriggersManager(ICommandsManager cmdMgr, IXApplication app, 
-            IMacroRunner macroRunner, IMessageService msgSvc, IXLogger logger)
+            IMacroRunner macroRunner, IXLogger logger)
         {
             m_CmdMgr = cmdMgr;
             m_App = app;
             m_MacroRunner = macroRunner;
-            m_Msg = msgSvc;
             m_Logger = logger;
 
             m_Triggers = LoadTriggers(m_CmdMgr.ToolbarInfo);
@@ -85,7 +83,7 @@ namespace Xarial.CadPlus.CustomToolbar.Services
                         }
                         break;
                     case Triggers_e.Rebuild:
-                        doc.Rebuild += OnRebuild;
+                        doc.Rebuilt += OnRebuild;
                         break;
                 }
             }
@@ -124,7 +122,7 @@ namespace Xarial.CadPlus.CustomToolbar.Services
 
             doc.Selections.NewSelection -= OnNewSelection;
             doc.Saving -= OnSaving;
-            doc.Rebuild -= OnRebuild;
+            doc.Rebuilt -= OnRebuild;
             doc.Closing -= OnDocumentClosing;
         }
 
@@ -204,15 +202,7 @@ namespace Xarial.CadPlus.CustomToolbar.Services
 
                     foreach (var cmd in cmds)
                     {
-                        try
-                        {
-                            m_MacroRunner.RunMacro(cmd.MacroPath, cmd.EntryPoint, false, cmd.Arguments);
-                        }
-                        catch(Exception ex)
-                        {
-                            m_Logger.Log(ex);
-                            m_Msg.ShowError(ex, $"Failed to run a macro '{cmd.Title}' on trigger '{trigger}'");
-                        }
+                        m_MacroRunner.TryRunMacroCommand(trigger, cmd);
                     }
                 }
             }

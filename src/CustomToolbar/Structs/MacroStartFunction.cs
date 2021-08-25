@@ -6,10 +6,11 @@
 //*********************************************************************
 
 using System;
+using Xarial.CadPlus.Plus.Modules;
 
 namespace Xarial.CadPlus.CustomToolbar.Structs
 {
-    public class MacroStartFunction
+    public class MacroStartFunction : IMacroStartFunction
     {
         public string ModuleName { get; set; }
         public string SubName { get; set; }
