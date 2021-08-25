@@ -42,6 +42,7 @@ namespace Xarial.CadPlus.Plus.Modules
 
     public interface ICommandMacroInfo
     {
+        string MacroPath { get; }
         string Title { get; }
         string Description { get; }
         bool UnloadAfterRun { get; }
