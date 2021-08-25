@@ -12,6 +12,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Xarial.CadPlus.Plus.Data;
+using Xarial.XCad.Documents;
 using Xarial.XCad.UI;
 
 namespace Xarial.CadPlus.Plus.Modules
@@ -43,6 +44,7 @@ namespace Xarial.CadPlus.Plus.Modules
     {
         public string MacroPath { get; set; }
         public IMacroStartFunction EntryPoint { get; set; }
+        public IXDocument TargetDocument { get; set; }
         public bool UnloadAfterRun { get; set; }
         public string Arguments { get; set; }
         public bool Cancel { get; set; }
