@@ -8,7 +8,6 @@
 using Autofac;
 using System;
 using System.ComponentModel;
-using Xarial.CadPlus.CustomToolbar.Properties;
 using Xarial.CadPlus.CustomToolbar.Services;
 using Xarial.CadPlus.CustomToolbar.UI.Forms;
 using Xarial.CadPlus.CustomToolbar.UI.ViewModels;
@@ -30,13 +29,14 @@ using Xarial.CadPlus.Plus.Attributes;
 using Xarial.CadPlus.Plus.Services;
 using Xarial.CadPlus.Plus.Shared;
 using Xarial.CadPlus.Plus.Shared.Extensions;
+using Xarial.CadPlus.Toolbar.Properties;
 
 namespace Xarial.CadPlus.CustomToolbar
 {
     [Module(typeof(IHostExtension))]
     public class CustomToolbarModule : IToolbarModule
     {
-        public event RunMacroDelegate RunMacro;
+        public event MacroRunningDelegate MacroRunning;
 
         [Title("Toolbar+")]
         [Description("Toolbar+ configuration")]
@@ -97,13 +97,13 @@ namespace Xarial.CadPlus.CustomToolbar
             m_Logger = Resolve<IXLogger>();
 
             m_ToolbarProxy = Resolve<IToolbarModuleProxy>();
-            m_ToolbarProxy.RequestRunMacro += OnRequestRunMacro;
+            m_ToolbarProxy.RequestMacroRunning += OnRequestMacroRunning;
 
             LoadCommands();
         }
 
-        private void OnRequestRunMacro(TriggerType_e triggerType, MacroRunArguments args)
-            => RunMacro?.Invoke(triggerType, args);
+        private void OnRequestMacroRunning(EventType_e eventType, MacroRunningArguments args)
+            => MacroRunning?.Invoke(eventType, args);
 
         protected virtual void CreateContainer()
         {
@@ -193,7 +193,7 @@ namespace Xarial.CadPlus.CustomToolbar
 
         public void Dispose()
         {
-            m_ToolbarProxy.RequestRunMacro -= OnRequestRunMacro;
+            m_ToolbarProxy.RequestMacroRunning -= OnRequestMacroRunning;
             m_Container.Dispose();
         }
 
@@ -202,15 +202,15 @@ namespace Xarial.CadPlus.CustomToolbar
     
     public interface IToolbarModuleProxy 
     {
-        event RunMacroDelegate RequestRunMacro;
-        void RunMacro(TriggerType_e trigger, MacroRunArguments args);
+        event MacroRunningDelegate RequestMacroRunning;
+        void CallMacroRunning(EventType_e trigger, MacroRunningArguments args);
     }
 
     internal class ToolbarModuleProxy : IToolbarModuleProxy
     {
-        public event RunMacroDelegate RequestRunMacro;
+        public event MacroRunningDelegate RequestMacroRunning;
 
-        public void RunMacro(TriggerType_e trigger, MacroRunArguments args)
-            => RequestRunMacro?.Invoke(trigger, args);
+        public void CallMacroRunning(EventType_e eventType, MacroRunningArguments args)
+            => RequestMacroRunning?.Invoke(eventType, args);
     }
 }

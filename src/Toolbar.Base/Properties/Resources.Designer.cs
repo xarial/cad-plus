@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Xarial.CadPlus.CustomToolbar.Properties {
+namespace Xarial.CadPlus.Toolbar.Properties {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace Xarial.CadPlus.CustomToolbar.Properties {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Xarial.CadPlus.CustomToolbar.Properties.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Xarial.CadPlus.Toolbar.Properties.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;

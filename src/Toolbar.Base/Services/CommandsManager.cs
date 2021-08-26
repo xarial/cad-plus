@@ -18,11 +18,11 @@ using Xarial.CadPlus.Common.Services;
 using Xarial.CadPlus.CustomToolbar.Base;
 using Xarial.CadPlus.CustomToolbar.Enums;
 using Xarial.CadPlus.CustomToolbar.Helpers;
-using Xarial.CadPlus.CustomToolbar.Properties;
 using Xarial.CadPlus.CustomToolbar.Structs;
 using Xarial.CadPlus.Plus;
 using Xarial.CadPlus.Plus.Modules;
 using Xarial.CadPlus.Plus.Services;
+using Xarial.CadPlus.Toolbar.Properties;
 using Xarial.XCad;
 using Xarial.XCad.Base;
 using Xarial.XCad.Exceptions;
@@ -194,7 +194,11 @@ namespace Xarial.CadPlus.CustomToolbar.Services
             var cmdSpec = (CommandItemInfoSpec)spec;
             var macroInfo = cmdSpec.Info;
 
-            if (m_MacroRunner.TryRunMacroCommand(macroInfo.Triggers.HasFlag(Triggers_e.ToggleButton) ? Triggers_e.ToggleButton : Triggers_e.Button, macroInfo))
+            var trigger = macroInfo.Triggers.HasFlag(Triggers_e.ToggleButton) ? Triggers_e.ToggleButton : Triggers_e.Button;
+
+            var targetDoc = m_App.Documents.Active;
+
+            if (m_MacroRunner.TryRunMacroCommand(trigger, macroInfo, targetDoc))
             {
                 if (macroInfo.Triggers.HasFlag(Triggers_e.ToggleButton))
                 {

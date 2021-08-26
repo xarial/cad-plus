@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Xarial.CadPlus.CustomToolbar.Properties {
+namespace Xarial.CadPlus.Toolbar.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]

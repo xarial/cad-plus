@@ -11,9 +11,9 @@ using System.IO;
 using System.Linq;
 using System.Windows.Data;
 using System.Windows.Media.Imaging;
-using Xarial.CadPlus.CustomToolbar.Properties;
 using Xarial.CadPlus.CustomToolbar.UI.ViewModels;
 using Xarial.CadPlus.Plus.Modules;
+using Xarial.CadPlus.Toolbar.Properties;
 using Xarial.XToolkit.Wpf.Extensions;
 
 namespace Xarial.CadPlus.CustomToolbar.UI.Converters
