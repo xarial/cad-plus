@@ -9,12 +9,12 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using Xarial.CadPlus.Common;
-using Xarial.CadPlus.CustomToolbar.Properties;
 using Xarial.CadPlus.CustomToolbar.Structs;
 using Xarial.CadPlus.Plus;
 using Xarial.CadPlus.Plus.Data;
 using Xarial.CadPlus.Plus.Extensions;
 using Xarial.CadPlus.Plus.Modules;
+using Xarial.CadPlus.Toolbar.Properties;
 using Xarial.XCad.UI;
 
 namespace Xarial.CadPlus.CustomToolbar.Base

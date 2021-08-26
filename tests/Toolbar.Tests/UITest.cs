@@ -33,16 +33,8 @@ namespace CustomToolbar.Tests
             {
                 return new MacroStartFunction[]
                 {
-                    new MacroStartFunction()
-                    {
-                        ModuleName = "Module1",
-                        SubName = "Sub1"
-                    },
-                    new MacroStartFunction()
-                    {
-                        ModuleName = "Module2",
-                        SubName = "Sub2"
-                    }
+                    new MacroStartFunction("Module1", "Sub1"),
+                    new MacroStartFunction("Module2", "Sub2")
                 };
             }
         }
@@ -89,11 +81,7 @@ namespace CustomToolbar.Tests
                             MacroPath = "D:\\1.swb",
                             Title = "Command1",
                             Description="Sample command in toolbar which will invoke some macro",
-                            EntryPoint = new MacroStartFunction()
-                            {
-                                ModuleName = "Module1",
-                                SubName = "Sub1"
-                            }
+                            EntryPoint = new MacroStartFunction("Module1", "Sub1")
                         },
                         new CommandMacroInfo() { Title = "Command2" },
                         new CommandMacroInfo() { Title = "Command3" }

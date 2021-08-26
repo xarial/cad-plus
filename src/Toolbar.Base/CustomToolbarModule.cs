@@ -8,7 +8,6 @@
 using Autofac;
 using System;
 using System.ComponentModel;
-using Xarial.CadPlus.CustomToolbar.Properties;
 using Xarial.CadPlus.CustomToolbar.Services;
 using Xarial.CadPlus.CustomToolbar.UI.Forms;
 using Xarial.CadPlus.CustomToolbar.UI.ViewModels;
@@ -30,12 +29,15 @@ using Xarial.CadPlus.Plus.Attributes;
 using Xarial.CadPlus.Plus.Services;
 using Xarial.CadPlus.Plus.Shared;
 using Xarial.CadPlus.Plus.Shared.Extensions;
+using Xarial.CadPlus.Toolbar.Properties;
 
 namespace Xarial.CadPlus.CustomToolbar
 {
     [Module(typeof(IHostExtension))]
     public class CustomToolbarModule : IToolbarModule
     {
+        public event MacroRunningDelegate MacroRunning;
+
         [Title("Toolbar+")]
         [Description("Toolbar+ configuration")]
         public enum Commands_e
@@ -61,6 +63,7 @@ namespace Xarial.CadPlus.CustomToolbar
         private List<IIconsProvider> m_IconsProviders;
 
         private IServiceProvider m_SvcProvider;
+        private IToolbarModuleProxy m_ToolbarProxy;
 
         public CustomToolbarModule() 
         {
@@ -93,8 +96,14 @@ namespace Xarial.CadPlus.CustomToolbar
             m_Msg = Resolve<IMessageService>();
             m_Logger = Resolve<IXLogger>();
 
+            m_ToolbarProxy = Resolve<IToolbarModuleProxy>();
+            m_ToolbarProxy.RequestMacroRunning += OnRequestMacroRunning;
+
             LoadCommands();
         }
+
+        private void OnRequestMacroRunning(EventType_e eventType, MacroRunningArguments args)
+            => MacroRunning?.Invoke(eventType, args);
 
         protected virtual void CreateContainer()
         {
@@ -108,7 +117,10 @@ namespace Xarial.CadPlus.CustomToolbar
                 .As<IMacroEntryPointsExtractor>();
 
             builder.RegisterType<MacroRunner>()
-                .As<IMacroRunner>();
+                .As<IMacroRunner>().SingleInstance();
+
+            builder.RegisterType<ToolbarModuleProxy>()
+                .As<IToolbarModuleProxy>().SingleInstance();
 
             builder.RegisterType<ToolbarConfigurationProvider>()
                 .As<IToolbarConfigurationProvider>();
@@ -179,8 +191,26 @@ namespace Xarial.CadPlus.CustomToolbar
             }
         }
 
-        public void Dispose() => m_Container.Dispose();
+        public void Dispose()
+        {
+            m_ToolbarProxy.RequestMacroRunning -= OnRequestMacroRunning;
+            m_Container.Dispose();
+        }
 
         public void RegisterIconsProvider(IIconsProvider provider) => m_IconsProviders.Add(provider);
+    }
+    
+    public interface IToolbarModuleProxy 
+    {
+        event MacroRunningDelegate RequestMacroRunning;
+        void CallMacroRunning(EventType_e trigger, MacroRunningArguments args);
+    }
+
+    internal class ToolbarModuleProxy : IToolbarModuleProxy
+    {
+        public event MacroRunningDelegate RequestMacroRunning;
+
+        public void CallMacroRunning(EventType_e eventType, MacroRunningArguments args)
+            => RequestMacroRunning?.Invoke(eventType, args);
     }
 }
