@@ -5,12 +5,18 @@
 //License: https://cadplus.xarial.com/license/
 //*********************************************************************
 
+using Newtonsoft.Json;
+using System.Xml.Serialization;
 using Xarial.CadPlus.CustomToolbar.Enums;
+using Xarial.CadPlus.Plus.Modules;
 
 namespace Xarial.CadPlus.CustomToolbar.Structs
 {
-    public class CommandMacroInfo : CommandItemInfo
+    public class CommandMacroInfo : CommandItemInfo, ICommandMacroInfo
     {
+        [JsonIgnore, XmlIgnore]
+        IMacroStartFunction ICommandMacroInfo.EntryPoint => EntryPoint;
+
         public string MacroPath { get; set; }
         public MacroStartFunction EntryPoint { get; set; }
         public MacroScope_e Scope { get; set; } = MacroScope_e.All;

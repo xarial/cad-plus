@@ -18,11 +18,11 @@ using Xarial.CadPlus.Common.Services;
 using Xarial.CadPlus.CustomToolbar.Base;
 using Xarial.CadPlus.CustomToolbar.Enums;
 using Xarial.CadPlus.CustomToolbar.Helpers;
-using Xarial.CadPlus.CustomToolbar.Properties;
 using Xarial.CadPlus.CustomToolbar.Structs;
 using Xarial.CadPlus.Plus;
 using Xarial.CadPlus.Plus.Modules;
 using Xarial.CadPlus.Plus.Services;
+using Xarial.CadPlus.Toolbar.Properties;
 using Xarial.XCad;
 using Xarial.XCad.Base;
 using Xarial.XCad.Exceptions;
@@ -34,7 +34,6 @@ namespace Xarial.CadPlus.CustomToolbar.Services
     {
         CustomToolbarInfo ToolbarInfo { get; }
         void UpdateToolbarConfiguration(ToolbarSettings toolbarSets, CustomToolbarInfo toolbarConf, bool isEditable);
-        bool RunMacroCommand(CommandMacroInfo cmd, out Exception err);
     }
 
     public partial class CommandsManager : ICommandsManager
@@ -81,23 +80,7 @@ namespace Xarial.CadPlus.CustomToolbar.Services
                 m_Msg.ShowError(ex, "Failed to load toolbar specification");
             }
         }
-
-        public bool RunMacroCommand(CommandMacroInfo cmd, out Exception err)
-        {
-            try
-            {
-                m_MacroRunner.RunMacro(cmd.MacroPath, cmd.EntryPoint, cmd.UnloadAfterRun, cmd.Arguments);
-                err = null;
-                return true;
-            }
-            catch (Exception ex)
-            {
-                m_Logger.Log(ex);
-                err = ex;
-                return false;
-            }
-        }
-
+        
         public void UpdateToolbarConfiguration(ToolbarSettings toolbarSets, CustomToolbarInfo toolbarConf, bool isEditable)
         {
             bool isToolbarChanged;
@@ -211,7 +194,11 @@ namespace Xarial.CadPlus.CustomToolbar.Services
             var cmdSpec = (CommandItemInfoSpec)spec;
             var macroInfo = cmdSpec.Info;
 
-            if (RunMacroCommand(macroInfo, out Exception err)) 
+            var trigger = macroInfo.Triggers.HasFlag(Triggers_e.ToggleButton) ? Triggers_e.ToggleButton : Triggers_e.Button;
+
+            var targetDoc = m_App.Documents.Active;
+
+            if (m_MacroRunner.TryRunMacroCommand(trigger, macroInfo, targetDoc))
             {
                 if (macroInfo.Triggers.HasFlag(Triggers_e.ToggleButton))
                 {
@@ -228,10 +215,6 @@ namespace Xarial.CadPlus.CustomToolbar.Services
                         }
                     }
                 }
-            }
-            else
-            {
-                m_Msg.ShowError(err, $"Failed to run macro: '{cmdSpec.Title}'");
             }
         }
         

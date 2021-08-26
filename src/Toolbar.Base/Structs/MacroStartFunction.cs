@@ -6,13 +6,20 @@
 //*********************************************************************
 
 using System;
+using Xarial.CadPlus.Plus.Modules;
 
 namespace Xarial.CadPlus.CustomToolbar.Structs
 {
-    public class MacroStartFunction
+    public class MacroStartFunction : IMacroStartFunction
     {
-        public string ModuleName { get; set; }
-        public string SubName { get; set; }
+        public string ModuleName { get; }
+        public string SubName { get; }
+
+        public MacroStartFunction(string moduleName, string subName)
+        {
+            ModuleName = moduleName;
+            SubName = subName;
+        }
 
         public static bool operator ==(MacroStartFunction x, MacroStartFunction y)
         {
