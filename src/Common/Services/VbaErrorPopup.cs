@@ -46,6 +46,8 @@ namespace Xarial.CadPlus.Common.Services
         private IntPtr m_DebugButton;
         private IntPtr m_HelpButton;
 
+        private int m_CurControlIndex;
+
         public VbaErrorPopup(IntPtr hWnd)
         {
             IsVbaErrorPopup = false;
@@ -56,7 +58,10 @@ namespace Xarial.CadPlus.Common.Services
             {
                 EnumChildWindows(hWnd, EnumWindow, IntPtr.Zero);
 
-                if (!IntPtr.Zero.Equals(m_Label)
+                const int NUMBER_OF_CONTROLS = 5;
+
+                if (m_CurControlIndex == NUMBER_OF_CONTROLS
+                    && !IntPtr.Zero.Equals(m_Label)
                     && !IntPtr.Zero.Equals(m_ContinueButton)
                     && !IntPtr.Zero.Equals(m_EndButton)
                     && !IntPtr.Zero.Equals(m_DebugButton)
@@ -82,30 +87,30 @@ namespace Xarial.CadPlus.Common.Services
 
         private bool EnumWindow(IntPtr hWnd, IntPtr lParam)
         {
-            var txt = GetText(hWnd);
             var className = GetClassName(hWnd);
 
-            if (className == "Static")
+            if (className == "Static" && m_CurControlIndex == 0)
             {
                 m_Label = hWnd;
             }
-            else if (txt == "&Continue" && className == "Button")
+            else if (className == "Button" && m_CurControlIndex == 1)//"&Continue"
             {
                 m_ContinueButton = hWnd;
             }
-            else if (txt == "&End" && className == "Button")
+            else if (className == "Button" && m_CurControlIndex == 2)//"&End"
             {
                 m_EndButton = hWnd;
             }
-            else if (txt == "&Debug" && className == "Button")
+            else if (className == "Button" && m_CurControlIndex == 3)//"&Debug"
             {
                 m_DebugButton = hWnd;
             }
-            else if (txt == "&Help" && className == "Button")
+            else if (className == "Button" && m_CurControlIndex == 4)//"&Help"
             {
                 m_HelpButton = hWnd;
             }
 
+            m_CurControlIndex++;
             return true;
         }
 

@@ -38,6 +38,7 @@ using Xarial.XToolkit.Wpf.Extensions;
 using Xarial.XToolkit.Wpf.Utils;
 using Xarial.CadPlus.Batch.Base.Services;
 using Xarial.CadPlus.Plus.Shared.Helpers;
+using Xarial.CadPlus.Batch.Base.ViewModels;
 
 namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
 {
@@ -325,7 +326,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
             = new Func<string, object>(p => new MacroDataVM(new MacroData() { FilePath = p }));
 
         public Func<object, string> MacroDataToPathConverter { get; }
-        = new Func<object, string>((m) => ((MacroDataVM)m).FilePath);
+            = new Func<object, string>((m) => ((MacroDataVM)m).FilePath);
 
         private bool CanRunJob => Input.Any() && Macros.Any() && Settings.Version != null;
 

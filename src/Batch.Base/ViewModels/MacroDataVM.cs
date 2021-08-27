@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using Xarial.CadPlus.Batch.Base.Core;
 using Xarial.XToolkit.Wpf.Extensions;
 
-namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
+namespace Xarial.CadPlus.Batch.Base.ViewModels
 {
     public class MacroDataVM : INotifyPropertyChanged
     {
@@ -18,18 +18,18 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
         public MacroData Data { get; }
 
         public string FilePath => Data.FilePath;
-        
-        public string Arguments 
+
+        public string Arguments
         {
             get => Data.Arguments;
-            set 
+            set
             {
                 Data.Arguments = value;
                 this.NotifyChanged();
                 Modified?.Invoke(this);
             }
         }
-        
+
         public MacroDataVM(MacroData data)
         {
             Data = data;
