@@ -21,6 +21,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Xarial.CadPlus.Batch.Base.Core;
+using Xarial.CadPlus.Batch.Base.ViewModels;
 using Xarial.XToolkit;
 
 namespace Xarial.CadPlus.Batch.Base.Controls
@@ -59,7 +60,7 @@ namespace Xarial.CadPlus.Batch.Base.Controls
 		{
 			try
 			{
-				var path = (this.DataContext as MacroData).FilePath;
+				var path = (this.DataContext as MacroDataVM).FilePath;
 
 				if (System.IO.Directory.Exists(path))
 				{

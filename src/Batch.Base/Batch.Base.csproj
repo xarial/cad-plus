@@ -165,6 +165,7 @@
     <Compile Include="ViewModels\JobResultJournalVM.cs" />
     <Compile Include="ViewModels\JobResultSummaryVM.cs" />
     <Compile Include="ViewModels\JobResultVM.cs" />
+    <Compile Include="ViewModels\MacroDataVM.cs" />
   </ItemGroup>
   <ItemGroup>
     <Page Include="Controls\JobItemsDataGrid.xaml">

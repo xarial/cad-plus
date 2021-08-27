@@ -226,7 +226,7 @@ namespace Xarial.CadPlus.Batch.InApp
                     ProcessInput?.Invoke(m_Host.Extension.Application, input);
 
                     var exec = new AssemblyBatchRunJobExecutor(m_Host.Extension.Application, m_MacroRunnerSvc,
-                        input.ToArray(), m_Logger, m_Data.Macros.Macros.Macros,
+                        input.ToArray(), m_Logger, m_Data.Macros.Macros.Macros.Select(x => x.Data).ToArray(),
                         m_Data.Options.ActivateDocuments, m_Data.Options.AllowReadOnly, m_Data.Options.AllowRapid);
 
                     var vm = new JobResultVM(rootDoc.Title, exec, m_CadDesc);
