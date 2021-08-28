@@ -17,7 +17,7 @@ namespace Xarial.CadPlus.CustomToolbar.UI.Converters
         private readonly IMacroEntryPointsExtractor m_Extractor;
 
         public MacroPathToEntryPointsConverter()
-            : this(CustomToolbarModule.Resolve<IMacroEntryPointsExtractor>())
+            : this(ToolbarModule.Resolve<IMacroEntryPointsExtractor>())
         {
         }
 

@@ -34,6 +34,7 @@ namespace Xarial.CadPlus.Export.InApp
         [Title("eXport+")]
         [Description("Commands to export files in a batch mode")]
         [IconEx(typeof(Resources), nameof(Resources.export_vector), nameof(Resources.export_icon))]
+        [CommandGroupInfo((int)CadCommandGroupIds_e.Export)]
         public enum Commands_e
         {
             [IconEx(typeof(Resources), nameof(Resources.export_vector), nameof(Resources.export_icon))]

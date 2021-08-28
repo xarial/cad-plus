@@ -70,6 +70,7 @@ namespace Xarial.CadPlus.Batch.InApp
         [Title("Batch+")]
         [Description("Commands to batch run macros")]
         [IconEx(typeof(Resources), nameof(Resources.batch_plus_vector), nameof(Resources.batch_plus_icon))]
+        [CommandGroupInfo((int)CadCommandGroupIds_e.Batch)]
         public enum Commands_e
         {
             [IconEx(typeof(Resources), nameof(Resources.batch_plus_vector), nameof(Resources.batch_plus_icon))]

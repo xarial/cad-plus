@@ -42,6 +42,7 @@ namespace Xarial.CadPlus.Drawing
 {
     [Title("Drawing+")]
     [IconEx(typeof(Resources), nameof(Resources.drawing_vector), nameof(Resources.drawing_icon))]
+    [CommandGroupInfo((int)CadCommandGroupIds_e.Drawing)]
     public enum Commands_e 
     {
         [CommandItemInfo(WorkspaceTypes_e.Drawing)]
@@ -51,8 +52,8 @@ namespace Xarial.CadPlus.Drawing
         InsertQrCode
     }
 
-    [CommandGroupInfo(2000)]
     [Title("Drawing+ QR Code")]
+    [CommandGroupInfo((int)CadCommandGroupIds_e.QrCodeContextMenu)]
     public enum PictureContextMenuCommands_e 
     {
         [Title("Edit")]

@@ -27,7 +27,7 @@ namespace Xarial.CadPlus.CustomToolbar.UI.ViewModels
         }
 
         public CommandGroupVM()
-            : this(new CommandGroupInfo(), CustomToolbarModule.Resolve<IIconsProvider[]>())
+            : this(new CommandGroupInfo(), ToolbarModule.Resolve<IIconsProvider[]>())
         {
         }
 

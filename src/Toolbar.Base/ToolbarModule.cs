@@ -34,12 +34,13 @@ using Xarial.CadPlus.Toolbar.Properties;
 namespace Xarial.CadPlus.CustomToolbar
 {
     [Module(typeof(IHostExtension))]
-    public class CustomToolbarModule : IToolbarModule
+    public class ToolbarModule : IToolbarModule
     {
         public event MacroRunningDelegate MacroRunning;
 
         [Title("Toolbar+")]
         [Description("Toolbar+ configuration")]
+        [CommandGroupInfo((int)CadCommandGroupIds_e.Toolbar)]
         public enum Commands_e
         {
             [IconEx(typeof(Resources), nameof(Resources.configure_vector), nameof(Resources.configure_icon))]
@@ -65,7 +66,7 @@ namespace Xarial.CadPlus.CustomToolbar
         private IServiceProvider m_SvcProvider;
         private IToolbarModuleProxy m_ToolbarProxy;
 
-        public CustomToolbarModule() 
+        public ToolbarModule() 
         {
             m_IconsProviders = new List<IIconsProvider>();
             

@@ -146,13 +146,13 @@ namespace Xarial.CadPlus.CustomToolbar.UI.ViewModels
 
         private readonly FileFilter[] m_MacroFileFilters;
 
-        public CommandMacroVM() : this(new CommandMacroInfo(), CustomToolbarModule.Resolve<IIconsProvider[]>())
+        public CommandMacroVM() : this(new CommandMacroInfo(), ToolbarModule.Resolve<IIconsProvider[]>())
         {
         }
 
         public CommandMacroVM(CommandMacroInfo cmd, IIconsProvider[] providers) : base(cmd, providers)
         {
-            m_MacroFileFilters = CustomToolbarModule.Resolve<ICadDescriptor>().MacroFileFilters
+            m_MacroFileFilters = ToolbarModule.Resolve<ICadDescriptor>().MacroFileFilters
                 .Select(f => new FileFilter(f.Name, f.Extensions))
                 .Union(new FileFilter[] { XCadMacroProvider.Filter, FileFilter.AllFiles }).ToArray();
         }

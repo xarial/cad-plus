@@ -32,7 +32,7 @@ namespace Xarial.CadPlus.CustomToolbar.UI.Converters
         private readonly IIconsProvider[] m_IconProviders;
 
         public PathToIconConverter() 
-            : this(CustomToolbarModule.Resolve<IIconsProvider[]>())
+            : this(ToolbarModule.Resolve<IIconsProvider[]>())
         {
         }
 
