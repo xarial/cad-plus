@@ -35,10 +35,11 @@ namespace Xarial.CadPlus.Export.InApp
         [Description("Commands to export files in a batch mode")]
         [IconEx(typeof(Resources), nameof(Resources.export_vector), nameof(Resources.export_icon))]
         [CommandGroupInfo((int)CadCommandGroupIds_e.Export)]
+        [CommandOrder(7)]
         public enum Commands_e
         {
             [IconEx(typeof(Resources), nameof(Resources.export_vector), nameof(Resources.export_icon))]
-            [Title("Open Stand-Alone...")]
+            [Title("Open eXport+ Stand-Alone...")]
             [Description("Runs stand-alone eXport+")]
             [CommandItemInfo(true, true, WorkspaceTypes_e.All)]
             RunStandAlone,

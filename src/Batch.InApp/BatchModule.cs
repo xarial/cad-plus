@@ -62,29 +62,30 @@ namespace Xarial.CadPlus.Batch.InApp
         public int GetHashCode(IXComponent obj) => 0;
     }
 
+    [Title("Batch+")]
+    [Description("Commands to batch run macros")]
+    [IconEx(typeof(Resources), nameof(Resources.batch_plus_vector), nameof(Resources.batch_plus_icon))]
+    [CommandGroupInfo((int)CadCommandGroupIds_e.Batch)]
+    [CommandOrder(4)]
+    public enum Commands_e
+    {
+        [IconEx(typeof(Resources), nameof(Resources.batch_plus_vector), nameof(Resources.batch_plus_icon))]
+        [Title("Open Batch+ Stand-Alone...")]
+        [Description("Runs stand-alone Batch+")]
+        [CommandItemInfo(true, true, WorkspaceTypes_e.All)]
+        RunStandAlone,
+
+        [IconEx(typeof(Resources), nameof(Resources.batch_plus_assm_vector), nameof(Resources.batch_plus_assm_icon))]
+        [Title("Batch Run Macros")]
+        [Description("Runs batch command to active file")]
+        [CommandItemInfo(true, true, WorkspaceTypes_e.Assembly, true)]
+        RunInApp
+    }
+
     [Module(typeof(IHostExtension))]
     public class BatchModule : IBatchInAppModule
     {
         public event ProcessInAppBatchInputDelegate ProcessInput;
-
-        [Title("Batch+")]
-        [Description("Commands to batch run macros")]
-        [IconEx(typeof(Resources), nameof(Resources.batch_plus_vector), nameof(Resources.batch_plus_icon))]
-        [CommandGroupInfo((int)CadCommandGroupIds_e.Batch)]
-        public enum Commands_e
-        {
-            [IconEx(typeof(Resources), nameof(Resources.batch_plus_vector), nameof(Resources.batch_plus_icon))]
-            [Title("Open Stand-Alone...")]
-            [Description("Runs stand-alone Batch+")]
-            [CommandItemInfo(true, true, WorkspaceTypes_e.All)]
-            RunStandAlone,
-
-            [IconEx(typeof(Resources), nameof(Resources.batch_plus_assm_vector), nameof(Resources.batch_plus_assm_icon))]
-            [Title("Run")]
-            [Description("Runs batch command to active file")]
-            [CommandItemInfo(true, true, WorkspaceTypes_e.Assembly)]
-            RunInApp
-        }
 
         private IHostExtension m_Host;
 

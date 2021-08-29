@@ -33,22 +33,23 @@ using Xarial.CadPlus.Toolbar.Properties;
 
 namespace Xarial.CadPlus.CustomToolbar
 {
+    [Title("Toolbar+")]
+    [Description("Toolbar+ configuration")]
+    [CommandGroupInfo((int)CadCommandGroupIds_e.Toolbar)]
+    [CommandOrder(5)]
+    public enum Commands_e
+    {
+        [IconEx(typeof(Resources), nameof(Resources.configure_vector), nameof(Resources.configure_icon))]
+        [Title("Configure Custom Toolbars...")]
+        [Description("Configure custom toolbar")]
+        [CommandItemInfo(true, false, WorkspaceTypes_e.All)]
+        Configuration
+    }
+
     [Module(typeof(IHostExtension))]
     public class ToolbarModule : IToolbarModule
     {
         public event MacroRunningDelegate MacroRunning;
-
-        [Title("Toolbar+")]
-        [Description("Toolbar+ configuration")]
-        [CommandGroupInfo((int)CadCommandGroupIds_e.Toolbar)]
-        public enum Commands_e
-        {
-            [IconEx(typeof(Resources), nameof(Resources.configure_vector), nameof(Resources.configure_icon))]
-            [Title("Configure...")]
-            [Description("Configure custom toolbar")]
-            [CommandItemInfo(true, false, WorkspaceTypes_e.All)]
-            Configuration
-        }
 
         protected static Autofac.IContainer m_Container;
 

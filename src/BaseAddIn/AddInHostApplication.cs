@@ -121,58 +121,71 @@ namespace Xarial.CadPlus.AddIn.Base
                 var mainGrpSpec = cmdGrp.Spec;
 
                 Connect?.Invoke();
+
+                var groups = m_RegisteredCommands.GroupBy(x => x.Item1.Id)
+                    .Select(g => 
+                    {
+                        var baseGroupSpecs = g.Where(x => !x.Item1.CmdGrpEnumType.TryGetAttribute<PartialCommandGroupAttribute>(out _))
+                            .Select(x => x).ToArray();
+
+                        if (baseGroupSpecs.Any())
+                        {
+                            if (baseGroupSpecs.Length == 1)
+                            {
+                                var baseGroupSpec = baseGroupSpecs.First().Item1;
+
+                                return new Tuple<EnumCommandGroupSpec, IEnumerable<Tuple<EnumCommandGroupSpec, Delegate>>>(baseGroupSpec, g);
+                            }
+                            else
+                            {
+                                throw new Exception("More than one base group defined");
+                            }
+                        }
+                        else
+                        {
+                            throw new Exception("No base groups defined");
+                        }
+                    }).OrderBy(g =>
+                    {
+                        if (g.Item1.CmdGrpEnumType.TryGetAttribute(out CommandOrderAttribute att))
+                        {
+                            return att.Order;
+                        }
+                        else
+                        {
+                            return 0;
+                        }
+                    }).ToArray();
                 
-                var groups = m_RegisteredCommands.GroupBy(x => x.Item1.Id);
-
-                //TODO: add support for the group ordering
-
                 foreach (var group in groups) 
                 {
-                    var baseGroupSpecs = group.Where(g => !g.Item1.CmdGrpEnumType.TryGetAttribute<PartialCommandGroupAttribute>(out _))
-                        .Select(g => g).ToArray();
+                    var baseGroupSpec = group.Item1;
 
-                    if (baseGroupSpecs.Any())
+                    //TODO: add support for nested groups
+                    baseGroupSpec.Parent = mainGrpSpec;
+
+                    baseGroupSpec.Commands = group.Item2.SelectMany(g =>
                     {
-                        if (baseGroupSpecs.Length == 1)
+                        var cmds = g.Item1.Commands;
+                        foreach (var cmd in cmds)
                         {
-                            var baseGroupSpec = baseGroupSpecs.First().Item1;
-
-                            //TODO: add support for nested groups
-                            baseGroupSpec.Parent = mainGrpSpec;
-
-                            baseGroupSpec.Commands = group.SelectMany(g =>
-                            {
-                                var cmds = g.Item1.Commands;
-                                foreach (var cmd in cmds) 
-                                {
-                                    m_Handlers.Add(cmd, new Tuple<Delegate, Enum>(g.Item2, cmd.Value));
-                                }
-
-                                return cmds;
-                            }).OrderBy(c =>
-                            {
-                                int order = -1;
-                                if (!c.Value.TryGetAttribute<CommandOrderAttribute>(x => order = x.Order)) 
-                                {
-                                    order = 0;
-                                };
-                                return order;
-                            }).ToArray();
-
-                            var grp = Extension.CommandManager.AddCommandGroup(baseGroupSpec);
-
-                            grp.CommandClick += OnCommandClick;
+                            m_Handlers.Add(cmd, new Tuple<Delegate, Enum>(g.Item2, cmd.Value));
                         }
-                        else 
-                        {
-                            throw new Exception("More than one base group defined");
-                        }
-                    }
-                    else 
+
+                        return cmds;
+                    }).OrderBy(c =>
                     {
-                        throw new Exception("No base groups defined");
-                    }
-                    
+                        int order = -1;
+                        if (!c.Value.TryGetAttribute<CommandOrderAttribute>(x => order = x.Order))
+                        {
+                            order = 0;
+                        };
+                        return order;
+                    }).ToArray();
+
+                    var grp = Extension.CommandManager.AddCommandGroup(baseGroupSpec);
+
+                    grp.CommandClick += OnCommandClick;
                 }
             }
             catch (Exception ex)

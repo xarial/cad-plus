@@ -43,9 +43,10 @@ namespace Xarial.CadPlus.Drawing
     [Title("Drawing+")]
     [IconEx(typeof(Resources), nameof(Resources.drawing_vector), nameof(Resources.drawing_icon))]
     [CommandGroupInfo((int)CadCommandGroupIds_e.Drawing)]
+    [CommandOrder(3)]
     public enum Commands_e 
     {
-        [CommandItemInfo(WorkspaceTypes_e.Drawing)]
+        [CommandItemInfo(true, true, WorkspaceTypes_e.Drawing, true)]
         [IconEx(typeof(Resources), nameof(Resources.qrcode_vector), nameof(Resources.qrcode_icon))]
         [Title("Insert QR Code")]
         [Description("Inserts QR code based on custom data source into the current drawing")]

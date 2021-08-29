@@ -28,10 +28,12 @@ namespace Xarial.CadPlus.AddIn.Base
     {
         [CommandItemInfo(true, false, WorkspaceTypes_e.All)]
         [IconEx(typeof(Resources), nameof(Resources.help_vector), nameof(Resources.help_icon))]
+        [Title("Help...")]
         Help,
 
         [CommandItemInfo(true, false, WorkspaceTypes_e.All)]
         [IconEx(typeof(Resources), nameof(Resources.about_vector), nameof(Resources.about_icon))]
+        [Title("About...")]
         About
     }
 }
