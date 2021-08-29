@@ -39,7 +39,7 @@ namespace CustomToolbar.Tests
             }
         }
 
-        public class CustomToolbarModuleMock : CustomToolbarModule 
+        public class CustomToolbarModuleMock : ToolbarModule 
         {
             protected override void CreateContainer()
             {
