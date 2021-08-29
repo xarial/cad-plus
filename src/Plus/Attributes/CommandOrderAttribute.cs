@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Xarial.CadPlus.Plus.Attributes
 {
-    [AttributeUsage(AttributeTargets.Field)]
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Field)]
     public class CommandOrderAttribute : Attribute
     {
         public int Order { get; }
