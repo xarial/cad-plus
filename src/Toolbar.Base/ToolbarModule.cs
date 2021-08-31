@@ -30,6 +30,8 @@ using Xarial.CadPlus.Plus.Services;
 using Xarial.CadPlus.Plus.Shared;
 using Xarial.CadPlus.Plus.Shared.Extensions;
 using Xarial.CadPlus.Toolbar.Properties;
+using Xarial.CadPlus.Toolbar.Services;
+using Xarial.CadPlus.CustomToolbar.Structs;
 
 namespace Xarial.CadPlus.CustomToolbar
 {
@@ -66,6 +68,7 @@ namespace Xarial.CadPlus.CustomToolbar
 
         private IServiceProvider m_SvcProvider;
         private IToolbarModuleProxy m_ToolbarProxy;
+        private IToolbarConfigurationManager m_ToolbarConfMgr;
 
         public ToolbarModule() 
         {
@@ -101,7 +104,18 @@ namespace Xarial.CadPlus.CustomToolbar
             m_ToolbarProxy = Resolve<IToolbarModuleProxy>();
             m_ToolbarProxy.RequestMacroRunning += OnRequestMacroRunning;
 
-            LoadCommands();
+            m_ToolbarConfMgr = Resolve<IToolbarConfigurationManager>();
+
+            try
+            {
+                m_ToolbarConfMgr.Load();
+                LoadCommands(m_ToolbarConfMgr.Toolbar);
+            }
+            catch (Exception ex)
+            {
+                m_Logger.Log(ex);
+                m_Msg.ShowError(ex, "Failed to load toolbar specification");
+            }
         }
 
         private void OnRequestMacroRunning(EventType_e eventType, MacroRunningArguments args)
@@ -126,9 +140,11 @@ namespace Xarial.CadPlus.CustomToolbar
 
             builder.RegisterType<ToolbarConfigurationProvider>()
                 .As<IToolbarConfigurationProvider>();
-            
-            builder.RegisterType<CommandManagerVM>()
-                .SingleInstance();
+
+            builder.RegisterType<ToolbarConfigurationManager>()
+                .As<IToolbarConfigurationManager>().SingleInstance();
+
+            builder.RegisterType<CommandManagerVM>();
 
             builder.RegisterType<CommandsManager>()
                 .As<ICommandsManager>().SingleInstance();
@@ -148,14 +164,15 @@ namespace Xarial.CadPlus.CustomToolbar
             m_Container = builder.Build();
         }
 
-        private void LoadCommands()
+        private void LoadCommands(CustomToolbarInfo toolbarInfo)
         {
             m_Host.RegisterCommands<Commands_e>(OnCommandClick);
             
             m_CmdsMgr = Resolve<ICommandsManager>();
             m_TriggersMgr = Resolve<ITriggersManager>();
 
-            m_CmdsMgr.CreateCommandGroups();
+            m_CmdsMgr.CreateCommandGroups(toolbarInfo);
+            m_TriggersMgr.Load(toolbarInfo);
         }
 
         private void OnCommandClick(Commands_e spec)
@@ -168,6 +185,8 @@ namespace Xarial.CadPlus.CustomToolbar
 
                         var vm = Resolve<CommandManagerVM>();
 
+                        vm.Load(m_ToolbarConfMgr.Toolbar.Clone(), m_ToolbarConfMgr.FilePath);
+                        
                         var popup = m_Host.Extension.CreatePopupWindow<CommandManagerForm>();
                         popup.Control.DataContext = vm;
                         popup.Control.WindowStartupLocation = System.Windows.WindowStartupLocation.CenterOwner;
@@ -176,7 +195,19 @@ namespace Xarial.CadPlus.CustomToolbar
                         {
                             try
                             {
-                                m_CmdsMgr.UpdateToolbarConfiguration(vm.Settings, vm.ToolbarInfo, vm.IsEditable);
+                                m_ToolbarConfMgr.Toolbar = vm.ToolbarInfo;
+                                m_ToolbarConfMgr.FilePath = vm.ToolbarSpecificationPath;
+
+                                if (m_ToolbarConfMgr.SettingsChanged)
+                                {
+                                    m_ToolbarConfMgr.SaveSettings();
+                                }
+
+                                if (m_ToolbarConfMgr.ToolbarChanged) 
+                                {
+                                    m_ToolbarConfMgr.SaveToolbar();
+                                    m_Msg.ShowInformation("Toolbar setting have been changed. Restart the application to load the command manager and menu");
+                                }
                             }
                             catch (Exception ex)
                             {

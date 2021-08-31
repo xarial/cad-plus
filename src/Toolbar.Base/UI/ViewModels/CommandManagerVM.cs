@@ -43,7 +43,6 @@ namespace Xarial.CadPlus.CustomToolbar.UI.ViewModels
         private CommandsCollection<CommandGroupVM> m_Groups;
 
         private readonly IToolbarConfigurationProvider m_ConfsProvider;
-        private readonly ISettingsProvider m_SettsProvider;
         private readonly IMessageService m_MsgService;
         private readonly IXLogger m_Logger;
 
@@ -52,14 +51,12 @@ namespace Xarial.CadPlus.CustomToolbar.UI.ViewModels
         private readonly IIconsProvider[] m_IconsProviders;
 
         private readonly string[] m_MacroExtensions;
-
+        
         public CommandManagerVM(IToolbarConfigurationProvider confsProvider,
-            ISettingsProvider settsProvider, 
             IMessageService msgService, IXLogger logger, IIconsProvider[] iconsProviders,
             ICadDescriptor cadEntDesc)
         {
             m_ConfsProvider = confsProvider;
-            m_SettsProvider = settsProvider;
             m_MsgService = msgService;
             m_Logger = logger;
 
@@ -74,10 +71,6 @@ namespace Xarial.CadPlus.CustomToolbar.UI.ViewModels
                 .ToArray();
 
             m_IconsProviders = iconsProviders;
-
-            Settings = m_SettsProvider.ReadSettings<ToolbarSettings>();
-
-            LoadCommands();
         }
 
         private void Help()
@@ -91,23 +84,17 @@ namespace Xarial.CadPlus.CustomToolbar.UI.ViewModels
             }
         }
 
-        private void LoadCommands()
+        public void Load(CustomToolbarInfo toolbarInfo, string toolbarPath) 
         {
-            bool isReadOnly;
+            ToolbarInfo = toolbarInfo;
+            ToolbarSpecificationPath = toolbarPath;
+            IsEditable = !m_ConfsProvider.IsReadOnly(ToolbarSpecificationPath);
 
-            try
-            {
-                ToolbarInfo = m_ConfsProvider.GetToolbar(out isReadOnly, ToolbarSpecificationPath);
-            }
-            catch(Exception ex)
-            {
-                m_Logger.Log(ex);
-                isReadOnly = true;
-                m_MsgService.ShowError("Failed to load the toolbar from the specification file. Make sure that you have access to the specification file");
-            }
+            LoadToolbar(ToolbarInfo);
+        }
 
-            IsEditable = !isReadOnly;
-
+        private void LoadToolbar(CustomToolbarInfo toolbarInfo)
+        {
             if (Groups != null)
             {
                 Groups.CommandsChanged -= OnGroupsCollectionChanged;
@@ -115,7 +102,7 @@ namespace Xarial.CadPlus.CustomToolbar.UI.ViewModels
             }
 
             Groups = new CommandsCollection<CommandGroupVM>(
-                (ToolbarInfo.Groups ?? new CommandGroupInfo[0])
+                (toolbarInfo.Groups ?? new CommandGroupInfo[0])
                 .Select(g => new CommandGroupVM(g, m_IconsProviders)));
 
             HandleCommandGroupCommandCreation(Groups.Commands);
@@ -144,8 +131,6 @@ namespace Xarial.CadPlus.CustomToolbar.UI.ViewModels
 
         public CustomToolbarInfo ToolbarInfo { get; private set; }
 
-        public ToolbarSettings Settings { get; }
-
         public CommandsCollection<CommandGroupVM> Groups
         {
             get
@@ -172,22 +157,7 @@ namespace Xarial.CadPlus.CustomToolbar.UI.ViewModels
             }
         }
 
-        public string ToolbarSpecificationPath
-        {
-            get
-            {
-                return Settings.SpecificationFile;
-            }
-            set
-            {
-                if (!string.Equals(value, Settings.SpecificationFile, StringComparison.CurrentCultureIgnoreCase))
-                {
-                    Settings.SpecificationFile = value;
-                    this.NotifyChanged();
-                    LoadCommands();
-                }
-            }
-        }
+        public string ToolbarSpecificationPath { get; private set; }
 
         public ICommand BrowseToolbarSpecificationCommand
         {
@@ -202,7 +172,24 @@ namespace Xarial.CadPlus.CustomToolbar.UI.ViewModels
                             FileSystemBrowser.BuildFilterString(
                                 new FileFilter("Toolbar Specification File", "*.setts")))) 
                         {
-                            ToolbarSpecificationPath = specFile;
+                            if (!string.Equals(specFile, ToolbarSpecificationPath, StringComparison.CurrentCultureIgnoreCase))
+                            {
+                                try
+                                {
+                                    ToolbarInfo = m_ConfsProvider.GetToolbar(ToolbarSpecificationPath);
+
+                                    IsEditable = !m_ConfsProvider.IsReadOnly(ToolbarSpecificationPath);
+
+                                    ToolbarSpecificationPath = specFile;
+
+                                    this.NotifyChanged();
+                                }
+                                catch (Exception ex)
+                                {
+                                    m_Logger.Log(ex);
+                                    m_MsgService.ShowError(ex, "Failed to load toolbar information from the specified file");
+                                }
+                            }
                         }
                     });
                 }

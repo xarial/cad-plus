@@ -103,5 +103,11 @@ namespace Xarial.CadPlus.CustomToolbar.Structs
         public CustomToolbarInfo()
         {
         }
+
+        internal CustomToolbarInfo Clone()
+            => new CustomToolbarInfo()
+            {
+                Groups = Groups?.Select(g => g.Clone()).ToArray()
+            };
     }
 }
