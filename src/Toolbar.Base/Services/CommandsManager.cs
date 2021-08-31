@@ -27,12 +27,14 @@ using Xarial.XCad;
 using Xarial.XCad.Base;
 using Xarial.XCad.Exceptions;
 using Xarial.XCad.Extensions;
+using Xarial.XCad.UI.Structures;
 
 namespace Xarial.CadPlus.CustomToolbar.Services
 {
     public interface ICommandsManager : IDisposable
     {
         CustomToolbarInfo ToolbarInfo { get; }
+        void CreateCommandGroups();
         void UpdateToolbarConfiguration(ToolbarSettings toolbarSets, CustomToolbarInfo toolbarConf, bool isEditable);
     }
 
@@ -93,19 +95,32 @@ namespace Xarial.CadPlus.CustomToolbar.Services
             }
         }
 
-        private CustomToolbarInfo LoadUserToolbar()
+        public void CreateCommandGroups() 
         {
-            bool isReadOnly;
-            var toolbarInfo = m_ToolbarConfProvider.GetToolbar(out isReadOnly,
-                ToolbarSpecificationFile);
+            const string COMMAND_GROUP_TITLE_TEMPLATE = "Toolbar+ Command Group";
+            const string COMMAND_TITLE_TEMPLATE = "Toolbar+ Command";
 
-            if (toolbarInfo?.Groups != null)
+            var usedCommandGroupNames = new List<string>();
+            var usedCommandNames = new List<string>();
+
+            if (ToolbarInfo?.Groups != null)
             {
-                foreach (var grp in toolbarInfo.Groups
+                foreach (var grp in ToolbarInfo.Groups
                     .Where(g => g.Commands?.Any(c => c.Triggers.HasFlag(Triggers_e.Button)) == true))
                 {
                     var cmdGrp = new CommandGroupInfoSpec(grp, m_IconsProviders);
                     
+                    ResolveEmptyName(cmdGrp.Info, COMMAND_GROUP_TITLE_TEMPLATE, usedCommandGroupNames, out string grpTitle, out string grpTooltip);
+                    cmdGrp.Title = grpTitle;
+                    cmdGrp.Tooltip = grpTooltip;
+
+                    foreach (var cmd in cmdGrp.Commands)
+                    {
+                        ResolveEmptyName(((CommandItemInfoSpec)cmd).Info, COMMAND_TITLE_TEMPLATE, usedCommandNames, out string cmdTitle, out string cmdTooltip);
+                        cmd.Title = cmdTitle;
+                        cmd.Tooltip = cmdTooltip;
+                    }
+
                     m_Logger.Log($"Adding command group: {cmdGrp.Title} [{cmdGrp.Id}]. Commands: {string.Join(", ", cmdGrp.Commands.Select(c => $"{c.Title} [{c.UserId}]").ToArray())}", XCad.Base.Enums.LoggerMessageSeverity_e.Debug);
 
                     var cmdGrpCad = m_AddIn.CommandManager.AddCommandGroup(cmdGrp);
@@ -115,10 +130,17 @@ namespace Xarial.CadPlus.CustomToolbar.Services
                 }
 
                 LoadToggleStateResolvers(
-                    toolbarInfo.Groups.SelectMany(
+                    ToolbarInfo.Groups.SelectMany(
                         g => g.Commands ?? Enumerable.Empty<CommandMacroInfo>())
                     .Where(m => m.Triggers.HasFlag(Triggers_e.ToggleButton) && m.ToggleButtonStateCodeType != ToggleButtonStateCode_e.None));
             }
+        }
+
+        private CustomToolbarInfo LoadUserToolbar()
+        {
+            bool isReadOnly;
+            var toolbarInfo = m_ToolbarConfProvider.GetToolbar(out isReadOnly,
+                ToolbarSpecificationFile);
 
             return toolbarInfo;
         }
@@ -148,6 +170,28 @@ namespace Xarial.CadPlus.CustomToolbar.Services
                 }
 
                 m_Msg.ShowError($"Failed to compile the toggle state code");
+            }
+        }
+
+        private void ResolveEmptyName(CommandItemInfo info, string nameTemplate, List<string> usedNames, out string title, out string tooltip)
+        {
+            title = info.Title;
+            tooltip = info.Description;
+
+            if (string.IsNullOrEmpty(title))
+            {
+                title = nameTemplate;
+                int i = 0;
+
+                while (usedNames.Contains(title, StringComparer.CurrentCultureIgnoreCase))
+                {
+                    title = $"{nameTemplate}{++i}";
+                }
+            }
+
+            if (string.IsNullOrEmpty(tooltip))
+            {
+                tooltip = title;
             }
         }
 

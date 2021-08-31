@@ -154,6 +154,8 @@ namespace Xarial.CadPlus.CustomToolbar
             
             m_CmdsMgr = Resolve<ICommandsManager>();
             m_TriggersMgr = Resolve<ITriggersManager>();
+
+            m_CmdsMgr.CreateCommandGroups();
         }
 
         private void OnCommandClick(Commands_e spec)

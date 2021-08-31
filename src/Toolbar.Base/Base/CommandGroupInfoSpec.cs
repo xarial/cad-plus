@@ -17,10 +17,14 @@ namespace Xarial.CadPlus.CustomToolbar.Base
 {
     internal class CommandGroupInfoSpec : CommandGroupSpec
     {
+        internal CommandGroupInfo Info { get; }
+
         private const int GROUP_ID_OFFSET = 500; //this offset is created to avoid conflicts of toolbar commands with the modules command manager
 
         internal CommandGroupInfoSpec(CommandGroupInfo info, IIconsProvider[] iconsProviders) : base(info.Id + GROUP_ID_OFFSET)
         {
+            Info = info;
+
             Title = info.Title;
             Tooltip = info.Description;
             Icon = info.GetCommandIcon(iconsProviders);
