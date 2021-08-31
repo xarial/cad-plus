@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 using System.Windows.Controls;
 using Xarial.CadPlus.CustomToolbar.Structs;
 
-namespace Xarial.CadPlus.CustomToolbar.UI.ValidationRules
+namespace Xarial.CadPlus.Toolbar.UI.ValidationRules
 {
     public class EntryPointsValidationRules : ValidationRule
     {

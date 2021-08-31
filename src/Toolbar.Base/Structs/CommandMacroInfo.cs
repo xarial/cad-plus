@@ -6,6 +6,7 @@
 //*********************************************************************
 
 using Newtonsoft.Json;
+using System;
 using System.Xml.Serialization;
 using Xarial.CadPlus.CustomToolbar.Enums;
 using Xarial.CadPlus.Plus.Modules;
@@ -29,5 +30,24 @@ namespace Xarial.CadPlus.CustomToolbar.Structs
         public ToggleButtonStateCode_e ToggleButtonStateCodeType { get; set; } = ToggleButtonStateCode_e.None;
         public string ToggleButtonStateCode { get; set; } = "";
         public bool ResolveButtonStateCodeOnce { get; set; } = true;
+
+        internal CommandMacroInfo Clone()
+            => new CommandMacroInfo()
+            {
+                Description = Description,
+                IconPath = IconPath,
+                Id = Id,
+                Title = Title,
+                MacroPath = MacroPath,
+                EntryPoint = EntryPoint,
+                Scope = Scope,
+                Triggers = Triggers,
+                UnloadAfterRun = UnloadAfterRun,
+                Location = Location,
+                Arguments = Arguments,
+                ToggleButtonStateCodeType = ToggleButtonStateCodeType,
+                ToggleButtonStateCode = ToggleButtonStateCode,
+                ResolveButtonStateCodeOnce = ResolveButtonStateCodeOnce
+            };
     }
 }

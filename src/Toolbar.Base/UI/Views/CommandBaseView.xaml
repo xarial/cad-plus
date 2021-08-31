@@ -4,7 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:vm="clr-namespace:Xarial.CadPlus.CustomToolbar.UI.ViewModels"
-             xmlns:val="clr-namespace:Xarial.CadPlus.CustomToolbar.UI.ValidationRules"
+             xmlns:val="clr-namespace:Xarial.CadPlus.Toolbar.UI.ValidationRules"
              xmlns:conv="clr-namespace:Xarial.CadPlus.CustomToolbar.UI.Converters"
              mc:Ignorable="d"
              d:DataContext="{x:Type vm:ICommandVM}"
@@ -22,8 +22,15 @@
         </Grid.RowDefinitions>
 
         <TextBlock Text="Title:" VerticalAlignment="Center"  Grid.Column="0" Grid.Row="0" Margin="2" />
-        <TextBox Text="{Binding Path=Title, UpdateSourceTrigger=PropertyChanged}"
-                 Grid.Column="1" Grid.Row="0" Margin="2" />
+        <TextBox Grid.Column="1" Grid.Row="0" Margin="2" >
+            <TextBox.Text>
+                <Binding Path="Title" UpdateSourceTrigger="PropertyChanged">
+                    <Binding.ValidationRules>
+                        <val:MandatoryValueValidationRule ValidatesOnTargetUpdated="True"/>
+                    </Binding.ValidationRules>
+                </Binding>
+            </TextBox.Text>
+        </TextBox>
 
         <TextBlock Text="Description:" VerticalAlignment="Center" Grid.Column="0" Grid.Row="1" Margin="2" />
         <TextBox Text="{Binding Path=Description, UpdateSourceTrigger=PropertyChanged}"

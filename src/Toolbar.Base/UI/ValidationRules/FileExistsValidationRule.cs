@@ -14,7 +14,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 
-namespace Xarial.CadPlus.CustomToolbar.UI.ValidationRules
+namespace Xarial.CadPlus.Toolbar.UI.ValidationRules
 {
     public class FileExistsValidationRule : ValidationRule
     {

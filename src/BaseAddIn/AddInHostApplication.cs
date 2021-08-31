@@ -39,6 +39,7 @@ using Xarial.XCad.UI.PropertyPage.Delegates;
 using Xarial.CadPlus.Plus.Delegates;
 using Xarial.XCad.UI.Structures;
 using Xarial.CadPlus.Plus.Attributes;
+using Xarial.XCad.Exceptions;
 
 namespace Xarial.CadPlus.AddIn.Base
 {
@@ -217,7 +218,7 @@ namespace Xarial.CadPlus.AddIn.Base
         {   
             builder.RegisterInstance(Extension.Application);
             builder.RegisterType<CadAppMessageService>()
-                .As<IMessageService>();
+                .As<IMessageService>().WithParameter(new TypedParameter(typeof(Type[]), new Type[] { typeof(IUserException) }));
             builder.RegisterType<DefaultDocumentAdapter>()
                 .As<IDocumentAdapter>();
             builder.RegisterType<SettingsProvider>()

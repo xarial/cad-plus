@@ -13,6 +13,7 @@ using Xarial.CadPlus.CustomToolbar.Enums;
 using Xarial.CadPlus.CustomToolbar.Helpers;
 using Xarial.CadPlus.CustomToolbar.Structs;
 using Xarial.CadPlus.Plus.Services;
+using Xarial.CadPlus.Toolbar.Services;
 using Xarial.XCad;
 using Xarial.XCad.Base;
 using Xarial.XCad.Base.Enums;
@@ -25,29 +26,31 @@ namespace Xarial.CadPlus.CustomToolbar.Services
 {
     public interface ITriggersManager : IDisposable
     {
+        void Load(CustomToolbarInfo toolbarInfo);
     }
 
     public class TriggersManager : ITriggersManager
     {
         private readonly IXApplication m_App;
-        private readonly Dictionary<Triggers_e, CommandMacroInfo[]> m_Triggers;
+        private Dictionary<Triggers_e, CommandMacroInfo[]> m_Triggers;
         private readonly IMacroRunner m_MacroRunner;
         private readonly IXLogger m_Logger;
-        private readonly ICommandsManager m_CmdMgr;
 
-        public TriggersManager(ICommandsManager cmdMgr, IXApplication app, 
+        public TriggersManager(IXApplication app, 
             IMacroRunner macroRunner, IXLogger logger)
         {
-            m_CmdMgr = cmdMgr;
             m_App = app;
             m_MacroRunner = macroRunner;
             m_Logger = logger;
+        }
 
-            m_Triggers = LoadTriggers(m_CmdMgr.ToolbarInfo);
+        public void Load(CustomToolbarInfo toolbarInfo)
+        {
+            m_Triggers = LoadTriggers(toolbarInfo);
 
             m_App.Documents.DocumentLoaded += OnDocumentLoaded;
 
-            if (m_Triggers.Keys.Contains(Triggers_e.DocumentOpen)) 
+            if (m_Triggers.Keys.Contains(Triggers_e.DocumentOpen))
             {
                 m_App.Documents.DocumentOpened += OnDocumentOpened;
             }

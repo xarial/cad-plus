@@ -16,9 +16,8 @@ namespace Xarial.CadPlus.CustomToolbar.Services
 {
     public interface IToolbarConfigurationProvider
     {
-        CustomToolbarInfo GetToolbar(out bool isReadOnly, string toolbarSpecFilePath);
-
-        void SaveToolbar(CustomToolbarInfo toolbar, string toolbarSpecFilePath);
+        CustomToolbarInfo GetToolbar(string toolbarSpecFilePath);
+        bool IsReadOnly(string toolbarSpecFilePath);
     }
 
     public class ToolbarConfigurationProvider : IToolbarConfigurationProvider
@@ -30,17 +29,27 @@ namespace Xarial.CadPlus.CustomToolbar.Services
             m_UserSettsSrv = userSettsSrv;
         }
 
-        public CustomToolbarInfo GetToolbar(out bool isReadOnly, string toolbarSpecFilePath)
+        public CustomToolbarInfo GetToolbar(string toolbarSpecFilePath)
         {
             if (File.Exists(toolbarSpecFilePath))
             {
-                isReadOnly = !IsEditable(toolbarSpecFilePath);
                 return m_UserSettsSrv.ReadSettings<CustomToolbarInfo>(toolbarSpecFilePath);
             }
             else
             {
-                isReadOnly = false;
                 return new CustomToolbarInfo();
+            }
+        }
+
+        public bool IsReadOnly(string toolbarSpecFilePath)
+        {
+            if (File.Exists(toolbarSpecFilePath))
+            {
+                return !IsEditable(toolbarSpecFilePath);
+            }
+            else
+            {
+                return false;
             }
         }
 
@@ -59,11 +68,6 @@ namespace Xarial.CadPlus.CustomToolbar.Services
             {
                 return false;
             }
-        }
-
-        public void SaveToolbar(CustomToolbarInfo toolbar, string toolbarSpecFilePath)
-        {
-            m_UserSettsSrv.StoreSettings(toolbar, toolbarSpecFilePath);
         }
     }
 }
