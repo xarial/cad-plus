@@ -27,12 +27,12 @@ namespace Xarial.CadPlus.CustomToolbar.Base
             Icon = info.GetCommandIcon(iconsProviders);
             HasToolbar = info.Location.HasFlag(Location_e.Toolbar);
             HasMenu = info.Location.HasFlag(Location_e.Menu);
-            HasTabBox = info.Location.HasFlag(Location_e.TabBox);
+            HasRibbon = info.Location.HasFlag(Location_e.TabBox);
             SupportedWorkspace = GetWorkspace(info.Scope);
 
-            if (HasTabBox)
+            if (HasRibbon)
             {
-                TabBoxStyle = RibbonTabTextDisplay_e.TextBelow;
+                RibbonTextStyle = RibbonTabTextDisplay_e.TextBelow;
             }
         }
 

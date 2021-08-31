@@ -27,6 +27,7 @@ namespace Xarial.CadPlus.CustomToolbar.Base
 
             Title = info.Title;
             Tooltip = info.Description;
+            RibbonTabName = "Toolbar+";
             Icon = info.GetCommandIcon(iconsProviders);
 
             if (info.Commands != null)

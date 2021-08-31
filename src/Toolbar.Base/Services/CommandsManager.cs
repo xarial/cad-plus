@@ -187,6 +187,8 @@ namespace Xarial.CadPlus.CustomToolbar.Services
                 {
                     title = $"{nameTemplate}{++i}";
                 }
+
+                usedNames.Add(title);
             }
 
             if (string.IsNullOrEmpty(tooltip))
