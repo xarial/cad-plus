@@ -54,7 +54,7 @@ namespace Xarial.CadPlus.Plus.Shared.Services
                 icon, Licenses.ThirdParty)
                 {
                     Edition = new PackageEditionSpec(
-                        licInfo.IsRegistered ? licInfo.Edition.ToString() : "NOT REGISTERED",
+                        licInfo.IsRegistered ? $"{licInfo.Edition.ToString()} Edition" : "NOT REGISTERED",
                         licInfo.IsRegistered ? licInfo.TrialExpiryDate : null)
                 });
 
