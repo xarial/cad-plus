@@ -33,7 +33,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Xarial.XCad" Version="0.7.5-20210901.1" />
-    <PackageReference Include="Xarial.XToolkit" Version="0.2.21" />
+    <PackageReference Include="Xarial.XToolkit" Version="0.2.22" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="PresentationCore" />
