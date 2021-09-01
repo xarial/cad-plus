@@ -27,33 +27,35 @@ namespace Xarial.CadPlus.Plus.Shared.Services
     {
         private readonly Window m_Wnd;
         private readonly IntPtr m_Parent;
-        private readonly ILicenseInfo m_License;
+        private readonly Func<ILicenseInfo> m_GetLicense;
 
-        public AboutService(ILicenseInfo license) : this(IntPtr.Zero, license)
+        public AboutService(Func<ILicenseInfo> getLicense) : this(IntPtr.Zero, getLicense)
         {
         }
 
-        public AboutService(Window wnd, ILicenseInfo license) 
+        public AboutService(Window wnd, Func<ILicenseInfo> getLicense) 
         {
             m_Wnd = wnd;
-            m_License = license;
+            m_GetLicense = getLicense;
         }
 
-        public AboutService(IntPtr parent, ILicenseInfo license)
+        public AboutService(IntPtr parent, Func<ILicenseInfo> getLicense)
         {
             m_Parent = parent;
-            m_License = license;
+            m_GetLicense = getLicense;
         }
 
         public void ShowAbout(Assembly assm, Image icon) 
         {
+            var licInfo = m_GetLicense.Invoke();
+
             var aboutDlg = new AboutDialog(
                 new AboutDialogSpec(assm,
                 icon, Licenses.ThirdParty)
                 {
                     Edition = new PackageEditionSpec(
-                        m_License.IsRegistered ? m_License.Edition.ToString() : "NOT REGISTERED",
-                        m_License.IsRegistered ? m_License.TrialExpiryDate : null)
+                        licInfo.IsRegistered ? licInfo.Edition.ToString() : "NOT REGISTERED",
+                        licInfo.IsRegistered ? licInfo.TrialExpiryDate : null)
                 });
 
             if (m_Wnd != null)
