@@ -18,6 +18,13 @@ using Xarial.XToolkit.Reporting;
 
 namespace Xarial.CadPlus.Init
 {
+    internal class LicenseInfo : ILicenseInfo
+    {
+        public bool IsRegistered => false;
+        public EditionType_e Edition => EditionType_e.Community;
+        public DateTime? TrialExpiryDate => null;
+    }
+
     public class Initiator : IInitiator
     {
         private IHost m_Host;
@@ -36,9 +43,8 @@ namespace Xarial.CadPlus.Init
 
         private void OnConfigureServices(IContainerBuilder builder)
         {
-            ExceptionExtension.GlobalUserExceptionTypes.Add(typeof(IUserException));
-
             builder.Register<AppLogger, IXLogger>();
+            builder.Register<ILicenseInfo>(c => new LicenseInfo());
         }
     }
 }
