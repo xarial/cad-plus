@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace Xarial.CadPlus.Plus
 {
-    public interface IInitiator
+    public interface IInitiator : IDisposable
     {
         void Init(IHost host);
     }
