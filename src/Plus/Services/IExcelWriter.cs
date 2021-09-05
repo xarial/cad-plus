@@ -26,8 +26,9 @@ namespace Xarial.CadPlus.Plus.Services
     public class ExcelCell 
     {
         public object Value { get; set; }
-        public KnownColor? ForegroundColor { get; set; }
+        public KnownColor? TextColor { get; set; }
         public KnownColor? BackgroundColor { get; set; }
+        public TextStyle_e? TextStyle { get; set; }
 
         public ExcelCell() 
         {
@@ -40,11 +41,38 @@ namespace Xarial.CadPlus.Plus.Services
     }
 
     [Serializable]
+    [Flags]
+    public enum TextStyle_e 
+    {
+        Bold = 1,
+        Italic = 2,
+        Underline = 4
+    }
+
+    [Serializable]
+    public class ExcelCustomProperty 
+    {
+        public string Name { get; set; }
+        public string Value { get; set; }
+
+        public ExcelCustomProperty() 
+        {
+        }
+
+        public ExcelCustomProperty(string name, string value)
+        {
+            Name = name;
+            Value = value;
+        }
+    }
+
+    [Serializable]
     public class ExcelWriterOptions 
     {
         public string SpreadsheetName { get; set; }
         public bool CreateTable { get; set; }
         public string TableName { get; set; }
+        public bool ShowStripes { get; set; }
     }
 
     public interface IExcelWriter
