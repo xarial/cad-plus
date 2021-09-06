@@ -25,6 +25,12 @@ namespace Xarial.CadPlus.Init
         public DateTime? TrialExpiryDate => null;
     }
 
+    internal class ExcelWriter : IExcelWriter
+    {
+        public void Create(string filePath, ExcelRow[] rows, ExcelWriterOptions options)
+            => throw new NotImplementedException();
+    }
+
     public class Initiator : IInitiator
     {
         private IHost m_Host;
@@ -44,7 +50,12 @@ namespace Xarial.CadPlus.Init
         private void OnConfigureServices(IContainerBuilder builder)
         {
             builder.Register<AppLogger, IXLogger>();
+            builder.Register<ExcelWriter, IExcelWriter>();
             builder.Register<ILicenseInfo>(c => new LicenseInfo());
+        }
+
+        public void Dispose()
+        {
         }
     }
 }
