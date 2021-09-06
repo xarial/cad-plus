@@ -39,9 +39,6 @@
     <Reference Include="ControlzEx, Version=4.0.0.0, Culture=neutral, PublicKeyToken=69f1c32f803d307e, processorArchitecture=MSIL">
       <HintPath>..\..\packages\ControlzEx.4.3.2\lib\net45\ControlzEx.dll</HintPath>
     </Reference>
-    <Reference Include="DocumentFormat.OpenXml, Version=2.7.2.0, Culture=neutral, PublicKeyToken=8fb06cb64d019a17, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\DocumentFormat.OpenXml.2.7.2\lib\net46\DocumentFormat.OpenXml.dll</HintPath>
-    </Reference>
     <Reference Include="Fluent, Version=8.0.0.0, Culture=neutral, PublicKeyToken=3e436e32a8c5546f, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Fluent.Ribbon.8.0.0\lib\net452\Fluent.dll</HintPath>
     </Reference>
@@ -106,10 +103,10 @@
     <Reference Include="WindowsBase" />
     <Reference Include="WindowsFormsIntegration" />
     <Reference Include="Xarial.CadPlusPlus, Version=0.2.1.0, Culture=neutral, PublicKeyToken=60dcaf351d4060db, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Xarial.CadPlusPlus.0.2.1-20210906.1\lib\net461\Xarial.CadPlusPlus.dll</HintPath>
+      <HintPath>..\..\packages\Xarial.CadPlusPlus.0.2.1-20210906.3\lib\net461\Xarial.CadPlusPlus.dll</HintPath>
     </Reference>
     <Reference Include="Xarial.CadPlusPlus.Shared, Version=0.2.1.0, Culture=neutral, PublicKeyToken=60dcaf351d4060db, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Xarial.CadPlusPlus.Shared.0.2.1-20210906.1\lib\net461\Xarial.CadPlusPlus.Shared.dll</HintPath>
+      <HintPath>..\..\packages\Xarial.CadPlusPlus.Shared.0.2.1-20210906.3\lib\net461\Xarial.CadPlusPlus.Shared.dll</HintPath>
     </Reference>
     <Reference Include="Xarial.XCad, Version=0.7.5.0, Culture=neutral, PublicKeyToken=60dcaf351d4060db, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Xarial.XCad.0.7.5-20210901.1\lib\net461\Xarial.XCad.dll</HintPath>

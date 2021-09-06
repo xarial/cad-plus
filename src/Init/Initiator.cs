@@ -10,6 +10,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using Xarial.CadPlus.Plus;
+using Xarial.CadPlus.Plus.Data;
 using Xarial.CadPlus.Plus.Services;
 using Xarial.XCad.Base;
 using Xarial.XCad.Exceptions;
@@ -27,7 +28,13 @@ namespace Xarial.CadPlus.Init
 
     internal class ExcelWriter : IExcelWriter
     {
-        public void Create(string filePath, ExcelRow[] rows, ExcelWriterOptions options)
+        public void CreateWorkbook(string filePath, ExcelRow[] rows, ExcelWriterOptions options)
+            => throw new NotImplementedException();
+    }
+
+    internal class ExcelReader : IExcelReader
+    {
+        public ExcelRow[] ReadWorkbook(string filePath, ExcelReaderOptions options, out ExcelCustomProperty[] customProperties)
             => throw new NotImplementedException();
     }
 
@@ -51,6 +58,7 @@ namespace Xarial.CadPlus.Init
         {
             builder.Register<AppLogger, IXLogger>();
             builder.Register<ExcelWriter, IExcelWriter>();
+            builder.Register<ExcelReader, IExcelReader>();
             builder.Register<ILicenseInfo>(c => new LicenseInfo());
         }
 

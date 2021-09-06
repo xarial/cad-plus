@@ -13,6 +13,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Xarial.CadPlus.Batch.Base.Converters;
 using Xarial.CadPlus.Batch.Base.ViewModels;
+using Xarial.CadPlus.Plus.Data;
 using Xarial.CadPlus.Plus.Exceptions;
 using Xarial.CadPlus.Plus.Services;
 using Xarial.XToolkit.Reporting;
@@ -51,11 +52,11 @@ namespace Xarial.CadPlus.Batch.Base.Services
                     rows.Add(CreateRowForItem(item));
                 }
 
-                m_ExcelWriter.Create(filePath, rows.ToArray(), new ExcelWriterOptions()
+                m_ExcelWriter.CreateWorkbook(filePath, rows.ToArray(), new ExcelWriterOptions()
                 {
                     CreateTable = true,
                     TableName = "Results",
-                    SpreadsheetName = name
+                    WorksheetName = name
                 });
             }
             else 
@@ -92,23 +93,6 @@ namespace Xarial.CadPlus.Batch.Base.Services
                 errors.Add($"[File] - {ExceptionToErrorConverter.Convert(item.Error)}");
             }
 
-            cells[0] = new ExcelCell(item.Status);
-            cells[1] = new ExcelCell(item.DisplayObject.Path);
-
-            for (int i = 0; i < item.Macros.Length; i++)
-            {
-                var macro = item.Macros[i];
-                
-                if (macro.Error != null)
-                {
-                    errors.Add($"[{macro.Name}] - {ExceptionToErrorConverter.Convert(item.Macros[i].Error)}");
-                }
-
-                cells[i + 2] = new ExcelCell(macro.Status);
-            }
-
-            cells[cells.Length - 1] = new ExcelCell(string.Join(Environment.NewLine, errors));
-
             var cellColor = default(KnownColor?);
 
             switch (item.Status)
@@ -134,10 +118,22 @@ namespace Xarial.CadPlus.Batch.Base.Services
                     break;
             }
 
-            foreach (var cell in cells) 
+            cells[0] = new ExcelCell(item.Status, null, cellColor);
+            cells[1] = new ExcelCell(item.DisplayObject.Path, null, cellColor);
+
+            for (int i = 0; i < item.Macros.Length; i++)
             {
-                cell.BackgroundColor = cellColor;
+                var macro = item.Macros[i];
+                
+                if (macro.Error != null)
+                {
+                    errors.Add($"[{macro.Name}] - {ExceptionToErrorConverter.Convert(item.Macros[i].Error)}");
+                }
+
+                cells[i + 2] = new ExcelCell(macro.Status, null, cellColor);
             }
+
+            cells[cells.Length - 1] = new ExcelCell(string.Join(Environment.NewLine, errors), null, cellColor);
 
             return new ExcelRow(cells);
         }
