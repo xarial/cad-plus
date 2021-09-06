@@ -73,6 +73,7 @@ namespace Xarial.CadPlus.Plus.Services
         public bool CreateTable { get; set; }
         public string TableName { get; set; }
         public bool ShowStripes { get; set; }
+        public string TableThemeName { get; set; }
         public ExcelCustomProperty[] CustomProperties { get; set; }
     }
 
