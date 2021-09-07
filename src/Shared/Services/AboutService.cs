@@ -49,14 +49,58 @@ namespace Xarial.CadPlus.Plus.Shared.Services
         {
             var licInfo = m_GetLicense.Invoke();
 
-            var aboutDlg = new AboutDialog(
-                new AboutDialogSpec(assm,
-                icon, Licenses.ThirdParty)
-                {
-                    Edition = new PackageEditionSpec(
-                        licInfo.IsRegistered ? $"{licInfo.Edition.ToString()} Edition" : "NOT REGISTERED",
-                        licInfo.IsRegistered ? licInfo.TrialExpiryDate : null)
-                });
+            var vers = assm.GetName().Version;
+
+            var buildTypeId = vers.Revision % 10;
+
+            string buildType;
+
+            switch (buildTypeId) 
+            {
+                case 0:
+                    buildType = "Dev Build";
+                    break;
+
+                case 4:
+                    buildType = "Preview Build";
+                    break;
+
+                case 5:
+                    buildType = "Alpha";
+                    break;
+
+                case 7:
+                    buildType = "Beta";
+                    break;
+
+                case 8:
+                    buildType = "Pre-Release";
+                    break;
+
+                case 9:
+                    buildType = "";
+                    break;
+
+                default:
+                    buildType = "Custom Build";
+                    break;
+            }
+
+            var edition = licInfo.IsRegistered ? $"{licInfo.Edition.ToString()} Edition" : "NOT REGISTERED";
+
+            if (!string.IsNullOrEmpty(buildType)) 
+            {
+                edition += $" [{buildType}]";
+            }
+
+            var spec = new AboutDialogSpec(assm, icon, Licenses.ThirdParty)
+            {
+                Edition = new PackageEditionSpec(
+                    edition,
+                    licInfo.IsRegistered ? licInfo.TrialExpiryDate : null)
+            };
+
+            var aboutDlg = new AboutDialog(spec);
 
             if (m_Wnd != null)
             {
