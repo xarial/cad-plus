@@ -8,6 +8,7 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Xarial.CadPlus.Common.Services;
@@ -37,6 +38,9 @@ namespace Xarial.CadPlus.Xport.EDrawingsHost
             m_PopupKiller.Start(Process.GetCurrentProcess(), TimeSpan.FromSeconds(1));
 
             m_Control = Load();
+
+            const int eMVEnableSilentMode = 16384;
+            m_Control.EnableFeatures = eMVEnableSilentMode;
 
             m_Control.OnFinishedLoadingDocument += OnFinishedLoadingDocument;
             m_Control.OnFailedLoadingDocument += OnFailedLoadingDocument;

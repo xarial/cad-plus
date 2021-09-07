@@ -8,6 +8,8 @@
 using System;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
+using System.Windows.Forms;
 using Xarial.CadPlus.Xport.EDrawingsHost;
 using Xarial.CadPlus.Xport.SwEDrawingsHost;
 
@@ -20,42 +22,52 @@ namespace Xarial.CadPlus.Xport.StandAloneExporter
         [STAThread]
         private static void Main(string[] args)
         {
-            try
+            async void OnIdle(object sender, EventArgs e)
             {
-                var srcFile = args[0];
-                var outFile = args[1];
-                var versNmb = args[2];
+                Application.Idle -= OnIdle;
 
-                var vers = EDrawingsVersion_e.Default;
-
-                foreach (EDrawingsVersion_e curVer in Enum.GetValues(typeof(EDrawingsVersion_e))) 
+                try
                 {
-                    if (string.Equals(curVer.ToString(), $"v{versNmb}")) 
-                    {
-                        vers = curVer;
-                        break;
-                    }
+                    await ProcessAsync(args[0], args[1], args[2]);
+                    Environment.Exit(0);
                 }
-
-                WriteLine($"eDrawings version: {vers}");
-
-                using (var publisher = new EDrawingsPublisher(vers))
+                catch (Exception ex)
                 {
-                    WriteLine($"Opening '{srcFile}'...");
-                    publisher.OpenDocument(srcFile).GetAwaiter().GetResult();
+                    //TODO: extract message exception only
+                    WriteLine(ex.Message);
+                    Environment.Exit(1);
+                }
+            };
 
-                    WriteLine($"Saving '{srcFile}' to '{outFile}'...");
-                    publisher.SaveDocument(outFile).GetAwaiter().GetResult();
+            Application.Idle += OnIdle;
+            Application.Run();
+        }
+        
+        private static async Task ProcessAsync(string srcFile, string outFile, string versNmb) 
+        {
+            var vers = EDrawingsVersion_e.Default;
 
-                    WriteLine($"Closing '{srcFile}'...");
-                    publisher.CloseDocument().GetAwaiter().GetResult();
+            foreach (EDrawingsVersion_e curVer in Enum.GetValues(typeof(EDrawingsVersion_e)))
+            {
+                if (string.Equals(curVer.ToString(), $"v{versNmb}"))
+                {
+                    vers = curVer;
+                    break;
                 }
             }
-            catch (Exception ex)
+
+            WriteLine($"eDrawings version: {vers}");
+
+            using (var publisher = new EDrawingsPublisher(vers))
             {
-                //TODO: extract message exception only
-                WriteLine(ex.Message);
-                Environment.Exit(1);
+                WriteLine($"Opening '{srcFile}'...");
+                await publisher.OpenDocument(srcFile);
+
+                WriteLine($"Saving '{srcFile}' to '{outFile}'...");
+                await publisher.SaveDocument(outFile);
+
+                WriteLine($"Closing '{srcFile}'...");
+                await publisher.CloseDocument();
             }
         }
 

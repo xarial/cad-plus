@@ -17,6 +17,7 @@ using Xarial.CadPlus.Common.Services;
 using Xarial.CadPlus.Init;
 using Xarial.CadPlus.Plus;
 using Xarial.CadPlus.Plus.Applications;
+using Xarial.CadPlus.Plus.Services;
 using Xarial.CadPlus.Plus.Shared;
 using Xarial.CadPlus.Plus.Shared.Services;
 using Xarial.CadPlus.Xport.Core;
@@ -50,6 +51,9 @@ namespace Xarial.CadPlus.Xport
             builder.RegisterType<ExporterModel>().As<IExporterModel>();
             builder.RegisterType<AboutService>().As<IAboutService>();
             builder.Register<Window>(c => m_Window);
+            builder.RegisterType<JobManager>().As<IJobManager>()
+                .SingleInstance()
+                .OnActivating(x => x.Instance.Init());
         }
 
         private static void OnWindowCreated(MainWindow window, Arguments args)
@@ -79,7 +83,7 @@ namespace Xarial.CadPlus.Xport
                 Version = args.Version
             };
 
-            using (var exporter = new Exporter(Console.Out, new ConsoleProgressWriter()))
+            using (var exporter = new Exporter(Console.Out, new JobManager(new AppLogger()), new ConsoleProgressWriter()))
             {
                 await exporter.Export(opts).ConfigureAwait(false);
             }
