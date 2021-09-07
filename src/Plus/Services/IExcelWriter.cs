@@ -7,6 +7,7 @@ using Xarial.CadPlus.Plus.Data;
 
 namespace Xarial.CadPlus.Plus.Services
 {
+    [Serializable]
     public class ExcelWriterOptions 
     {
         public string WorksheetName { get; set; }

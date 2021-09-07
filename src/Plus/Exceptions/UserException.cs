@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 using Xarial.XCad.Exceptions;
@@ -18,8 +19,13 @@ namespace Xarial.CadPlus.Plus.Exceptions
     /// <summary>
     /// Default user friendly exception
     /// </summary>
+    [Serializable]
     public class UserException : Exception, IUserMessageException, IUserException
     {
+        protected UserException(SerializationInfo info, StreamingContext context) : base(info, context)
+        { 
+        }
+
         public UserException(string userMessage) : base(userMessage)
         {
         }

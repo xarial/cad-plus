@@ -9,7 +9,7 @@ namespace Xarial.CadPlus.Plus.Services
 {
     public class ExcelReaderOptions
     {
-        public int WorksheetIndex { get; set; }
+        public uint WorksheetIndex { get; set; }
         public bool ReadCustomProperites { get; set; }
         public bool ReadCellBackgroundColor { get; set; }
         public bool ReadCellTextColor { get; set; }
