@@ -28,7 +28,15 @@ namespace Xarial.CadPlus.Plus.Shared.Converters
                 switch (value)
                 {
                     case IXDocument doc:
-                        return doc.Path;
+                        var path = doc.Path;
+                        if (!string.IsNullOrEmpty(path))
+                        {
+                            return path;
+                        }
+                        else 
+                        {
+                            return doc.Title;
+                        }
 
                     case IXConfiguration conf:
                         return conf.Name;

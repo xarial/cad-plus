@@ -30,28 +30,25 @@ namespace Xarial.CadPlus.Plus.Shared.Converters
                 switch (obj)
                 {
                     case IXDocument doc:
-                        if (!string.IsNullOrEmpty(doc.Path))
+                        var dispType = (DocumentTitleDisplayType_e)values[1];
+
+                        var path = doc.Path;
+
+                        if (string.IsNullOrEmpty(path))
                         {
-                            var dispType = (DocumentTitleDisplayType_e)values[1];
+                            path = doc.Title;
+                        }
 
-                            var path = doc.Path;
+                        switch (dispType)
+                        {
+                            case DocumentTitleDisplayType_e.Path:
+                                return path;
 
-                            if (string.IsNullOrEmpty(path)) 
-                            {
-                                path = doc.Title;
-                            }
+                            case DocumentTitleDisplayType_e.FileName:
+                                return Path.GetFileName(path);
 
-                            switch (dispType)
-                            {
-                                case DocumentTitleDisplayType_e.Path:
-                                    return path;
-
-                                case DocumentTitleDisplayType_e.FileName:
-                                    return Path.GetFileName(path);
-
-                                case DocumentTitleDisplayType_e.FileNameWithoutExtension:
-                                    return Path.GetFileNameWithoutExtension(path);
-                            }
+                            case DocumentTitleDisplayType_e.FileNameWithoutExtension:
+                                return Path.GetFileNameWithoutExtension(path);
                         }
                         break;
 
