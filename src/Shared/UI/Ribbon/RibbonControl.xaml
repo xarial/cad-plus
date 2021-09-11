@@ -25,6 +25,7 @@
                                       IsRibbonAligned="True" />
                 </Setter.Value>
             </Setter>
+            <Setter Property="MinWidth" Value="60"/>
         </Style>
         <local:RibbonCommandTemplateSelector x:Key="ribbonGrpCmdTemplateSelector">
             <local:RibbonCommandTemplateSelector.Separator>

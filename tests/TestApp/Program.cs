@@ -62,6 +62,10 @@ namespace TestApp
 
         private void OnHostConfigureServices(IContainerBuilder obj)
             => m_Logger.Log("3 - Host configure services");
+
+        public void Dispose()
+        {
+        }
     }
 
     class Program
