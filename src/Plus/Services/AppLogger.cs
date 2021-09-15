@@ -25,6 +25,6 @@ namespace Xarial.CadPlus.Plus.Services
         }
 
         public virtual void Log(string msg, LoggerMessageSeverity_e severity = LoggerMessageSeverity_e.Information)
-            => this.Trace(msg, m_Category, severity);
+            => this.Trace(msg, m_Category, severity, true);
     }
 }
