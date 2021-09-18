@@ -6,7 +6,8 @@
         xmlns:views="clr-namespace:Xarial.CadPlus.CustomToolbar.UI.Views"
         xmlns:vm="clr-namespace:Xarial.CadPlus.CustomToolbar.UI.ViewModels"
         xmlns:base="clr-namespace:Xarial.CadPlus.CustomToolbar.UI.Base"
-        xmlns:conv="clr-namespace:Xarial.CadPlus.CustomToolbar.UI.Converters"
+        xmlns:conv="clr-namespace:Xarial.CadPlus.Toolbar.UI.Converters"
+        xmlns:local="clr-namespace:Xarial.CadPlus.CustomToolbar.UI.Forms"
         xmlns:xconv="clr-namespace:Xarial.XToolkit.Wpf.Converters;assembly=Xarial.XToolkit.Wpf"
         xmlns:sys="clr-namespace:System;assembly=mscorlib"
         xmlns:win="clr-namespace:System.Windows;assembly=PresentationCore"
@@ -16,6 +17,7 @@
 		Title="Toolbar+ Configuration" WindowStyle="ToolWindow">
     <Window.Resources>
         <conv:CommandContextMenuTitleConverter x:Key="menuTitleConv" />
+        <conv:FilePathToDirectoryPathConverter x:Key="filePathToDirConv"/>
         <xconv:ObjectIsNotNullUniversalConverter x:Key="objIsNotNulToBool"/>
         <xconv:MatchValueUniversalConverter x:Key="groupsIsEmpty" 
                                            TrueValue="{x:Static win:Visibility.Visible}"
@@ -155,12 +157,12 @@
                             <base:CommandPropertiesDataTemplateSelector>
                                 <base:CommandPropertiesDataTemplateSelector.CommandMacroTemplate>
                                     <DataTemplate>
-                                        <views:CommandMacroView />
+                                        <views:CommandMacroView WorkingDirectory="{Binding Path=DataContext.ToolbarSpecificationPath, RelativeSource={RelativeSource AncestorType={x:Type local:CommandManagerForm}}, Converter={StaticResource filePathToDirConv}}" />
                                     </DataTemplate>
                                 </base:CommandPropertiesDataTemplateSelector.CommandMacroTemplate>
                                 <base:CommandPropertiesDataTemplateSelector.CommandGroupTemplate>
                                     <DataTemplate>
-                                        <views:CommandBaseView />
+                                        <views:CommandBaseView WorkingDirectory="{Binding Path=DataContext.ToolbarSpecificationPath, RelativeSource={RelativeSource AncestorType={x:Type local:CommandManagerForm}}, Converter={StaticResource filePathToDirConv}}"/>
                                     </DataTemplate>
                                 </base:CommandPropertiesDataTemplateSelector.CommandGroupTemplate>
                                 <base:CommandPropertiesDataTemplateSelector.DefaultTemplate>

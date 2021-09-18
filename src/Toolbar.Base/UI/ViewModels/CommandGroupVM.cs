@@ -7,38 +7,39 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using System.Windows.Media.Imaging;
 using Xarial.CadPlus.CustomToolbar.Structs;
 using Xarial.CadPlus.CustomToolbar.UI.Base;
 using Xarial.CadPlus.Plus.Modules;
+using Xarial.CadPlus.Toolbar.Properties;
+using Xarial.CadPlus.Toolbar.Services;
+using Xarial.XToolkit.Wpf.Extensions;
 
 namespace Xarial.CadPlus.CustomToolbar.UI.ViewModels
 {
     public class CommandGroupVM : CommandVM<CommandGroupInfo>
     {
-        private readonly CommandGroupInfo m_CmdGrp;
-        private readonly CommandsCollection<CommandMacroVM> m_Commands;
+        private static readonly BitmapImage m_DefaultGroupIcon = Resources.group_icon_default.ToBitmapImage();
 
-        public CommandsCollection<CommandMacroVM> Commands
-        {
-            get
-            {
-                return m_Commands;
-            }
-        }
+        private readonly CommandGroupInfo m_CmdGrp;
+
+        public CommandsCollection<CommandMacroVM> Commands { get; }
+
+        protected override BitmapSource DefaultIcon => m_DefaultGroupIcon;
 
         public CommandGroupVM()
-            : this(new CommandGroupInfo(), ToolbarModule.Resolve<IIconsProvider[]>())
+            : this(new CommandGroupInfo(), ToolbarModule.Resolve<IIconsProvider[]>(), ToolbarModule.Resolve<IFilePathResolver>())
         {
         }
 
-        public CommandGroupVM(CommandGroupInfo cmdGrp, IIconsProvider[] providers) : base(cmdGrp, providers)
+        public CommandGroupVM(CommandGroupInfo cmdGrp, IIconsProvider[] providers, IFilePathResolver filePathResolver) : base(cmdGrp, providers, filePathResolver)
         {
             m_CmdGrp = cmdGrp;
-            m_Commands = new CommandsCollection<CommandMacroVM>(
+            Commands = new CommandsCollection<CommandMacroVM>(
                 (cmdGrp.Commands ?? new CommandMacroInfo[0])
-                .Select(c => new CommandMacroVM(c, providers)));
+                .Select(c => new CommandMacroVM(c, providers, filePathResolver)));
 
-            m_Commands.CommandsChanged += OnCommandsCollectionChanged;
+            Commands.CommandsChanged += OnCommandsCollectionChanged;
         }
 
         private void OnCommandsCollectionChanged(IEnumerable<CommandMacroVM> cmds)

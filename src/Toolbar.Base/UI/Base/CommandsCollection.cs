@@ -22,7 +22,7 @@ namespace Xarial.CadPlus.CustomToolbar.UI.Base
         ICommandVM AddNewCommand(int index);
     }
 
-    public class CommandsCollection<TCommandVM> : CompositeCollection, ICommandsCollection
+    public class CommandsCollection<TCommandVM> : CompositeCollection, ICommandsCollection, IEnumerable<TCommandVM>
             where TCommandVM : ICommandVM, new()
     {
         public event Action<ICommandVM> NewCommandCreated;
@@ -33,13 +33,7 @@ namespace Xarial.CadPlus.CustomToolbar.UI.Base
 
         public ObservableCollection<TCommandVM> Commands { get; }
 
-        IList ICommandsCollection.Commands
-        {
-            get
-            {
-                return Commands;
-            }
-        }
+        IList ICommandsCollection.Commands => Commands;
 
         public CommandsCollection(IEnumerable<TCommandVM> commands)
         {
@@ -122,5 +116,7 @@ namespace Xarial.CadPlus.CustomToolbar.UI.Base
         {
             CommandsChanged?.Invoke(Commands);
         }
+
+        public IEnumerator<TCommandVM> GetEnumerator() => Commands.GetEnumerator();
     }
 }

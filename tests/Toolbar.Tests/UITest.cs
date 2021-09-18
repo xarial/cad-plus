@@ -17,6 +17,7 @@ using Xarial.CadPlus.CustomToolbar.UI.Forms;
 using Xarial.CadPlus.CustomToolbar.UI.ViewModels;
 using Xarial.CadPlus.Plus;
 using Xarial.CadPlus.Plus.Services;
+using Xarial.CadPlus.Toolbar.Services;
 using Xarial.XCad;
 using Xarial.XCad.Base;
 using Xarial.XCad.Extensions;
@@ -29,7 +30,7 @@ namespace CustomToolbar.Tests
     {
         public class MacroEntryPointsExtractorMock : IMacroEntryPointsExtractor
         {
-            public MacroStartFunction[] GetEntryPoints(string macroPath)
+            public MacroStartFunction[] GetEntryPoints(string macroPath, string workDir)
             {
                 return new MacroStartFunction[]
                 {
@@ -118,7 +119,7 @@ namespace CustomToolbar.Tests
             var vm = new CommandManagerVM(confProviderMock.Object,
                 new Mock<IMessageService>().Object, new Mock<IXLogger>().Object,
                 new Xarial.CadPlus.Plus.Modules.IIconsProvider[0], 
-                new Mock<ICadDescriptor>().Object);
+                new Mock<ICadDescriptor>().Object, new Mock<IFilePathResolver>().Object);
 
             var form = new CommandManagerForm();
             form.DataContext = vm;

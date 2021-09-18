@@ -32,6 +32,7 @@ using Xarial.CadPlus.Plus.Shared.Extensions;
 using Xarial.CadPlus.Toolbar.Properties;
 using Xarial.CadPlus.Toolbar.Services;
 using Xarial.CadPlus.CustomToolbar.Structs;
+using System.IO;
 
 namespace Xarial.CadPlus.CustomToolbar
 {
@@ -109,7 +110,8 @@ namespace Xarial.CadPlus.CustomToolbar
             try
             {
                 m_ToolbarConfMgr.Load();
-                LoadCommands(m_ToolbarConfMgr.Toolbar);
+                var workDir = Path.GetDirectoryName(m_ToolbarConfMgr.FilePath);
+                LoadCommands(m_ToolbarConfMgr.Toolbar, workDir);
             }
             catch (Exception ex)
             {
@@ -132,6 +134,9 @@ namespace Xarial.CadPlus.CustomToolbar
             builder.RegisterType<MacroEntryPointsExtractor>()
                 .As<IMacroEntryPointsExtractor>();
 
+            builder.RegisterType<FilePathResolver>()
+                .As<IFilePathResolver>();
+            
             builder.RegisterType<MacroRunner>()
                 .As<IMacroRunner>().SingleInstance();
 
@@ -164,15 +169,15 @@ namespace Xarial.CadPlus.CustomToolbar
             m_Container = builder.Build();
         }
 
-        private void LoadCommands(CustomToolbarInfo toolbarInfo)
+        private void LoadCommands(CustomToolbarInfo toolbarInfo, string workDir)
         {
             m_Host.RegisterCommands<Commands_e>(OnCommandClick);
             
             m_CmdsMgr = Resolve<ICommandsManager>();
             m_TriggersMgr = Resolve<ITriggersManager>();
 
-            m_CmdsMgr.CreateCommandGroups(toolbarInfo);
-            m_TriggersMgr.Load(toolbarInfo);
+            m_CmdsMgr.CreateCommandGroups(toolbarInfo, workDir);
+            m_TriggersMgr.Load(toolbarInfo, workDir);
         }
 
         private void OnCommandClick(Commands_e spec)
@@ -206,7 +211,9 @@ namespace Xarial.CadPlus.CustomToolbar
                                 if (m_ToolbarConfMgr.ToolbarChanged) 
                                 {
                                     m_ToolbarConfMgr.SaveToolbar();
-                                    m_Msg.ShowInformation("Toolbar setting have been changed. Restart the application to load the command manager and menu");
+                                    
+                                    //TODO: make this message SOLIDWORKS specific only as other CAD systems might have different conditions for loading of toolbar
+                                    m_Msg.ShowInformation("Toolbar settings have been changed. Restart SOLIDWORKS to load the command manager and menu. If commands in the toolbar have been changed (added or removed) then it might be required to restart SOLIDWORKS twice for the changes to be applied");
                                 }
                             }
                             catch (Exception ex)

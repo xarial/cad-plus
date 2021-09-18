@@ -18,6 +18,7 @@ using Xarial.XCad;
 using Xarial.XCad.Base;
 using Xarial.XCad.Base.Enums;
 using Xarial.XCad.Documents;
+using Xarial.XCad.Documents.Delegates;
 using Xarial.XCad.Documents.Enums;
 using Xarial.XCad.Documents.Structures;
 using Xarial.XToolkit.Reflection;
@@ -26,7 +27,7 @@ namespace Xarial.CadPlus.CustomToolbar.Services
 {
     public interface ITriggersManager : IDisposable
     {
-        void Load(CustomToolbarInfo toolbarInfo);
+        void Load(CustomToolbarInfo toolbarInfo, string workDir);
     }
 
     public class TriggersManager : ITriggersManager
@@ -35,6 +36,7 @@ namespace Xarial.CadPlus.CustomToolbar.Services
         private Dictionary<Triggers_e, CommandMacroInfo[]> m_Triggers;
         private readonly IMacroRunner m_MacroRunner;
         private readonly IXLogger m_Logger;
+        private string m_WorkDir;
 
         public TriggersManager(IXApplication app, 
             IMacroRunner macroRunner, IXLogger logger)
@@ -44,9 +46,11 @@ namespace Xarial.CadPlus.CustomToolbar.Services
             m_Logger = logger;
         }
 
-        public void Load(CustomToolbarInfo toolbarInfo)
+        public void Load(CustomToolbarInfo toolbarInfo, string workDir)
         {
             m_Triggers = LoadTriggers(toolbarInfo);
+
+            m_WorkDir = workDir;
 
             m_App.Documents.DocumentLoaded += OnDocumentLoaded;
 
@@ -89,7 +93,7 @@ namespace Xarial.CadPlus.CustomToolbar.Services
                     case Triggers_e.NewSelection:
                         doc.Selections.NewSelection += OnNewSelection;
                         break;
-                    case Triggers_e.ConfigurationChange:
+                    case Triggers_e.ConfigurationSheetChange:
                         switch (doc) 
                         {
                             case IXDocument3D doc3D:
@@ -109,27 +113,30 @@ namespace Xarial.CadPlus.CustomToolbar.Services
             doc.Closing += OnDocumentClosing;
         }
 
-        private void OnDocumentClosing(IXDocument doc)
+        private void OnDocumentClosing(IXDocument doc, DocumentCloseType_e type)
         {
-            if (!doc.State.HasFlag(DocumentState_e.Hidden))
+            if (doc == m_App.Documents.Active)
             {
                 InvokeTrigger(Triggers_e.DocumentClose, doc);
             }
 
-            switch (doc)
+            if (type == DocumentCloseType_e.Destroy)
             {
-                case IXDocument3D doc3D:
-                    doc3D.Configurations.ConfigurationActivated -= OnConfigurationActivated;
-                    break;
-                case IXDrawing draw:
-                    draw.Sheets.SheetActivated -= OnSheetActivated;
-                    break;
-            }
+                switch (doc)
+                {
+                    case IXDocument3D doc3D:
+                        doc3D.Configurations.ConfigurationActivated -= OnConfigurationActivated;
+                        break;
+                    case IXDrawing draw:
+                        draw.Sheets.SheetActivated -= OnSheetActivated;
+                        break;
+                }
 
-            doc.Selections.NewSelection -= OnNewSelection;
-            doc.Saving -= OnSaving;
-            doc.Rebuilt -= OnRebuild;
-            doc.Closing -= OnDocumentClosing;
+                doc.Selections.NewSelection -= OnNewSelection;
+                doc.Saving -= OnSaving;
+                doc.Rebuilt -= OnRebuild;
+                doc.Closing -= OnDocumentClosing;
+            }
         }
 
         private void OnRebuild(IXDocument doc)
@@ -144,7 +151,7 @@ namespace Xarial.CadPlus.CustomToolbar.Services
         {
             if (doc == m_App.Documents.Active)
             {
-                InvokeTrigger(Triggers_e.ConfigurationChange, doc);
+                InvokeTrigger(Triggers_e.ConfigurationSheetChange, doc);
             }
         }
 
@@ -152,7 +159,7 @@ namespace Xarial.CadPlus.CustomToolbar.Services
         {
             if (doc == m_App.Documents.Active)
             {
-                InvokeTrigger(Triggers_e.ConfigurationChange, doc);
+                InvokeTrigger(Triggers_e.ConfigurationSheetChange, doc);
             }
         }
 
@@ -172,7 +179,7 @@ namespace Xarial.CadPlus.CustomToolbar.Services
                 InvokeTrigger(Triggers_e.DocumentSave, doc);
             }
         }
-
+        
         private Dictionary<Triggers_e, CommandMacroInfo[]> LoadTriggers(CustomToolbarInfo toolbarInfo)
         {
             var triggersCmds = new Dictionary<Triggers_e, CommandMacroInfo[]>();
@@ -205,13 +212,13 @@ namespace Xarial.CadPlus.CustomToolbar.Services
             {
                 cmds = cmds.Where(c => c.Scope.IsInScope(m_App)).ToArray();
 
-                if (cmds != null && cmds.Any())
+                if (cmds.Any())
                 {
                     m_Logger.Log($"Invoking {cmds.Length} command(s) for the trigger {trigger}", LoggerMessageSeverity_e.Debug);
 
                     foreach (var cmd in cmds)
                     {
-                        m_MacroRunner.TryRunMacroCommand(trigger, cmd, targetDoc);
+                        m_MacroRunner.TryRunMacroCommand(trigger, cmd, targetDoc, m_WorkDir);
                     }
                 }
             }

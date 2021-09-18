@@ -9,11 +9,14 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Windows.Input;
+using System.Windows.Media.Imaging;
 using Xarial.CadPlus.Common.Services;
 using Xarial.CadPlus.CustomToolbar.Enums;
 using Xarial.CadPlus.CustomToolbar.Structs;
 using Xarial.CadPlus.Plus.Modules;
 using Xarial.CadPlus.Plus.Services;
+using Xarial.CadPlus.Toolbar.Properties;
+using Xarial.CadPlus.Toolbar.Services;
 using Xarial.XToolkit.Wpf;
 using Xarial.XToolkit.Wpf.Extensions;
 using Xarial.XToolkit.Wpf.Utils;
@@ -22,6 +25,8 @@ namespace Xarial.CadPlus.CustomToolbar.UI.ViewModels
 {
     public class CommandMacroVM : CommandVM<CommandMacroInfo>, INotifyPropertyChanged
     {
+        private static readonly BitmapImage m_DefaultMacroIcon = Resources.macro_icon_default.ToBitmapImage();
+
         private ICommand m_BrowseMacroPathCommand;
 
         public string MacroPath
@@ -144,13 +149,16 @@ namespace Xarial.CadPlus.CustomToolbar.UI.ViewModels
             }
         }
 
+        protected override BitmapSource DefaultIcon => m_DefaultMacroIcon;
+
         private readonly FileFilter[] m_MacroFileFilters;
 
-        public CommandMacroVM() : this(new CommandMacroInfo(), ToolbarModule.Resolve<IIconsProvider[]>())
+        public CommandMacroVM() : this(new CommandMacroInfo(), ToolbarModule.Resolve<IIconsProvider[]>(), ToolbarModule.Resolve<IFilePathResolver>())
         {
         }
 
-        public CommandMacroVM(CommandMacroInfo cmd, IIconsProvider[] providers) : base(cmd, providers)
+        public CommandMacroVM(CommandMacroInfo cmd, IIconsProvider[] providers, IFilePathResolver filePathResolver)
+            : base(cmd, providers, filePathResolver)
         {
             m_MacroFileFilters = ToolbarModule.Resolve<ICadDescriptor>().MacroFileFilters
                 .Select(f => new FileFilter(f.Name, f.Extensions))

@@ -19,6 +19,7 @@ using Xarial.CadPlus.CustomToolbar.UI.Base;
 using Xarial.CadPlus.Plus;
 using Xarial.CadPlus.Plus.Modules;
 using Xarial.CadPlus.Plus.Services;
+using Xarial.CadPlus.Toolbar.Services;
 using Xarial.XCad.Base;
 using Xarial.XToolkit.Wpf;
 using Xarial.XToolkit.Wpf.Extensions;
@@ -46,15 +47,17 @@ namespace Xarial.CadPlus.CustomToolbar.UI.ViewModels
         private readonly IMessageService m_MsgService;
         private readonly IXLogger m_Logger;
 
+        private string m_ToolbarSpecificationPath;
         private bool m_IsEditable;
 
         private readonly IIconsProvider[] m_IconsProviders;
+        private readonly IFilePathResolver m_FilePathResolver;
 
         private readonly string[] m_MacroExtensions;
         
         public CommandManagerVM(IToolbarConfigurationProvider confsProvider,
             IMessageService msgService, IXLogger logger, IIconsProvider[] iconsProviders,
-            ICadDescriptor cadEntDesc)
+            ICadDescriptor cadEntDesc, IFilePathResolver filePathResolver)
         {
             m_ConfsProvider = confsProvider;
             m_MsgService = msgService;
@@ -71,6 +74,7 @@ namespace Xarial.CadPlus.CustomToolbar.UI.ViewModels
                 .ToArray();
 
             m_IconsProviders = iconsProviders;
+            m_FilePathResolver = filePathResolver;
         }
 
         private void Help()
@@ -87,8 +91,8 @@ namespace Xarial.CadPlus.CustomToolbar.UI.ViewModels
         public void Load(CustomToolbarInfo toolbarInfo, string toolbarPath) 
         {
             ToolbarInfo = toolbarInfo;
-            ToolbarSpecificationPath = toolbarPath;
-            IsEditable = !m_ConfsProvider.IsReadOnly(ToolbarSpecificationPath);
+            m_ToolbarSpecificationPath = toolbarPath;
+            IsEditable = !m_ConfsProvider.IsReadOnly(toolbarPath);
 
             LoadToolbar(ToolbarInfo);
         }
@@ -103,7 +107,7 @@ namespace Xarial.CadPlus.CustomToolbar.UI.ViewModels
 
             Groups = new CommandsCollection<CommandGroupVM>(
                 (toolbarInfo.Groups ?? new CommandGroupInfo[0])
-                .Select(g => new CommandGroupVM(g, m_IconsProviders)));
+                .Select(g => new CommandGroupVM(g, m_IconsProviders, m_FilePathResolver)));
 
             HandleCommandGroupCommandCreation(Groups.Commands);
 
@@ -114,6 +118,7 @@ namespace Xarial.CadPlus.CustomToolbar.UI.ViewModels
         private void OnNewCommandCreated(ICommandVM cmd)
         {
             SelectedElement = cmd;
+            cmd.WorkingDirectory = WorkingDirectory;
         }
 
         public bool IsEditable
@@ -157,7 +162,18 @@ namespace Xarial.CadPlus.CustomToolbar.UI.ViewModels
             }
         }
 
-        public string ToolbarSpecificationPath { get; private set; }
+        public string ToolbarSpecificationPath 
+        {
+            get => m_ToolbarSpecificationPath;
+            private set 
+            {
+                m_ToolbarSpecificationPath = value;
+
+                Load(m_ConfsProvider.GetToolbar(m_ToolbarSpecificationPath), m_ToolbarSpecificationPath);
+                
+                this.NotifyChanged();
+            }
+        }
 
         public ICommand BrowseToolbarSpecificationCommand
         {
@@ -176,13 +192,7 @@ namespace Xarial.CadPlus.CustomToolbar.UI.ViewModels
                             {
                                 try
                                 {
-                                    ToolbarInfo = m_ConfsProvider.GetToolbar(ToolbarSpecificationPath);
-
-                                    IsEditable = !m_ConfsProvider.IsReadOnly(ToolbarSpecificationPath);
-
                                     ToolbarSpecificationPath = specFile;
-
-                                    this.NotifyChanged();
                                 }
                                 catch (Exception ex)
                                 {
@@ -468,6 +478,33 @@ namespace Xarial.CadPlus.CustomToolbar.UI.ViewModels
             {
                 grp.Commands.NewCommandCreated -= OnNewCommandCreated;
                 grp.Commands.NewCommandCreated += OnNewCommandCreated;
+            }
+
+            SetCommandGroupsWorkingDirectory(grps);
+        }
+
+        private string WorkingDirectory => Path.GetDirectoryName(ToolbarSpecificationPath);
+
+        private void SetCommandGroupsWorkingDirectory(IEnumerable<CommandGroupVM> grps) 
+        {
+            if (grps != null)
+            {
+                var workDir = WorkingDirectory;
+
+                foreach (var grp in grps)
+                {
+                    grp.WorkingDirectory = workDir;
+
+                    var cmds = grp.Commands;
+
+                    if (cmds != null)
+                    {
+                        foreach (var cmd in cmds)
+                        {
+                            cmd.WorkingDirectory = workDir;
+                        }
+                    }
+                }
             }
         }
     }
