@@ -40,6 +40,7 @@ using Xarial.CadPlus.Plus.Delegates;
 using Xarial.XCad.UI.Structures;
 using Xarial.CadPlus.Plus.Attributes;
 using Xarial.XCad.Exceptions;
+using Xarial.CadPlus.Plus.Extensions;
 
 namespace Xarial.CadPlus.AddIn.Base
 {
@@ -219,6 +220,8 @@ namespace Xarial.CadPlus.AddIn.Base
             builder.RegisterInstance(Extension.Application);
             builder.RegisterType<CadAppMessageService>()
                 .As<IMessageService>().WithParameter(new TypedParameter(typeof(Type[]), new Type[] { typeof(IUserException) }));
+            builder.RegisterType<AboutService>().As<IAboutService>().WithParameter(
+                new TypedParameter(typeof(IntPtr), Extension.Application.WindowHandle));
             builder.RegisterType<DefaultDocumentAdapter>()
                 .As<IDocumentAdapter>();
             builder.RegisterType<SettingsProvider>()
@@ -273,10 +276,14 @@ namespace Xarial.CadPlus.AddIn.Base
                     break;
 
                 case CadPlusCommands_e.About:
-                    ShowPopup(new AboutDialog(
-                        new AboutDialogSpec(this.GetType().Assembly,
-                        Resources.logo,
-                        Licenses.ThirdParty)));
+                    try
+                    {
+                        m_SvcProvider.GetService<IAboutService>().ShowAbout(this.GetType().Assembly,
+                            Resources.logo);
+                    }
+                    catch
+                    {
+                    }
                     break;
             }
         }

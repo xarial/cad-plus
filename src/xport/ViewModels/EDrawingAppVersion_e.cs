@@ -26,6 +26,9 @@ namespace Xarial.CadPlus.Xport.ViewModels
         v2020 = 2020,
 
         [EnumDescription("2021")]
-        v2021 = 2021
+        v2021 = 2021,
+
+        [EnumDescription("2022")]
+        v2022 = 2022
     }
 }

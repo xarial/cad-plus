@@ -1,11 +1,4 @@
-﻿//*********************************************************************
-//CAD+ Toolset
-//Copyright(C) 2021 Xarial Pty Limited
-//Product URL: https://cadplus.xarial.com
-//License: https://cadplus.xarial.com/license/
-//*********************************************************************
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -15,9 +8,9 @@ using System.Threading.Tasks;
 using Xarial.XCad.Base;
 using Xarial.XCad.Base.Enums;
 
-namespace Xarial.CadPlus.Batch.Base.Services
+namespace Xarial.CadPlus.Common.Services
 {
-    public interface IJobManager : IDisposable 
+    public interface IJobManager : IDisposable
     {
         void AddProcess(Process process);
     }
@@ -36,7 +29,7 @@ namespace Xarial.CadPlus.Batch.Base.Services
             public ulong WriteTransferCount;
             public ulong OtherTransferCount;
         }
-        
+
         [StructLayout(LayoutKind.Sequential)]
         public struct JOBOBJECT_BASIC_LIMIT_INFORMATION
         {
@@ -102,7 +95,7 @@ namespace Xarial.CadPlus.Batch.Base.Services
 
         private readonly IXLogger m_Logger;
 
-        public JobManager(IXLogger logger) 
+        public JobManager(IXLogger logger)
         {
             m_Logger = logger;
             m_IsInit = false;
@@ -165,7 +158,7 @@ namespace Xarial.CadPlus.Batch.Base.Services
 
                 m_Logger.Log($"Added process to job: {process.Id}", LoggerMessageSeverity_e.Debug);
             }
-            else 
+            else
             {
                 throw new Exception("Job object is not initialized");
             }
