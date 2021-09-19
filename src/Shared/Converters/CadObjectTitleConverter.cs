@@ -40,6 +40,18 @@ namespace Xarial.CadPlus.Plus.Shared.Converters
                             path = title;
                         }
 
+                        if (string.IsNullOrEmpty(title))
+                        {
+                            if (!string.IsNullOrEmpty(path))
+                            {
+                                title = Path.GetFileName(path);
+                            }
+                            else 
+                            {
+                                title = "???";
+                            }
+                        }
+
                         switch (dispType)
                         {
                             case DocumentTitleDisplayType_e.FilePath:
