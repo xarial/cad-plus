@@ -10,7 +10,7 @@ using System.Globalization;
 using System.Windows.Data;
 using Xarial.CadPlus.CustomToolbar.UI.ViewModels;
 
-namespace Xarial.CadPlus.CustomToolbar.UI.Converters
+namespace Xarial.CadPlus.Toolbar.UI.Converters
 {
     public class SelectedCommandConverter : IValueConverter
     {

@@ -5,6 +5,7 @@
 //License: https://cadplus.xarial.com/license/
 //*********************************************************************
 
+using System.Windows;
 using System.Windows.Controls;
 
 namespace Xarial.CadPlus.CustomToolbar.UI.Views
@@ -15,5 +16,16 @@ namespace Xarial.CadPlus.CustomToolbar.UI.Views
         {
             InitializeComponent();
         }
-    }
+
+		public static readonly DependencyProperty WorkingDirectoryProperty =
+			DependencyProperty.Register(
+			nameof(WorkingDirectory), typeof(string),
+			typeof(CommandBaseView));
+
+		public string WorkingDirectory
+		{
+			get { return (string)GetValue(WorkingDirectoryProperty); }
+			set { SetValue(WorkingDirectoryProperty, value); }
+		}
+	}
 }

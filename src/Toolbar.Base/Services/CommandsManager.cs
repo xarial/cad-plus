@@ -6,7 +6,6 @@
 //*********************************************************************
 
 using Microsoft.CodeAnalysis;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -14,26 +13,24 @@ using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-using Xarial.CadPlus.Common.Services;
 using Xarial.CadPlus.CustomToolbar.Base;
 using Xarial.CadPlus.CustomToolbar.Enums;
 using Xarial.CadPlus.CustomToolbar.Helpers;
 using Xarial.CadPlus.CustomToolbar.Structs;
-using Xarial.CadPlus.Plus;
 using Xarial.CadPlus.Plus.Modules;
 using Xarial.CadPlus.Plus.Services;
 using Xarial.CadPlus.Toolbar.Properties;
+using Xarial.CadPlus.Toolbar.Services;
 using Xarial.XCad;
 using Xarial.XCad.Base;
-using Xarial.XCad.Exceptions;
 using Xarial.XCad.Extensions;
-using Xarial.XCad.UI.Structures;
+using Xarial.XCad.UI.Commands.Structures;
 
 namespace Xarial.CadPlus.CustomToolbar.Services
 {
     public interface ICommandsManager : IDisposable
     {
-        void CreateCommandGroups(CustomToolbarInfo toolbarInfo);
+        void CreateCommandGroups(CustomToolbarInfo toolbarInfo, string workDir);
     }
 
     public partial class CommandsManager : ICommandsManager
@@ -47,10 +44,13 @@ namespace Xarial.CadPlus.CustomToolbar.Services
 
         private readonly Dictionary<CommandMacroInfo, bool> m_CachedToggleStates;
         private readonly ConcurrentDictionary<CommandMacroInfo, IToggleButtonStateResolver> m_StateResolvers;
+        private readonly IFilePathResolver m_PathResolver;
+
+        private string m_WorkDir;
 
         public CommandsManager(IXExtension addIn, IXApplication app,
             IMacroRunner macroRunner, IMessageService msg,
-            IXLogger logger, IIconsProvider[] iconsProviders)
+            IXLogger logger, IIconsProvider[] iconsProviders, IFilePathResolver pathResolver)
         {
             m_AddIn = addIn;
             m_App = app;
@@ -61,12 +61,15 @@ namespace Xarial.CadPlus.CustomToolbar.Services
 
             m_CachedToggleStates = new Dictionary<CommandMacroInfo, bool>();
             m_StateResolvers = new ConcurrentDictionary<CommandMacroInfo, IToggleButtonStateResolver>();
+            m_PathResolver = pathResolver;
         }
 
-        public void CreateCommandGroups(CustomToolbarInfo toolbarInfo) 
+        public void CreateCommandGroups(CustomToolbarInfo toolbarInfo, string workDir) 
         {
             const string COMMAND_GROUP_TITLE_TEMPLATE = "Toolbar+ Command Group";
             const string COMMAND_TITLE_TEMPLATE = "Toolbar+ Command";
+
+            m_WorkDir = workDir;
 
             var usedCommandGroupNames = new List<string>();
             var usedCommandNames = new List<string>();
@@ -76,7 +79,7 @@ namespace Xarial.CadPlus.CustomToolbar.Services
                 foreach (var grp in toolbarInfo.Groups
                     .Where(g => g.Commands?.Any(c => c.Triggers.HasFlag(Triggers_e.Button)) == true))
                 {
-                    var cmdGrp = new CommandGroupInfoSpec(grp, m_IconsProviders);
+                    var cmdGrp = new CommandGroupInfoSpec(grp, m_IconsProviders, m_PathResolver, m_WorkDir);
                     
                     ResolveEmptyName(cmdGrp.Info, COMMAND_GROUP_TITLE_TEMPLATE, usedCommandGroupNames, out string grpTitle, out string grpTooltip);
                     cmdGrp.Title = grpTitle;
@@ -180,7 +183,7 @@ namespace Xarial.CadPlus.CustomToolbar.Services
             }
         }
         
-        private void OnCommandStateResolve(XCad.UI.Commands.Structures.CommandSpec spec, XCad.UI.Commands.Structures.CommandState state)
+        private void OnCommandStateResolve(CommandSpec spec, CommandState state)
         {
             var cmdSpec = (CommandItemInfoSpec)spec;
             state.Enabled = cmdSpec.Info.Scope.IsInScope(m_App);
@@ -194,7 +197,7 @@ namespace Xarial.CadPlus.CustomToolbar.Services
             }
         }
 
-        private void OnCommandClick(XCad.UI.Commands.Structures.CommandSpec spec)
+        private void OnCommandClick(CommandSpec spec)
         {
             var cmdSpec = (CommandItemInfoSpec)spec;
             var macroInfo = cmdSpec.Info;
@@ -203,7 +206,7 @@ namespace Xarial.CadPlus.CustomToolbar.Services
 
             var targetDoc = m_App.Documents.Active;
 
-            if (m_MacroRunner.TryRunMacroCommand(trigger, macroInfo, targetDoc))
+            if (m_MacroRunner.TryRunMacroCommand(trigger, macroInfo, targetDoc, m_WorkDir))
             {
                 if (macroInfo.Triggers.HasFlag(Triggers_e.ToggleButton))
                 {

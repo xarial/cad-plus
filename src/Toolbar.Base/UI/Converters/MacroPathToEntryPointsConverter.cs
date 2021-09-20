@@ -7,12 +7,14 @@
 
 using System;
 using System.Globalization;
+using System.IO;
 using System.Windows.Data;
+using Xarial.CadPlus.CustomToolbar;
 using Xarial.CadPlus.CustomToolbar.Services;
 
-namespace Xarial.CadPlus.CustomToolbar.UI.Converters
+namespace Xarial.CadPlus.Toolbar.UI.Converters
 {
-    public class MacroPathToEntryPointsConverter : IValueConverter
+    public class MacroPathToEntryPointsConverter : IMultiValueConverter
     {
         private readonly IMacroEntryPointsExtractor m_Extractor;
 
@@ -26,13 +28,16 @@ namespace Xarial.CadPlus.CustomToolbar.UI.Converters
             m_Extractor = extractor;
         }
 
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value is string)
-            {
+            if (values[0] is string && values[1] is string)
+            {   
                 try
                 {
-                    return m_Extractor.GetEntryPoints(value as string);
+                    var macroPath = (string)values[0];
+                    var workDir = (string)values[1];
+
+                    return m_Extractor.GetEntryPoints(macroPath, workDir);
                 }
                 catch
                 {
@@ -43,7 +48,7 @@ namespace Xarial.CadPlus.CustomToolbar.UI.Converters
             return null;
         }
 
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
         {
             throw new NotImplementedException();
         }

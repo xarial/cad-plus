@@ -4,7 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:hlp="clr-namespace:Xarial.XToolkit.Wpf;assembly=Xarial.XToolkit.Wpf"
-             xmlns:conv="clr-namespace:Xarial.CadPlus.CustomToolbar.UI.Converters"
+             xmlns:conv="clr-namespace:Xarial.CadPlus.Toolbar.UI.Converters"
              xmlns:base="clr-namespace:Xarial.CadPlus.CustomToolbar.UI.Base"
              xmlns:vm="clr-namespace:Xarial.CadPlus.CustomToolbar.UI.ViewModels"
              xmlns:ctrls="clr-namespace:Xarial.XToolkit.Wpf.Controls;assembly=Xarial.XToolkit.Wpf"
@@ -14,7 +14,7 @@
     <UserControl.Resources>
         <hlp:BindingProxy x:Key="CmdsMgr" Data="{Binding}" />
         <conv:SelectedCommandConverter x:Key="selCmdConv" />
-        <conv:PathToIconConverter x:Key="pathToIconConv" />
+        <conv:FilePathToDirectoryPathConverter x:Key="filePathToDirConv"/>
         <conv:CommandContextMenuTitleConverter x:Key="menuTitleConv" />
         <ContextMenu x:Key="CommandContextMenu">
             <MenuItem Header="{Binding Converter={StaticResource menuTitleConv}, ConverterParameter={x:Static conv:CommandContextMenu_e.MoveUp}}"
@@ -87,15 +87,7 @@
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-                <Image Width="18" Height="18" Margin="2" 
-                       Grid.Column="0">
-                    <Image.Source>
-                        <MultiBinding Converter="{StaticResource pathToIconConv}">
-                            <Binding Path="IconPath"/>
-                            <Binding/>
-                        </MultiBinding>
-                    </Image.Source>
-                </Image>
+                <Image Width="18" Height="18" Margin="2" Grid.Column="0" Source="{Binding Path=Icon}"/>
                 <TextBlock Text="{Binding Path=Title}" Grid.Column="1" VerticalAlignment="Center">
                     <TextBlock.Style>
                         <Style TargetType="{x:Type TextBlock}">

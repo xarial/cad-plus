@@ -6,10 +6,14 @@
 //*********************************************************************
 
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Windows.Input;
+using System.Windows.Media.Imaging;
 using Xarial.CadPlus.CustomToolbar.Structs;
 using Xarial.CadPlus.Plus.Modules;
+using Xarial.CadPlus.Toolbar.Properties;
+using Xarial.CadPlus.Toolbar.Services;
 using Xarial.XToolkit.Wpf;
 using Xarial.XToolkit.Wpf.Extensions;
 using Xarial.XToolkit.Wpf.Utils;
@@ -18,9 +22,11 @@ namespace Xarial.CadPlus.CustomToolbar.UI.ViewModels
 {
     public interface ICommandVM
     {
+        string WorkingDirectory { get; set; }
         string Title { get; set; }
         string Description { get; set; }
         string IconPath { get; set; }
+        BitmapSource Icon { get; }
         ICommand BrowseIconCommand { get; }
         CommandItemInfo Command { get; }
     }
@@ -30,26 +36,19 @@ namespace Xarial.CadPlus.CustomToolbar.UI.ViewModels
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
-        private readonly TCmdInfo m_Command;
         private ICommand m_BrowseIconCommand;
 
-        internal TCmdInfo Command
-        {
-            get
-            {
-                return m_Command;
-            }
-        }
+        internal TCmdInfo Command { get; }
 
         public string Title
         {
             get
             {
-                return m_Command.Title;
+                return Command.Title;
             }
             set
             {
-                m_Command.Title = value;
+                Command.Title = value;
                 this.NotifyChanged();
             }
         }
@@ -58,11 +57,11 @@ namespace Xarial.CadPlus.CustomToolbar.UI.ViewModels
         {
             get
             {
-                return m_Command.Description;
+                return Command.Description;
             }
             set
             {
-                m_Command.Description = value;
+                Command.Description = value;
                 this.NotifyChanged();
             }
         }
@@ -71,11 +70,15 @@ namespace Xarial.CadPlus.CustomToolbar.UI.ViewModels
         {
             get
             {
-                return m_Command.IconPath;
+                return Command.IconPath;
             }
             set
             {
-                m_Command.IconPath = value;
+                if (!string.Equals(Command.IconPath, value))
+                {
+                    Command.IconPath = value;
+                    UpdateIcon();
+                }
                 this.NotifyChanged();
             }
         }
@@ -104,20 +107,76 @@ namespace Xarial.CadPlus.CustomToolbar.UI.ViewModels
             }
         }
 
-        CommandItemInfo ICommandVM.Command
+        CommandItemInfo ICommandVM.Command => Command;
+
+        public string WorkingDirectory
         {
-            get
+            get => m_WorkingDirectory;
+            set 
             {
-                return Command;
+                if (!string.Equals(m_WorkingDirectory, value))
+                {
+                    m_WorkingDirectory = value;
+                    UpdateIcon();
+                }
             }
         }
 
-        private readonly IIconsProvider[] m_IconProviders;
-
-        protected CommandVM(TCmdInfo cmd, IIconsProvider[] providers)
+        public BitmapSource Icon
         {
-            m_Command = cmd;
-            m_IconProviders = providers;
+            get => m_Icon;
+            private set
+            {
+                m_Icon = value;
+                this.NotifyChanged();
+            }
         }
+
+        private string m_WorkingDirectory;
+        private BitmapSource m_Icon;
+        private readonly IIconsProvider[] m_IconProviders;
+        private readonly IFilePathResolver m_FilePathResolver;
+
+        protected CommandVM(TCmdInfo cmd, IIconsProvider[] providers, IFilePathResolver filePathResolver)
+        {
+            Command = cmd;
+            m_IconProviders = providers;
+            m_FilePathResolver = filePathResolver;
+        }
+
+        private void UpdateIcon() 
+        {
+            var iconPath = IconPath;
+            var workDir = WorkingDirectory;
+
+            BitmapSource icon = null;
+
+            try
+            {
+                iconPath = m_FilePathResolver.Resolve(iconPath, workDir);
+
+                if (File.Exists(iconPath))
+                {
+                    var provider = m_IconProviders.FirstOrDefault(p => p.Matches(iconPath));
+
+                    if (provider != null)
+                    {
+                        icon = provider.GetThumbnail(iconPath).ToBitmapImage();
+                    }
+                }
+            }
+            catch
+            {
+            }
+
+            if (icon == null)
+            {
+                icon = DefaultIcon;
+            }
+
+            Icon = icon;
+        }
+
+        protected abstract BitmapSource DefaultIcon { get; }
     }
 }
