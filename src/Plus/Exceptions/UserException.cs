@@ -22,11 +22,11 @@ namespace Xarial.CadPlus.Plus.Exceptions
     [Serializable]
     public class UserException : Exception, IUserMessageException, IUserException
     {
-        public static Type[] AdditionalUserException { get; }
+        public static Type[] AdditionalUserExceptions { get; }
 
         static UserException() 
         {
-            AdditionalUserException = new Type[] { typeof(IUserException) };
+            AdditionalUserExceptions = new Type[] { typeof(IUserException) };
         }
 
         protected UserException(SerializationInfo info, StreamingContext context) : base(info, context)

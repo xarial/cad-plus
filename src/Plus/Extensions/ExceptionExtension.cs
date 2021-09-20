@@ -11,6 +11,6 @@ namespace Xarial.CadPlus.Plus.Extensions
     public static class ExceptionExtension
     {
         public static string ParseUserError(this Exception ex, string genericError = "Generic error")
-            => ex.ParseUserError(out _, genericError, UserException.AdditionalUserException);
+            => ex.ParseUserError(out _, genericError, UserException.AdditionalUserExceptions);
     }
 }

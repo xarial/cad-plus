@@ -18,6 +18,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
+using Xarial.CadPlus.Plus.Extensions;
 using Xarial.CadPlus.Plus.Hosts;
 using Xarial.CadPlus.Plus.Services;
 using Xarial.CadPlus.Plus.Shared.Services;
@@ -215,7 +216,7 @@ namespace Xarial.CadPlus.Plus.Shared
                         }
                         catch (Exception ex)
                         {
-                            PrintError(ex.ParseUserError(out _));
+                            PrintError(ex.ParseUserError());
                         }
                     }
                     else
@@ -322,7 +323,7 @@ namespace Xarial.CadPlus.Plus.Shared
                 catch (Exception ex)
                 {
                     m_Logger.Log(ex);
-                    errorWriter.WriteLine(ex.ParseUserError(out _));
+                    errorWriter.WriteLine(ex.ParseUserError());
                     hasError = true;
                 }
             }
