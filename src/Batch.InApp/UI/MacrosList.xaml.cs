@@ -23,7 +23,7 @@ using Xarial.CadPlus.Batch.InApp.ViewModels;
 
 namespace Xarial.CadPlus.Batch.InApp.UI
 {
-    public partial class MacrosList : UserControl
+    public partial class MacrosList : UserControl, IDisposable
     {
         public MacrosList()
         {
@@ -45,10 +45,19 @@ namespace Xarial.CadPlus.Batch.InApp.UI
 
             if (newVm != null)
             {
+                newVm.AddMacros -= OnAddMacros;
                 newVm.AddMacros += OnAddMacros;
             }
         }
 
-        private void OnAddMacros() => lstMacros.AddFilesCommand.Execute(null);
+        private void OnAddMacros() => lstMacros.AddFiles();
+
+        public void Dispose()
+        {
+            if (this.DataContext is MacrosVM)
+            {
+                ((MacrosVM)this.DataContext).AddMacros -= OnAddMacros;
+            }
+        }
     }
 }

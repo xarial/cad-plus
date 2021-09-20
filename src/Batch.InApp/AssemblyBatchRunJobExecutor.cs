@@ -21,6 +21,7 @@ using Xarial.XCad.Documents;
 using Xarial.XCad.Documents.Enums;
 using Xarial.XCad.Exceptions;
 using Xarial.XToolkit.Reporting;
+using Xarial.CadPlus.Plus.Extensions;
 
 namespace Xarial.CadPlus.Batch.InApp
 {
@@ -61,8 +62,8 @@ namespace Xarial.CadPlus.Batch.InApp
         {
             //Not supported yet
         }
-
-        public Task<bool> ExecuteAsync()
+        
+        public bool TryExecute()
         {
             var startTime = DateTime.Now;
 
@@ -79,28 +80,30 @@ namespace Xarial.CadPlus.Batch.InApp
                     for (int i = 0; i < jobItems.Length; i++)
                     {
                         var jobItem = jobItems[i];
-                        
+
                         prg.SetStatus($"Processing {jobItem.FilePath}");
 
                         var res = TryProcessFile(jobItem, default);
-                        
+
                         ProgressChanged?.Invoke(jobItem, res);
                         prg.Report((double)i / (double)jobItems.Length);
                     }
                 }
 
-                return Task.FromResult(true);
+                return true;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 m_Logger.Log(ex);
-                return Task.FromResult(false);
+                return false;
             }
-            finally 
+            finally
             {
                 JobCompleted?.Invoke(DateTime.Now - startTime);
             }
         }
+
+        public Task<bool> TryExecuteAsync() => Task.FromResult(TryExecute());
 
         private JobItemDocument[] PrepareJob() 
         {
@@ -174,8 +177,9 @@ namespace Xarial.CadPlus.Batch.InApp
             }
             catch(Exception ex)
             {
-                LogMessage($"Failed to process file '{file.FilePath}': {ex.ParseUserError(out _)}");
+                LogMessage($"Failed to process file '{file.FilePath}': {ex.ParseUserError()}");
                 file.Status = JobItemStatus_e.Failed;
+                file.Error = ex;
             }
             finally 
             {
@@ -218,11 +222,12 @@ namespace Xarial.CadPlus.Batch.InApp
                 }
                 else
                 {
-                    errorDesc = ex.ParseUserError(out _, "Unknown error");
+                    errorDesc = ex.ParseUserError("Unknown error");
                 }
 
                 LogMessage($"Failed to run macro '{macro.FilePath}': {errorDesc}");
 
+                macro.Error = ex;
                 macro.Status = JobItemStatus_e.Failed;
             }
         }

@@ -147,9 +147,7 @@ namespace Xarial.CadPlus.Batch.InApp
             }
 
             private void OnAddMacros()
-            {
-                Macros.RequestAddMacros();
-            }
+                => Macros.RequestAddMacros();
         }
 
         public class OptionsGroup 

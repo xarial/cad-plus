@@ -15,13 +15,13 @@ using Xarial.CadPlus.MacroRunner;
 using Xarial.CadPlus.Plus;
 using Xarial.CadPlus.Plus.Exceptions;
 using Xarial.CadPlus.Plus.Services;
-using Xarial.CadPlus.Plus.Shared.Helpers;
 using Xarial.XCad;
 using Xarial.XCad.Base;
 using Xarial.XCad.Documents;
 using Xarial.XCad.Enums;
 using Xarial.XCad.Exceptions;
 using Xarial.XCad.Structures;
+using Xarial.XToolkit;
 
 namespace Xarial.CadPlus.Common.Services
 {
@@ -146,7 +146,7 @@ namespace Xarial.CadPlus.Common.Services
 
             try
             {
-                if (FileHelper.MatchesFilter(path, XCadMacroProvider.Filter.Extensions))
+                if (FileSystemUtils.MatchesAnyFilter(path, XCadMacroProvider.Filter.Extensions))
                 {
                     macro = m_XCadMacroProvider.GetMacro(path);
                     m_XCadMacrosCache.Add(path, macro);
