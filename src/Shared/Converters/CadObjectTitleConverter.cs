@@ -44,7 +44,14 @@ namespace Xarial.CadPlus.Plus.Shared.Converters
                         {
                             if (!string.IsNullOrEmpty(path))
                             {
-                                title = Path.GetFileName(path);
+                                try
+                                {
+                                    title = Path.GetFileName(path); //Some path can be illegal
+                                }
+                                catch 
+                                {
+                                    title = "???";
+                                }
                             }
                             else 
                             {
@@ -82,7 +89,7 @@ namespace Xarial.CadPlus.Plus.Shared.Converters
             {
             }
 
-            return "";
+            return "???";
         }
         
         public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
