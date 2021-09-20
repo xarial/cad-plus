@@ -6,6 +6,7 @@
 //*********************************************************************
 
 using System.Diagnostics;
+using System.Windows;
 using System.Windows.Controls;
 
 namespace Xarial.CadPlus.CustomToolbar.UI.Views
@@ -17,7 +18,18 @@ namespace Xarial.CadPlus.CustomToolbar.UI.Views
             InitializeComponent();
         }
 
-        private void OnHelpClicked(object sender, System.Windows.RoutedEventArgs e)
+        public static readonly DependencyProperty WorkingDirectoryProperty =
+            DependencyProperty.Register(
+            nameof(WorkingDirectory), typeof(string),
+            typeof(CommandMacroView));
+
+        public string WorkingDirectory
+        {
+            get { return (string)GetValue(WorkingDirectoryProperty); }
+            set { SetValue(WorkingDirectoryProperty, value); }
+        }
+
+        private void OnHelpClicked(object sender, RoutedEventArgs e)
         {
             try
             {

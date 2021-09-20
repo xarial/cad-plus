@@ -15,23 +15,26 @@ using Xarial.CadPlus.Plus.Data;
 using Xarial.CadPlus.Plus.Extensions;
 using Xarial.CadPlus.Plus.Modules;
 using Xarial.CadPlus.Toolbar.Properties;
+using Xarial.CadPlus.Toolbar.Services;
 using Xarial.XCad.UI;
 
 namespace Xarial.CadPlus.CustomToolbar.Base
 {
     internal static class CommandItemInfoExtension
     {
-        internal static IXImage GetCommandIcon(this CommandItemInfo info, IIconsProvider[] iconsProviders)
+        internal static IXImage GetCommandIcon(this CommandItemInfo info, IIconsProvider[] iconsProviders, IFilePathResolver pathResolver, string workDir)
         {
             IXImage icon = null;
 
             try
             {
-                var provider = iconsProviders.FirstOrDefault(p => p.Matches(info.IconPath));
+                var iconPath = pathResolver.Resolve(info.IconPath, workDir);
+
+                var provider = iconsProviders.FirstOrDefault(p => p.Matches(iconPath));
 
                 if (provider != null) 
                 {
-                    icon = provider.GetIcon(info.IconPath);
+                    icon = provider.GetIcon(iconPath);
                 }
             }
             catch

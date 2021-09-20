@@ -5,6 +5,7 @@
 //License: https://cadplus.xarial.com/license/
 //*********************************************************************
 
+using System;
 using System.IO;
 using Xarial.CadPlus.Plus;
 using Xarial.CadPlus.Plus.Attributes;
@@ -33,5 +34,11 @@ namespace Xarial.CadPlus.CustomToolbar.Structs
             SpecificationFile = Path.Combine(Locations.AppDirectoryPath,
                     Settings.Default.ToolbarsSpecFile);
         }
+
+        internal ToolbarSettings Clone()
+            => new ToolbarSettings()
+            {
+                SpecificationFile = SpecificationFile
+            };
     }
 }

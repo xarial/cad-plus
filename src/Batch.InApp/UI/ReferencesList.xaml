@@ -19,7 +19,7 @@
         <ListBox Grid.Row="0" ItemsSource="{Binding Path=References}">
             <ListBox.ItemTemplate>
                 <DataTemplate>
-                    <Grid ToolTip="{Binding Path=Document.Path}">
+                    <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto"/>
                             <ColumnDefinition Width="*"/>

@@ -4,11 +4,15 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:vm="clr-namespace:Xarial.CadPlus.CustomToolbar.UI.ViewModels"
-             xmlns:val="clr-namespace:Xarial.CadPlus.CustomToolbar.UI.ValidationRules"
-             xmlns:conv="clr-namespace:Xarial.CadPlus.CustomToolbar.UI.Converters"
+             xmlns:wpf="clr-namespace:Xarial.XToolkit.Wpf;assembly=Xarial.XToolkit.Wpf"
+             xmlns:local="clr-namespace:Xarial.CadPlus.CustomToolbar.UI.Views"
+             xmlns:val="clr-namespace:Xarial.CadPlus.Toolbar.UI.ValidationRules"
              mc:Ignorable="d"
              d:DataContext="{x:Type vm:ICommandVM}"
              d:DesignHeight="300" d:DesignWidth="300">
+    <UserControl.Resources>
+        <wpf:BindingProxy x:Key="this" Data="{Binding RelativeSource={RelativeSource AncestorType={x:Type local:CommandBaseView}}}"/>
+    </UserControl.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto" SharedSizeGroup="Header" />
@@ -22,8 +26,15 @@
         </Grid.RowDefinitions>
 
         <TextBlock Text="Title:" VerticalAlignment="Center"  Grid.Column="0" Grid.Row="0" Margin="2" />
-        <TextBox Text="{Binding Path=Title, UpdateSourceTrigger=PropertyChanged}"
-                 Grid.Column="1" Grid.Row="0" Margin="2" />
+        <TextBox Grid.Column="1" Grid.Row="0" Margin="2" >
+            <TextBox.Text>
+                <Binding Path="Title" UpdateSourceTrigger="PropertyChanged">
+                    <Binding.ValidationRules>
+                        <val:MandatoryValueValidationRule ValidatesOnTargetUpdated="True"/>
+                    </Binding.ValidationRules>
+                </Binding>
+            </TextBox.Text>
+        </TextBox>
 
         <TextBlock Text="Description:" VerticalAlignment="Center" Grid.Column="0" Grid.Row="1" Margin="2" />
         <TextBox Text="{Binding Path=Description, UpdateSourceTrigger=PropertyChanged}"
@@ -40,7 +51,11 @@
                 <TextBox.Text>
                     <Binding Path="IconPath" UpdateSourceTrigger="PropertyChanged">
                         <Binding.ValidationRules>
-                            <val:FileExistsValidationRule AllowEmptyValues="True" ValidatesOnTargetUpdated="True"/>
+                            <val:FileExistsValidationRule AllowEmptyValues="True" ValidatesOnTargetUpdated="True">
+                                <val:FileExistsValidationRule.Parameters>
+                                    <val:FileExistsValidationRuleParameters WorkingDirectory="{Binding Path=Data.WorkingDirectory, Source={StaticResource this}}"/>
+                                </val:FileExistsValidationRule.Parameters>
+                            </val:FileExistsValidationRule>
                         </Binding.ValidationRules>
                     </Binding>
                 </TextBox.Text>

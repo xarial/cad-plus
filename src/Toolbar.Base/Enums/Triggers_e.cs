@@ -46,8 +46,8 @@ namespace Xarial.CadPlus.CustomToolbar.Enums
         [Title("New Selection")]
         NewSelection = 1 << 7,
 
-        [Title("Change Configuration")]
-        ConfigurationChange = 1 << 8,
+        [Title("Change Configuration/Sheet")]
+        ConfigurationSheetChange = 1 << 8,
 
         [Title("Rebuild")]
         Rebuild = 1 << 9,

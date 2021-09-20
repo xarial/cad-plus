@@ -52,7 +52,7 @@ namespace Xarial.CadPlus.Batch.Extensions.Services
                 switch (scope) 
                 {
                     case ReferencesScope_e.TopLevelDependencies:
-                        deps = doc.Dependencies;
+                        deps = doc.Dependencies.ToArray();
                         break;
 
                     case ReferencesScope_e.AllDependencies:

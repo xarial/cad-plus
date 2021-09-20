@@ -30,24 +30,29 @@ using Xarial.CadPlus.Plus.Services;
 using Xarial.CadPlus.Plus.Shared;
 using Xarial.CadPlus.Plus.Shared.Extensions;
 using Xarial.CadPlus.Toolbar.Properties;
+using Xarial.CadPlus.Toolbar.Services;
+using Xarial.CadPlus.CustomToolbar.Structs;
+using System.IO;
 
 namespace Xarial.CadPlus.CustomToolbar
 {
+    [Title("Toolbar+")]
+    [Description("Toolbar+ configuration")]
+    [CommandGroupInfo((int)CadCommandGroupIds_e.Toolbar)]
+    [CommandOrder(5)]
+    public enum Commands_e
+    {
+        [IconEx(typeof(Resources), nameof(Resources.configure_vector), nameof(Resources.configure_icon))]
+        [Title("Configure Custom Toolbars...")]
+        [Description("Configure custom toolbar")]
+        [CommandItemInfo(true, false, WorkspaceTypes_e.All)]
+        Configuration
+    }
+
     [Module(typeof(IHostExtension))]
-    public class CustomToolbarModule : IToolbarModule
+    public class ToolbarModule : IToolbarModule
     {
         public event MacroRunningDelegate MacroRunning;
-
-        [Title("Toolbar+")]
-        [Description("Toolbar+ configuration")]
-        public enum Commands_e
-        {
-            [IconEx(typeof(Resources), nameof(Resources.configure_vector), nameof(Resources.configure_icon))]
-            [Title("Configure...")]
-            [Description("Configure custom toolbar")]
-            [CommandItemInfo(true, false, WorkspaceTypes_e.All)]
-            Configuration
-        }
 
         protected static Autofac.IContainer m_Container;
 
@@ -64,8 +69,9 @@ namespace Xarial.CadPlus.CustomToolbar
 
         private IServiceProvider m_SvcProvider;
         private IToolbarModuleProxy m_ToolbarProxy;
+        private IToolbarConfigurationManager m_ToolbarConfMgr;
 
-        public CustomToolbarModule() 
+        public ToolbarModule() 
         {
             m_IconsProviders = new List<IIconsProvider>();
             
@@ -99,7 +105,19 @@ namespace Xarial.CadPlus.CustomToolbar
             m_ToolbarProxy = Resolve<IToolbarModuleProxy>();
             m_ToolbarProxy.RequestMacroRunning += OnRequestMacroRunning;
 
-            LoadCommands();
+            m_ToolbarConfMgr = Resolve<IToolbarConfigurationManager>();
+
+            try
+            {
+                m_ToolbarConfMgr.Load();
+                var workDir = Path.GetDirectoryName(m_ToolbarConfMgr.FilePath);
+                LoadCommands(m_ToolbarConfMgr.Toolbar, workDir);
+            }
+            catch (Exception ex)
+            {
+                m_Logger.Log(ex);
+                m_Msg.ShowError(ex, "Failed to load toolbar specification");
+            }
         }
 
         private void OnRequestMacroRunning(EventType_e eventType, MacroRunningArguments args)
@@ -116,6 +134,9 @@ namespace Xarial.CadPlus.CustomToolbar
             builder.RegisterType<MacroEntryPointsExtractor>()
                 .As<IMacroEntryPointsExtractor>();
 
+            builder.RegisterType<FilePathResolver>()
+                .As<IFilePathResolver>();
+            
             builder.RegisterType<MacroRunner>()
                 .As<IMacroRunner>().SingleInstance();
 
@@ -124,9 +145,11 @@ namespace Xarial.CadPlus.CustomToolbar
 
             builder.RegisterType<ToolbarConfigurationProvider>()
                 .As<IToolbarConfigurationProvider>();
-            
-            builder.RegisterType<CommandManagerVM>()
-                .SingleInstance();
+
+            builder.RegisterType<ToolbarConfigurationManager>()
+                .As<IToolbarConfigurationManager>().SingleInstance();
+
+            builder.RegisterType<CommandManagerVM>();
 
             builder.RegisterType<CommandsManager>()
                 .As<ICommandsManager>().SingleInstance();
@@ -146,12 +169,15 @@ namespace Xarial.CadPlus.CustomToolbar
             m_Container = builder.Build();
         }
 
-        private void LoadCommands()
+        private void LoadCommands(CustomToolbarInfo toolbarInfo, string workDir)
         {
             m_Host.RegisterCommands<Commands_e>(OnCommandClick);
             
             m_CmdsMgr = Resolve<ICommandsManager>();
             m_TriggersMgr = Resolve<ITriggersManager>();
+
+            m_CmdsMgr.CreateCommandGroups(toolbarInfo, workDir);
+            m_TriggersMgr.Load(toolbarInfo, workDir);
         }
 
         private void OnCommandClick(Commands_e spec)
@@ -164,6 +190,8 @@ namespace Xarial.CadPlus.CustomToolbar
 
                         var vm = Resolve<CommandManagerVM>();
 
+                        vm.Load(m_ToolbarConfMgr.Toolbar.Clone(), m_ToolbarConfMgr.FilePath);
+                        
                         var popup = m_Host.Extension.CreatePopupWindow<CommandManagerForm>();
                         popup.Control.DataContext = vm;
                         popup.Control.WindowStartupLocation = System.Windows.WindowStartupLocation.CenterOwner;
@@ -172,7 +200,21 @@ namespace Xarial.CadPlus.CustomToolbar
                         {
                             try
                             {
-                                m_CmdsMgr.UpdateToolbarConfiguration(vm.Settings, vm.ToolbarInfo, vm.IsEditable);
+                                m_ToolbarConfMgr.Toolbar = vm.ToolbarInfo;
+                                m_ToolbarConfMgr.FilePath = vm.ToolbarSpecificationPath;
+
+                                if (m_ToolbarConfMgr.SettingsChanged)
+                                {
+                                    m_ToolbarConfMgr.SaveSettings();
+                                }
+
+                                if (m_ToolbarConfMgr.ToolbarChanged) 
+                                {
+                                    m_ToolbarConfMgr.SaveToolbar();
+                                    
+                                    //TODO: make this message SOLIDWORKS specific only as other CAD systems might have different conditions for loading of toolbar
+                                    m_Msg.ShowInformation("Toolbar settings have been changed. Restart SOLIDWORKS to load the command manager and menu. If commands in the toolbar have been changed (added or removed) then it might be required to restart SOLIDWORKS twice for the changes to be applied");
+                                }
                             }
                             catch (Exception ex)
                             {

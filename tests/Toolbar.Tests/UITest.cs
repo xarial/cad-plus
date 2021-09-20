@@ -17,6 +17,7 @@ using Xarial.CadPlus.CustomToolbar.UI.Forms;
 using Xarial.CadPlus.CustomToolbar.UI.ViewModels;
 using Xarial.CadPlus.Plus;
 using Xarial.CadPlus.Plus.Services;
+using Xarial.CadPlus.Toolbar.Services;
 using Xarial.XCad;
 using Xarial.XCad.Base;
 using Xarial.XCad.Extensions;
@@ -29,7 +30,7 @@ namespace CustomToolbar.Tests
     {
         public class MacroEntryPointsExtractorMock : IMacroEntryPointsExtractor
         {
-            public MacroStartFunction[] GetEntryPoints(string macroPath)
+            public MacroStartFunction[] GetEntryPoints(string macroPath, string workDir)
             {
                 return new MacroStartFunction[]
                 {
@@ -39,7 +40,7 @@ namespace CustomToolbar.Tests
             }
         }
 
-        public class CustomToolbarModuleMock : CustomToolbarModule 
+        public class CustomToolbarModuleMock : ToolbarModule 
         {
             protected override void CreateContainer()
             {
@@ -109,16 +110,16 @@ namespace CustomToolbar.Tests
             var confProviderMock = new Mock<IToolbarConfigurationProvider>();
             var settsProviderMock = new Mock<ISettingsProvider>();
 
-            confProviderMock.Setup(m => m.GetToolbar(out It.Ref<bool>.IsAny, It.IsAny<string>())).
+            confProviderMock.Setup(m => m.GetToolbar(It.IsAny<string>())).
                 Returns(toolbar);
 
             settsProviderMock.Setup(p => p.ReadSettings<ToolbarSettings>())
                 .Returns(new ToolbarSettings());
 
-            var vm = new CommandManagerVM(confProviderMock.Object, settsProviderMock.Object,
+            var vm = new CommandManagerVM(confProviderMock.Object,
                 new Mock<IMessageService>().Object, new Mock<IXLogger>().Object,
                 new Xarial.CadPlus.Plus.Modules.IIconsProvider[0], 
-                new Mock<ICadDescriptor>().Object);
+                new Mock<ICadDescriptor>().Object, new Mock<IFilePathResolver>().Object);
 
             var form = new CommandManagerForm();
             form.DataContext = vm;

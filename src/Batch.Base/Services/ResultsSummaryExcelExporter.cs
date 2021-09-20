@@ -5,15 +5,17 @@
 //License: https://cadplus.xarial.com/license/
 //*********************************************************************
 
-using ClosedXML.Excel;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Xarial.CadPlus.Batch.Base.Converters;
 using Xarial.CadPlus.Batch.Base.ViewModels;
+using Xarial.CadPlus.Plus.Data;
 using Xarial.CadPlus.Plus.Exceptions;
+using Xarial.CadPlus.Plus.Services;
 using Xarial.XToolkit.Reporting;
 using Xarial.XToolkit.Wpf.Utils;
 
@@ -29,65 +31,61 @@ namespace Xarial.CadPlus.Batch.Base.Services
     {
         public FileFilter Filter { get; }
 
-        public ResultsSummaryExcelExporter() 
+        private readonly IExcelWriter m_ExcelWriter;
+
+        public ResultsSummaryExcelExporter(IExcelWriter excelWriter) 
         {
+            m_ExcelWriter = excelWriter;
             Filter = new FileFilter("Excel file", "*.xlsx");
         }
 
         public void Export(string name, JobResultSummaryVM summary, string filePath)
         {
-            try
+            if (summary.JobItemFiles.Any())
             {
-                using (var workbook = new XLWorkbook())
+                var rows = new List<ExcelRow>();
+
+                rows.Add(CreateHeader(summary.JobItemFiles.FirstOrDefault()));
+
+                foreach (var item in summary.JobItemFiles)
                 {
-                    var worksheet = workbook.Worksheets.Add(name);
-
-                    WriteHeader(worksheet, summary.JobItemFiles.FirstOrDefault());
-
-                    var nextRow = 2;
-
-                    foreach (var item in summary.JobItemFiles)
-                    {
-                        WriteItem(worksheet, item, ref nextRow);
-                        nextRow++;
-                    }
-
-                    var range = worksheet.Range(worksheet.FirstCellUsed().Address, worksheet.LastCellUsed().Address);
-
-                    var table = range.CreateTable("Results");
-                    table.ShowHeaderRow = true;
-
-                    worksheet.Columns().AdjustToContents();
-
-                    workbook.SaveAs(filePath);
+                    rows.Add(CreateRowForItem(item));
                 }
+
+                m_ExcelWriter.CreateWorkbook(filePath, rows.ToArray(), new ExcelWriterOptions()
+                {
+                    CreateTable = true,
+                    TableName = "Results",
+                    WorksheetName = name
+                });
             }
-            catch (UnauthorizedAccessException ex)
+            else 
             {
-                throw new UserException(ex.Message, ex);
+                throw new UserException("No results to export"); ;
             }
         }
 
-        private void WriteHeader(IXLWorksheet worksheet, JobItemDocumentVM template)
+        private ExcelRow CreateHeader(JobItemDocumentVM template)
         {
-            if (template != null)
+            var cells = new ExcelCell[template.Macros.Length + 3];
+
+            cells[0] = new ExcelCell("Status");
+            cells[1] = new ExcelCell("File");
+
+            for (int i = 0; i < template.Macros.Length; i++)
             {
-                worksheet.Cell(1, 1).Value = "Status";
-                worksheet.Cell(1, 2).Value = "File";
-
-                var colIndex = 2;
-
-                for (int i = 0; i < template.Macros.Length; i++)
-                {
-                    worksheet.Cell(1, ++colIndex).Value = template.Macros[i].Name;
-                }
-
-                worksheet.Cell(1, ++colIndex).Value = "Error";
+                cells[i + 2] = new ExcelCell(template.Macros[i].Name);
             }
+
+            cells[cells.Length - 1] = new ExcelCell("Error");
+
+            return new ExcelRow(cells);
         }
 
-        private void WriteItem(IXLWorksheet worksheet, JobItemDocumentVM item, ref int nextRow)
+        private ExcelRow CreateRowForItem(JobItemDocumentVM item)
         {
+            var cells = new ExcelCell[item.Macros.Length + 3];
+
             var errors = new List<string>();
 
             if (item.Error != null)
@@ -95,10 +93,33 @@ namespace Xarial.CadPlus.Batch.Base.Services
                 errors.Add($"[File] - {ExceptionToErrorConverter.Convert(item.Error)}");
             }
 
-            worksheet.Cell(nextRow, 1).Value = item.Status;
-            worksheet.Cell(nextRow, 2).Value = item.DisplayObject.Path;
+            var cellColor = default(KnownColor?);
 
-            var colIndex = 2;
+            switch (item.Status)
+            {
+                case Common.Services.JobItemStatus_e.Failed:
+                    cellColor = KnownColor.Red;
+                    break;
+
+                case Common.Services.JobItemStatus_e.InProgress:
+                    cellColor = KnownColor.LightBlue;
+                    break;
+
+                case Common.Services.JobItemStatus_e.Succeeded:
+                    cellColor = KnownColor.LightGreen;
+                    break;
+
+                case Common.Services.JobItemStatus_e.Warning:
+                    cellColor = KnownColor.LightYellow;
+                    break;
+
+                case Common.Services.JobItemStatus_e.AwaitingProcessing:
+                    cellColor = KnownColor.LightGray;
+                    break;
+            }
+
+            cells[0] = new ExcelCell(item.Status, null, cellColor);
+            cells[1] = new ExcelCell(item.DisplayObject.Path, null, cellColor);
 
             for (int i = 0; i < item.Macros.Length; i++)
             {
@@ -109,37 +130,12 @@ namespace Xarial.CadPlus.Batch.Base.Services
                     errors.Add($"[{macro.Name}] - {ExceptionToErrorConverter.Convert(item.Macros[i].Error)}");
                 }
 
-                worksheet.Cell(nextRow, ++colIndex).Value = macro.Status;
+                cells[i + 2] = new ExcelCell(macro.Status, null, cellColor);
             }
 
-            worksheet.Cell(nextRow, ++colIndex).Value = string.Join(Environment.NewLine, errors);
+            cells[cells.Length - 1] = new ExcelCell(string.Join(Environment.NewLine, errors), null, cellColor);
 
-            var cellColor = XLColor.Transparent;
-
-            switch (item.Status)
-            {
-                case Common.Services.JobItemStatus_e.Failed:
-                    cellColor = XLColor.Red;
-                    break;
-
-                case Common.Services.JobItemStatus_e.InProgress:
-                    cellColor = XLColor.LightBlue;
-                    break;
-
-                case Common.Services.JobItemStatus_e.Succeeded:
-                    cellColor = XLColor.LightGreen;
-                    break;
-
-                case Common.Services.JobItemStatus_e.Warning:
-                    cellColor = XLColor.LightYellow;
-                    break;
-
-                case Common.Services.JobItemStatus_e.AwaitingProcessing:
-                    cellColor = XLColor.LightGray;
-                    break;
-            }
-
-            worksheet.Range(nextRow, 1, nextRow, colIndex).Style.Fill.BackgroundColor = cellColor;
+            return new ExcelRow(cells);
         }
     }
 }
