@@ -41,10 +41,12 @@ namespace Xarial.CadPlus.Batch.InApp
         private readonly bool m_ActivateDocs;
         private readonly bool m_AllowReadOnly;
         private readonly bool m_AllowRapid;
+        private readonly bool m_AutoSaveDocs;
         private readonly IXLogger m_Logger;
 
         internal AssemblyBatchRunJobExecutor(IXApplication app, IMacroExecutor macroRunnerSvc,
-            IXDocument[] documents, IXLogger logger, IEnumerable<MacroData> macros, bool activateDocs, bool allowReadOnly, bool allowRapid) 
+            IXDocument[] documents, IXLogger logger, IEnumerable<MacroData> macros,
+            bool activateDocs, bool allowReadOnly, bool allowRapid, bool autoSaveDocs) 
         {
             m_App = app;
             m_Logger = logger;
@@ -56,6 +58,7 @@ namespace Xarial.CadPlus.Batch.InApp
             m_ActivateDocs = activateDocs;
             m_AllowReadOnly = allowReadOnly;
             m_AllowRapid = allowRapid;
+            m_AutoSaveDocs = autoSaveDocs;
         }
 
         public void Cancel()
@@ -86,7 +89,7 @@ namespace Xarial.CadPlus.Batch.InApp
                         var res = TryProcessFile(jobItem, default);
 
                         ProgressChanged?.Invoke(jobItem, res);
-                        prg.Report((double)i / (double)jobItems.Length);
+                        prg.Report((double)(i + 1) / (double)jobItems.Length);
                     }
                 }
 
@@ -138,12 +141,12 @@ namespace Xarial.CadPlus.Batch.InApp
                         state |= DocumentState_e.Hidden;
                     }
 
-                    if (m_AllowReadOnly) 
+                    if (m_AllowReadOnly)
                     {
                         state |= DocumentState_e.ReadOnly;
                     }
 
-                    if (m_AllowRapid) 
+                    if (m_AllowRapid)
                     {
                         state |= DocumentState_e.Rapid;
                     }
@@ -160,6 +163,11 @@ namespace Xarial.CadPlus.Batch.InApp
                 foreach (var macro in file.Macros)
                 {
                     TryRunMacro(macro, doc);
+                }
+
+                if (m_AutoSaveDocs) 
+                {
+                    doc.Save();
                 }
 
                 if (file.Macros.All(m => m.Status == JobItemStatus_e.Succeeded))

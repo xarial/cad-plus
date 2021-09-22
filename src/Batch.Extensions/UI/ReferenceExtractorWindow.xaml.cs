@@ -33,22 +33,16 @@ namespace Xarial.CadPlus.Batch.Extensions.UI
             this.DataContextChanged += OnDataContextChanged;
         }
 
-        private void OnDataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
+        public static readonly DependencyProperty ReferencesGroupVisibleProperty =
+            DependencyProperty.Register(
+            nameof(ReferencesGroupVisible), typeof(bool),
+            typeof(ReferenceExtractorWindow), new PropertyMetadata(true));
+
+        public bool ReferencesGroupVisible
         {
-            if (m_RefExtractorVm != null) 
-            {
-                m_RefExtractorVm.GridDataChanged -= OnGridDataChanged;
-            }
-
-            if (e.NewValue is ReferenceExtractorVM) 
-            {
-                m_RefExtractorVm = e.NewValue as ReferenceExtractorVM;
-                m_RefExtractorVm.GridDataChanged += OnGridDataChanged;
-            }
+            get { return (bool)GetValue(ReferencesGroupVisibleProperty); }
+            set { SetValue(ReferencesGroupVisibleProperty, value); }
         }
-
-        private void OnGridDataChanged()
-            => ResetColumnWidths(grdRefs);
 
         public void ResetColumnWidths(GridView gridView)
         {
@@ -64,6 +58,23 @@ namespace Xarial.CadPlus.Batch.Extensions.UI
                 }
             }
         }
+
+        private void OnDataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            if (m_RefExtractorVm != null)
+            {
+                m_RefExtractorVm.GridDataChanged -= OnGridDataChanged;
+            }
+
+            if (e.NewValue is ReferenceExtractorVM)
+            {
+                m_RefExtractorVm = e.NewValue as ReferenceExtractorVM;
+                m_RefExtractorVm.GridDataChanged += OnGridDataChanged;
+            }
+        }
+
+        private void OnGridDataChanged()
+            => ResetColumnWidths(grdRefs);
 
         private void OnCancelClick(object sender, RoutedEventArgs e)
         {
