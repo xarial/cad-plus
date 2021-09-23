@@ -94,10 +94,10 @@
     <Reference Include="WindowsBase" />
     <Reference Include="WindowsFormsIntegration" />
     <Reference Include="Xarial.CadPlusPlus, Version=0.2.1.0, Culture=neutral, PublicKeyToken=60dcaf351d4060db, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Xarial.CadPlusPlus.0.2.1-20210922.4\lib\net461\Xarial.CadPlusPlus.dll</HintPath>
+      <HintPath>..\..\packages\Xarial.CadPlusPlus.0.2.1-20210923.3\lib\net461\Xarial.CadPlusPlus.dll</HintPath>
     </Reference>
     <Reference Include="Xarial.XCad, Version=0.7.5.0, Culture=neutral, PublicKeyToken=60dcaf351d4060db, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Xarial.XCad.0.7.5-20210922.3\lib\net461\Xarial.XCad.dll</HintPath>
+      <HintPath>..\..\packages\Xarial.XCad.0.7.5-20210923.3\lib\net461\Xarial.XCad.dll</HintPath>
     </Reference>
     <Reference Include="Xarial.XToolkit, Version=0.2.25.0, Culture=neutral, PublicKeyToken=60dcaf351d4060db, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Xarial.XToolkit.0.2.25\lib\net461\Xarial.XToolkit.dll</HintPath>
