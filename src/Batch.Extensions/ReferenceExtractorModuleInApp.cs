@@ -86,6 +86,7 @@ namespace Xarial.CadPlus.Batch.Extensions
 
                 var popup = m_Host.Extension.CreatePopupWindow<ReferenceExtractorWindow>();
                 popup.Control.DataContext = vm;
+                popup.Control.ReferencesGroupVisible = false;
 
                 popup.Control.Loaded += async (s, e) =>
                 {

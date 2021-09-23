@@ -17,6 +17,7 @@ using Xarial.CadPlus.Plus.Services;
 using Xarial.CadPlus.Batch.Base.Exceptions;
 using Xarial.XToolkit.Wpf;
 using Xarial.XToolkit.Wpf.Extensions;
+using Xarial.XCad.Base;
 
 namespace Xarial.CadPlus.Batch.Base.ViewModels
 {
@@ -70,11 +71,15 @@ namespace Xarial.CadPlus.Batch.Base.ViewModels
 
         public ICadDescriptor CadDescriptor { get; }
 
-        public JobResultVM(string name, IBatchRunJobExecutor executor, ICadDescriptor cadDesc)
+        private readonly IXLogger m_Logger;
+
+        public JobResultVM(string name, IBatchRunJobExecutor executor, ICadDescriptor cadDesc, IXLogger logger)
         {
             m_Executor = executor;
             CadDescriptor = cadDesc;
-            
+
+            m_Logger = logger;
+
             Name = name;
             Summary = new JobResultSummaryVM(m_Executor, CadDescriptor);
             Journal = new JobResultJournalVM(m_Executor);
@@ -91,37 +96,75 @@ namespace Xarial.CadPlus.Batch.Base.ViewModels
 
                 IsBatchInProgress = true;
 
-                if (await m_Executor.ExecuteAsync().ConfigureAwait(false))
+                if (await m_Executor.TryExecuteAsync().ConfigureAwait(false))
                 {
-                    if (Summary.JobItemFiles.All(f => f.Status == Common.Services.JobItemStatus_e.Succeeded))
-                    {
-                        Status = JobState_e.Succeeded;
-                    }
-                    else if (Summary.JobItemFiles.Any(f => f.Status == Common.Services.JobItemStatus_e.Succeeded))
-                    {
-                        Status = JobState_e.CompletedWithWarning;
-                    }
-                    else 
-                    {
-                        Status = JobState_e.Failed;
-                    }
+                    UpdateJobStatus();
                 }
                 else
                 {
                     Status = JobState_e.Failed;
                 }
             }
-            catch (JobCancelledException) 
+            catch (JobCancelledException)
             {
                 Status = JobState_e.Cancelled;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 Status = JobState_e.Failed;
+                m_Logger.Log(ex);
             }
             finally
             {
                 IsBatchInProgress = false;
+            }
+        }
+
+        public void RunBatch()
+        {
+            try
+            {
+                Status = JobState_e.InProgress;
+
+                IsBatchInProgress = true;
+
+                if (m_Executor.TryExecute())
+                {
+                    UpdateJobStatus();
+                }
+                else
+                {
+                    Status = JobState_e.Failed;
+                }
+            }
+            catch (JobCancelledException)
+            {
+                Status = JobState_e.Cancelled;
+            }
+            catch (Exception ex)
+            {
+                Status = JobState_e.Failed;
+                m_Logger.Log(ex);
+            }
+            finally
+            {
+                IsBatchInProgress = false;
+            }
+        }
+
+        private void UpdateJobStatus()
+        {
+            if (Summary.JobItemFiles.All(f => f.Status == Common.Services.JobItemStatus_e.Succeeded))
+            {
+                Status = JobState_e.Succeeded;
+            }
+            else if (Summary.JobItemFiles.Any(f => f.Status == Common.Services.JobItemStatus_e.Succeeded))
+            {
+                Status = JobState_e.CompletedWithWarning;
+            }
+            else
+            {
+                Status = JobState_e.Failed;
             }
         }
     }

@@ -22,6 +22,7 @@ using Xarial.XCad.UI.PropertyPage;
 using Xarial.XCad.UI.PropertyPage.Enums;
 using Xarial.XCad.UI.PropertyPage.Structures;
 using Xarial.XToolkit.Reporting;
+using Xarial.CadPlus.Plus.Extensions;
 
 namespace Xarial.CadPlus.Drawing.Features
 {
@@ -79,7 +80,7 @@ namespace Xarial.CadPlus.Drawing.Features
                 {
                     m_Logger.Log(ex);
                     arg.Cancel = true;
-                    arg.ErrorMessage = ex.ParseUserError(out _);
+                    arg.ErrorMessage = ex.ParseUserError();
                 }
             }
         }

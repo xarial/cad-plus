@@ -37,7 +37,6 @@ using Xarial.XToolkit.Wpf;
 using Xarial.XToolkit.Wpf.Extensions;
 using Xarial.XToolkit.Wpf.Utils;
 using Xarial.CadPlus.Batch.Base.Services;
-using Xarial.CadPlus.Plus.Shared.Helpers;
 using Xarial.CadPlus.Batch.Base.ViewModels;
 
 namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
@@ -162,7 +161,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
             Name = name;
             Settings = new BatchDocumentSettingsVM(m_Job, m_AppProvider, m_Logger);
             Settings.Modified += OnSettingsModified;
-            Results = new JobResultsVM(m_Job, m_ExecFact, m_AppProvider.Descriptor);
+            Results = new JobResultsVM(m_Job, m_ExecFact, m_AppProvider.Descriptor, m_Logger);
 
             Filters = new ObservableCollection<FilterVM>((m_Job.Filters ?? Enumerable.Empty<string>()).Select(f => new FilterVM(f)));
             Filters.CollectionChanged += OnFiltersCollectionChanged;
@@ -358,7 +357,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
                     FileSystemBrowser.BuildFilterString(
                         m_ResultsExporters.Select(e => e.Filter).Concat(new FileFilter[] { FileFilter.AllFiles }).ToArray())))
                 {
-                    var exp = m_ResultsExporters.FirstOrDefault(j => FileHelper.MatchesFilter(filePath, j.Filter.Extensions));
+                    var exp = m_ResultsExporters.FirstOrDefault(j => FileSystemUtils.MatchesAnyFilter(filePath, j.Filter.Extensions));
 
                     if (exp != null)
                     {
@@ -386,7 +385,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
                     FileSystemBrowser.BuildFilterString(
                         m_JournalExporters.Select(e => e.Filter).Concat(new FileFilter[] { FileFilter.AllFiles }).ToArray())))
                 {
-                    var exp = m_JournalExporters.FirstOrDefault(j => FileHelper.MatchesFilter(filePath, j.Filter.Extensions));
+                    var exp = m_JournalExporters.FirstOrDefault(j => FileSystemUtils.MatchesAnyFilter(filePath, j.Filter.Extensions));
 
                     if (exp != null)
                     {

@@ -198,17 +198,23 @@ namespace Xarial.CadPlus.Common.Controls
             m_AddFolderButton.Click += OnAddFoldersButtonClick;
         }
 
-        private void OnAddFilesButtonClick(object sender, RoutedEventArgs e)
+        public void AddFiles()
         {
-            AddFiles();
+            var filter = "";
+
+            if (Filters != null)
+            {
+                var filters = Filters?.Cast<FileFilter>()?.ToArray();
+                filter = FileSystemBrowser.BuildFilterString(filters);
+            }
+
+            if (FileSystemBrowser.BrowseFilesOpen(out string[] paths, "Select file to process", filter))
+            {
+                AddPathsToSource(paths);
+            }
         }
 
-        private void OnAddFoldersButtonClick(object sender, RoutedEventArgs e)
-        {
-            AddFolders();
-        }
-
-        private void AddFolders()
+        public void AddFolders()
         {
             var dlg = new BetterFolderBrowser()
             {
@@ -224,21 +230,22 @@ namespace Xarial.CadPlus.Common.Controls
             }
         }
 
-        private void AddFiles()
+        public void DeleteSelected()
         {
-            var filter = "";
+            var itemsToDelete = new object[m_ListBox.SelectedItems.Count];
+            m_ListBox.SelectedItems.CopyTo(itemsToDelete, 0);
 
-            if (Filters != null)
+            foreach (var selItem in itemsToDelete)
             {
-                var filters = Filters?.Cast<FileFilter>()?.ToArray();
-                filter = FileSystemBrowser.BuildFilterString(filters);
-            }
-
-            if (FileSystemBrowser.BrowseFilesOpen(out string[] paths, "Select file to process", filter))
-            {
-                AddPathsToSource(paths);
+                PathsSource.Remove(selItem);
             }
         }
+
+        private void OnAddFilesButtonClick(object sender, RoutedEventArgs e)
+            => AddFiles();
+
+        private void OnAddFoldersButtonClick(object sender, RoutedEventArgs e)
+            => AddFolders();
 
         private void OnDragOver(object sender, DragEventArgs e)
         {
@@ -377,17 +384,6 @@ namespace Xarial.CadPlus.Common.Controls
             if (e.Key == Key.Delete)
             {
                 DeleteSelected();
-            }
-        }
-
-        private void DeleteSelected()
-        {
-            var itemsToDelete = new object[m_ListBox.SelectedItems.Count];
-            m_ListBox.SelectedItems.CopyTo(itemsToDelete, 0);
-
-            foreach (var selItem in itemsToDelete)
-            {
-                PathsSource.Remove(selItem);
             }
         }
     }

@@ -13,6 +13,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Data;
 using Xarial.XToolkit.Reporting;
+using Xarial.CadPlus.Plus.Extensions;
 
 namespace Xarial.CadPlus.Batch.Base.Converters
 {
@@ -30,7 +31,7 @@ namespace Xarial.CadPlus.Batch.Base.Converters
             }
             else
             {
-                return ex.ParseUserError(out _);
+                return ex.ParseUserError();
             }
         }
 

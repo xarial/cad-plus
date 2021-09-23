@@ -84,7 +84,7 @@ namespace Xarial.CadPlus.Batch.InApp.ViewModels
             {
                 if (m_TopLevelReferences == null)
                 {
-                    m_TopLevelReferences = CreateDocumentVMs(m_Doc.Dependencies);
+                    m_TopLevelReferences = CreateDocumentVMs(m_Doc.Dependencies.ToArray());
                 }
 
                 References = m_TopLevelReferences;
@@ -93,14 +93,14 @@ namespace Xarial.CadPlus.Batch.InApp.ViewModels
             {
                 if (m_AllReferences == null)
                 {
-                    m_AllReferences = CreateDocumentVMs(m_Doc.GetAllDependencies());
+                    m_AllReferences = CreateDocumentVMs(m_Doc.GetAllDependencies().ToArray());
                 }
 
                 References = m_AllReferences;
             }
         }
 
-        private DocumentVM[] CreateDocumentVMs(IEnumerable<IXDocument3D> refs)
+        private DocumentVM[] CreateDocumentVMs(IXDocument3D[] refs)
             => new IXDocument[] { m_Doc }.Union(refs).Select(d => new DocumentVM(d)).ToArray();
         
         private void TogglePartFilter() 
