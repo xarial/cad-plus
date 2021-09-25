@@ -22,7 +22,7 @@ namespace Xarial.CadPlus.Batch.Base.ViewModels
         
         public string Name => m_JobItem.DisplayName;
         public JobItemStatus_e Status => m_JobItem.Status;
-        public Exception Error => m_JobItem.Error;
+        public IReadOnlyList<string> Issues => m_JobItem.Issues;
 
         private readonly IJobItem m_JobItem;
 
@@ -30,11 +30,11 @@ namespace Xarial.CadPlus.Batch.Base.ViewModels
         {
             m_JobItem = jobItem;
             m_JobItem.StatusChanged += OnJobItemFileStatusChanged;
-            m_JobItem.ErrorReported += OnJobItemFileErrorReported;
+            m_JobItem.IssuesChanged += OnIssuesChanged;
         }
 
-        private void OnJobItemFileErrorReported(IJobItem item, Exception err)
-            => this.NotifyChanged(nameof(Error));
+        private void OnIssuesChanged(IJobItem item)
+            => this.NotifyChanged(nameof(Issues));
 
         private void OnJobItemFileStatusChanged(IJobItem item, JobItemStatus_e newStatus)
             => this.NotifyChanged(nameof(Status));

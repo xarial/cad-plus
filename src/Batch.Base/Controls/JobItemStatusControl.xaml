@@ -14,7 +14,8 @@
         <xconv:ObjectIsNotNullUniversalConverter x:Key="objIsNotNullToVisConv" 
                                                  TrueValue="{x:Static win:Visibility.Visible}"
                                                  FalseValue="{x:Static win:Visibility.Collapsed}"/>
-        <conv:ExceptionToErrorConverter x:Key="exToErrConv"/>
+        <conv:HasIssuesToVisibilityConverter x:Key="hasIssuesToVisConv"/>
+        <conv:IssuesToTextConverter x:Key="issuesToTextConv"/>
     </UserControl.Resources>
     <Grid HorizontalAlignment="Center">
         <Grid.ColumnDefinitions>
@@ -23,14 +24,14 @@
         </Grid.ColumnDefinitions>
         <Image Width="16" Height="16" Grid.Column="0"
                Source="{Binding Path=Status, Converter={StaticResource statusToImgConv}}"/>
-        <TextBlock x:Name="txtWhatsWrong" Visibility="{Binding Path=Error, Converter={StaticResource objIsNotNullToVisConv}}"
+        <TextBlock x:Name="txtIssues" Visibility="{Binding Path=Issues, Converter={StaticResource hasIssuesToVisConv}}"
                    Grid.Column="1" Margin="2" ToolTip="What's Wrong" FontSize="14" VerticalAlignment="Center">
             <Hyperlink Click="OnShowErrorClick">?</Hyperlink>
         </TextBlock>
 
         <Popup x:Name="popupError" Placement="Bottom" MaxWidth="500"
                StaysOpen="False" AllowsTransparency="True" PopupAnimation="Scroll"
-               PlacementTarget="{Binding ElementName=txtWhatsWrong}">
+               PlacementTarget="{Binding ElementName=txtIssues}">
             <Grid Margin="5" Background="White">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
@@ -39,9 +40,9 @@
                 <Grid.Effect>
                     <DropShadowEffect BlurRadius="2" Opacity="0.5" />
                 </Grid.Effect>
-                <Image Source="/Batch.Base;component/Resources/error.png" Width="12" Height="12" Margin="2"
+                <Image Source="/Batch.Base;component/Resources/info.png" Width="16" Height="16" Margin="4"
                        Grid.Column="0" VerticalAlignment="Center" />
-                <TextBlock VerticalAlignment="Center" Text="{Binding Path=Error, Converter={StaticResource exToErrConv}}"
+                <TextBlock VerticalAlignment="Center" Text="{Binding Path=Issues, Converter={StaticResource issuesToTextConv}}"
                            Foreground="Black"
                            Margin="5" TextWrapping="Wrap"
                            Grid.Column="1"/>

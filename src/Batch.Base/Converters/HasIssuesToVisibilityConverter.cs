@@ -14,35 +14,24 @@ using System.Threading.Tasks;
 using System.Windows.Data;
 using Xarial.XToolkit.Reporting;
 using Xarial.CadPlus.Plus.Extensions;
+using System.Collections;
+using System.Windows;
 
 namespace Xarial.CadPlus.Batch.Base.Converters
 {
-    public class ExceptionToErrorConverter : IValueConverter
+    public class HasIssuesToVisibilityConverter : IValueConverter
     {
-        public static string Convert(Exception ex) 
-        {
-            if (ex is OperationCanceledException)
-            {
-                return "Operation cancelled";
-            }
-            else if (ex is TimeoutException)
-            {
-                return "Timeout";
-            }
-            else
-            {
-                return ex.ParseUserError();
-            }
-        }
-
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value is Exception)
+            if (value is IEnumerable) 
             {
-                return Convert(value as Exception);
+                if (((IEnumerable)value).GetEnumerator().MoveNext()) 
+                {
+                    return Visibility.Visible;
+                }
             }
 
-            return null;
+            return Visibility.Collapsed;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

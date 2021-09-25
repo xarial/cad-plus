@@ -412,11 +412,11 @@ namespace Xarial.CadPlus.Batch.Base.Core
 
                     if (context.CurrentDocument == null)
                     {
-                        context.CurrentJobItem.Error = ex;
+                        context.CurrentJobItem.ReportError(ex);
                     }
                     else 
                     {
-                        context.CurrentMacro.Error = ex;
+                        context.CurrentMacro.ReportError(ex);
                     }
 
                     m_JournalWriter.WriteLine(ex.ParseUserError(out _));
@@ -529,7 +529,7 @@ namespace Xarial.CadPlus.Batch.Base.Core
                 }
                 else if (ex is INoRetryMacroRunException) 
                 {
-                    context.CurrentMacro.Error = ex;
+                    context.CurrentMacro.ReportError(ex);
                 }
                 else
                 {

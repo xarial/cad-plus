@@ -22,6 +22,7 @@ using Xarial.XCad.Documents.Enums;
 using Xarial.XCad.Exceptions;
 using Xarial.XToolkit.Reporting;
 using Xarial.CadPlus.Plus.Extensions;
+using Xarial.XCad.Base.Enums;
 
 namespace Xarial.CadPlus.Batch.InApp
 {
@@ -128,10 +129,22 @@ namespace Xarial.CadPlus.Batch.InApp
             
             var doc = file.Document;
 
-            var closeDoc = !doc.IsCommitted || doc.State.HasFlag(DocumentState_e.Hidden);
+            var closeDoc = false;
+            var hideDoc = false;
+
+            if (!doc.IsCommitted)
+            {
+                closeDoc = true;
+            }
+            else 
+            {
+                hideDoc = doc.State.HasFlag(DocumentState_e.Hidden);
+            }
 
             try
             {
+                file.ClearIssues();
+
                 if (!doc.IsCommitted)
                 {
                     var state = DocumentState_e.Silent;
@@ -187,22 +200,47 @@ namespace Xarial.CadPlus.Batch.InApp
             {
                 LogMessage($"Failed to process file '{file.FilePath}': {ex.ParseUserError()}");
                 file.Status = JobItemStatus_e.Failed;
-                file.Error = ex;
+                file.ReportError(ex);
             }
             finally 
             {
-                if (closeDoc)
+                try
                 {
-                    try
+                    if (doc != null && doc.IsCommitted)
                     {
-                        if (doc != null && doc.IsCommitted)
+                        if (closeDoc)
                         {
+                            if (doc.IsDirty) 
+                            {
+                                if (file.Status == JobItemStatus_e.Succeeded)
+                                {
+                                    file.Status = JobItemStatus_e.Warning;
+                                }
+
+                                file.ReportIssue("The document has been modified and closed without saving changes. Use 'Auto Save' option or call Save API function from the macro directly if it is required to keep the changes");
+                            }
+
+                            m_Logger.Log($"Closing '{doc.Path}'", LoggerMessageSeverity_e.Debug);
                             doc.Close();
                         }
+                        else if (hideDoc)
+                        {
+                            m_Logger.Log($"Hiding '{doc.Path}'", LoggerMessageSeverity_e.Debug);
+                            var hiddenState = doc.State | DocumentState_e.Hidden;
+                            doc.State = hiddenState;
+                        }
                     }
-                    catch
+                }
+                catch(Exception ex)
+                {
+                    m_Logger.Log(ex);
+                    
+                    if (file.Status == JobItemStatus_e.Succeeded)
                     {
+                        file.Status = JobItemStatus_e.Warning;
                     }
+
+                    file.ReportError(ex, "Failed to close document");
                 }
             }
 
@@ -213,6 +251,8 @@ namespace Xarial.CadPlus.Batch.InApp
         {
             try
             {
+                macro.ClearIssues();
+
                 macro.Status = JobItemStatus_e.InProgress;
                 
                 m_MacroRunner.RunMacro(m_App, macro.Macro.FilePath, null, 
@@ -235,7 +275,7 @@ namespace Xarial.CadPlus.Batch.InApp
 
                 LogMessage($"Failed to run macro '{macro.FilePath}': {errorDesc}");
 
-                macro.Error = ex;
+                macro.ReportError(ex);
                 macro.Status = JobItemStatus_e.Failed;
             }
         }
