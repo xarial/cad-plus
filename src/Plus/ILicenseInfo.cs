@@ -19,7 +19,7 @@ namespace Xarial.CadPlus.Plus
         Standard = 1,
         Professional = 2,
         Premium = 3,
-        Platinum
+        Platinum = 4
     }
 
     public interface ILicenseInfo

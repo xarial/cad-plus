@@ -88,6 +88,11 @@ namespace Xarial.CadPlus.Plus.Shared
                 {
                     Title = "ClosedXML",
                     Url = "https://licenses.nuget.org/MIT"
+                },
+                new LicenseInfo()
+                {
+                    Title = "CsvHelper",
+                    Url = "https://licenses.nuget.org/Apache-2.0"
                 }
             };
         }
