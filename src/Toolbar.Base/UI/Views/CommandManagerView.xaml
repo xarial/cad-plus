@@ -16,6 +16,7 @@
         <conv:SelectedCommandConverter x:Key="selCmdConv" />
         <conv:FilePathToDirectoryPathConverter x:Key="filePathToDirConv"/>
         <conv:CommandContextMenuTitleConverter x:Key="menuTitleConv" />
+        <conv:MacroTreeItemOpacityConverter x:Key="macroTreeItemOpacityConv"/>
         <ContextMenu x:Key="CommandContextMenu">
             <MenuItem Header="{Binding Converter={StaticResource menuTitleConv}, ConverterParameter={x:Static conv:CommandContextMenu_e.MoveUp}}"
 					  Command="{Binding Source={StaticResource CmdsMgr}, Path=Data.MoveCommandUpCommand}"
@@ -82,7 +83,7 @@
             </Button>
         </DataTemplate>
         <DataTemplate x:Key="CommandTemplate">
-            <Grid Margin="2" ContextMenu="{StaticResource CommandContextMenu}">
+            <Grid Margin="2" ContextMenu="{StaticResource CommandContextMenu}" Opacity="{Binding Path=Triggers, Converter={StaticResource macroTreeItemOpacityConv}}">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
