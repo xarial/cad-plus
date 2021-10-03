@@ -76,7 +76,7 @@ namespace Xarial.CadPlus.Batch.Extensions.Services
 
                 try
                 {
-                    var dependencies = doc.Dependencies;
+                    var dependencies = doc.Dependencies.ToArray();
 
                     if (dependencies?.Any() == true)
                     {

@@ -229,11 +229,12 @@ namespace Xarial.CadPlus.Batch.InApp
 
                     var exec = new AssemblyBatchRunJobExecutor(m_Host.Extension.Application, m_MacroRunnerSvc,
                         input.ToArray(), m_Logger, m_Data.Macros.Macros.Macros.Select(x => x.Data).ToArray(),
-                        m_Data.Options.ActivateDocuments, m_Data.Options.AllowReadOnly, m_Data.Options.AllowRapid);
+                        m_Data.Options.ActivateDocuments, m_Data.Options.AllowReadOnly,
+                        m_Data.Options.AllowRapid, m_Data.Options.AutoSave);
 
-                    var vm = new JobResultVM(rootDoc.Title, exec, m_CadDesc);
+                    var vm = new JobResultVM(rootDoc.Title, exec, m_CadDesc, m_Logger);
 
-                    exec.ExecuteAsync().Wait();
+                    vm.RunBatch();
 
                     var wnd = m_Host.Extension.CreatePopupWindow<ResultsWindow>();
                     wnd.Control.Title = $"{rootDoc.Title} batch job result";
@@ -245,8 +246,8 @@ namespace Xarial.CadPlus.Batch.InApp
                 }
                 catch (Exception ex)
                 {
-                    m_Msg.ShowError(ex.ParseUserError(out string callStack));
-                    m_Logger.Log(callStack, LoggerMessageSeverity_e.Error);
+                    m_Msg.ShowError(ex);
+                    m_Logger.Log(ex);
                 }
             }
         }

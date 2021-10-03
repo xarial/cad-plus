@@ -12,14 +12,8 @@
              mc:Ignorable="d" Title="References Extractor" WindowStartupLocation="CenterOwner"
              Height="800" Width="800">
     <Window.Resources>
-        <xconv:BooleanUniversalConverter x:Key="boolRevConv">
-            <xconv:BooleanUniversalConverter.TrueValue>
-                <sys:Boolean>False</sys:Boolean>
-            </xconv:BooleanUniversalConverter.TrueValue>
-            <xconv:BooleanUniversalConverter.FalseValue>
-                <sys:Boolean>True</sys:Boolean>
-            </xconv:BooleanUniversalConverter.FalseValue>
-        </xconv:BooleanUniversalConverter>
+        <xconv:BooleanUniversalConverter x:Key="boolRevConv" Reverse="True"/>
+        <xconv:BooleanVisibilityConverter x:Key="boolToVisConv"/>
         <xconv:ImageToImageSourceConverter x:Key="imgSrcConv"/>
     </Window.Resources>
     <Grid Margin="5">
@@ -40,7 +34,8 @@
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
-                    <GroupBox Grid.Column="0" Header="References" Margin="5">
+                    <GroupBox Grid.Column="0" Header="References" Margin="5"
+                              Visibility="{Binding Path=ReferencesGroupVisible, RelativeSource={RelativeSource AncestorType={x:Type local:ReferenceExtractorWindow}}, Converter={StaticResource boolToVisConv}}">
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto"/>

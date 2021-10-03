@@ -19,11 +19,8 @@ namespace Xarial.CadPlus.Batch.Base.ViewModels
 {
     public class JobItemMacroVM : JobItemVM
     {
-        private readonly IJobItemOperation m_JobItemMacro;
-
         public JobItemMacroVM(IJobItemOperation jobItemMacro) : base(jobItemMacro)
         {
-            m_JobItemMacro = jobItemMacro;
         }
     }
 }

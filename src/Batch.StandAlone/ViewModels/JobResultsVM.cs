@@ -18,6 +18,7 @@ using Xarial.CadPlus.Plus.Services;
 using Xarial.CadPlus.Batch.Base.Core;
 using Xarial.CadPlus.Batch.Base.ViewModels;
 using Xarial.XToolkit.Wpf.Extensions;
+using Xarial.XCad.Base;
 
 namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
 {
@@ -44,13 +45,15 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
         private readonly Func<BatchJob, IBatchRunJobExecutor> m_ExecFact;
 
         private readonly ICadDescriptor m_CadDesc;
+        private readonly IXLogger m_Logger;
 
         public JobResultsVM(BatchJob job, 
-            Func<BatchJob, IBatchRunJobExecutor> execFact, ICadDescriptor cadDesc) 
+            Func<BatchJob, IBatchRunJobExecutor> execFact, ICadDescriptor cadDesc, IXLogger logger) 
         {
             m_Job = job;
 
             m_CadDesc = cadDesc;
+            m_Logger = logger;
 
             m_ExecFact = execFact;
             Items = new ObservableCollection<JobResultVM>();
@@ -58,7 +61,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
 
         public void StartNewJob()
         {
-            var newRes = new JobResultVM($"Job #{Items.Count + 1}", m_ExecFact.Invoke(m_Job), m_CadDesc);
+            var newRes = new JobResultVM($"Job #{Items.Count + 1}", m_ExecFact.Invoke(m_Job), m_CadDesc, m_Logger);
             Items.Add(newRes);
             Selected = newRes;
             newRes.RunBatchAsync();

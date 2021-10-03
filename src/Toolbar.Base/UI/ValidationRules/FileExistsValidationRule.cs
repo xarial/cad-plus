@@ -18,6 +18,7 @@ using System.Windows.Data;
 using Xarial.CadPlus.CustomToolbar;
 using Xarial.CadPlus.Toolbar.Services;
 using Xarial.XToolkit.Reporting;
+using Xarial.CadPlus.Plus.Extensions;
 
 namespace Xarial.CadPlus.Toolbar.UI.ValidationRules
 {
@@ -108,7 +109,7 @@ namespace Xarial.CadPlus.Toolbar.UI.ValidationRules
             }
             catch (Exception ex)
             {
-                return new ValidationResult(false, ex.ParseUserError(out _, "Invalid path"));
+                return new ValidationResult(false, ex.ParseUserError("Invalid path"));
             }
         }
     }
