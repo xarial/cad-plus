@@ -48,7 +48,7 @@
                     </DataTemplate>
                 </DataGridTemplateColumn.CellTemplate>
             </DataGridTemplateColumn>
-            <DataGridTemplateColumn IsReadOnly="True" Header="File">
+            <DataGridTemplateColumn IsReadOnly="True" Header="File" SortMemberPath="DisplayObject.Title">
                 <DataGridTemplateColumn.CellTemplate>
                     <DataTemplate>
                         <sctrls:CadObjectLabelControl Object="{Binding Path=DisplayObject}"
