@@ -67,7 +67,7 @@ namespace Xarial.CadPlus.Drawing.Services
                         throw new UserException("No drawing views in this document");
                     }
 
-                    var refDoc = view.Document;
+                    var refDoc = view.ReferencedDocument;
 
                     if (refDoc == null)
                     {

@@ -37,45 +37,10 @@ using Xarial.XToolkit.Wpf;
 using Xarial.XToolkit.Wpf.Extensions;
 using Xarial.XToolkit.Wpf.Utils;
 using Xarial.CadPlus.Batch.Base.Services;
-using Xarial.CadPlus.Plus.Shared.Helpers;
+using Xarial.CadPlus.Batch.Base.ViewModels;
 
 namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
 {
-    public class FilterVM : INotifyPropertyChanged
-    {
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        private string[] m_Src;
-        private int m_Index;
-        private string m_Value;
-
-        public string Value
-        {
-            get => m_Value;
-            set 
-            {
-                m_Value = value;
-                m_Src[m_Index] = value;
-                this.NotifyChanged();
-            }
-        }
-
-        public FilterVM() : this("*.*")
-        {
-        }
-
-        public FilterVM(string value) 
-        {
-            m_Value = value;
-        }
-
-        internal void SetBinding(string[] src, int index) 
-        {
-            m_Src = src;
-            m_Index = index;
-        }
-    }
-
     public class BatchDocumentVM : INotifyPropertyChanged
     {
         internal static FileFilter[] FileFilters { get; }
@@ -103,7 +68,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
 
         public ObservableCollection<string> Input { get; }
 
-        public ObservableCollection<MacroData> Macros { get; }
+        public ObservableCollection<MacroDataVM> Macros { get; }
 
         public ObservableCollection<FilterVM> Filters { get; }
 
@@ -196,7 +161,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
             Name = name;
             Settings = new BatchDocumentSettingsVM(m_Job, m_AppProvider, m_Logger);
             Settings.Modified += OnSettingsModified;
-            Results = new JobResultsVM(m_Job, m_ExecFact, m_AppProvider.Descriptor);
+            Results = new JobResultsVM(m_Job, m_ExecFact, m_AppProvider.Descriptor, m_Logger);
 
             Filters = new ObservableCollection<FilterVM>((m_Job.Filters ?? Enumerable.Empty<string>()).Select(f => new FilterVM(f)));
             Filters.CollectionChanged += OnFiltersCollectionChanged;
@@ -205,8 +170,13 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
             Input = new ObservableCollection<string>(m_Job.Input ?? Enumerable.Empty<string>());
             Input.CollectionChanged += OnInputCollectionChanged;
 
-            Macros = new ObservableCollection<MacroData>(m_Job.Macros ?? Enumerable.Empty<MacroData>());
+            Macros = new ObservableCollection<MacroDataVM>((m_Job.Macros ?? Enumerable.Empty<MacroData>()).Select(m => new MacroDataVM(m)));
             Macros.CollectionChanged += OnMacrosCollectionChanged;
+
+            foreach (var macro in Macros)
+            {
+                macro.Modified += OnMacroDataModified;
+            }
         }
 
         protected virtual FileFilter[] GetFileFilters(ICadDescriptor cadEntDesc)
@@ -352,10 +322,10 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
         }
 
         public Func<string, object> PathToMacroDataConverter { get; }
-            = new Func<string, object>(p => new MacroData() { FilePath = p });
+            = new Func<string, object>(p => new MacroDataVM(new MacroData() { FilePath = p }));
 
         public Func<object, string> MacroDataToPathConverter { get; }
-        = new Func<object, string>((m) => ((MacroData)m).FilePath);
+            = new Func<object, string>((m) => ((MacroDataVM)m).FilePath);
 
         private bool CanRunJob => Input.Any() && Macros.Any() && Settings.Version != null;
 
@@ -387,7 +357,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
                     FileSystemBrowser.BuildFilterString(
                         m_ResultsExporters.Select(e => e.Filter).Concat(new FileFilter[] { FileFilter.AllFiles }).ToArray())))
                 {
-                    var exp = m_ResultsExporters.FirstOrDefault(j => FileHelper.MatchesFilter(filePath, j.Filter.Extensions));
+                    var exp = m_ResultsExporters.FirstOrDefault(j => FileSystemUtils.MatchesAnyFilter(filePath, j.Filter.Extensions));
 
                     if (exp != null)
                     {
@@ -415,7 +385,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
                     FileSystemBrowser.BuildFilterString(
                         m_JournalExporters.Select(e => e.Filter).Concat(new FileFilter[] { FileFilter.AllFiles }).ToArray())))
                 {
-                    var exp = m_JournalExporters.FirstOrDefault(j => FileHelper.MatchesFilter(filePath, j.Filter.Extensions));
+                    var exp = m_JournalExporters.FirstOrDefault(j => FileSystemUtils.MatchesAnyFilter(filePath, j.Filter.Extensions));
 
                     if (exp != null)
                     {
@@ -473,7 +443,28 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
 
         private void OnMacrosCollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
-            m_Job.Macros = Macros.ToArray();
+            if (e.OldItems != null) 
+            {
+                foreach (MacroDataVM macro in e.OldItems)
+                {
+                    macro.Modified -= OnMacroDataModified;
+                }
+            }
+
+            if (e.NewItems != null)
+            {
+                foreach (MacroDataVM macro in e.NewItems)
+                {
+                    macro.Modified += OnMacroDataModified;
+                }
+            }
+
+            m_Job.Macros = Macros.Select(m => m.Data).ToArray();
+            IsDirty = true;
+        }
+
+        private void OnMacroDataModified(MacroDataVM obj)
+        {
             IsDirty = true;
         }
 

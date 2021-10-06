@@ -53,7 +53,7 @@ namespace Xarial.CadPlus.Drawing
                     if (feat != null)
                     {
                         var skPict = (ISketchPicture)feat.GetSpecificFeature2();
-                        return SwObjectFactory.FromDispatch<ISwObject>(skPict, (ISwDrawing)m_Draw);
+                        return ((ISwDrawing)m_Draw).CreateObjectFromDispatch<ISwObject>(skPict);
                     }
                     else 
                     {

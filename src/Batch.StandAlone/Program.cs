@@ -30,6 +30,7 @@ using Xarial.XToolkit.Reporting;
 using Xarial.CadPlus.Plus.Exceptions;
 using Xarial.CadPlus.Plus;
 using System.Windows;
+using Xarial.CadPlus.Plus.Extensions;
 
 namespace Xarial.CadPlus.Batch.StandAlone
 {
@@ -78,7 +79,7 @@ namespace Xarial.CadPlus.Batch.StandAlone
             catch (Exception ex)
             {
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine(ex.ParseUserError(out _));
+                Console.WriteLine(ex.ParseUserError());
                 Console.ResetColor();
                 Environment.Exit(1);
             }
@@ -153,7 +154,7 @@ namespace Xarial.CadPlus.Batch.StandAlone
                     msgSvc = new GenericMessageService("Batch+");
                 }
 
-                msgSvc.ShowError(ex.ParseUserError(out _));
+                msgSvc.ShowError(ex.ParseUserError());
                 Environment.Exit(1);
             }
         }

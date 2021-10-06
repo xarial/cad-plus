@@ -22,9 +22,9 @@ using Xarial.CadPlus.Common.Services;
 using Xarial.CadPlus.Common.Utils;
 using Xarial.CadPlus.Plus.Services;
 using Xarial.CadPlus.Plus.Shared.Controls;
-using Xarial.CadPlus.Plus.Shared.Helpers;
 using Xarial.XCad.Documents;
 using Xarial.XCad.UI;
+using Xarial.XToolkit;
 using Xarial.XToolkit.Wpf.Extensions;
 
 namespace Xarial.CadPlus.Batch.Base.ViewModels
@@ -88,15 +88,15 @@ namespace Xarial.CadPlus.Batch.Base.ViewModels
                     m_Icons.Add(m_CadDesc.ApplicationId, icons);
                 }
 
-                if (FileHelper.MatchesFilter(Path, m_CadDesc.PartFileFilter.Extensions))
+                if (FileSystemUtils.MatchesAnyFilter(Path, m_CadDesc.PartFileFilter.Extensions))
                 {
                     return icons.Part ?? (icons.Part = m_CadDesc.PartIcon.ToBitmapImage());
                 }
-                else if (FileHelper.MatchesFilter(Path, m_CadDesc.AssemblyFileFilter.Extensions))
+                else if (FileSystemUtils.MatchesAnyFilter(Path, m_CadDesc.AssemblyFileFilter.Extensions))
                 {
                     return icons.Assembly ?? (icons.Assembly = m_CadDesc.AssemblyIcon.ToBitmapImage());
                 }
-                else if (FileHelper.MatchesFilter(Path, m_CadDesc.DrawingFileFilter.Extensions))
+                else if (FileSystemUtils.MatchesAnyFilter(Path, m_CadDesc.DrawingFileFilter.Extensions))
                 {
                     return icons.Drawing ?? (icons.Drawing = m_CadDesc.DrawingIcon.ToBitmapImage());
                 }

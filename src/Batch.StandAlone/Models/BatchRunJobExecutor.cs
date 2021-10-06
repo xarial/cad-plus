@@ -17,6 +17,7 @@ using Xarial.CadPlus.Batch.Base.Core;
 using Xarial.CadPlus.Batch.Base.Exceptions;
 using Xarial.XCad;
 using Xarial.XToolkit.Reporting;
+using Xarial.CadPlus.Plus.Extensions;
 
 namespace Xarial.CadPlus.Batch.Base.Models
 {
@@ -54,7 +55,9 @@ namespace Xarial.CadPlus.Batch.Base.Models
             m_IsExecuting = false;
         }
 
-        public async Task<bool> ExecuteAsync()
+        public bool TryExecute() => TryExecuteAsync().Result;
+
+        public async Task<bool> TryExecuteAsync()
         {
             if (!m_IsExecuting)
             {
@@ -78,7 +81,7 @@ namespace Xarial.CadPlus.Batch.Base.Models
                 }
                 catch (Exception ex)
                 {
-                    m_LogWriter.WriteLine(ex.ParseUserError(out _));
+                    m_LogWriter.WriteLine(ex.ParseUserError());
                     throw;
                 }
                 finally

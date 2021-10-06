@@ -86,7 +86,7 @@ namespace Xarial.CadPlus.AddIn.Sw
 
             svc.RegisterType<CadPlusPropertyPageHandlerProvider>().As<IPropertyPageHandlerProvider>();
             svc.RegisterType<CadPlusTaskPaneControlProvider>().As<ITaskPaneControlProvider>();
-
+            
             builder.RegisterAdapter<IXApplication, ISwApplication>(a => (ISwApplication)a);
             builder.Register(x => x.GetService<IMacroExecutor>(CadApplicationIds.SolidWorks));
             builder.Register(x => x.GetService<ICadDescriptor>(CadApplicationIds.SolidWorks));

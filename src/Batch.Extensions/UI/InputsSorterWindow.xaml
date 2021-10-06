@@ -54,7 +54,7 @@
                         </ListView.ItemsPanel>
                         <ListView.ItemTemplate>
                             <DataTemplate>
-                                <sctrls:CadObjectLabelControl Object="{Binding Path=Document}" DocumentTitleDisplayType="Path"
+                                <sctrls:CadObjectLabelControl Object="{Binding Path=Document}" DocumentTitleDisplayType="FilePath"
                                                             Descriptor="{Binding Path=DataContext.Descriptor, RelativeSource={RelativeSource AncestorType={x:Type local:InputsSorterWindow}}}"/>
                             </DataTemplate>
                         </ListView.ItemTemplate>

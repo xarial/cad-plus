@@ -77,6 +77,23 @@ namespace Xarial.CadPlus.Batch.InApp
     {
         public class InputGroup 
         {
+            [OptionBox]
+            [ControlOptions(align: ControlLeftAlign_e.Indent)]
+            [ControlTag(nameof(Scope))]
+            public InputScope_e Scope
+            {
+                get => m_Scope;
+                set
+                {
+                    m_Scope = value;
+
+                    if (m_Scope == InputScope_e.AllReferences)
+                    {
+                        AllDocuments.UpdateReferences();
+                    }
+                }
+            }
+
             [ControlOptions(height: 100)]
             [DependentOn(typeof(SelectionScopeDependencyHandler), nameof(Scope))]
             [Description("List of components to run macros on")]
@@ -88,23 +105,6 @@ namespace Xarial.CadPlus.Batch.InApp
             [StandardControlIcon(BitmapLabelType_e.SelectComponent)]
             [CustomControl(typeof(ReferencesList))]
             public ReferenceDocumentsVM AllDocuments { get; }
-
-            [OptionBox]
-            [ControlOptions(align: ControlLeftAlign_e.Indent)]
-            [ControlTag(nameof(Scope))]
-            public InputScope_e Scope 
-            {
-                get => m_Scope;
-                set 
-                {
-                    m_Scope = value;
-
-                    if (m_Scope == InputScope_e.AllReferences) 
-                    {
-                        AllDocuments.UpdateReferences();
-                    }
-                }
-            }
 
             private IXDocument m_Document;
             private InputScope_e m_Scope;
@@ -133,7 +133,7 @@ namespace Xarial.CadPlus.Batch.InApp
             [CustomControl(typeof(MacrosList))]
             [ControlOptions(height: 80)]
             [IconEx(typeof(Resources), nameof(Resources.macros_vector), nameof(Resources.macros_icon))]
-            public MacrosVM Macros { get; set; }
+            public MacrosVM Macros { get; }
 
             [Title("Add Macros...")]
             [ControlOptions(align: ControlLeftAlign_e.Indent)]
@@ -147,9 +147,7 @@ namespace Xarial.CadPlus.Batch.InApp
             }
 
             private void OnAddMacros()
-            {
-                Macros.RequestAddMacros();
-            }
+                => Macros.RequestAddMacros();
         }
 
         public class OptionsGroup 
@@ -168,6 +166,11 @@ namespace Xarial.CadPlus.Batch.InApp
             [Title("Allow Rapid")]
             [ControlOptions(align: ControlLeftAlign_e.Indent)]
             public bool AllowRapid { get; set; } = false;
+
+            [Description("Save documents automatically after running the macros")]
+            [Title("Auto Save")]
+            [ControlOptions(align: ControlLeftAlign_e.Indent)]
+            public bool AutoSave { get; set; } = false;
 
             [DynamicControls(BatchModuleGroup_e.Options)]
             public List<IRibbonCommand> AdditionalCommands { get; }

@@ -52,7 +52,7 @@ namespace Xarial.CadPlus.Batch.Extensions.Services
                 switch (scope) 
                 {
                     case ReferencesScope_e.TopLevelDependencies:
-                        deps = doc.Dependencies;
+                        deps = doc.Dependencies.ToArray();
                         break;
 
                     case ReferencesScope_e.AllDependencies:
@@ -108,8 +108,10 @@ namespace Xarial.CadPlus.Batch.Extensions.Services
                 var drw = m_App.Documents.PreCreate<IXDrawing>();
                 drw.Path = drwFile;
 
-                var usedDocs = drw.Dependencies.Intersect(docs,
-                    new DocumentComparer());
+                var drwDeps = drw.Dependencies.ToArray();
+
+                var usedDocs = drwDeps.Intersect(docs,
+                    new DocumentComparer()).ToArray();
 
                 if (usedDocs.Any())
                 {

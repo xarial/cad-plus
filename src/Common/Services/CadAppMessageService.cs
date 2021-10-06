@@ -19,9 +19,16 @@ namespace Xarial.CadPlus.Common.Services
     {
         private readonly IXApplication m_App;
 
+        public Type[] UserErrors { get; }
+
         public CadAppMessageService(IXApplication app) 
         {
             m_App = app;
+        }
+
+        public CadAppMessageService(IXApplication app, Type[] userErrors) : this(app)
+        {
+            UserErrors = userErrors;
         }
 
         public void ShowError(string error)

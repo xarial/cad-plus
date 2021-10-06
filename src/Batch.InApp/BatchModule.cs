@@ -62,28 +62,30 @@ namespace Xarial.CadPlus.Batch.InApp
         public int GetHashCode(IXComponent obj) => 0;
     }
 
+    [Title("Batch+")]
+    [Description("Commands to batch run macros")]
+    [IconEx(typeof(Resources), nameof(Resources.batch_plus_vector), nameof(Resources.batch_plus_icon))]
+    [CommandGroupInfo((int)CadCommandGroupIds_e.Batch)]
+    [CommandOrder(4)]
+    public enum Commands_e
+    {
+        [IconEx(typeof(Resources), nameof(Resources.batch_plus_vector), nameof(Resources.batch_plus_icon))]
+        [Title("Open Batch+ Stand-Alone...")]
+        [Description("Runs stand-alone Batch+")]
+        [CommandItemInfo(true, true, WorkspaceTypes_e.All)]
+        RunStandAlone,
+
+        [IconEx(typeof(Resources), nameof(Resources.batch_plus_assm_vector), nameof(Resources.batch_plus_assm_icon))]
+        [Title("Batch Run Macros")]
+        [Description("Runs batch command to active file")]
+        [CommandItemInfo(true, true, WorkspaceTypes_e.Assembly, true)]
+        RunInApp
+    }
+
     [Module(typeof(IHostExtension))]
     public class BatchModule : IBatchInAppModule
     {
         public event ProcessInAppBatchInputDelegate ProcessInput;
-
-        [Title("Batch+")]
-        [Description("Commands to batch run macros")]
-        [IconEx(typeof(Resources), nameof(Resources.batch_plus_vector), nameof(Resources.batch_plus_icon))]
-        public enum Commands_e
-        {
-            [IconEx(typeof(Resources), nameof(Resources.batch_plus_vector), nameof(Resources.batch_plus_icon))]
-            [Title("Open Stand-Alone...")]
-            [Description("Runs stand-alone Batch+")]
-            [CommandItemInfo(true, true, WorkspaceTypes_e.All)]
-            RunStandAlone,
-
-            [IconEx(typeof(Resources), nameof(Resources.batch_plus_assm_vector), nameof(Resources.batch_plus_assm_icon))]
-            [Title("Run")]
-            [Description("Runs batch command to active file")]
-            [CommandItemInfo(true, true, WorkspaceTypes_e.Assembly)]
-            RunInApp
-        }
 
         private IHostExtension m_Host;
 
@@ -215,7 +217,7 @@ namespace Xarial.CadPlus.Batch.InApp
                         case InputScope_e.Selection:
                             docs = m_Data.Input.Components
                                 .Distinct(new ComponentDocumentSafeEqualityComparer())
-                                .Select(c => c.Document).ToArray();
+                                .Select(c => c.ReferencedDocument).ToArray();
                             break;
 
                         default:
@@ -226,12 +228,13 @@ namespace Xarial.CadPlus.Batch.InApp
                     ProcessInput?.Invoke(m_Host.Extension.Application, input);
 
                     var exec = new AssemblyBatchRunJobExecutor(m_Host.Extension.Application, m_MacroRunnerSvc,
-                        input.ToArray(), m_Logger, m_Data.Macros.Macros.Macros,
-                        m_Data.Options.ActivateDocuments, m_Data.Options.AllowReadOnly, m_Data.Options.AllowRapid);
+                        input.ToArray(), m_Logger, m_Data.Macros.Macros.Macros.Select(x => x.Data).ToArray(),
+                        m_Data.Options.ActivateDocuments, m_Data.Options.AllowReadOnly,
+                        m_Data.Options.AllowRapid, m_Data.Options.AutoSave);
 
-                    var vm = new JobResultVM(rootDoc.Title, exec, m_CadDesc);
+                    var vm = new JobResultVM(rootDoc.Title, exec, m_CadDesc, m_Logger);
 
-                    exec.ExecuteAsync().Wait();
+                    vm.RunBatch();
 
                     var wnd = m_Host.Extension.CreatePopupWindow<ResultsWindow>();
                     wnd.Control.Title = $"{rootDoc.Title} batch job result";
@@ -243,8 +246,8 @@ namespace Xarial.CadPlus.Batch.InApp
                 }
                 catch (Exception ex)
                 {
-                    m_Msg.ShowError(ex.ParseUserError(out string callStack));
-                    m_Logger.Log(callStack, LoggerMessageSeverity_e.Error);
+                    m_Msg.ShowError(ex);
+                    m_Logger.Log(ex);
                 }
             }
         }

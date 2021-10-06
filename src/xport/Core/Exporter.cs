@@ -19,7 +19,7 @@ namespace Xarial.CadPlus.Xport.Core
     internal class JobItem : IJobItem
     {
         public event Action<IJobItem, JobItemStatus_e> StatusChanged;
-        public event Action<IJobItem, Exception> ErrorReported;
+        public event Action<IJobItem> IssuesChanged;
 
         public string DisplayName { get; protected set; }
 
@@ -35,23 +35,17 @@ namespace Xarial.CadPlus.Xport.Core
             }
         }
 
-        public Exception Error 
-        {
-            get => m_Error;
-            set 
-            {
-                m_Error = value;
-                ErrorReported?.Invoke(this, value);
-            }
-        }
+        public IReadOnlyList<string> Issues => m_Issues;
 
         private JobItemStatus_e m_Status;
-        private Exception m_Error;
+
+        private List<string> m_Issues;
 
         internal JobItem(string filePath)
         {
             FilePath = filePath;
             m_Status = JobItemStatus_e.AwaitingProcessing;
+            m_Issues = new List<string>();
         }
     }
 
@@ -76,18 +70,20 @@ namespace Xarial.CadPlus.Xport.Core
 
     public class Exporter : IDisposable
     {
-        private readonly TextWriter m_Logger;
+        private readonly TextWriter m_TextLogger;
         private readonly IProgressHandler m_ProgressHandler;
+        private readonly IJobManager m_JobMgr;
 
-        public Exporter(TextWriter logger, IProgressHandler progressHandler)
+        public Exporter(TextWriter txtLogger, IJobManager jobMgr, IProgressHandler progressHandler)
         {
-            m_Logger = logger;
+            m_TextLogger = txtLogger;
             m_ProgressHandler = progressHandler;
+            m_JobMgr = jobMgr;
         }
 
         public async Task Export(ExportOptions opts, CancellationToken token = default)
         {
-            m_Logger.WriteLine($"Exporting Started");
+            m_TextLogger.WriteLine($"Exporting Started");
 
             var startTime = DateTime.Now;
 
@@ -124,7 +120,7 @@ namespace Xarial.CadPlus.Xport.Core
 
                         if (token.IsCancellationRequested)
                         {
-                            m_Logger.WriteLine($"Cancelled by the user");
+                            m_TextLogger.WriteLine($"Cancelled by the user");
                             return;
                         }
 
@@ -151,7 +147,7 @@ namespace Xarial.CadPlus.Xport.Core
                     }
                     catch (Exception ex)
                     {
-                        m_Logger.WriteLine($"Error while processing '{file}': {ex.Message}");
+                        m_TextLogger.WriteLine($"Error while processing '{file}': {ex.Message}");
                         if (!opts.ContinueOnError)
                         {
                             throw ex;
@@ -164,7 +160,7 @@ namespace Xarial.CadPlus.Xport.Core
 
             var duration = DateTime.Now.Subtract(startTime);
             m_ProgressHandler.ReportCompleted(duration);
-            m_Logger.WriteLine($"Exporting completed in {duration.ToString(@"hh\:mm\:ss")}");
+            m_TextLogger.WriteLine($"Exporting completed in {duration.ToString(@"hh\:mm\:ss")}");
         }
 
         private Task<bool> StartWaitProcessAsync(ProcessStartInfo prcStartInfo,
@@ -184,9 +180,10 @@ namespace Xarial.CadPlus.Xport.Core
                 var tag = StandAloneExporter.Program.LOG_MESSAGE_TAG;
                 if (e.Data?.StartsWith(tag) == true)
                 {
-                    m_Logger.WriteLine(e.Data.Substring(tag.Length));
+                    m_TextLogger.WriteLine(e.Data.Substring(tag.Length));
                 }
             };
+
             process.Exited += (sender, args) =>
             {
                 if (!isCancelled)
@@ -195,7 +192,7 @@ namespace Xarial.CadPlus.Xport.Core
                 }
             };
 
-            if (cancellationToken != default(CancellationToken))
+            if (cancellationToken != default)
             {
                 cancellationToken.Register(() =>
                 {
@@ -209,6 +206,7 @@ namespace Xarial.CadPlus.Xport.Core
             }
 
             process.Start();
+            m_JobMgr.AddProcess(process);
             process.BeginOutputReadLine();
             return tcs.Task;
         }

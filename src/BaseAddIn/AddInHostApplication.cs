@@ -38,6 +38,10 @@ using System.Windows.Interop;
 using Xarial.XCad.UI.PropertyPage.Delegates;
 using Xarial.CadPlus.Plus.Delegates;
 using Xarial.XCad.UI.Structures;
+using Xarial.CadPlus.Plus.Attributes;
+using Xarial.XCad.Exceptions;
+using Xarial.CadPlus.Plus.Extensions;
+using Xarial.CadPlus.Plus.Exceptions;
 
 namespace Xarial.CadPlus.AddIn.Base
 {
@@ -45,8 +49,6 @@ namespace Xarial.CadPlus.AddIn.Base
 
     public class AddInHost : IHostExtension
     {
-        internal const int ROOT_GROUP_ID = 1000;
-
         public IXExtension Extension { get; }
         
         public event Action Connect;
@@ -54,11 +56,7 @@ namespace Xarial.CadPlus.AddIn.Base
         public event HostInitializedDelegate Initialized;
         public event Action<IContainerBuilder> ConfigureServices;
         public event HostStartedDelegate Started;
-
-        private CommandGroupSpec m_ParentGrpSpec;
-
-        private int m_NextId;
-
+        
         private readonly Dictionary<CommandSpec, Tuple<Delegate, Enum>> m_Handlers;
         
         public IServiceProvider Services => m_SvcProvider;
@@ -73,14 +71,12 @@ namespace Xarial.CadPlus.AddIn.Base
 
         private readonly IModule[] m_Modules;
 
-        private readonly List<CommandGroupSpec> m_Specs;
+        private readonly List<Tuple<EnumCommandGroupSpec, Delegate>> m_RegisteredCommands;
 
         public AddInHost(ICadExtensionApplication app, IInitiator initiator) 
         {
             m_App = app;
-
-            m_Specs = new List<CommandGroupSpec>();
-
+                        
             m_Initiator = initiator;
 
             try
@@ -89,8 +85,7 @@ namespace Xarial.CadPlus.AddIn.Base
 
                 Extension = m_App.Extension;
 
-                m_NextId = ROOT_GROUP_ID + 1;
-
+                m_RegisteredCommands = new List<Tuple<EnumCommandGroupSpec, Delegate>>();
                 m_Handlers = new Dictionary<CommandSpec, Tuple<Delegate, Enum>>();
 
                 Extension.StartupCompleted += OnStartupCompleted;
@@ -126,13 +121,72 @@ namespace Xarial.CadPlus.AddIn.Base
                 var cmdGrp = Extension.CommandManager.AddCommandGroup<CadPlusCommands_e>();
                 cmdGrp.CommandClick += OnCommandClick;
 
-                m_ParentGrpSpec = cmdGrp.Spec;
+                var mainGrpSpec = cmdGrp.Spec;
 
                 Connect?.Invoke();
 
-                foreach (var spec in m_Specs) 
+                var groups = m_RegisteredCommands.GroupBy(x => x.Item1.Id)
+                    .Select(g => 
+                    {
+                        var baseGroupSpecs = g.Where(x => !x.Item1.CmdGrpEnumType.TryGetAttribute<PartialCommandGroupAttribute>(out _))
+                            .Select(x => x).ToArray();
+
+                        if (baseGroupSpecs.Any())
+                        {
+                            if (baseGroupSpecs.Length == 1)
+                            {
+                                var baseGroupSpec = baseGroupSpecs.First().Item1;
+
+                                return new Tuple<EnumCommandGroupSpec, IEnumerable<Tuple<EnumCommandGroupSpec, Delegate>>>(baseGroupSpec, g);
+                            }
+                            else
+                            {
+                                throw new Exception("More than one base group defined");
+                            }
+                        }
+                        else
+                        {
+                            throw new Exception("No base groups defined");
+                        }
+                    }).OrderBy(g =>
+                    {
+                        if (g.Item1.CmdGrpEnumType.TryGetAttribute(out CommandOrderAttribute att))
+                        {
+                            return att.Order;
+                        }
+                        else
+                        {
+                            return 0;
+                        }
+                    }).ToArray();
+                
+                foreach (var group in groups) 
                 {
-                    var grp = Extension.CommandManager.AddCommandGroup(spec);
+                    var baseGroupSpec = group.Item1;
+
+                    //TODO: add support for nested groups
+                    baseGroupSpec.Parent = mainGrpSpec;
+
+                    baseGroupSpec.Commands = group.Item2.SelectMany(g =>
+                    {
+                        var cmds = g.Item1.Commands;
+                        foreach (var cmd in cmds)
+                        {
+                            m_Handlers.Add(cmd, new Tuple<Delegate, Enum>(g.Item2, cmd.Value));
+                        }
+
+                        return cmds;
+                    }).OrderBy(c =>
+                    {
+                        int order = -1;
+                        if (!c.Value.TryGetAttribute<CommandOrderAttribute>(x => order = x.Order))
+                        {
+                            order = 0;
+                        };
+                        return order;
+                    }).ToArray();
+
+                    var grp = Extension.CommandManager.AddCommandGroup(baseGroupSpec);
 
                     grp.CommandClick += OnCommandClick;
                 }
@@ -166,7 +220,9 @@ namespace Xarial.CadPlus.AddIn.Base
         {   
             builder.RegisterInstance(Extension.Application);
             builder.RegisterType<CadAppMessageService>()
-                .As<IMessageService>();
+                .As<IMessageService>().WithParameter(new TypedParameter(typeof(Type[]), UserException.AdditionalUserExceptions));
+            builder.RegisterType<AboutService>().As<IAboutService>().WithParameter(
+                new TypedParameter(typeof(IntPtr), Extension.Application.WindowHandle));
             builder.RegisterType<DefaultDocumentAdapter>()
                 .As<IDocumentAdapter>();
             builder.RegisterType<SettingsProvider>()
@@ -178,52 +234,22 @@ namespace Xarial.CadPlus.AddIn.Base
         public void RegisterCommands<TCmd>(CommandHandler<TCmd> handler)
             where TCmd : Enum
         {
-            var newSpec = Extension.CommandManager.CreateSpecFromEnum<TCmd>(m_NextId++, m_ParentGrpSpec);
+            int? id;
 
-            var spec = m_Specs.FirstOrDefault(s => string.Equals(s.Title, newSpec.Title, StringComparison.CurrentCultureIgnoreCase));
-
-            CommandSpec[] existingCmds;
-
-            if (spec != null)
+            if (typeof(TCmd).TryGetAttribute(out PartialCommandGroupAttribute att))
             {
-                existingCmds = spec.Commands;
+                id = att.BaseCommandGroupId;
             }
             else 
             {
-                existingCmds = new CommandSpec[0];
-                newSpec.Parent = m_ParentGrpSpec;
-                m_Specs.Add(newSpec);
-                spec = newSpec;
+                id = null;
             }
 
-            var cmds = new List<CommandSpec>();
-            cmds.AddRange(existingCmds);
-
-            for (int i = 0; i < newSpec.Commands.Length; i++) 
-            {
-                var src = newSpec.Commands[i];
-
-                var cmd = new CommandSpec(existingCmds.Length + i)
-                {
-                    HasMenu = src.HasMenu,
-                    HasSpacer = src.HasSpacer,
-                    HasTabBox = src.HasTabBox,
-                    HasToolbar = src.HasToolbar,
-                    Icon = src.Icon,
-                    SupportedWorkspace = src.SupportedWorkspace,
-                    TabBoxStyle = src.TabBoxStyle,
-                    Title = src.Title,
-                    Tooltip = src.Tooltip
-                };
-
-                m_Handlers.Add(cmd, new Tuple<Delegate, Enum>(handler, (Enum)Enum.ToObject(typeof(TCmd), src.UserId)));
-
-                cmds.Add(cmd);
-            }
-
-            spec.Commands = cmds.ToArray();
+            var spec = Extension.CommandManager.CreateSpecFromEnum<TCmd>(null, id);
+            
+            m_RegisteredCommands.Add(new Tuple<EnumCommandGroupSpec, Delegate>(spec, handler));
         }
-
+        
         private void OnCommandClick(CommandSpec spec)
         {
             if (m_Handlers.TryGetValue(spec, out Tuple<Delegate, Enum> handler))
@@ -251,10 +277,14 @@ namespace Xarial.CadPlus.AddIn.Base
                     break;
 
                 case CadPlusCommands_e.About:
-                    ShowPopup(new AboutDialog(
-                        new AboutDialogSpec(this.GetType().Assembly,
-                        Resources.logo,
-                        Licenses.ThirdParty)));
+                    try
+                    {
+                        m_SvcProvider.GetService<IAboutService>().ShowAbout(this.GetType().Assembly,
+                            Resources.logo);
+                    }
+                    catch
+                    {
+                    }
                     break;
             }
         }
