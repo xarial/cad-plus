@@ -26,7 +26,7 @@ namespace Xarial.CadPlus.Plus.Shared.Services
 
     public class PopupKiller : IPopupKiller
     {
-        private delegate bool EnumThreadProc(IntPtr hwnd, IntPtr lParam);
+        private delegate bool EnumThreadProc(IntPtr hWnd, IntPtr lParam);
 
         [DllImport("user32.dll", CharSet = CharSet.Auto)]
         private static extern bool EnumThreadWindows(int threadId, EnumThreadProc pfnEnum, IntPtr lParam);
@@ -65,6 +65,8 @@ namespace Xarial.CadPlus.Plus.Shared.Services
 
         private readonly object m_Lock;
 
+        private IntPtr m_CurrentModalPopupHwnd;
+
         public PopupKiller(IXLogger logger) 
         {
             IsStarted = false;
@@ -102,39 +104,51 @@ namespace Xarial.CadPlus.Plus.Shared.Services
         {
             if (Monitor.TryEnter(m_Lock))
             {
-                try
+                var curModalPopupHwnd = m_CurrentModalPopupHwnd;
+
+                m_CurrentModalPopupHwnd = IntPtr.Zero;
+
+                if (!IntPtr.Zero.Equals(curModalPopupHwnd) && IsWindow(curModalPopupHwnd))
                 {
-                    foreach (ProcessThread thread in m_Process.Threads)
-                    {
-                        var callbackProc = new EnumThreadProc(EnumThreadWindowsCallback);
-                        EnumThreadWindows(thread.Id, callbackProc, IntPtr.Zero);
-                    }
+                    PopupNotClosed?.Invoke(m_Process, curModalPopupHwnd);
                 }
-                finally
+                else
                 {
-                    Monitor.Exit(m_Lock);
+                    try
+                    {
+                        foreach (ProcessThread thread in m_Process.Threads)
+                        {
+                            var callbackProc = new EnumThreadProc(EnumThreadWindowsCallback);
+                            EnumThreadWindows(thread.Id, callbackProc, IntPtr.Zero);
+                        }
+                    }
+                    finally
+                    {
+                        Monitor.Exit(m_Lock);
+                    }
                 }
             }
         }
 
-        private bool EnumThreadWindowsCallback(IntPtr hwnd, IntPtr lParam)
+        private bool EnumThreadWindowsCallback(IntPtr hWnd, IntPtr lParam)
         {
             const int WM_SYSCOMMAND = 0x0112;
             const int SC_CLOSE = 0xF060;
             
             var className = new StringBuilder(256);
-            GetClassName(hwnd, className, 256);
+            GetClassName(hWnd, className, className.Capacity);
             
             if (className.ToString() == m_PopupClassName)
             {
-                if (IsWindow(hwnd) && IsModalPopup(hwnd))
+                if (IsWindow(hWnd) && IsModalPopup(hWnd))
                 {
-                    m_Logger.Log($"Killing popup: {hwnd}", LoggerMessageSeverity_e.Debug);
-                    SendMessage(hwnd, WM_SYSCOMMAND, SC_CLOSE, 0);
+                    m_Logger.Log($"Killing popup: {hWnd}", LoggerMessageSeverity_e.Debug);
+                    SendMessage(hWnd, WM_SYSCOMMAND, SC_CLOSE, 0);
 
-                    if (IsWindow(hwnd))
+                    if (IsWindow(hWnd))
                     {
-                        PopupNotClosed?.Invoke(m_Process, hwnd);
+                        //windows closing may take time. Remember the hWnd and check if still active in next timer tick
+                        m_CurrentModalPopupHwnd = hWnd;
                     }
 
                     return false;

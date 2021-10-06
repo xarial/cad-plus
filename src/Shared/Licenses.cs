@@ -26,6 +26,16 @@ namespace Xarial.CadPlus.Plus.Shared
             {
                 new LicenseInfo()
                 {
+                    Title = "xCAD.NET",
+                    Url = "https://xcad.xarial.com/license/"
+                },
+                new LicenseInfo()
+                {
+                    Title = "xToolkit",
+                    Url = "https://xtoolkit.xarial.com/license/"
+                },
+                new LicenseInfo()
+                {
                     Title = "Autofac",
                     Url = "https://licenses.nuget.org/MIT"
                 },
@@ -88,6 +98,11 @@ namespace Xarial.CadPlus.Plus.Shared
                 {
                     Title = "ClosedXML",
                     Url = "https://licenses.nuget.org/MIT"
+                },
+                new LicenseInfo()
+                {
+                    Title = "CsvHelper",
+                    Url = "https://licenses.nuget.org/Apache-2.0"
                 }
             };
         }

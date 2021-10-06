@@ -24,6 +24,7 @@ namespace Xarial.CadPlus.Plus.Shared.UI
         public DataTemplate NumericSwitch { get; set; }
         public DataTemplate DropDownButton { get; set; }
         public DataTemplate Custom { get; set; }
+        public DataTemplate Separator { get; set; }
 
         public override DataTemplate SelectTemplate(object item, DependencyObject container)
         {
@@ -51,7 +52,11 @@ namespace Xarial.CadPlus.Plus.Shared.UI
             {
                 return Custom;
             }
-            else 
+            else if (item is null) 
+            {
+                return Separator;
+            }
+            else
             {
                 return base.SelectTemplate(item, container);
             }            

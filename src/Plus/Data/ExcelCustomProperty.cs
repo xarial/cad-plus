@@ -6,15 +6,19 @@
 //*********************************************************************
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Xarial.CadPlus.Plus
+namespace Xarial.CadPlus.Plus.Data
 {
-    public interface IInitiator : IDisposable
+    [Serializable]
+    public class ExcelCustomProperty 
     {
-        void Init(IHost host);
+        public string Name { get; }
+        public object Value { get; }
+
+        public ExcelCustomProperty(string name, object value)
+        {
+            Name = name;
+            Value = value;
+        }
     }
 }

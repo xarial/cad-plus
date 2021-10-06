@@ -10,21 +10,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Xarial.XCad.Base;
-using Xarial.XCad.Base.Enums;
 
-namespace Xarial.CadPlus.Plus.Services
+namespace Xarial.CadPlus.Plus.Attributes
 {
-    public class AppLogger : IXLogger
+    [AttributeUsage(AttributeTargets.Enum | AttributeTargets.Field)]
+    public class CommandOrderAttribute : Attribute
     {
-        protected readonly string m_Category;
+        public int Order { get; }
 
-        public AppLogger()
+        public CommandOrderAttribute(int order) 
         {
-            m_Category = "CAD+ Toolset";
+            Order = order;
         }
-
-        public virtual void Log(string msg, LoggerMessageSeverity_e severity = LoggerMessageSeverity_e.Information)
-            => this.Trace(msg, m_Category, severity, true);
     }
 }

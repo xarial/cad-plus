@@ -13,8 +13,19 @@ using System.Threading.Tasks;
 
 namespace Xarial.CadPlus.Plus
 {
-    public interface IInitiator : IDisposable
+    public enum EditionType_e
     {
-        void Init(IHost host);
+        Community = 0,
+        Standard = 1,
+        Professional = 2,
+        Premium = 3,
+        Platinum = 4
+    }
+
+    public interface ILicenseInfo
+    {
+        bool IsRegistered { get; }
+        EditionType_e Edition { get; }
+        DateTime? TrialExpiryDate { get; }
     }
 }

@@ -29,9 +29,9 @@ namespace Xarial.CadPlus.Plus.Shared.Controls
 {
     public enum DocumentTitleDisplayType_e
     {
-        Path,
-        FileName,
-        FileNameWithoutExtension
+        FilePath,
+        Title,
+        FileName
     }
 
     public interface ICustomObject 
@@ -83,7 +83,7 @@ namespace Xarial.CadPlus.Plus.Shared.Controls
         public static readonly DependencyProperty DocumentTitleDisplayTypeProperty =
             DependencyProperty.Register(
             nameof(DocumentTitleDisplayType), typeof(DocumentTitleDisplayType_e),
-            typeof(CadObjectLabelControl), new PropertyMetadata(DocumentTitleDisplayType_e.FileName));
+            typeof(CadObjectLabelControl), new PropertyMetadata(DocumentTitleDisplayType_e.Title));
 
         public DocumentTitleDisplayType_e DocumentTitleDisplayType
         {

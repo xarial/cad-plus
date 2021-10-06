@@ -16,6 +16,10 @@ namespace Xarial.CadPlus.Plus.Services
 {
     public interface IMessageService
     {
+        /// <summary>
+        /// Type of exceptions which should be considered as user friendly errors
+        /// </summary>
+        Type[] UserErrors { get; }
         void ShowError(string error);
         void ShowWarning(string warn);
         void ShowInformation(string msg);
@@ -26,7 +30,7 @@ namespace Xarial.CadPlus.Plus.Services
     {
         public static void ShowError(this IMessageService msgSvc, Exception ex, string baseMsg = "Generic error. Please see log for more details")
         {
-            var err = ex.ParseUserError(out _, baseMsg);
+            var err = ex.ParseUserError(out _, baseMsg, msgSvc.UserErrors ?? new Type[0]);
             msgSvc.ShowError(err);
         }
     }

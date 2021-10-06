@@ -25,8 +25,23 @@
                                       IsRibbonAligned="True" />
                 </Setter.Value>
             </Setter>
+            <Setter Property="MinWidth" Value="60"/>
         </Style>
         <local:RibbonCommandTemplateSelector x:Key="ribbonGrpCmdTemplateSelector">
+            <local:RibbonCommandTemplateSelector.Separator>
+                <DataTemplate>
+                    <Grid VerticalAlignment="Stretch" Height="500">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Stretch">
+                            <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" VerticalAlignment="Stretch" />
+                        </StackPanel>
+                    </Grid>
+                </DataTemplate>
+            </local:RibbonCommandTemplateSelector.Separator>
             <local:RibbonCommandTemplateSelector.Button>
                 <DataTemplate>
                     <fluent:Button Header="{Binding Path=Title}" Margin="1" Style="{StaticResource RibbonCommandStyle}"
