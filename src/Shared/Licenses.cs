@@ -26,6 +26,16 @@ namespace Xarial.CadPlus.Plus.Shared
             {
                 new LicenseInfo()
                 {
+                    Title = "xCAD.NET",
+                    Url = "https://xcad.xarial.com/license/"
+                },
+                new LicenseInfo()
+                {
+                    Title = "xToolkit",
+                    Url = "https://xtoolkit.xarial.com/license/"
+                },
+                new LicenseInfo()
+                {
                     Title = "Autofac",
                     Url = "https://licenses.nuget.org/MIT"
                 },
