@@ -638,16 +638,9 @@ namespace Xarial.CadPlus.Batch.Base.Core
 
                 doc.State = state;
 
-                try
-                {
-                    m_JournalWriter.WriteLine($"Opening '{doc.Path}'");
+                m_JournalWriter.WriteLine($"Opening '{doc.Path}'");
 
-                    doc.Commit(cancellationToken);
-                }
-                catch (OpenDocumentFailedException ex)
-                {
-                    throw new UserException($"Failed to open document {doc.Path}: {(ex as OpenDocumentFailedException).Message}", ex);
-                }
+                doc.Commit(cancellationToken);
             }
             else
             {
