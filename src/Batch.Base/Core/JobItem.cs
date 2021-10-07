@@ -67,8 +67,11 @@ namespace Xarial.CadPlus.Batch.Base.Core
 
         public void ReportIssue(string issue)
         {
-            m_Issues.Add(issue);
-            IssuesChanged?.Invoke(this);
+            if (!m_Issues.Contains(issue))
+            {
+                m_Issues.Add(issue);
+                IssuesChanged?.Invoke(this);
+            }
         }
 
         public void ClearIssues()
