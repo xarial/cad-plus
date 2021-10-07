@@ -184,12 +184,28 @@ Contains detailed breakdown for each file and macro. Icon corresponds to the sta
 
 Files or macros which are failed to process will have a corresponding icon and the clickable **?** link. Click this link to get more information about the error.
 
-![Failed status information](failed-status.png)
-
 Each column of the grid can be sorted to quickly identify failed items if needed.
+
+#### Custom Errors
+
+Batch+ can read the exception errors thrown by the macro with **Err.Raise** when run in the **Silent** mode and display this error in the status.
+
+~~~ vb
+Dim swApp As SldWorks.SldWorks
+
+Sub main()
+
+    Set swApp = Application.SldWorks
+    
+    Err.Raise vbError, "", "Custom error from the VBA macro"
+
+End Sub
+~~~
+
+![Custom VBA macro error](custom-vba-macro-error.png)
 
 ### Journal
 
-![Log tab](journal-tab.png)
+![Journal tab](journal-tab.png)
 
 Journal contains detailed log messages about the progress. Use this log to troubleshoot errors.
