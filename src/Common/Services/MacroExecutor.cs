@@ -146,7 +146,7 @@ namespace Xarial.CadPlus.Common.Services
 
             try
             {
-                if (FileSystemUtils.MatchesAnyFilter(path, XCadMacroProvider.Filter.Extensions))
+                if (TextUtils.MatchesAnyFilter(path, XCadMacroProvider.Filter.Extensions))
                 {
                     macro = m_XCadMacroProvider.GetMacro(path);
                     m_XCadMacrosCache.Add(path, macro);

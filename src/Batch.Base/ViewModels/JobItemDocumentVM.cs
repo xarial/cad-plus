@@ -88,15 +88,15 @@ namespace Xarial.CadPlus.Batch.Base.ViewModels
                     m_Icons.Add(m_CadDesc.ApplicationId, icons);
                 }
 
-                if (FileSystemUtils.MatchesAnyFilter(Path, m_CadDesc.PartFileFilter.Extensions))
+                if (TextUtils.MatchesAnyFilter(Path, m_CadDesc.PartFileFilter.Extensions))
                 {
                     return icons.Part ?? (icons.Part = m_CadDesc.PartIcon.ToBitmapImage());
                 }
-                else if (FileSystemUtils.MatchesAnyFilter(Path, m_CadDesc.AssemblyFileFilter.Extensions))
+                else if (TextUtils.MatchesAnyFilter(Path, m_CadDesc.AssemblyFileFilter.Extensions))
                 {
                     return icons.Assembly ?? (icons.Assembly = m_CadDesc.AssemblyIcon.ToBitmapImage());
                 }
-                else if (FileSystemUtils.MatchesAnyFilter(Path, m_CadDesc.DrawingFileFilter.Extensions))
+                else if (TextUtils.MatchesAnyFilter(Path, m_CadDesc.DrawingFileFilter.Extensions))
                 {
                     return icons.Drawing ?? (icons.Drawing = m_CadDesc.DrawingIcon.ToBitmapImage());
                 }
