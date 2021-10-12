@@ -101,10 +101,10 @@
       <HintPath>..\..\packages\Xarial.XCad.0.7.6-20211008.2\lib\net461\Xarial.XCad.dll</HintPath>
     </Reference>
     <Reference Include="Xarial.XToolkit, Version=0.3.0.0, Culture=neutral, PublicKeyToken=60dcaf351d4060db, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Xarial.XToolkit.0.3.0-20211011.4\lib\net461\Xarial.XToolkit.dll</HintPath>
+      <HintPath>..\..\packages\Xarial.XToolkit.0.3.0-20211012.1\lib\net461\Xarial.XToolkit.dll</HintPath>
     </Reference>
     <Reference Include="Xarial.XToolkit.Wpf, Version=0.3.0.0, Culture=neutral, PublicKeyToken=60dcaf351d4060db, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Xarial.XToolkit.Wpf.0.3.0-20211011.4\lib\net461\Xarial.XToolkit.Wpf.dll</HintPath>
+      <HintPath>..\..\packages\Xarial.XToolkit.Wpf.0.3.0-20211012.1\lib\net461\Xarial.XToolkit.Wpf.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
