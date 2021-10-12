@@ -10,7 +10,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 using Xarial.CadPlus.Common.Exceptions;
-using Xarial.CadPlus.Common.Utils;
 using Xarial.CadPlus.MacroRunner;
 using Xarial.CadPlus.Plus;
 using Xarial.CadPlus.Plus.Exceptions;
@@ -59,7 +58,7 @@ namespace Xarial.CadPlus.Common.Services
         {
             try
             {
-                var argsArr = !string.IsNullOrEmpty(args) ? CommandLineHelper.ParseCommandLine(args) : null;
+                var argsArr = !string.IsNullOrEmpty(args) ? CommandLineUtils.ParseCommandLine(args) : null;
 
                 var xCadMacro = GetXCadMacroIfExists(macroPath);
 

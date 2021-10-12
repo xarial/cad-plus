@@ -33,6 +33,7 @@ using Xarial.CadPlus.Toolbar.Properties;
 using Xarial.CadPlus.Toolbar.Services;
 using Xarial.CadPlus.CustomToolbar.Structs;
 using System.IO;
+using System.Linq;
 
 namespace Xarial.CadPlus.CustomToolbar
 {

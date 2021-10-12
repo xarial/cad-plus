@@ -32,6 +32,7 @@ using Xarial.XCad.SolidWorks.Services;
 using System.Windows.Threading;
 using Xarial.XCad.Base.Enums;
 using Xarial.CadPlus.Plus.Shared.Services;
+using Xarial.XToolkit.Helpers;
 
 namespace Xarial.CadPlus.AddIn.Sw
 {
@@ -42,6 +43,10 @@ namespace Xarial.CadPlus.AddIn.Sw
     {
         private class LocalAppConfigBindingRedirectReferenceResolver : AppConfigBindingRedirectReferenceResolver
         {
+            internal LocalAppConfigBindingRedirectReferenceResolver() : base("CAD+ SOLIDWORKS Add-In") 
+            {
+            }
+
             protected override Assembly[] GetRequestingAssemblies(Assembly requestingAssembly)
             {
                 if (requestingAssembly != null)
@@ -58,10 +63,13 @@ namespace Xarial.CadPlus.AddIn.Sw
                 }
             }   
         }
-        
+
+        private static readonly AssemblyResolver m_AssmResolver;
+
         static CadPlusSwAddIn() 
-        {   
-            AppDomain.CurrentDomain.ResolveBindingRedirects(new LocalAppConfigBindingRedirectReferenceResolver());
+        {
+            m_AssmResolver = new AssemblyResolver(AppDomain.CurrentDomain);
+            m_AssmResolver.RegisterAssemblyReferenceResolver(new LocalAppConfigBindingRedirectReferenceResolver());
         }
 
         private readonly AddInHost m_Host;

@@ -19,7 +19,6 @@ using Xarial.CadPlus.Batch.Base.Core;
 using Xarial.CadPlus.Batch.Base.Properties;
 using Xarial.CadPlus.Batch.Base.ViewModels;
 using Xarial.CadPlus.Common.Services;
-using Xarial.CadPlus.Common.Utils;
 using Xarial.CadPlus.Plus.Services;
 using Xarial.CadPlus.Plus.Shared.Controls;
 using Xarial.XCad.Documents;

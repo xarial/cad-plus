@@ -31,7 +31,6 @@ using Xarial.XCad.Documents.Structures;
 using Xarial.XCad.Exceptions;
 using Xarial.XToolkit.Reporting;
 using Xarial.CadPlus.Batch.StandAlone.Exceptions;
-using Xarial.CadPlus.Common.Utils;
 using Xarial.CadPlus.Plus.Shared.Extensions;
 using Xarial.XCad.Base.Enums;
 using Xarial.XToolkit;
