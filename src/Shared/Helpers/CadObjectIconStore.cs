@@ -24,6 +24,7 @@ namespace Xarial.CadPlus.Plus.Shared.Helpers
             internal ImageSource Drawing { get; set; }
             internal ImageSource CutList { get; set; }
             internal ImageSource Configuration { get; set; }
+            internal ImageSource Sheet { get; set; }
         }
 
         public static CadObjectIconStore Instance { get; }
@@ -89,7 +90,10 @@ namespace Xarial.CadPlus.Plus.Shared.Helpers
                     {
                         return icons.CutList ?? (icons.CutList = cadDesc.CutListIcon.ToBitmapImage());
                     }
-                    //else if(obj is IXSheet)
+                    else if (obj is IXSheet)
+                    {
+                        return icons.Sheet ?? (icons.Sheet = cadDesc.SheetIcon.ToBitmapImage());
+                    }
                 }
             }
             catch
