@@ -31,7 +31,6 @@ using Xarial.XCad.Documents.Structures;
 using Xarial.XCad.Exceptions;
 using Xarial.XToolkit.Reporting;
 using Xarial.CadPlus.Batch.StandAlone.Exceptions;
-using Xarial.CadPlus.Common.Utils;
 using Xarial.CadPlus.Plus.Shared.Extensions;
 using Xarial.XCad.Base.Enums;
 using Xarial.XToolkit;
@@ -258,7 +257,7 @@ namespace Xarial.CadPlus.Batch.Base.Core
                 {
                     foreach (var file in Directory.EnumerateFiles(input, "*.*", SearchOption.AllDirectories))
                     {
-                        if (FileSystemUtils.MatchesAnyFilter(file, filters))
+                        if (TextUtils.MatchesAnyFilter(file, filters))
                         {
                             if (!m_AppProvider.Descriptor.IsSystemFile(file))
                             {
@@ -662,9 +661,9 @@ namespace Xarial.CadPlus.Batch.Base.Core
             {
                 try
                 {
-                    if (FileSystemUtils.MatchesAnyFilter(doc.Path, m_AppProvider.Descriptor.PartFileFilter.Extensions)
-                        || FileSystemUtils.MatchesAnyFilter(doc.Path, m_AppProvider.Descriptor.AssemblyFileFilter.Extensions)
-                        || FileSystemUtils.MatchesAnyFilter(doc.Path, m_AppProvider.Descriptor.DrawingFileFilter.Extensions))
+                    if (TextUtils.MatchesAnyFilter(doc.Path, m_AppProvider.Descriptor.PartFileFilter.Extensions)
+                        || TextUtils.MatchesAnyFilter(doc.Path, m_AppProvider.Descriptor.AssemblyFileFilter.Extensions)
+                        || TextUtils.MatchesAnyFilter(doc.Path, m_AppProvider.Descriptor.DrawingFileFilter.Extensions))
                     {
                         if (app.Version.Compare(doc.Version) == VersionEquality_e.Newer)
                         {
