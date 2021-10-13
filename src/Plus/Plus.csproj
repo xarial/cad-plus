@@ -32,8 +32,8 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Xarial.XCad" Version="0.7.6-20211013.2" />
-    <PackageReference Include="Xarial.XToolkit" Version="0.3.0-20211012.7" />
+    <PackageReference Include="Xarial.XCad" Version="0.7.6" />
+    <PackageReference Include="Xarial.XToolkit" Version="0.3.0" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="PresentationCore" />
