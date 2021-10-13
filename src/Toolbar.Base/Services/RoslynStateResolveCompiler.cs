@@ -77,16 +77,6 @@ namespace Xarial.CadPlus.CustomToolbar.Services
                 {
                     assm = Assembly.Load(assmStream.GetBuffer());
 
-                    //Assembly AssemblyResolve(object sender, ResolveEventArgs args)
-                    //{
-                    //    var resolvedAssm = AppDomain.CurrentDomain.GetAssemblies()
-                    //        .FirstOrDefault(a => string.Equals(a.GetName().FullName, args.Name));
-
-                    //    return resolvedAssm;
-                    //}
-
-                    //AppDomain.CurrentDomain.AssemblyResolve += AssemblyResolve;
-
                     foreach (var type in assm.GetTypes().Where(t => typeof(IToggleButtonStateResolver).IsAssignableFrom(t)))
                     {
                         if (classToMacroMap.TryGetValue(type.Name, out CommandMacroInfo macroInfo))
@@ -99,8 +89,6 @@ namespace Xarial.CadPlus.CustomToolbar.Services
                             Debug.Assert(false, "Unregistered type");
                         }
                     }
-
-                    //AppDomain.CurrentDomain.AssemblyResolve -= AssemblyResolve;
                 }
                 else
                 {
