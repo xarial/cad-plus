@@ -47,7 +47,7 @@ namespace Xarial.CadPlus.Init
 
         public Initiator() 
         {
-            m_AssmResolver = new AssemblyResolver(AppDomain.CurrentDomain);
+            m_AssmResolver = new AssemblyResolver(AppDomain.CurrentDomain, "CAD+ Toolset");
             m_AssmResolver.RegisterAssemblyReferenceResolver(
                 new LocalFolderReferencesResolver(Path.GetDirectoryName(typeof(Initiator).Assembly.Location),
                 AssemblyMatchFilter_e.Culture | AssemblyMatchFilter_e.PublicKeyToken | AssemblyMatchFilter_e.Version,

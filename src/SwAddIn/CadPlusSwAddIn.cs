@@ -68,7 +68,7 @@ namespace Xarial.CadPlus.AddIn.Sw
 
         static CadPlusSwAddIn() 
         {
-            m_AssmResolver = new AssemblyResolver(AppDomain.CurrentDomain);
+            m_AssmResolver = new AssemblyResolver(AppDomain.CurrentDomain, "CAD+ Toolset");
             m_AssmResolver.RegisterAssemblyReferenceResolver(new LocalAppConfigBindingRedirectReferenceResolver());
         }
 
