@@ -16,7 +16,9 @@ using System.Windows.Data;
 using System.Windows.Media;
 using Xarial.CadPlus.Plus.Services;
 using Xarial.CadPlus.Plus.Shared.Controls;
+using Xarial.CadPlus.Plus.Shared.Helpers;
 using Xarial.CadPlus.Plus.Shared.Properties;
+using Xarial.XCad;
 using Xarial.XCad.Documents;
 using Xarial.XCad.Features;
 using Xarial.XToolkit.Wpf.Extensions;
@@ -25,23 +27,7 @@ namespace Xarial.CadPlus.Plus.Shared.Converters
 {
     public class CadObjectIconConverter : IMultiValueConverter
     {
-        private class CadObjectIcons 
-        {
-            internal ImageSource Part { get; set; }
-            internal ImageSource Assembly { get; set; }
-            internal ImageSource Drawing { get; set; }
-            internal ImageSource CutList { get; set; }
-            internal ImageSource Configuration { get; set; }
-        }
-
-        private static readonly Dictionary<string, CadObjectIcons> m_Icons;
-
         private static ImageSource m_DefaultIcon;
-
-        static CadObjectIconConverter() 
-        {
-            m_Icons = new Dictionary<string, CadObjectIcons>();
-        }
 
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {
@@ -50,53 +36,13 @@ namespace Xarial.CadPlus.Plus.Shared.Converters
                 var ent = values[0];
                 var cadDesc = (ICadDescriptor)values[1];
 
-                if (ent != null && cadDesc != null)
+                if (ent is ICustomObject)
                 {
-                    if (!m_Icons.TryGetValue(cadDesc.ApplicationId, out CadObjectIcons icons))
-                    {
-                        icons = new CadObjectIcons();
-                        m_Icons.Add(cadDesc.ApplicationId, icons);
-                    }
-
-                    if (ent is IXPart)
-                    {
-                        return icons.Part ?? (icons.Part = cadDesc.PartIcon.ToBitmapImage());
-                    }
-                    else if (ent is IXAssembly)
-                    {
-                        return icons.Assembly ?? (icons.Assembly = cadDesc.AssemblyIcon.ToBitmapImage());
-                    }
-                    else if (ent is IXDrawing)
-                    {
-                        return icons.Drawing ?? (icons.Drawing = cadDesc.DrawingIcon.ToBitmapImage());
-                    }
-                    else if (ent is IXDocument)
-                    {
-                        if (MatchesExtension(ent as IXDocument, cadDesc.PartFileFilter.Extensions))
-                        {
-                            return icons.Part ?? (icons.Part = cadDesc.PartIcon.ToBitmapImage());
-                        }
-                        else if (MatchesExtension(ent as IXDocument, cadDesc.AssemblyFileFilter.Extensions))
-                        {
-                            return icons.Assembly ?? (icons.Assembly = cadDesc.AssemblyIcon.ToBitmapImage());
-                        }
-                        else if (MatchesExtension(ent as IXDocument, cadDesc.DrawingFileFilter.Extensions))
-                        {
-                            return icons.Drawing ?? (icons.Drawing = cadDesc.DrawingIcon.ToBitmapImage());
-                        }
-                    }
-                    else if (ent is IXConfiguration)
-                    {
-                        return icons.Configuration ?? (icons.Configuration = cadDesc.ConfigurationIcon.ToBitmapImage());
-                    }
-                    else if (ent is IXCutListItem)
-                    {
-                        return icons.CutList ?? (icons.CutList = cadDesc.CutListIcon.ToBitmapImage());
-                    }
-                    else if (ent is ICustomObject)
-                    {
-                        return ((ICustomObject)ent).Icon;
-                    }
+                    return ((ICustomObject)ent).Icon;
+                }
+                else if (ent is IXObject)
+                {
+                    return CadObjectIconStore.Instance.GetIcon((IXObject)ent, cadDesc);
                 }
             }
             catch 
@@ -109,19 +55,6 @@ namespace Xarial.CadPlus.Plus.Shared.Converters
         public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
         {
             throw new NotImplementedException();
-        }
-        
-        private bool MatchesExtension(IXDocument doc, string[] exts)
-        {
-            try
-            {
-                var ext = Path.GetExtension(doc.Path);
-                return exts.Any(e => Path.GetExtension(e).Equals(ext, StringComparison.CurrentCultureIgnoreCase));
-            }
-            catch
-            {
-                return false;
-            }
         }
     }
 }
