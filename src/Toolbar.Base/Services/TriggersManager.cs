@@ -92,7 +92,6 @@ namespace Xarial.CadPlus.CustomToolbar.Services
                         break;
                     case Triggers_e.NewSelection:
                         doc.Selections.NewSelection += OnNewSelection;
-                        doc.Selections.ClearSelection += OnClearSelection;
                         break;
                     case Triggers_e.ConfigurationSheetChange:
                         switch (doc) 
@@ -134,7 +133,6 @@ namespace Xarial.CadPlus.CustomToolbar.Services
                 }
 
                 doc.Selections.NewSelection -= OnNewSelection;
-                doc.Selections.ClearSelection -= OnClearSelection;
                 doc.Saving -= OnSaving;
                 doc.Rebuilt -= OnRebuild;
                 doc.Closing -= OnDocumentClosing;
@@ -166,14 +164,6 @@ namespace Xarial.CadPlus.CustomToolbar.Services
         }
 
         private void OnNewSelection(IXDocument doc, IXSelObject selObject)
-        {
-            if (doc == m_App.Documents.Active)
-            {
-                InvokeTrigger(Triggers_e.NewSelection, doc);
-            }
-        }
-
-        private void OnClearSelection(IXDocument doc)
         {
             if (doc == m_App.Documents.Active)
             {
