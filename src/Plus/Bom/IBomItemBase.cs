@@ -11,6 +11,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Media.Imaging;
 
 namespace Xarial.CadPlus.Plus.Bom
 {
@@ -22,7 +23,7 @@ namespace Xarial.CadPlus.Plus.Bom
         IBomItemBase[] Children { get; }
         object GetValue(ValueSource_e src, string arg);
 
-        Image Preview { get; }
+        BitmapSource Preview { get; }
 
         ItemType_e Type { get; }
     }

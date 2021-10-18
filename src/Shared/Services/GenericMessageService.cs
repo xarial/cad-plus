@@ -7,6 +7,7 @@
 
 using System;
 using System.Windows;
+using System.Windows.Threading;
 using Xarial.CadPlus.Plus.Services;
 
 namespace Xarial.CadPlus.Plus.Shared.Services
@@ -36,13 +37,10 @@ namespace Xarial.CadPlus.Plus.Shared.Services
 
         private readonly string m_Title;
 
+        private readonly Dispatcher m_Dispatcher;
+
         public GenericMessageService() : this("CAD+ Toolset")
         {
-        }
-
-        public GenericMessageService(string title) 
-        {
-            m_Title = title;
         }
 
         public GenericMessageService(string title, Type[] userErrors) : this(title)
@@ -50,7 +48,24 @@ namespace Xarial.CadPlus.Plus.Shared.Services
             UserErrors = userErrors;
         }
 
+        public GenericMessageService(string title)
+        {
+            m_Title = title;
+            m_Dispatcher = Dispatcher.CurrentDispatcher;
+        }
+
         public MessageBoxResult ShowMessage(string msg, MessageBoxImage img, MessageBoxButton btn = MessageBoxButton.OK)
-            => MessageBox.Show(msg, m_Title, btn, img);
+        {
+            MessageBoxResult Show() => MessageBox.Show(msg, m_Title, btn, img);
+
+            if (m_Dispatcher != null)
+            {
+                return m_Dispatcher.Invoke(Show);
+            }
+            else 
+            {
+                return Show();
+            }
+        }
     }
 }
