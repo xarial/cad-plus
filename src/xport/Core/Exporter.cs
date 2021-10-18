@@ -140,13 +140,19 @@ namespace Xarial.CadPlus.Xport.Core
 
                         var res = await StartWaitProcessAsync(prcStartInfo, tcs.Token).ConfigureAwait(false);
 
-                        if (!res)
+                        if (res)
+                        {
+                            outFile.Status = JobItemStatus_e.Succeeded;
+                        }
+                        else 
                         {
                             throw new Exception("Failed to process the file");
                         }
                     }
                     catch (Exception ex)
                     {
+                        outFile.Status = JobItemStatus_e.Failed;
+
                         m_TextLogger.WriteLine($"Error while processing '{file}': {ex.Message}");
                         if (!opts.ContinueOnError)
                         {
@@ -155,6 +161,19 @@ namespace Xarial.CadPlus.Xport.Core
                     }
 
                     m_ProgressHandler?.ReportProgress(outFile, true);
+                }
+
+                if (outFiles.All(f => f.Status == JobItemStatus_e.Succeeded))
+                {
+                    job.Status = JobItemStatus_e.Succeeded;
+                }
+                else if (outFiles.All(f => f.Status == JobItemStatus_e.Failed))
+                {
+                    job.Status = JobItemStatus_e.Failed;
+                }
+                else 
+                {
+                    job.Status = JobItemStatus_e.Warning;
                 }
             }
 

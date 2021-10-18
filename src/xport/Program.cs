@@ -83,7 +83,9 @@ namespace Xarial.CadPlus.Xport
                 Version = args.Version
             };
 
-            using (var exporter = new Exporter(Console.Out, new JobManager(new AppLogger()), new ConsoleProgressWriter()))
+            var jobMgr = m_AppLauncher.Container.Resolve<IJobManager>();
+
+            using (var exporter = new Exporter(Console.Out, jobMgr, new ConsoleProgressWriter()))
             {
                 await exporter.Export(opts).ConfigureAwait(false);
             }
