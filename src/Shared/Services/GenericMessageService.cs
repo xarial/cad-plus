@@ -35,26 +35,26 @@ namespace Xarial.CadPlus.Plus.Shared.Services
             m_Dispatcher = Dispatcher.CurrentDispatcher;
         }
 
-        public bool? ShowMessage(string msg, MessageBoxIcon_e icon, MessageBoxButtons_e btns)
+        public bool? ShowMessage(string msg, MessageServiceIcon_e icon, MessageServiceButtons_e btns)
         {
             MessageBoxImage msgBoxImg;
             MessageBoxButton msgBoxBtns;
 
             switch (icon) 
             {
-                case MessageBoxIcon_e.Information:
+                case MessageServiceIcon_e.Information:
                     msgBoxImg = MessageBoxImage.Information;
                     break;
 
-                case MessageBoxIcon_e.Warning:
+                case MessageServiceIcon_e.Warning:
                     msgBoxImg = MessageBoxImage.Warning;
                     break;
 
-                case MessageBoxIcon_e.Error:
+                case MessageServiceIcon_e.Error:
                     msgBoxImg = MessageBoxImage.Error;
                     break;
 
-                case MessageBoxIcon_e.Question:
+                case MessageServiceIcon_e.Question:
                     msgBoxImg = MessageBoxImage.Question;
                     break;
 
@@ -64,19 +64,19 @@ namespace Xarial.CadPlus.Plus.Shared.Services
 
             switch (btns) 
             {
-                case MessageBoxButtons_e.Ok:
+                case MessageServiceButtons_e.Ok:
                     msgBoxBtns = MessageBoxButton.OK;
                     break;
 
-                case MessageBoxButtons_e.OkCancel:
+                case MessageServiceButtons_e.OkCancel:
                     msgBoxBtns = MessageBoxButton.OKCancel;
                     break;
 
-                case MessageBoxButtons_e.YesNo:
+                case MessageServiceButtons_e.YesNo:
                     msgBoxBtns = MessageBoxButton.YesNo;
                     break;
 
-                case MessageBoxButtons_e.YesNoCancel:
+                case MessageServiceButtons_e.YesNoCancel:
                     msgBoxBtns = MessageBoxButton.YesNoCancel;
                     break;
 
