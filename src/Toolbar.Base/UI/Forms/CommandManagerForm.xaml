@@ -58,6 +58,9 @@
             <Setter Property="Height" Value="24"/>
         </Style>
     </Window.Resources>
+    <Window.InputBindings>
+        <KeyBinding Key="Delete" Command="{Binding Path=CommandRemoveCommand}" CommandParameter="{Binding Path=SelectedElement}"/>
+    </Window.InputBindings>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />

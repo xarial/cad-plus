@@ -88,9 +88,9 @@ namespace Xarial.CadPlus.Batch.Base.Services
 
             var errors = new List<string>();
 
-            if (item.Error != null)
+            if (item.Issues.Any())
             {
-                errors.Add($"[File] - {ExceptionToErrorConverter.Convert(item.Error)}");
+                errors.Add($"[File] - {string.Join(", ", item.Issues)}");
             }
 
             var cellColor = default(KnownColor?);
@@ -125,9 +125,9 @@ namespace Xarial.CadPlus.Batch.Base.Services
             {
                 var macro = item.Macros[i];
                 
-                if (macro.Error != null)
+                if (macro.Issues.Any())
                 {
-                    errors.Add($"[{macro.Name}] - {ExceptionToErrorConverter.Convert(item.Macros[i].Error)}");
+                    errors.Add($"[{macro.Name}] - {string.Join("; ", macro.Issues)}");
                 }
 
                 cells[i + 2] = new ExcelCell(macro.Status, null, cellColor);

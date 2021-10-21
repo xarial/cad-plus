@@ -31,7 +31,6 @@ using Xarial.XCad.Documents.Structures;
 using Xarial.XCad.Exceptions;
 using Xarial.XToolkit.Reporting;
 using Xarial.CadPlus.Batch.StandAlone.Exceptions;
-using Xarial.CadPlus.Common.Utils;
 using Xarial.CadPlus.Plus.Shared.Extensions;
 using Xarial.XCad.Base.Enums;
 using Xarial.XToolkit;
@@ -258,7 +257,7 @@ namespace Xarial.CadPlus.Batch.Base.Core
                 {
                     foreach (var file in Directory.EnumerateFiles(input, "*.*", SearchOption.AllDirectories))
                     {
-                        if (FileSystemUtils.MatchesAnyFilter(file, filters))
+                        if (TextUtils.MatchesAnyFilter(file, filters))
                         {
                             if (!m_AppProvider.Descriptor.IsSystemFile(file))
                             {
@@ -412,11 +411,11 @@ namespace Xarial.CadPlus.Batch.Base.Core
 
                     if (context.CurrentDocument == null)
                     {
-                        context.CurrentJobItem.Error = ex;
+                        context.CurrentJobItem.ReportError(ex);
                     }
                     else 
                     {
-                        context.CurrentMacro.Error = ex;
+                        context.CurrentMacro.ReportError(ex);
                     }
 
                     m_JournalWriter.WriteLine(ex.ParseUserError(out _));
@@ -529,7 +528,7 @@ namespace Xarial.CadPlus.Batch.Base.Core
                 }
                 else if (ex is INoRetryMacroRunException) 
                 {
-                    context.CurrentMacro.Error = ex;
+                    context.CurrentMacro.ReportError(ex);
                 }
                 else
                 {
@@ -638,16 +637,9 @@ namespace Xarial.CadPlus.Batch.Base.Core
 
                 doc.State = state;
 
-                try
-                {
-                    m_JournalWriter.WriteLine($"Opening '{doc.Path}'");
+                m_JournalWriter.WriteLine($"Opening '{doc.Path}'");
 
-                    doc.Commit(cancellationToken);
-                }
-                catch (OpenDocumentFailedException ex)
-                {
-                    throw new UserException($"Failed to open document {doc.Path}: {(ex as OpenDocumentFailedException).Message}", ex);
-                }
+                doc.Commit(cancellationToken);
             }
             else
             {
@@ -669,9 +661,9 @@ namespace Xarial.CadPlus.Batch.Base.Core
             {
                 try
                 {
-                    if (FileSystemUtils.MatchesAnyFilter(doc.Path, m_AppProvider.Descriptor.PartFileFilter.Extensions)
-                        || FileSystemUtils.MatchesAnyFilter(doc.Path, m_AppProvider.Descriptor.AssemblyFileFilter.Extensions)
-                        || FileSystemUtils.MatchesAnyFilter(doc.Path, m_AppProvider.Descriptor.DrawingFileFilter.Extensions))
+                    if (TextUtils.MatchesAnyFilter(doc.Path, m_AppProvider.Descriptor.PartFileFilter.Extensions)
+                        || TextUtils.MatchesAnyFilter(doc.Path, m_AppProvider.Descriptor.AssemblyFileFilter.Extensions)
+                        || TextUtils.MatchesAnyFilter(doc.Path, m_AppProvider.Descriptor.DrawingFileFilter.Extensions))
                     {
                         if (app.Version.Compare(doc.Version) == VersionEquality_e.Newer)
                         {

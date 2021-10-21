@@ -184,7 +184,7 @@ namespace Xarial.CadPlus.CustomToolbar.Services
         {
             var triggersCmds = new Dictionary<Triggers_e, CommandMacroInfo[]>();
 
-            var allCmds = toolbarInfo?.Groups?.SelectMany(g => g.Commands);
+            var allCmds = toolbarInfo?.Groups?.SelectMany(g => g.Commands ?? Enumerable.Empty<CommandMacroInfo>());
 
             if (allCmds?.Any() == true)
             {

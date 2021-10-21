@@ -84,7 +84,7 @@ namespace Xarial.CadPlus.Batch.InApp.ViewModels
             {
                 if (m_TopLevelReferences == null)
                 {
-                    m_TopLevelReferences = CreateDocumentVMs(m_Doc.Dependencies.ToArray());
+                    m_TopLevelReferences = CreateDocumentVMs(m_Doc.IterateDependencies(true).ToArray());
                 }
 
                 References = m_TopLevelReferences;
@@ -93,7 +93,7 @@ namespace Xarial.CadPlus.Batch.InApp.ViewModels
             {
                 if (m_AllReferences == null)
                 {
-                    m_AllReferences = CreateDocumentVMs(m_Doc.GetAllDependencies().ToArray());
+                    m_AllReferences = CreateDocumentVMs(m_Doc.IterateDependencies(false).ToArray());
                 }
 
                 References = m_AllReferences;

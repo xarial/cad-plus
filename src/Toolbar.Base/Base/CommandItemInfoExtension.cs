@@ -28,13 +28,16 @@ namespace Xarial.CadPlus.CustomToolbar.Base
 
             try
             {
-                var iconPath = pathResolver.Resolve(info.IconPath, workDir);
-
-                var provider = iconsProviders.FirstOrDefault(p => p.Matches(iconPath));
-
-                if (provider != null) 
+                if (!string.IsNullOrEmpty(info.IconPath))
                 {
-                    icon = provider.GetIcon(iconPath);
+                    var iconPath = pathResolver.Resolve(info.IconPath, workDir);
+
+                    var provider = iconsProviders.FirstOrDefault(p => p.Matches(iconPath));
+
+                    if (provider != null)
+                    {
+                        icon = provider.GetIcon(iconPath);
+                    }
                 }
             }
             catch

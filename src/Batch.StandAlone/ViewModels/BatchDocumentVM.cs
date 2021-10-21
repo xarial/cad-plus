@@ -357,7 +357,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
                     FileSystemBrowser.BuildFilterString(
                         m_ResultsExporters.Select(e => e.Filter).Concat(new FileFilter[] { FileFilter.AllFiles }).ToArray())))
                 {
-                    var exp = m_ResultsExporters.FirstOrDefault(j => FileSystemUtils.MatchesAnyFilter(filePath, j.Filter.Extensions));
+                    var exp = m_ResultsExporters.FirstOrDefault(j => TextUtils.MatchesAnyFilter(filePath, j.Filter.Extensions));
 
                     if (exp != null)
                     {
@@ -385,7 +385,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
                     FileSystemBrowser.BuildFilterString(
                         m_JournalExporters.Select(e => e.Filter).Concat(new FileFilter[] { FileFilter.AllFiles }).ToArray())))
                 {
-                    var exp = m_JournalExporters.FirstOrDefault(j => FileSystemUtils.MatchesAnyFilter(filePath, j.Filter.Extensions));
+                    var exp = m_JournalExporters.FirstOrDefault(j => TextUtils.MatchesAnyFilter(filePath, j.Filter.Extensions));
 
                     if (exp != null)
                     {

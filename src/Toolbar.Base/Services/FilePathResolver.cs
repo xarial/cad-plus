@@ -19,7 +19,7 @@ namespace Xarial.CadPlus.Toolbar.Services
         {
             try
             {
-                if (!Path.IsPathRooted(path))
+                if (!string.IsNullOrEmpty(path) && !Path.IsPathRooted(path))
                 {
                     return FileSystemUtils.CombinePaths(workDir, path);
                 }
