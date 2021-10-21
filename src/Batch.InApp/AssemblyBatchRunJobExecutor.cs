@@ -46,6 +46,8 @@ namespace Xarial.CadPlus.Batch.InApp
         private readonly bool m_AutoSaveDocs;
         private readonly IXLogger m_Logger;
 
+        private CancellationTokenSource m_CurrentCancellationToken;
+
         internal AssemblyBatchRunJobExecutor(IXApplication app, IMacroExecutor macroRunnerSvc,
             IXDocument[] documents, IXLogger logger, IEnumerable<MacroData> macros,
             bool activateDocs, bool allowReadOnly, bool allowRapid, bool autoSaveDocs) 
@@ -64,16 +66,17 @@ namespace Xarial.CadPlus.Batch.InApp
         }
 
         public void Cancel()
-        {
-            //Not supported yet
-        }
-        
-        public bool TryExecute()
+            => m_CurrentCancellationToken.Cancel();
+
+        public bool Execute()
         {
             var startTime = DateTime.Now;
 
             try
             {
+                m_CurrentCancellationToken = new CancellationTokenSource();
+                var cancellationToken = m_CurrentCancellationToken.Token;
+
                 using (var prg = m_App.CreateProgress())
                 {
                     LogMessage("Preparing job");
@@ -84,11 +87,13 @@ namespace Xarial.CadPlus.Batch.InApp
 
                     for (int i = 0; i < jobItems.Length; i++)
                     {
+                        cancellationToken.ThrowIfCancellationRequested();
+
                         var jobItem = jobItems[i];
 
                         prg.SetStatus($"Processing {jobItem.FilePath}");
 
-                        var res = TryProcessFile(jobItem, default);
+                        var res = TryProcessFile(jobItem, cancellationToken);
 
                         ProgressChanged?.Invoke(jobItem, res);
                         prg.Report((double)(i + 1) / (double)jobItems.Length);
@@ -96,6 +101,10 @@ namespace Xarial.CadPlus.Batch.InApp
                 }
 
                 return true;
+            }
+            catch (OperationCanceledException)
+            {
+                throw new JobCancelledException();
             }
             catch (Exception ex)
             {
@@ -108,7 +117,7 @@ namespace Xarial.CadPlus.Batch.InApp
             }
         }
 
-        public Task<bool> TryExecuteAsync() => Task.FromResult(TryExecute());
+        public Task<bool> ExecuteAsync() => Task.FromResult(Execute());
 
         private JobItemDocument[] PrepareJob() 
         {
@@ -171,16 +180,19 @@ namespace Xarial.CadPlus.Batch.InApp
 
                 if (m_ActivateDocs)
                 {
+                    cancellationToken.ThrowIfCancellationRequested();
                     m_App.Documents.Active = doc;
                 }
 
                 foreach (var macro in file.Macros)
                 {
+                    cancellationToken.ThrowIfCancellationRequested();
                     TryRunMacro(macro, doc);
                 }
 
                 if (m_AutoSaveDocs) 
                 {
+                    cancellationToken.ThrowIfCancellationRequested();
                     doc.Save();
                 }
 

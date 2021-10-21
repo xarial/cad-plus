@@ -55,9 +55,9 @@ namespace Xarial.CadPlus.Batch.Base.Models
             m_IsExecuting = false;
         }
 
-        public bool TryExecute() => TryExecuteAsync().Result;
+        public bool Execute() => ExecuteAsync().Result;
 
-        public async Task<bool> TryExecuteAsync()
+        public async Task<bool> ExecuteAsync()
         {
             if (!m_IsExecuting)
             {
