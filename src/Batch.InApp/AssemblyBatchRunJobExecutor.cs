@@ -23,6 +23,7 @@ using Xarial.XCad.Exceptions;
 using Xarial.XToolkit.Reporting;
 using Xarial.CadPlus.Plus.Extensions;
 using Xarial.XCad.Base.Enums;
+using Xarial.CadPlus.Batch.Base.Exceptions;
 
 namespace Xarial.CadPlus.Batch.InApp
 {
