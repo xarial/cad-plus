@@ -16,7 +16,6 @@ using Xarial.CadPlus.Batch.Extensions.Services;
 using Xarial.CadPlus.Batch.Extensions.UI;
 using Xarial.CadPlus.Batch.Extensions.ViewModels;
 using Xarial.CadPlus.Plus;
-using Xarial.CadPlus.Plus.Atributes;
 using Xarial.CadPlus.Plus.Attributes;
 using Xarial.CadPlus.Plus.Modules;
 using Xarial.CadPlus.Plus.Services;
