@@ -11,7 +11,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Xarial.CadPlus.Plus.Atributes
+namespace Xarial.CadPlus.Plus.Attributes
 {
     public enum ModuleRelativeOrder_e 
     {

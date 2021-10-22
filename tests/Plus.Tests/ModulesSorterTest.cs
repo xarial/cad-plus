@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Xarial.CadPlus.Plus.Atributes;
+using Xarial.CadPlus.Plus.Attributes;
 using Xarial.CadPlus.Plus.Exceptions;
 using Xarial.CadPlus.Plus.Services;
 
