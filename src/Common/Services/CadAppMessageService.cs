@@ -6,10 +6,7 @@
 //*********************************************************************
 
 using System;
-using System.Diagnostics;
-using Xarial.CadPlus.Common.Services;
 using Xarial.CadPlus.Plus.Services;
-using Xarial.CadPlus.Plus.Shared.Services;
 using Xarial.XCad;
 using Xarial.XCad.Base.Enums;
 
@@ -31,22 +28,66 @@ namespace Xarial.CadPlus.Common.Services
             UserErrors = userErrors;
         }
 
-        public void ShowError(string error)
-            => m_App.ShowMessageBox(error, MessageBoxIcon_e.Error, MessageBoxButtons_e.Ok);
-
-        public void ShowInformation(string msg)
-            => m_App.ShowMessageBox(msg, MessageBoxIcon_e.Info, MessageBoxButtons_e.Ok);
-
-        public void ShowWarning(string warn)
-            => m_App.ShowMessageBox(warn, MessageBoxIcon_e.Warning, MessageBoxButtons_e.Ok);
-
-        public bool? ShowQuestion(string question)
+        public bool? ShowMessage(string msg, MessageServiceIcon_e icon, MessageServiceButtons_e btns)
         {
-            var res = m_App.ShowMessageBox(question, MessageBoxIcon_e.Question, MessageBoxButtons_e.YesNoCancel);
+            MessageBoxIcon_e msgBoxImg;
+            MessageBoxButtons_e msgBoxBtns;
 
-            switch (res) 
+            switch (icon)
+            {
+                case MessageServiceIcon_e.Information:
+                    msgBoxImg = MessageBoxIcon_e.Info;
+                    break;
+
+                case MessageServiceIcon_e.Warning:
+                    msgBoxImg = MessageBoxIcon_e.Warning;
+                    break;
+
+                case MessageServiceIcon_e.Error:
+                    msgBoxImg = MessageBoxIcon_e.Error;
+                    break;
+
+                case MessageServiceIcon_e.Question:
+                    msgBoxImg = MessageBoxIcon_e.Question;
+                    break;
+
+                default:
+                    throw new NotSupportedException();
+            }
+
+            switch (btns)
+            {
+                case MessageServiceButtons_e.Ok:
+                    msgBoxBtns = MessageBoxButtons_e.Ok;
+                    break;
+
+                case MessageServiceButtons_e.OkCancel:
+                    msgBoxBtns = MessageBoxButtons_e.OkCancel;
+                    break;
+
+                case MessageServiceButtons_e.YesNo:
+                    msgBoxBtns = MessageBoxButtons_e.YesNo;
+                    break;
+
+                case MessageServiceButtons_e.YesNoCancel:
+                    msgBoxBtns = MessageBoxButtons_e.YesNoCancel;
+                    break;
+
+                default:
+                    throw new NotSupportedException();
+            }
+
+            return ShowMessage(msg, msgBoxImg, msgBoxBtns);
+        }
+
+        private bool? ShowMessage(string question, MessageBoxIcon_e img, MessageBoxButtons_e btns)
+        {
+            var res = m_App.ShowMessageBox(question, img, btns);
+
+            switch (res)
             {
                 case MessageBoxResult_e.Yes:
+                case MessageBoxResult_e.Ok:
                     return true;
 
                 case MessageBoxResult_e.No:
@@ -56,8 +97,7 @@ namespace Xarial.CadPlus.Common.Services
                     return null;
 
                 default:
-                    Debug.Assert(false, "Should be 3 options only");
-                    return null;
+                    throw new NotSupportedException();
             }
         }
     }

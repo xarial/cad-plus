@@ -21,8 +21,8 @@ namespace Xarial.CadPlus.Batch.Base.Models
         event Action<IJobItem, bool> ProgressChanged;
         event Action<string> Log;
 
-        bool TryExecute();
-        Task<bool> TryExecuteAsync();
+        bool Execute();
+        Task<bool> ExecuteAsync();
         void Cancel();
     }
 }
