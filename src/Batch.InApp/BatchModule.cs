@@ -42,6 +42,8 @@ using Xarial.XCad.UI.PropertyPage.Base;
 using Xarial.CadPlus.Batch.InApp.Controls;
 using Xarial.CadPlus.Plus.Data;
 using Xarial.XCad.Base.Enums;
+using Xarial.CadPlus.Batch.InApp.Services;
+using System.Windows.Threading;
 
 namespace Xarial.CadPlus.Batch.InApp
 {
@@ -98,12 +100,16 @@ namespace Xarial.CadPlus.Batch.InApp
 
         private ICadDescriptor m_CadDesc;
 
+        private Dispatcher m_Dispatcher;
+
         public void Init(IHost host)
         {
             if (!(host is IHostExtension))
             {
                 throw new InvalidCastException("Only extension host is supported for this module");
             }
+
+            m_Dispatcher = Dispatcher.CurrentDispatcher;
 
             m_Host = (IHostExtension)host;
             m_Host.Connect += OnConnect;
@@ -234,7 +240,10 @@ namespace Xarial.CadPlus.Batch.InApp
 
                     var vm = new JobResultVM(rootDoc.Title, exec, m_CadDesc, m_Logger);
 
-                    vm.RunBatch();
+                    using (var cancelHandler = new EscapeBatchExecutorCancelHandler(exec, m_Host.Extension.Application, m_Dispatcher))
+                    {
+                        vm.TryRunBatch();
+                    }
 
                     var wnd = m_Host.Extension.CreatePopupWindow<ResultsWindow>();
                     wnd.Control.Title = $"{rootDoc.Title} batch job result";

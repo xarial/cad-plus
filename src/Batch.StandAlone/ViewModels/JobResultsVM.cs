@@ -64,7 +64,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
             var newRes = new JobResultVM($"Job #{Items.Count + 1}", m_ExecFact.Invoke(m_Job), m_CadDesc, m_Logger);
             Items.Add(newRes);
             Selected = newRes;
-            newRes.RunBatchAsync();
+            newRes.TryRunBatchAsync();
         }
     }
 }

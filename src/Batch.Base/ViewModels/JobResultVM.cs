@@ -88,7 +88,7 @@ namespace Xarial.CadPlus.Batch.Base.ViewModels
         public void CancelJob()
             => m_Executor.Cancel();
 
-        public async void RunBatchAsync()
+        public async void TryRunBatchAsync()
         {
             try
             {
@@ -96,7 +96,7 @@ namespace Xarial.CadPlus.Batch.Base.ViewModels
 
                 IsBatchInProgress = true;
 
-                if (await m_Executor.TryExecuteAsync().ConfigureAwait(false))
+                if (await m_Executor.ExecuteAsync().ConfigureAwait(false))
                 {
                     UpdateJobStatus();
                 }
@@ -120,7 +120,7 @@ namespace Xarial.CadPlus.Batch.Base.ViewModels
             }
         }
 
-        public void RunBatch()
+        public void TryRunBatch()
         {
             try
             {
@@ -128,7 +128,7 @@ namespace Xarial.CadPlus.Batch.Base.ViewModels
 
                 IsBatchInProgress = true;
 
-                if (m_Executor.TryExecute())
+                if (m_Executor.Execute())
                 {
                     UpdateJobStatus();
                 }

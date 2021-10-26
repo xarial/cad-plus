@@ -11,9 +11,11 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Xarial.CadPlus.Common.Helpers;
 using Xarial.CadPlus.Plus.Applications;
 using Xarial.CadPlus.Plus.Data;
 using Xarial.CadPlus.Plus.Services;
@@ -137,6 +139,8 @@ namespace Xarial.CadPlus.Batch.Sw
             prc.EnableRaisingEvents = true;
             prc.Exited += OnProcessExited;
             m_ForceDisabledAddIns.Add(prc, forceDisabledAddIns);
+
+            WindowHelper.TrySendWindowBackground(app.WindowHandle);
 
             return app;
         }
