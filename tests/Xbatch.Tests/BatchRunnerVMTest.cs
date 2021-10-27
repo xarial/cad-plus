@@ -26,14 +26,19 @@ using Xarial.XCad.Base;
 using Xarial.XCad.SolidWorks;
 using Xarial.XCad.SolidWorks.Enums;
 using Xarial.XToolkit.Wpf.Utils;
+using Xarial.CadPlus.Batch.Base.Services;
 
 namespace Xbatch.Tests
 {
 
     public class BatchDocumentMockVM : BatchDocumentVM
     {
-        public BatchDocumentMockVM(string name, BatchJob job, ICadApplicationInstanceProvider[] appProviders, IMessageService msgSvc, IXLogger logger, Func<BatchJob, IBatchRunJobExecutor> execFact, IBatchApplicationProxy batchAppProxy, MainWindow parentWnd, IRibbonButtonCommand[] backstageCmds) 
-            : base(name, job, appProviders, msgSvc, logger, execFact, batchAppProxy, parentWnd, backstageCmds)
+        public BatchDocumentMockVM(string name, BatchJob job, ICadApplicationInstanceProvider[] appProviders,
+            IJournalExporter[] journalExporters, IResultsSummaryExcelExporter[] resultsExporters,
+            IMessageService msgSvc, IXLogger logger, Func<BatchJob, IBatchRunJobExecutor> execFact,
+            IBatchApplicationProxy batchAppProxy, MainWindow parentWnd, IRibbonButtonCommand[] backstageCmds) 
+            : base(name, job, appProviders, journalExporters, resultsExporters,
+                  msgSvc, logger, execFact, batchAppProxy, parentWnd, backstageCmds)
         {
         }
 
@@ -126,7 +131,11 @@ namespace Xbatch.Tests
             var modelMock = mock.Object;
             var msgSvcMock = new Mock<IMessageService>().Object;
             
-            var docVm = new BatchDocumentMockVM("", new BatchJob(), new ICadApplicationInstanceProvider[] { appProviderMock.Object }, msgSvcMock, new Mock<IXLogger>().Object,
+            var docVm = new BatchDocumentMockVM("", new BatchJob(),
+                new ICadApplicationInstanceProvider[] { appProviderMock.Object },
+                new IJournalExporter[] { new Mock<IJournalExporter>().Object },
+                new IResultsSummaryExcelExporter[] { new Mock<IResultsSummaryExcelExporter>().Object },
+                msgSvcMock, new Mock<IXLogger>().Object,
                 j =>
                 {
                     opts = j;
