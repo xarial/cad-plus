@@ -107,6 +107,8 @@ namespace Xarial.CadPlus.CustomToolbar
 
             m_ToolbarConfMgr = Resolve<IToolbarConfigurationManager>();
 
+            m_Host.RegisterCommands<Commands_e>(OnCommandClick);
+
             try
             {
                 m_ToolbarConfMgr.Load();
@@ -116,7 +118,7 @@ namespace Xarial.CadPlus.CustomToolbar
             catch (Exception ex)
             {
                 m_Logger.Log(ex);
-                m_Msg.ShowError(ex, "Failed to load toolbar specification");
+                m_Msg.ShowError(ex, "Failed to load Toolbar+ commands");
             }
         }
 
@@ -151,6 +153,9 @@ namespace Xarial.CadPlus.CustomToolbar
 
             builder.RegisterType<CommandManagerVM>();
 
+            builder.RegisterType<CommandGroupVM>();
+            builder.RegisterType<CommandMacroVM>();
+            
             builder.RegisterType<CommandsManager>()
                 .As<ICommandsManager>().SingleInstance();
 
@@ -170,9 +175,7 @@ namespace Xarial.CadPlus.CustomToolbar
         }
 
         private void LoadCommands(CustomToolbarInfo toolbarInfo, string workDir)
-        {
-            m_Host.RegisterCommands<Commands_e>(OnCommandClick);
-            
+        {   
             m_CmdsMgr = Resolve<ICommandsManager>();
             m_TriggersMgr = Resolve<ITriggersManager>();
 

@@ -109,7 +109,7 @@ namespace Xarial.CadPlus.CustomToolbar.UI.ViewModels
 
         CommandItemInfo ICommandVM.Command => Command;
 
-        public string WorkingDirectory
+        public virtual string WorkingDirectory
         {
             get => m_WorkingDirectory;
             set 

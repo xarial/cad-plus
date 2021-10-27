@@ -180,12 +180,12 @@
     <Compile Include="UI\Converters\CommandContextMenuTitleConverter.cs" />
     <Compile Include="UI\Converters\FilePathToDirectoryPathConverter.cs" />
     <Compile Include="UI\Converters\HasEnumFlagToVisibilityConverter.cs" />
-    <Compile Include="UI\Converters\MacroPathToEntryPointsConverter.cs" />
     <Compile Include="UI\Converters\MacroTreeItemOpacityConverter.cs" />
     <Compile Include="UI\Converters\SelectedCommandConverter.cs" />
     <Compile Include="UI\Forms\CommandManagerForm.xaml.cs">
       <DependentUpon>CommandManagerForm.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI\ValidationRules\LegalFilePathValidationRule.cs" />
     <Compile Include="UI\ValidationRules\MandatoryValueValidationRule.cs" />
     <Compile Include="UI\ValidationRules\EntryPointsValidationRules.cs" />
     <Compile Include="UI\ValidationRules\FileExistsValidationRule.cs" />

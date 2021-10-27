@@ -12,6 +12,7 @@ using System.Windows.Input;
 using System.Windows.Media.Imaging;
 using Xarial.CadPlus.Common.Services;
 using Xarial.CadPlus.CustomToolbar.Enums;
+using Xarial.CadPlus.CustomToolbar.Services;
 using Xarial.CadPlus.CustomToolbar.Structs;
 using Xarial.CadPlus.Plus.Modules;
 using Xarial.CadPlus.Plus.Services;
@@ -28,6 +29,7 @@ namespace Xarial.CadPlus.CustomToolbar.UI.ViewModels
         private static readonly BitmapImage m_DefaultMacroIcon = Resources.macro_icon_default.ToBitmapImage();
 
         private ICommand m_BrowseMacroPathCommand;
+        private MacroStartFunction[] m_EntryPoints;
 
         public string MacroPath
         {
@@ -36,9 +38,46 @@ namespace Xarial.CadPlus.CustomToolbar.UI.ViewModels
             {
                 Command.MacroPath = value;
                 this.NotifyChanged();
+                TryUpdateEntryPoints();
             }
         }
-        
+
+        public override string WorkingDirectory 
+        {
+            get => base.WorkingDirectory;
+            set
+            {
+                base.WorkingDirectory = value;
+                TryUpdateEntryPoints();
+            }
+        }
+
+        public MacroStartFunction[] EntryPoints 
+        {
+            get => m_EntryPoints;
+            private set 
+            {
+                m_EntryPoints = value;
+                EntryPoint = EntryPoints?.FirstOrDefault();
+                this.NotifyChanged();
+            }
+        }
+
+        private void TryUpdateEntryPoints() 
+        {
+            try
+            {
+                if (!string.IsNullOrEmpty(MacroPath))
+                {
+                    EntryPoints = m_Extractor.GetEntryPoints(MacroPath, WorkingDirectory);
+                }
+            }
+            catch
+            {
+                EntryPoints = null;
+            }
+        }
+
         public MacroStartFunction EntryPoint
         {
             get => Command.EntryPoint;
@@ -152,17 +191,20 @@ namespace Xarial.CadPlus.CustomToolbar.UI.ViewModels
         protected override BitmapSource DefaultIcon => m_DefaultMacroIcon;
 
         private readonly FileFilter[] m_MacroFileFilters;
+        private readonly IMacroEntryPointsExtractor m_Extractor;
 
-        public CommandMacroVM() : this(new CommandMacroInfo(), ToolbarModule.Resolve<IIconsProvider[]>(), ToolbarModule.Resolve<IFilePathResolver>())
+        public CommandMacroVM() : this(new CommandMacroInfo(), ToolbarModule.Resolve<IIconsProvider[]>(), ToolbarModule.Resolve<IFilePathResolver>(), ToolbarModule.Resolve<IMacroEntryPointsExtractor>())
         {
         }
 
-        public CommandMacroVM(CommandMacroInfo cmd, IIconsProvider[] providers, IFilePathResolver filePathResolver)
+        public CommandMacroVM(CommandMacroInfo cmd, IIconsProvider[] providers, IFilePathResolver filePathResolver, IMacroEntryPointsExtractor extractor)
             : base(cmd, providers, filePathResolver)
         {
             m_MacroFileFilters = ToolbarModule.Resolve<ICadDescriptor>().MacroFileFilters
                 .Select(f => new FileFilter(f.Name, f.Extensions))
                 .Union(new FileFilter[] { XCadMacroProvider.Filter, FileFilter.AllFiles }).ToArray();
+            
+            m_Extractor = extractor;
         }
     }
 }

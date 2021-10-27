@@ -5,6 +5,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
         xmlns:views="clr-namespace:Xarial.CadPlus.CustomToolbar.UI.Views"
         xmlns:vm="clr-namespace:Xarial.CadPlus.CustomToolbar.UI.ViewModels"
+        xmlns:val="clr-namespace:Xarial.CadPlus.Toolbar.UI.ValidationRules"
         xmlns:base="clr-namespace:Xarial.CadPlus.CustomToolbar.UI.Base"
         xmlns:conv="clr-namespace:Xarial.CadPlus.Toolbar.UI.Converters"
         xmlns:local="clr-namespace:Xarial.CadPlus.CustomToolbar.UI.Forms"
@@ -74,7 +75,15 @@
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
             <TextBlock Grid.Column="0" Text="Toolbar Path:" Margin="2" />
-            <TextBox Grid.Column="1" Text="{Binding Path=ToolbarSpecificationPath, UpdateSourceTrigger=PropertyChanged}" Margin="2" />
+            <TextBox Grid.Column="1" Margin="2">
+                <TextBox.Text>
+                    <Binding Path="ToolbarSpecificationPath" UpdateSourceTrigger="PropertyChanged">
+                        <Binding.ValidationRules>
+                            <val:LegalFilePathValidationRule ValidatesOnTargetUpdated="True"/>
+                        </Binding.ValidationRules>
+                    </Binding>
+                </TextBox.Text>
+            </TextBox>
             <Button Grid.Column="2" Margin="2" Command="{Binding Path=BrowseToolbarSpecificationCommand}">
                 <TextBlock Text="Browse..." />
             </Button>
