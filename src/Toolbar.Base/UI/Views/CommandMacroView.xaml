@@ -17,7 +17,6 @@
              d:DesignHeight="500" d:DesignWidth="300">
     <UserControl.Resources>
         <wpf:BindingProxy x:Key="this" Data="{Binding RelativeSource={RelativeSource AncestorType={x:Type local:CommandMacroView}}}"/>
-        <conv:MacroPathToEntryPointsConverter x:Key="macroPathToEntryPtsConv" />
         <conv:HasEnumFlagToVisibilityConverter x:Key="hasEnumToVisConv"/>
         <xconv:MatchValueUniversalConverter TargetValue="{x:Static enums:ToggleButtonStateCode_e.None}" x:Key="stateCodeEnabledConv">
             <xconv:MatchValueUniversalConverter.TrueValue>
@@ -74,19 +73,7 @@
 
                 <TextBlock Text="Entry Point:" VerticalAlignment="Center"  Grid.Column="0" Grid.Row="1" Margin="2" />
                 <ComboBox SelectedItem="{Binding Path=EntryPoint, UpdateSourceTrigger=PropertyChanged}"
-					  Grid.Column="1" Grid.Row="1" Margin="2"
-					  IsSynchronizedWithCurrentItem="True">
-                    <ComboBox.ItemsSource>
-                        <MultiBinding Converter="{StaticResource macroPathToEntryPtsConv}">
-                            <Binding Path="MacroPath"/>
-                            <Binding Path="WorkingDirectory" RelativeSource="{RelativeSource AncestorType={x:Type local:CommandMacroView}}"/>
-                            <MultiBinding.ValidationRules>
-                                <val:EntryPointsValidationRules ValidatesOnTargetUpdated="True"/>
-                            </MultiBinding.ValidationRules>
-                        </MultiBinding>
-                    </ComboBox.ItemsSource>
-                </ComboBox>
-
+					  Grid.Column="1" Grid.Row="1" Margin="2" ItemsSource="{Binding Path=EntryPoints}"/>
                 <TextBlock Text="Arguments:" VerticalAlignment="Center" Grid.Column="0" Grid.Row="2" Margin="2" />
                 <Grid Grid.Column="1" Grid.Row="2">
                     <Grid.ColumnDefinitions>

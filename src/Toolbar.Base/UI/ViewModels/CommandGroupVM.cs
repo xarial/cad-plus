@@ -5,9 +5,11 @@
 //License: https://cadplus.xarial.com/license/
 //*********************************************************************
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Media.Imaging;
+using Xarial.CadPlus.CustomToolbar.Services;
 using Xarial.CadPlus.CustomToolbar.Structs;
 using Xarial.CadPlus.CustomToolbar.UI.Base;
 using Xarial.CadPlus.Plus.Modules;
@@ -28,16 +30,17 @@ namespace Xarial.CadPlus.CustomToolbar.UI.ViewModels
         protected override BitmapSource DefaultIcon => m_DefaultGroupIcon;
 
         public CommandGroupVM()
-            : this(new CommandGroupInfo(), ToolbarModule.Resolve<IIconsProvider[]>(), ToolbarModule.Resolve<IFilePathResolver>())
+            : this(new CommandGroupInfo(), ToolbarModule.Resolve<IIconsProvider[]>(), ToolbarModule.Resolve<IFilePathResolver>(), ToolbarModule.Resolve<Func<CommandMacroInfo, CommandMacroVM>>())
         {
         }
 
-        public CommandGroupVM(CommandGroupInfo cmdGrp, IIconsProvider[] providers, IFilePathResolver filePathResolver) : base(cmdGrp, providers, filePathResolver)
+        public CommandGroupVM(CommandGroupInfo cmdGrp, IIconsProvider[] providers, IFilePathResolver filePathResolver, Func<CommandMacroInfo, CommandMacroVM> cmdMacroFact) : base(cmdGrp, providers, filePathResolver)
         {
             m_CmdGrp = cmdGrp;
+
             Commands = new CommandsCollection<CommandMacroVM>(
                 (cmdGrp.Commands ?? new CommandMacroInfo[0])
-                .Select(c => new CommandMacroVM(c, providers, filePathResolver)));
+                .Select(c => cmdMacroFact.Invoke(c)));
 
             Commands.CommandsChanged += OnCommandsCollectionChanged;
         }
