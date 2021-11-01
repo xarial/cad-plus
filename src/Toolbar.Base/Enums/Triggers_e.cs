@@ -43,8 +43,8 @@ namespace Xarial.CadPlus.CustomToolbar.Enums
         [Title("Close Document")]
         DocumentClose = 1 << 6,
 
-        [Title("New Selection")]
-        NewSelection = 1 << 7,
+        [Title("New/Clear Selection")]
+        Selection = 1 << 7,
 
         [Title("Change Configuration/Sheet")]
         ConfigurationSheetChange = 1 << 8,

@@ -127,7 +127,7 @@ namespace Xarial.CadPlus.CustomToolbar.Services
                 case Triggers_e.DocumentClose:
                     eventType = EventType_e.DocumentClose;
                     break;
-                case Triggers_e.NewSelection:
+                case Triggers_e.Selection:
                     eventType = EventType_e.NewSelection;
                     break;
                 case Triggers_e.ConfigurationSheetChange:
