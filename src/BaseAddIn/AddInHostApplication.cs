@@ -217,7 +217,8 @@ namespace Xarial.CadPlus.AddIn.Base
         }
 
         private void ConfigureHostServices(ContainerBuilder builder) 
-        {   
+        {
+            builder.RegisterInstance(Extension);
             builder.RegisterInstance(Extension.Application);
             builder.RegisterType<CadAppMessageService>()
                 .As<IMessageService>().WithParameter(new TypedParameter(typeof(Type[]), UserException.AdditionalUserExceptions));
