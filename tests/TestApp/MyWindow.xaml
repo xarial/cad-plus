@@ -24,7 +24,7 @@
             <StackPanel Orientation="Vertical" Grid.Row="1">
                 <TextBlock Text="Hello World" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                 <sharedctrls:CadObjectLabelControl HorizontalAlignment="Stretch" Object="{Binding Path=ObjectLabel.Document}" Descriptor="{Binding Path=ObjectLabel.Descriptor}"/>
-                <sharedctrls:CadObjectLabelControl HorizontalAlignment="Stretch" Object="{Binding Path=ObjectLabel.Document}" DocumentTitleDisplayType="Path" Descriptor="{Binding Path=ObjectLabel.Descriptor}"/>
+                <sharedctrls:CadObjectLabelControl HorizontalAlignment="Stretch" Object="{Binding Path=ObjectLabel.Document}" DocumentTitleDisplayType="FilePath" Descriptor="{Binding Path=ObjectLabel.Descriptor}"/>
                 <sharedctrls:CadObjectLabelControl HorizontalAlignment="Stretch" Object="{Binding Path=ObjectLabel.Configuration}" Descriptor="{Binding Path=ObjectLabel.Descriptor}"/>
                 <sharedctrls:CadObjectLabelControl HorizontalAlignment="Stretch" Object="{Binding Path=ObjectLabel.CutList}" Descriptor="{Binding Path=ObjectLabel.Descriptor}"/>
             </StackPanel>

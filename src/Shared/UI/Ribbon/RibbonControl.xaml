@@ -64,9 +64,9 @@
                     <Grid Margin="2">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
-                        <metro:ToggleSwitch Grid.Column="0" 
+                        <metro:ToggleSwitch Grid.Column="0" HorizontalAlignment="Stretch"
                                             Style="{StaticResource RibbonCommandStyle}"
                                             VerticalAlignment="Center" 
                                             OnContent="{Binding Path=OnText}" 
@@ -76,7 +76,7 @@
                         <fluent:Spinner Value="{Binding Path=NumericValue}" Style="{StaticResource RibbonCommandStyle}"
                                         Grid.Column="1"
                                         Minimum="{Binding Path=Options.Minimum}" Maximum="{Binding Path=Options.Maximum}"
-                                        Format="{Binding Path=Options.Format}" Width="75" Margin="-20 0 0 0"
+                                        Format="{Binding Path=Options.Format}" Width="75" Margin="0"
                                         Header="" IsEnabled="{Binding Path=Value}">
                             <fluent:Spinner.Visibility>
                                 <MultiBinding Converter="{StaticResource numSpinVisConv}">
