@@ -84,9 +84,11 @@ namespace TestApp
         private DropDownItem m_SelectedDropDown1Item;
 
         private bool m_Switch1;
+        private bool m_NumericSwitch1;
         private bool m_Toggle1;
         private bool m_Toggle2;
         private bool m_Toggle3;
+        private double m_NumericValue1;
 
         public TestVM() 
         {
@@ -119,6 +121,7 @@ namespace TestApp
                         new RibbonButtonCommand("Button1", Resources.icon5, "Button1 Tooltip", () => { }, null),
                         null,
                         new RibbonButtonCommand("Very Wide Button2", Resources.icon1, "Button 2 Tooltip", () => { }, null),
+                        new RibbonNumericSwitchCommand("NumericSwitch1", Resources.icon3, "Some numeric toggle switch", "Numeric Toggle On", "Numeric Toggle Off", () => m_NumericSwitch1, x => m_NumericSwitch1 = x, () => m_NumericValue1, x => m_NumericValue1 = x, new RibbonNumericSwitchCommandOptions(10, 100, true, "0")),
                         new RibbonSwitchCommand("Switch1", Resources.icon3, "Some toggle switch", "Toggle On", "Toggle Off", () => m_Switch1, x => m_Switch1 = x))));
         }
     }
