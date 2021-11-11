@@ -11,14 +11,16 @@
     <PackageReference Include="nunit" Version="3.12.0" />
     <PackageReference Include="NUnit3TestAdapter" Version="3.15.1" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.2.0" />
-    <PackageReference Include="Xarial.XCad.SolidWorks" Version="0.6.10" />
+    <PackageReference Include="Xarial.CadPlusPlus" Version="0.2.6" />
+    <PackageReference Include="Xarial.XCad.SolidWorks" Version="0.7.8" />
+    <PackageReference Include="Xarial.XToolkit.Wpf" Version="0.3.0" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\src\Batch.Base\Batch.Base.csproj" />
+    <ProjectReference Include="..\..\src\Batch.StandAlone\Batch.StandAlone.csproj" />
     <ProjectReference Include="..\..\src\Common\Common.csproj" />
     <ProjectReference Include="..\..\src\MacroRunner\MacroRunner.csproj" />
-    <ProjectReference Include="..\..\src\XBatch.Base\XBatch.Base.csproj" />
-    <ProjectReference Include="..\..\src\XBatch.Sw\XBatch.Sw.csproj" />
   </ItemGroup>
 
   <Import Project="$(SolutionDir)common\common.tests.props" />

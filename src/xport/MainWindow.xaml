@@ -5,12 +5,10 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:metro="http://metro.mahapps.com/winfx/xaml/controls"
         xmlns:fluent="clr-namespace:Fluent;assembly=Fluent"
-        mc:Ignorable="d" TitleCharacterCasing="Normal" WindowTransitionsEnabled="False"
+        mc:Ignorable="d"
         xmlns:views="clr-namespace:Xarial.CadPlus.Xport.Views"
-        Title="eXport+" Height="450" Width="800" Icon="Resources/xport.png">
-    <metro:MetroWindow.Resources>
-        <ResourceDictionary Source="pack://application:,,,/Fluent;Component/Themes/Generic.xaml" />
-    </metro:MetroWindow.Resources>
+        Title="eXport+" Height="450" Width="800" Icon="Resources/xport.png"
+        Style="{StaticResource MetroWindowStyle}">
     <metro:MetroWindow.RightWindowCommands>
         <metro:WindowCommands>
             <fluent:Button Header="Help" ToolTip="Help" Icon="Resources/help-icon.png" 

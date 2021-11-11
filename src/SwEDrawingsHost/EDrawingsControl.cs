@@ -1,6 +1,6 @@
 ﻿//*********************************************************************
 //CAD+ Toolset
-//Copyright(C) 2020 Xarial Pty Limited
+//Copyright(C) 2021 Xarial Pty Limited
 //Product URL: https://cadplus.xarial.com
 //License: https://cadplus.xarial.com/license/
 //*********************************************************************
@@ -15,6 +15,7 @@ namespace Xarial.CadPlus.Xport.SwEDrawingsHost
         v2019,
         v2020,
         v2021,
+        v2022,
         Default
     }
 
@@ -46,6 +47,7 @@ namespace Xarial.CadPlus.Xport.SwEDrawingsHost
             EDrawingsPrintType_e printType, double scale, int centerOffsetX, int centerOffsetY,
             bool printAll, int pageFirst, int pageLast, string printToFileName);
 
+        int EnableFeatures { get; set; }
         string FileName { get; }
         void CloseActiveDoc(string commandString);
 
@@ -75,6 +77,8 @@ namespace Xarial.CadPlus.Xport.SwEDrawingsHost
                     return "0FEA599D-6369-4811-8D00-E52B8A59C901";
                 case EDrawingsVersion_e.v2021:
                     return "DF78AAAB-45C8-420C-9DB3-CAD13762FE35";
+                case EDrawingsVersion_e.v2022:
+                    return "C59EEF21-0223-4C39-A708-A3BE9008C67E";
                 default:
                     throw new NotSupportedException("This version of eDrawings is not supported");
             }
@@ -90,6 +94,8 @@ namespace Xarial.CadPlus.Xport.SwEDrawingsHost
                     return new Guid("18ADE509-EA30-4084-BF7A-6FA2C2D65A77");
                 case EDrawingsVersion_e.v2021:
                     return new Guid("CEE0D6AD-C251-430C-BA88-FE237B138B91");
+                case EDrawingsVersion_e.v2022:
+                    return new Guid("2EA4AE0F-494C-4554-97AE-F02F3076A90D");
                 default:
                     throw new NotSupportedException("This version of eDrawings is not supported");
             }
@@ -98,6 +104,12 @@ namespace Xarial.CadPlus.Xport.SwEDrawingsHost
         public EDrawingsVersion_e Version { get; }
 
         public string FileName => ((dynamic)m_Ocx).FileName;
+
+        public int EnableFeatures 
+        {
+            get => ((dynamic)m_Ocx).EnableFeatures;
+            set => ((dynamic)m_Ocx).EnableFeatures = value;
+        }
 
         private readonly object m_Ocx;
 
@@ -163,6 +175,8 @@ namespace Xarial.CadPlus.Xport.SwEDrawingsHost
                     return EDrawingsVersion_e.v2020;
                 case 29:
                     return EDrawingsVersion_e.v2021;
+                case 30:
+                    return EDrawingsVersion_e.v2022;
                 default:
                     throw new NotSupportedException($"Version of eDrawings '{buildNumber}' is not supported");
             }

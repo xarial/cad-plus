@@ -1,4 +1,11 @@
-﻿using System;
+﻿//*********************************************************************
+//CAD+ Toolset
+//Copyright(C) 2021 Xarial Pty Limited
+//Product URL: https://cadplus.xarial.com
+//License: https://cadplus.xarial.com/license/
+//*********************************************************************
+
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
@@ -15,44 +22,57 @@ using Xarial.XCad.UI.Commands.Enums;
 using Xarial.CadPlus.Common;
 using Xarial.CadPlus.Export.InApp.Properties;
 using Xarial.CadPlus.Common.Attributes;
+using Xarial.CadPlus.Plus.Attributes;
+using Xarial.CadPlus.Plus.Services;
+using Xarial.CadPlus.Plus.Extensions;
 
 namespace Xarial.CadPlus.Export.InApp
 {
-    [Export(typeof(IExtensionModule))]
-    public class ExportModule : IExtensionModule
+    [Module(typeof(IHostExtension))]
+    public class ExportModule : IModule
     {
         [Title("eXport+")]
         [Description("Commands to export files in a batch mode")]
         [IconEx(typeof(Resources), nameof(Resources.export_vector), nameof(Resources.export_icon))]
+        [CommandGroupInfo((int)CadCommandGroupIds_e.Export)]
+        [CommandOrder(7)]
         public enum Commands_e
         {
             [IconEx(typeof(Resources), nameof(Resources.export_vector), nameof(Resources.export_icon))]
-            [Title("Open Stand-Alone...")]
+            [Title("Open eXport+ Stand-Alone...")]
             [Description("Runs stand-alone eXport+")]
             [CommandItemInfo(true, true, WorkspaceTypes_e.All)]
             RunStandAlone,
         }
 
-        private IHostExtensionApplication m_Host;
+        private IHostExtension m_Host;
 
         private IMessageService m_Msg;
         private IXLogger m_Logger;
 
-        public void Init(IHostApplication host)
+        private IServiceProvider m_SvcProvider;
+
+        public void Init(IHost host)
         {
-            if (!(host is IHostExtensionApplication))
+            if (!(host is IHostExtension))
             {
                 throw new InvalidCastException("Only extension host is supported for this module");
             }
 
-            m_Host = (IHostExtensionApplication)host;
+            m_Host = (IHostExtension)host;
+            m_Host.Initialized += OnHostInitialized;
             m_Host.Connect += OnConnect;
+        }
+
+        private void OnHostInitialized(IApplication app, IServiceContainer svcProvider, IModule[] modules)
+        {
+            m_SvcProvider = svcProvider;
         }
 
         private void OnConnect()
         {
-            m_Msg = m_Host.Services.GetService<IMessageService>();
-            m_Logger = m_Host.Services.GetService<IXLogger>();
+            m_Msg = m_SvcProvider.GetService<IMessageService>();
+            m_Logger = m_SvcProvider.GetService<IXLogger>();
 
             m_Host.RegisterCommands<Commands_e>(OnCommandClick);
         }

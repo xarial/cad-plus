@@ -1,6 +1,6 @@
 ﻿//*********************************************************************
 //CAD+ Toolset
-//Copyright(C) 2020 Xarial Pty Limited
+//Copyright(C) 2021 Xarial Pty Limited
 //Product URL: https://cadplus.xarial.com
 //License: https://cadplus.xarial.com/license/
 //*********************************************************************
@@ -35,11 +35,18 @@ namespace Xarial.CadPlus.Xport.Models
         private int m_ProcessedFiles;
         private int m_TotalFiles;
 
+        private readonly IJobManager m_JobMgr;
+
+        public ExporterModel(IJobManager jobMgr) 
+        {
+            m_JobMgr = jobMgr;
+        }
+
         public async Task Export(ExportOptions opts) 
         {
             m_CurrentCancellationToken = new CancellationTokenSource();
 
-            var logWriter = new LogWriter();
+            var logWriter = new JournalWriter(true);
             var prgHander = new ProgressHandler();
 
             logWriter.Log += OnLog;
@@ -48,7 +55,7 @@ namespace Xarial.CadPlus.Xport.Models
 
             try
             {
-                using (var exporter = new Exporter(logWriter, prgHander))
+                using (var exporter = new Exporter(logWriter, m_JobMgr, prgHander))
                 {
                     await exporter.Export(opts, m_CurrentCancellationToken.Token).ConfigureAwait(false);
                 }

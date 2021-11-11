@@ -1,6 +1,6 @@
 ﻿//*********************************************************************
 //CAD+ Toolset
-//Copyright(C) 2020 Xarial Pty Limited
+//Copyright(C) 2021 Xarial Pty Limited
 //Product URL: https://cadplus.xarial.com
 //License: https://cadplus.xarial.com/license/
 //*********************************************************************
@@ -8,8 +8,12 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Xarial.CadPlus.Common.Services;
+using Xarial.CadPlus.Plus.Services;
+using Xarial.CadPlus.Plus.Shared.Services;
 using Xarial.CadPlus.Xport.SwEDrawingsHost;
 
 namespace Xarial.CadPlus.Xport.EDrawingsHost
@@ -30,9 +34,13 @@ namespace Xarial.CadPlus.Xport.EDrawingsHost
         public EDrawingsPublisher(EDrawingsVersion_e version)
         {
             m_Version = version;
-            m_PopupKiller = new PopupKiller(Process.GetCurrentProcess());
+            m_PopupKiller = new PopupKiller(new AppLogger());
+            m_PopupKiller.Start(Process.GetCurrentProcess(), TimeSpan.FromSeconds(1));
 
             m_Control = Load();
+
+            const int eMVEnableSilentMode = 16384;
+            m_Control.EnableFeatures = eMVEnableSilentMode;
 
             m_Control.OnFinishedLoadingDocument += OnFinishedLoadingDocument;
             m_Control.OnFailedLoadingDocument += OnFailedLoadingDocument;

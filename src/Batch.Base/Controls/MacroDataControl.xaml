@@ -1,0 +1,98 @@
+﻿<UserControl x:Class="Xarial.CadPlus.Batch.Base.Controls.MacroDataControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Xarial.CadPlus.Batch.Base.Controls"
+             xmlns:conv="clr-namespace:Xarial.CadPlus.Batch.Base.Converters"
+             xmlns:xconv="clr-namespace:Xarial.XToolkit.Wpf.Converters;assembly=Xarial.XToolkit.Wpf"
+             mc:Ignorable="d"
+             d:DesignHeight="40" d:DesignWidth="800">
+    <UserControl.Resources>
+        <conv:FilePathConverter x:Key="filePathConv"/>
+        <conv:ArgumentsConverter x:Key="argsConv"/>
+        <xconv:ObjectIsNotNullVisibilityConverter x:Key="objIsNotNullToVisConv"/>
+        <xconv:ObjectIsNotNullVisibilityConverter x:Key="objIsNullToVisConv" Reverse="True"/>
+    </UserControl.Resources>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="Auto"/>
+        </Grid.ColumnDefinitions>
+        <TextBlock TextTrimming="CharacterEllipsis" VerticalAlignment="Center" ToolTip="{Binding Path=FilePath}">
+            <TextBlock.Text>
+                <MultiBinding Converter="{StaticResource filePathConv}">
+                    <Binding Path="FilePath"/>
+                    <Binding Path="ShowFullPath" RelativeSource="{RelativeSource AncestorType={x:Type local:MacroDataControl}}"/>
+                </MultiBinding>
+            </TextBlock.Text>
+        </TextBlock>
+        <ToggleButton Grid.Column="1" x:Name="argsToggle" ToolTip="Macro arguments" Cursor="Hand">
+            <Image Width="20" VerticalAlignment="Center" Source="/Batch.Base;component/Resources/arguments-icon.png"/>
+        </ToggleButton>
+        <Popup PlacementTarget="{Binding ElementName=argsToggle}" StaysOpen="False" AllowsTransparency="True"
+               IsOpen="{Binding Path=IsChecked, ElementName=argsToggle}"
+               Placement="Bottom" PopupAnimation="Scroll">
+            <Grid Width="240">
+                <Border BorderBrush="Black"
+                    BorderThickness="1"
+                    CornerRadius="1" Background="White">
+                    <Border.Effect>
+                        <DropShadowEffect BlurRadius="10" Opacity="0.5" ShadowDepth="5" />
+                    </Border.Effect>
+                </Border>
+                <Grid Margin="5">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <TextBlock Grid.Row="0" Grid.ColumnSpan="2" Text="Arguments:" Margin="2"/>
+                    <TextBox Text="{Binding Path=Arguments, UpdateSourceTrigger=PropertyChanged}"
+                             Grid.Column="0" Grid.Row="1" HorizontalAlignment="Stretch" Focusable="True">
+                        <TextBox.ToolTip>
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+                                <TextBlock Text="{Binding Path=Arguments}" Margin="2" FontWeight="Bold"/>
+                                <Grid Grid.Row="1" DataContext="{Binding Path=Arguments, Converter={StaticResource argsConv}}">
+                                    <ItemsControl ItemsSource="{Binding}" Visibility="{Binding Converter={StaticResource objIsNotNullToVisConv}}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Grid Grid.IsSharedSizeScope="True">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="Auto" SharedSizeGroup="Index"/>
+                                                        <ColumnDefinition Width="*"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <TextBlock Text="{Binding Path=Index, StringFormat={}#{0} - }" Margin="2" FontWeight="Bold" Foreground="DarkGray"/>
+                                                    <TextBlock Text="{Binding Path=Value}" Grid.Column="1" Margin="2" Foreground="DarkGray"/>
+                                                </Grid>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                    <TextBlock Text="No arguments specified" Visibility="{Binding Converter={StaticResource objIsNullToVisConv}}"  FontWeight="Bold"
+                                   VerticalAlignment="Center" HorizontalAlignment="Center" TextAlignment="Center"/>
+                                </Grid>
+                            </Grid>
+                        </TextBox.ToolTip>
+                    </TextBox>
+                    <Button Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" Focusable="False"
+                            Grid.Column="1" Grid.Row="1" HorizontalAlignment="Right"
+                            ToolTip="About macro arguments" Click="OnHelpClicked">
+                        <Image Source="/Batch.Base;component/Resources/help-icon.png" Width="6"/>
+                    </Button>
+                </Grid>
+            </Grid>
+        </Popup>
+        <Grid.ContextMenu>
+            <ContextMenu>
+                <MenuItem Header="Open In File Explorer" Click="OnOpenInFileExplorer"/>
+            </ContextMenu>
+        </Grid.ContextMenu>
+    </Grid>
+</UserControl>

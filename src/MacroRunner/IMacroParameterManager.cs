@@ -1,6 +1,6 @@
 ﻿//*********************************************************************
 //CAD+ Toolset
-//Copyright(C) 2020 Xarial Pty Limited
+//Copyright(C) 2021 Xarial Pty Limited
 //Product URL: https://cadplus.xarial.com
 //License: https://cadplus.xarial.com/license/
 //*********************************************************************
@@ -41,95 +41,62 @@ namespace Xarial.CadPlus.MacroRunner
 
         public IMacroParameter PopParameter(string sessionId)
         {
-            try
+            lock (m_Lock)
             {
-                lock (m_Lock)
+                if (m_Parameters.TryGetValue(sessionId, out List<IMacroParameter> paramsStack))
                 {
-                    if (m_Parameters.TryGetValue(sessionId, out List<IMacroParameter> paramsStack))
+                    if (paramsStack.Count > 0)
                     {
-                        if (paramsStack.Count > 0)
-                        {
-                            var param = paramsStack.First();
+                        var param = paramsStack.First();
 
-                            paramsStack.Remove(param);
-
-                            if (!paramsStack.Any())
-                            {
-                                m_Parameters.Remove(sessionId);
-                            }
-
-                            return param;
-                        }
-                        else
-                        {
-                            throw new COMException("No parameters remain for this session");
-                        }
-                    }
-                    else
-                    {
-                        throw new COMException("Parameter for this macro cannot be found");
-                    }
-                }
-            }
-            catch (COMException)
-            {
-                throw;
-            }
-            catch (Exception ex)
-            {
-                throw new COMException(ex.Message, ex.InnerException);
-            }
-        }
-
-        public void PushParameter(string sessionId, IMacroParameter param)
-        {
-            try
-            {
-                lock (m_Lock)
-                {
-                    if (!m_Parameters.TryGetValue(sessionId, out List<IMacroParameter> paramsStack))
-                    {
-                        paramsStack = new List<IMacroParameter>();
-                        m_Parameters.Add(sessionId, paramsStack);
-                    }
-
-                    paramsStack.Add(param);
-                }
-            }
-            catch (COMException)
-            {
-                throw;
-            }
-            catch (Exception ex)
-            {
-                throw new COMException(ex.Message, ex.InnerException);
-            }
-        }
-
-        public void TryRemoveParameter(string sessionId, IMacroParameter param) 
-        {
-            try
-            {
-                lock (m_Lock)
-                {
-                    if (m_Parameters.TryGetValue(sessionId, out List<IMacroParameter> paramsStack))
-                    {
                         paramsStack.Remove(param);
 
                         if (!paramsStack.Any())
                         {
                             m_Parameters.Remove(sessionId);
                         }
+
+                        return param;
+                    }
+                    else
+                    {
+                        throw new Exception("No parameters remain for this session");
                     }
                 }
+                else
+                {
+                    throw new Exception("Parameter for this macro cannot be found");
+                }
             }
-            catch (COMException)
+        }
+
+        public void PushParameter(string sessionId, IMacroParameter param)
+        {
+            lock (m_Lock)
             {
-                throw;
+                if (!m_Parameters.TryGetValue(sessionId, out List<IMacroParameter> paramsStack))
+                {
+                    paramsStack = new List<IMacroParameter>();
+                    m_Parameters.Add(sessionId, paramsStack);
+                }
+
+                paramsStack.Add(param);
             }
-            catch (Exception ex)
+        }
+
+        public void TryRemoveParameter(string sessionId, IMacroParameter param) 
+        {
+            lock (m_Lock)
             {
-                throw new COMException(ex.Message, ex.InnerException);
+                if (m_Parameters.TryGetValue(sessionId, out List<IMacroParameter> paramsStack))
+                {
+                    paramsStack.Remove(param);
+
+                    if (!paramsStack.Any())
+                    {
+                        m_Parameters.Remove(sessionId);
+                    }
+                }
             }
         }
     }
