@@ -19,6 +19,8 @@ namespace Xarial.CadPlus.Plus.Bom
     {
         string Name { get; }
 
+        string DisplayName { get; }
+
         double Quantity { get; }
         IBomItemBase[] Children { get; }
         object GetValue(ValueSource_e src, string arg);
