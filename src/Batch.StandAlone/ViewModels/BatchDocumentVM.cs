@@ -121,23 +121,25 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
             IMessageService msgSvc, IXLogger logger,
             Func<BatchJob, IBatchRunJobExecutor> execFact,
             IBatchApplicationProxy batchAppProxy, MainWindow parentWnd, IRibbonButtonCommand[] backstageCmds)
-            : this(Path.GetFileNameWithoutExtension(file.FullName), job, appProviders, 
+            : this(Path.GetFileNameWithoutExtension(file.FullName), job, appProviders, journalExporters, resultsExporters,
                   msgSvc, logger, execFact, batchAppProxy, parentWnd, backstageCmds)
         {
-            m_JournalExporters = journalExporters;
-            m_ResultsExporters = resultsExporters;
-
             m_FilePath = file.FullName;
             IsDirty = false;
         }
 
         public BatchDocumentVM(string name, BatchJob job,
             ICadApplicationInstanceProvider[] appProviders,
+            IJournalExporter[] journalExporters, IResultsSummaryExcelExporter[] resultsExporters,
             IMessageService msgSvc, IXLogger logger, Func<BatchJob, IBatchRunJobExecutor> execFact,
             IBatchApplicationProxy batchAppProxy, MainWindow parentWnd, IRibbonButtonCommand[] backstageCmds)
         {
             m_ExecFact = execFact;
             m_AppProvider = job.FindApplicationProvider(appProviders);
+            
+            m_JournalExporters = journalExporters;
+            m_ResultsExporters = resultsExporters;
+
             m_Job = job;
             m_MsgSvc = msgSvc;
             m_Logger = logger;

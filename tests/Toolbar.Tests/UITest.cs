@@ -16,6 +16,7 @@ using Xarial.CadPlus.CustomToolbar.Structs;
 using Xarial.CadPlus.CustomToolbar.UI.Forms;
 using Xarial.CadPlus.CustomToolbar.UI.ViewModels;
 using Xarial.CadPlus.Plus;
+using Xarial.CadPlus.Plus.Modules;
 using Xarial.CadPlus.Plus.Services;
 using Xarial.CadPlus.Toolbar.Services;
 using Xarial.XCad;
@@ -118,8 +119,9 @@ namespace CustomToolbar.Tests
 
             var vm = new CommandManagerVM(confProviderMock.Object,
                 new Mock<IMessageService>().Object, new Mock<IXLogger>().Object,
-                new Xarial.CadPlus.Plus.Modules.IIconsProvider[0], 
-                new Mock<ICadDescriptor>().Object, new Mock<IFilePathResolver>().Object);
+                new Mock<ICadDescriptor>().Object,
+                c => new CommandGroupVM(c, new Mock<IIconsProvider[]>().Object, new Mock<IFilePathResolver>().Object,
+                x => new CommandMacroVM(x, new Mock<IIconsProvider[]>().Object, new Mock<IFilePathResolver>().Object, new Mock<IMacroEntryPointsExtractor>().Object)));
 
             var form = new CommandManagerForm();
             form.DataContext = vm;

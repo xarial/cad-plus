@@ -76,8 +76,18 @@ namespace Xport.Tests
             int succShown = 0;
             
             var msgMock = new Mock<IMessageService>();
-            msgMock.Setup(m => m.ShowError(It.IsAny<string>())).Callback<string>(m => errShown++);
-            msgMock.Setup(m => m.ShowInformation(It.IsAny<string>())).Callback<string>(m => succShown++);
+            msgMock.Setup(m => m.ShowMessage(It.IsAny<string>(), It.IsAny<MessageServiceIcon_e>(), It.IsAny<MessageServiceButtons_e>()))
+                .Callback<string, MessageServiceIcon_e, MessageServiceButtons_e>((m, i, b) => 
+                {
+                    if (i == MessageServiceIcon_e.Error)
+                    {
+                        errShown++;
+                    }
+                    else if (i == MessageServiceIcon_e.Information)
+                    {
+                        succShown++;
+                    }
+                });
 
             new ExporterVM(mock1.Object, msgMock.Object, new Mock<IXLogger>().Object, new Mock<IAboutService>().Object).ExportCommand.Execute(null);
             var res1 = errShown == 0 && succShown == 1;
