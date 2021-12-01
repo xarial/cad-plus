@@ -443,6 +443,16 @@ namespace Xarial.CadPlus.Batch.StandAlone.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap top_level_only {
+            get {
+                object obj = ResourceManager.GetObject("top_level_only", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap xbatch {
             get {
                 object obj = ResourceManager.GetObject("xbatch", resourceCulture);

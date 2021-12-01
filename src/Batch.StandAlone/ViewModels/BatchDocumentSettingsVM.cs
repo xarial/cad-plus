@@ -245,6 +245,17 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
             }
         }
 
+        public bool TopLevelFilesOnly
+        {
+            get => m_Job.TopLevelFilesOnly;
+            set
+            {
+                m_Job.TopLevelFilesOnly = value;
+
+                Modified?.Invoke();
+            }
+        }
+
         public bool ForbidUpgrade 
         {
             get => m_Job.OpenFileOptions.HasFlag(OpenFileOptions_e.ForbidUpgrade);

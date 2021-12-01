@@ -350,5 +350,8 @@
   <ItemGroup>
     <None Include="Resources\export-log.png" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\top-level-only.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

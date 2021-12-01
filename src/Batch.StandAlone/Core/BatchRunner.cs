@@ -160,7 +160,7 @@ namespace Xarial.CadPlus.Batch.Base.Core
 
                     var app = EnsureApplication(m_CurrentContext, cancellationToken);
 
-                    var allFiles = PrepareJobScope(app, m_Job.Input, m_Job.Filters, m_Job.Macros);
+                    var allFiles = PrepareJobScope(app, m_Job.Input, m_Job.Filters, m_Job.TopLevelFilesOnly, m_Job.Macros);
 
                     m_JournalWriter.WriteLine($"Running batch processing for {allFiles.Length} file(s)");
 
@@ -247,7 +247,7 @@ namespace Xarial.CadPlus.Batch.Base.Core
         }
         
         private JobItemDocument[] PrepareJobScope(IXApplication app,
-            IEnumerable<string> inputs, string[] filters, IEnumerable<MacroData> macros) 
+            IEnumerable<string> inputs, string[] filters, bool topLevelOnly, IEnumerable<MacroData> macros) 
         {
             var inputFiles = new List<string>();
 
@@ -255,7 +255,9 @@ namespace Xarial.CadPlus.Batch.Base.Core
             {
                 if (Directory.Exists(input))
                 {
-                    foreach (var file in Directory.EnumerateFiles(input, "*.*", SearchOption.AllDirectories))
+                    var searchOpts = topLevelOnly ? SearchOption.TopDirectoryOnly : SearchOption.AllDirectories;
+
+                    foreach (var file in Directory.EnumerateFiles(input, "*.*", searchOpts))
                     {
                         if (TextUtils.MatchesAnyFilter(file, filters))
                         {

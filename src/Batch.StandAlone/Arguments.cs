@@ -70,6 +70,12 @@ namespace Xarial.CadPlus.Batch.Base
             set => Job.Filters = value.ToArray();
         }
 
+        [Option('t', "toplevelfiles", Required = false, HelpText = "Option to only process top-level files in the specified folders")]
+        public bool TopLevelFilesOnly
+        {
+            set => Job.TopLevelFilesOnly = value;
+        }
+
         [Option('m', "macros", Required = true, HelpText = "List of macros to run")]
         public IEnumerable<string> Macros 
         {

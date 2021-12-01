@@ -63,7 +63,7 @@ namespace Xarial.CadPlus.Batch.Base.Core
         }
     }
 
-    [UserSettingVersion("1.2.0", typeof(BatchJobVersionTransformer))]
+    [UserSettingVersion("1.2.1", typeof(BatchJobVersionTransformer))]
     public class BatchJob
     {
         internal static BatchJob FromFile(string filePath) 
@@ -79,6 +79,7 @@ namespace Xarial.CadPlus.Batch.Base.Core
 
         public string[] Input { get; set; }
         public string[] Filters { get; set; }
+        public bool TopLevelFilesOnly { get; set; }
         
         public bool ContinueOnError { get; set; }
         public int Timeout { get; set; }
