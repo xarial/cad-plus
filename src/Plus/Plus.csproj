@@ -6,10 +6,10 @@
     <SignAssembly>false</SignAssembly>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <PackageId>Xarial.CadPlusPlus</PackageId>
-    <VersionPrefix>0.3.0</VersionPrefix>
+    <VersionPrefix>0.3.1</VersionPrefix>
     <Authors>Xarial</Authors>
     <Product>CAD+</Product>
-    <Copyright>© 2021 Xarial Pty Limited</Copyright>
+    <Copyright>© 2022 Xarial Pty Limited</Copyright>
     <PackageProjectUrl>https://cadplus.xarial.com</PackageProjectUrl>
     <AssemblyOriginatorKeyFile></AssemblyOriginatorKeyFile>
     <Company>Xarial Pty Limited</Company>

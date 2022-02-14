@@ -15,9 +15,13 @@ using Xarial.XCad.Base.Enums;
 
 namespace Xarial.CadPlus.Plus.Shared.Services
 {
+    public delegate void PopupNotClosedDelegate(Process prc, IntPtr hWnd);
+    public delegate void ShouldClosePopupDelegate(Process prc, IntPtr hWnd, ref bool close);
+
     public interface IPopupKiller : IDisposable
     {
-        event Action<Process, IntPtr> PopupNotClosed;
+        event PopupNotClosedDelegate PopupNotClosed;
+        event ShouldClosePopupDelegate ShouldClosePopup;
 
         bool IsStarted { get; }
         void Start(Process prc, TimeSpan period, string popupClassName = "#32770");
@@ -26,6 +30,8 @@ namespace Xarial.CadPlus.Plus.Shared.Services
 
     public class PopupKiller : IPopupKiller
     {
+        #region Windows API
+
         private delegate bool EnumThreadProc(IntPtr hWnd, IntPtr lParam);
 
         [DllImport("user32.dll", CharSet = CharSet.Auto)]
@@ -48,12 +54,15 @@ namespace Xarial.CadPlus.Plus.Shared.Services
         private static extern int GetWindowLong(IntPtr hWnd, int nIndex);
 
         [DllImport("user32.dll", ExactSpelling = true)]
-        static extern IntPtr GetAncestor(IntPtr hwnd, uint flags);
+        private static extern IntPtr GetAncestor(IntPtr hwnd, uint flags);
 
         [DllImport("user32.dll", SetLastError = false)]
-        static extern IntPtr GetDesktopWindow();
+        private static extern IntPtr GetDesktopWindow();
 
-        public event Action<Process, IntPtr> PopupNotClosed;
+        #endregion
+
+        public event PopupNotClosedDelegate PopupNotClosed;
+        public event ShouldClosePopupDelegate ShouldClosePopup;
 
         private Timer m_Timer;
         private Process m_Process;
@@ -142,13 +151,20 @@ namespace Xarial.CadPlus.Plus.Shared.Services
             {
                 if (IsWindow(hWnd) && IsModalPopup(hWnd))
                 {
-                    m_Logger.Log($"Killing popup: {hWnd}", LoggerMessageSeverity_e.Debug);
-                    SendMessage(hWnd, WM_SYSCOMMAND, SC_CLOSE, 0);
+                    var close = true;
 
-                    if (IsWindow(hWnd))
+                    ShouldClosePopup?.Invoke(m_Process, hWnd, ref close);
+
+                    if (close)
                     {
-                        //windows closing may take time. Remember the hWnd and check if still active in next timer tick
-                        m_CurrentModalPopupHwnd = hWnd;
+                        m_Logger.Log($"Killing popup: {hWnd}", LoggerMessageSeverity_e.Debug);
+                        SendMessage(hWnd, WM_SYSCOMMAND, SC_CLOSE, 0);
+
+                        if (IsWindow(hWnd))
+                        {
+                            //windows closing may take time. Remember the hWnd and check if still active in next timer tick
+                            m_CurrentModalPopupHwnd = hWnd;
+                        }
                     }
 
                     return false;
