@@ -56,6 +56,10 @@ namespace Xarial.CadPlus.Batch.Base.Core
         }
     }
 
+    /// <summary>
+    /// Class to run the batch operation
+    /// </summary>
+    /// <remarks>This class should be disposed after each job</remarks>
     public class BatchRunner : IDisposable
     {
         private const double POPUP_KILLER_PING_SECS = 2;
@@ -94,37 +98,12 @@ namespace Xarial.CadPlus.Batch.Base.Core
             m_BatchAppProxy = batchAppProxy;
 
             m_PopupKiller = popupKiller;
+            m_PopupKiller.ShouldClosePopup += OnShouldClosePopup;
             m_PopupKiller.PopupNotClosed += OnPopupNotClosed;
 
             m_Logger = logger;
 
             m_JobMgr = jobMgr;
-        }
-
-        private void OnPopupNotClosed(Process prc, IntPtr hWnd)
-        {
-            using (var vbaErrPopup = new VbaErrorPopup(hWnd))
-            {
-                if (vbaErrPopup.IsVbaErrorPopup)
-                {
-                    var curMacro = m_CurrentContext.CurrentMacro;
-
-                    if (curMacro != null)
-                    {
-                        curMacro.InternalMacroException = new VbaMacroException(vbaErrPopup.ErrorText);
-                    }
-
-                    m_Logger.Log($"Closing VBA Error popup window: {hWnd}", LoggerMessageSeverity_e.Debug);
-
-                    vbaErrPopup.Close();
-                }
-                else
-                {
-                    m_Logger.Log($"Blocking popup window is not closed: {hWnd}", LoggerMessageSeverity_e.Debug);
-
-                    m_JournalWriter.WriteLine("Failed to close the blocking popup window");
-                }
-            }
         }
 
         public async Task<bool> BatchRunAsync(CancellationToken cancellationToken = default)
@@ -230,6 +209,53 @@ namespace Xarial.CadPlus.Batch.Base.Core
 
         public void TryCancel() 
             => TryShutDownApplication(m_CurrentContext?.CurrentApplicationProcess);
+
+        private void OnPopupNotClosed(Process prc, IntPtr hWnd)
+        {
+            //VBA error popup cannot be closed automatically
+            TryHandleVbaExceptionPopup(hWnd);
+        }
+
+        private void OnShouldClosePopup(Process prc, IntPtr hWnd, ref bool close)
+        {
+            if (m_CurrentContext.Job.StartupOptions.HasFlag(StartupOptions_e.Silent))
+            {
+                //attempt to close all popups in the silent mode
+                close = true;
+            }
+            else 
+            {
+                close = false;
+                //only close VBA error popup
+                TryHandleVbaExceptionPopup(hWnd);
+            }            
+        }
+
+        private void TryHandleVbaExceptionPopup(IntPtr hWnd)
+        {
+            using (var vbaErrPopup = new VbaErrorPopup(hWnd))
+            {
+                if (vbaErrPopup.IsVbaErrorPopup)
+                {
+                    var curMacro = m_CurrentContext.CurrentMacro;
+
+                    if (curMacro != null)
+                    {
+                        curMacro.InternalMacroException = new VbaMacroException(vbaErrPopup.ErrorText);
+                    }
+
+                    m_Logger.Log($"Closing VBA Error popup window: {hWnd}", LoggerMessageSeverity_e.Debug);
+
+                    vbaErrPopup.Close();
+                }
+                else
+                {
+                    m_Logger.Log($"Blocking popup window is not closed: {hWnd}", LoggerMessageSeverity_e.Debug);
+
+                    m_JournalWriter.WriteLine("Failed to close the blocking popup window");
+                }
+            }
+        }
 
         private void OnRetry(Exception err, int retry, BatchJobContext context)
         {
@@ -566,10 +592,7 @@ namespace Xarial.CadPlus.Batch.Base.Core
                 app = m_AppProvider.StartApplication(versionInfo,
                     opts, p => TryAddProcessToJob(p), cancellationToken);
 
-                if (opts.HasFlag(StartupOptions_e.Silent)) 
-                {
-                    m_PopupKiller.Start(app.Process, TimeSpan.FromSeconds(POPUP_KILLER_PING_SECS));
-                }
+                m_PopupKiller.Start(app.Process, TimeSpan.FromSeconds(POPUP_KILLER_PING_SECS));
             }
             catch (Exception ex)
             {
@@ -682,6 +705,7 @@ namespace Xarial.CadPlus.Batch.Base.Core
 
         public void Dispose()
         {
+            m_PopupKiller.Dispose();
             m_AppProvider.Dispose();
         }
     }
