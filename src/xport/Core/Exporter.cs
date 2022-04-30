@@ -1,6 +1,6 @@
 ﻿//*********************************************************************
 //CAD+ Toolset
-//Copyright(C) 2020 Xarial Pty Limited
+//Copyright(C) 2021 Xarial Pty Limited
 //Product URL: https://cadplus.xarial.com
 //License: https://cadplus.xarial.com/license/
 //*********************************************************************
@@ -19,6 +19,7 @@ namespace Xarial.CadPlus.Xport.Core
     internal class JobItem : IJobItem
     {
         public event Action<IJobItem, JobItemStatus_e> StatusChanged;
+        public event Action<IJobItem> IssuesChanged;
 
         public string DisplayName { get; protected set; }
 
@@ -34,16 +35,21 @@ namespace Xarial.CadPlus.Xport.Core
             }
         }
 
+        public IReadOnlyList<string> Issues => m_Issues;
+
         private JobItemStatus_e m_Status;
+
+        private List<string> m_Issues;
 
         internal JobItem(string filePath)
         {
             FilePath = filePath;
             m_Status = JobItemStatus_e.AwaitingProcessing;
+            m_Issues = new List<string>();
         }
     }
 
-    internal class JobItemFile : JobItem, IJobItemFile
+    internal class JobItemFile : JobItem, IJobItemDocument
     {
         public IEnumerable<IJobItemOperation> Operations => throw new NotImplementedException();
 
@@ -64,18 +70,20 @@ namespace Xarial.CadPlus.Xport.Core
 
     public class Exporter : IDisposable
     {
-        private readonly TextWriter m_Logger;
+        private readonly TextWriter m_TextLogger;
         private readonly IProgressHandler m_ProgressHandler;
+        private readonly IJobManager m_JobMgr;
 
-        public Exporter(TextWriter logger, IProgressHandler progressHandler)
+        public Exporter(TextWriter txtLogger, IJobManager jobMgr, IProgressHandler progressHandler)
         {
-            m_Logger = logger;
+            m_TextLogger = txtLogger;
             m_ProgressHandler = progressHandler;
+            m_JobMgr = jobMgr;
         }
 
         public async Task Export(ExportOptions opts, CancellationToken token = default)
         {
-            m_Logger.WriteLine($"Exporting Started");
+            m_TextLogger.WriteLine($"Exporting Started");
 
             var startTime = DateTime.Now;
 
@@ -112,7 +120,7 @@ namespace Xarial.CadPlus.Xport.Core
 
                         if (token.IsCancellationRequested)
                         {
-                            m_Logger.WriteLine($"Cancelled by the user");
+                            m_TextLogger.WriteLine($"Cancelled by the user");
                             return;
                         }
 
@@ -121,7 +129,7 @@ namespace Xarial.CadPlus.Xport.Core
                             CreateNoWindow = true,
                             UseShellExecute = false,
                             FileName = typeof(StandAloneExporter.Program).Assembly.Location,
-                            Arguments = $"\"{file}\" \"{desFile}\""
+                            Arguments = $"\"{file}\" \"{desFile}\" {opts.Version}"
                         };
 
                         var tcs = CancellationTokenSource.CreateLinkedTokenSource(token);
@@ -132,14 +140,20 @@ namespace Xarial.CadPlus.Xport.Core
 
                         var res = await StartWaitProcessAsync(prcStartInfo, tcs.Token).ConfigureAwait(false);
 
-                        if (!res)
+                        if (res)
+                        {
+                            outFile.Status = JobItemStatus_e.Succeeded;
+                        }
+                        else 
                         {
                             throw new Exception("Failed to process the file");
                         }
                     }
                     catch (Exception ex)
                     {
-                        m_Logger.WriteLine($"Error while processing '{file}': {ex.Message}");
+                        outFile.Status = JobItemStatus_e.Failed;
+
+                        m_TextLogger.WriteLine($"Error while processing '{file}': {ex.Message}");
                         if (!opts.ContinueOnError)
                         {
                             throw ex;
@@ -148,11 +162,24 @@ namespace Xarial.CadPlus.Xport.Core
 
                     m_ProgressHandler?.ReportProgress(outFile, true);
                 }
+
+                if (outFiles.All(f => f.Status == JobItemStatus_e.Succeeded))
+                {
+                    job.Status = JobItemStatus_e.Succeeded;
+                }
+                else if (outFiles.All(f => f.Status == JobItemStatus_e.Failed))
+                {
+                    job.Status = JobItemStatus_e.Failed;
+                }
+                else 
+                {
+                    job.Status = JobItemStatus_e.Warning;
+                }
             }
 
             var duration = DateTime.Now.Subtract(startTime);
             m_ProgressHandler.ReportCompleted(duration);
-            m_Logger.WriteLine($"Exporting completed in {duration.ToString(@"hh\:mm\:ss")}");
+            m_TextLogger.WriteLine($"Exporting completed in {duration.ToString(@"hh\:mm\:ss")}");
         }
 
         private Task<bool> StartWaitProcessAsync(ProcessStartInfo prcStartInfo,
@@ -172,9 +199,10 @@ namespace Xarial.CadPlus.Xport.Core
                 var tag = StandAloneExporter.Program.LOG_MESSAGE_TAG;
                 if (e.Data?.StartsWith(tag) == true)
                 {
-                    m_Logger.WriteLine(e.Data.Substring(tag.Length));
+                    m_TextLogger.WriteLine(e.Data.Substring(tag.Length));
                 }
             };
+
             process.Exited += (sender, args) =>
             {
                 if (!isCancelled)
@@ -183,7 +211,7 @@ namespace Xarial.CadPlus.Xport.Core
                 }
             };
 
-            if (cancellationToken != default(CancellationToken))
+            if (cancellationToken != default)
             {
                 cancellationToken.Register(() =>
                 {
@@ -197,6 +225,7 @@ namespace Xarial.CadPlus.Xport.Core
             }
 
             process.Start();
+            m_JobMgr.AddProcess(process);
             process.BeginOutputReadLine();
             return tcs.Task;
         }

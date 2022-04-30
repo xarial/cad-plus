@@ -1,6 +1,6 @@
 ﻿//*********************************************************************
 //CAD+ Toolset
-//Copyright(C) 2020 Xarial Pty Limited
+//Copyright(C) 2021 Xarial Pty Limited
 //Product URL: https://cadplus.xarial.com
 //License: https://cadplus.xarial.com/license/
 //*********************************************************************
@@ -22,7 +22,7 @@ namespace Xarial.CadPlus.Common.Services
         Warning
     }
 
-    public interface IJobItemFile : IJobItem
+    public interface IJobItemDocument : IJobItem
     {
         IEnumerable<IJobItemOperation> Operations { get; }
     }
@@ -34,6 +34,9 @@ namespace Xarial.CadPlus.Common.Services
     public interface IJobItem
     {
         event Action<IJobItem, JobItemStatus_e> StatusChanged;
+        event Action<IJobItem> IssuesChanged;
+
+        IReadOnlyList<string> Issues { get; }
         JobItemStatus_e Status { get; }
         string DisplayName { get; }
     }

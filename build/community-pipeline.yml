@@ -4,6 +4,9 @@ trigger:
     - master
     - dev
     - staging
+  paths:
+    include:
+    - src/*
 
 name: '$(Date:yyyyMMdd).$(Rev:r)[$(BuildID)]'
 
@@ -23,13 +26,15 @@ stages:
     
     steps:
 
-    - task: NuGetToolInstaller@0
+    - task: NuGetToolInstaller@1
       displayName: 'Use NuGet'
 
     - task: NuGetCommand@2
       displayName: 'NuGet restore'
       inputs:
         restoreSolution: 'cad-plus.sln'
+        feedsToUse: config
+        nugetConfigPath: 'nuget.config'
 
     - task: VSBuild@1
       displayName: 'Build source code and unit tests'

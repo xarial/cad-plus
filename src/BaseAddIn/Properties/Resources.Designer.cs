@@ -71,12 +71,32 @@ namespace Xarial.CadPlus.AddIn.Base.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] about_vector {
+            get {
+                object obj = ResourceManager.GetObject("about_vector", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         internal static System.Drawing.Bitmap help_icon {
             get {
                 object obj = ResourceManager.GetObject("help_icon", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] help_vector {
+            get {
+                object obj = ResourceManager.GetObject("help_vector", resourceCulture);
+                return ((byte[])(obj));
             }
         }
         

@@ -1,6 +1,6 @@
 ﻿//*********************************************************************
 //CAD+ Toolset
-//Copyright(C) 2020 Xarial Pty Limited
+//Copyright(C) 2021 Xarial Pty Limited
 //Product URL: https://cadplus.xarial.com
 //License: https://cadplus.xarial.com/license/
 //*********************************************************************
@@ -8,6 +8,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -27,6 +28,26 @@ using Xarial.XToolkit.Wpf.Utils;
 
 namespace Xarial.CadPlus.Common.Controls
 {
+    public class WatermarkVisibilityConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value is int && (int)value > 0)
+            {
+                return Visibility.Collapsed;
+            }
+            else 
+            {
+                return Visibility.Visible;
+            }
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
     public class PathListBox : Control
     {
         private ListBox m_ListBox;
@@ -109,6 +130,50 @@ namespace Xarial.CadPlus.Common.Controls
             set { SetValue(FiltersProperty, value); }
         }
 
+        public static readonly DependencyProperty ItemTemplateProperty =
+            DependencyProperty.Register(
+            nameof(ItemTemplate), typeof(DataTemplate),
+            typeof(PathListBox));
+
+        public DataTemplate ItemTemplate
+        {
+            get { return (DataTemplate)GetValue(ItemTemplateProperty); }
+            set { SetValue(ItemTemplateProperty, value); }
+        }
+
+        public static readonly DependencyProperty ItemToPathConverterProperty =
+            DependencyProperty.Register(
+            nameof(ItemToPathConverter), typeof(Func<object, string>),
+            typeof(PathListBox));
+
+        public Func<object, string> ItemToPathConverter
+        {
+            get { return (Func<object, string>)GetValue(ItemToPathConverterProperty); }
+            set { SetValue(ItemToPathConverterProperty, value); }
+        }
+
+        public static readonly DependencyProperty PathToItemConverterProperty =
+            DependencyProperty.Register(
+            nameof(PathToItemConverter), typeof(Func<string, object>),
+            typeof(PathListBox));
+
+        public Func<string, object> PathToItemConverter
+        {
+            get { return (Func<string, object>)GetValue(PathToItemConverterProperty); }
+            set { SetValue(PathToItemConverterProperty, value); }
+        }
+
+        public static readonly DependencyProperty WatermarkProperty =
+            DependencyProperty.Register(
+            nameof(Watermark), typeof(string),
+            typeof(PathListBox));
+
+        public string Watermark
+        {
+            get { return (string)GetValue(WatermarkProperty); }
+            set { SetValue(WatermarkProperty, value); }
+        }
+
         public PathListBox() 
         {
             AddFilesCommand = new RelayCommand(AddFiles);
@@ -121,7 +186,7 @@ namespace Xarial.CadPlus.Common.Controls
             m_ListBox = (ListBox)this.Template.FindName("PART_ListBox", this);
             m_AddFileButton = (Button)this.Template.FindName("PART_AddFilesButton", this);
             m_AddFolderButton = (Button)this.Template.FindName("PART_AddFoldersButton", this);
-
+            
             m_ListBox.AllowDrop = true;
 
             m_ListBox.DragEnter += OnDragEnter;
@@ -133,17 +198,23 @@ namespace Xarial.CadPlus.Common.Controls
             m_AddFolderButton.Click += OnAddFoldersButtonClick;
         }
 
-        private void OnAddFilesButtonClick(object sender, RoutedEventArgs e)
+        public void AddFiles()
         {
-            AddFiles();
+            var filter = "";
+
+            if (Filters != null)
+            {
+                var filters = Filters?.Cast<FileFilter>()?.ToArray();
+                filter = FileSystemBrowser.BuildFilterString(filters);
+            }
+
+            if (FileSystemBrowser.BrowseFilesOpen(out string[] paths, "Select file to process", filter))
+            {
+                AddPathsToSource(paths);
+            }
         }
 
-        private void OnAddFoldersButtonClick(object sender, RoutedEventArgs e)
-        {
-            AddFolders();
-        }
-
-        private void AddFolders()
+        public void AddFolders()
         {
             var dlg = new BetterFolderBrowser()
             {
@@ -159,21 +230,22 @@ namespace Xarial.CadPlus.Common.Controls
             }
         }
 
-        private void AddFiles()
+        public void DeleteSelected()
         {
-            var filter = "";
+            var itemsToDelete = new object[m_ListBox.SelectedItems.Count];
+            m_ListBox.SelectedItems.CopyTo(itemsToDelete, 0);
 
-            if (Filters != null)
+            foreach (var selItem in itemsToDelete)
             {
-                var filters = Filters?.Cast<FileFilter>()?.ToArray();
-                filter = FileSystemBrowser.BuildFilterString(filters);
-            }
-
-            if (FileSystemBrowser.BrowseFilesOpen(out string[] paths, "Select file to process", filter))
-            {
-                AddPathsToSource(paths);
+                PathsSource.Remove(selItem);
             }
         }
+
+        private void OnAddFilesButtonClick(object sender, RoutedEventArgs e)
+            => AddFiles();
+
+        private void OnAddFoldersButtonClick(object sender, RoutedEventArgs e)
+            => AddFolders();
 
         private void OnDragOver(object sender, DragEventArgs e)
         {
@@ -249,7 +321,18 @@ namespace Xarial.CadPlus.Common.Controls
                 {
                     if (!ContainsPath(path))
                     {
-                        PathsSource?.Add(path);
+                        object item;
+
+                        if (PathToItemConverter != null)
+                        {
+                            item = PathToItemConverter.Invoke(path);
+                        }
+                        else 
+                        {
+                            item = path;
+                        }
+
+                        PathsSource?.Add(item);
                     }
                 }
             }
@@ -259,8 +342,19 @@ namespace Xarial.CadPlus.Common.Controls
         {
             if (PathsSource != null)
             {
-                foreach (string curPath in PathsSource)
+                foreach (object curItem in PathsSource)
                 {
+                    string curPath;
+
+                    if (ItemToPathConverter != null)
+                    {
+                        curPath = ItemToPathConverter.Invoke(curItem);
+                    }
+                    else 
+                    {
+                        curPath = curItem.ToString();
+                    }
+
                     if (string.Equals(curPath, path, StringComparison.CurrentCultureIgnoreCase))
                     {
                         return true;
@@ -290,17 +384,6 @@ namespace Xarial.CadPlus.Common.Controls
             if (e.Key == Key.Delete)
             {
                 DeleteSelected();
-            }
-        }
-
-        private void DeleteSelected()
-        {
-            var itemsToDelete = new object[m_ListBox.SelectedItems.Count];
-            m_ListBox.SelectedItems.CopyTo(itemsToDelete, 0);
-
-            foreach (var selItem in itemsToDelete)
-            {
-                PathsSource.Remove(selItem);
             }
         }
     }

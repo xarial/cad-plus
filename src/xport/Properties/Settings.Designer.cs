@@ -22,5 +22,17 @@ namespace Xarial.CadPlus.Xport.Properties {
                 return defaultInstance;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("https://cadplus.xarial.com/export/")]
+        public string HelpLink {
+            get {
+                return ((string)(this["HelpLink"]));
+            }
+            set {
+                this["HelpLink"] = value;
+            }
+        }
     }
 }

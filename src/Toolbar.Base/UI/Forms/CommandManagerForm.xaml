@@ -1,0 +1,214 @@
+﻿<Window x:Class="Xarial.CadPlus.CustomToolbar.UI.Forms.CommandManagerForm"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+        xmlns:views="clr-namespace:Xarial.CadPlus.CustomToolbar.UI.Views"
+        xmlns:vm="clr-namespace:Xarial.CadPlus.CustomToolbar.UI.ViewModels"
+        xmlns:val="clr-namespace:Xarial.CadPlus.Toolbar.UI.ValidationRules"
+        xmlns:base="clr-namespace:Xarial.CadPlus.CustomToolbar.UI.Base"
+        xmlns:conv="clr-namespace:Xarial.CadPlus.Toolbar.UI.Converters"
+        xmlns:local="clr-namespace:Xarial.CadPlus.CustomToolbar.UI.Forms"
+        xmlns:xconv="clr-namespace:Xarial.XToolkit.Wpf.Converters;assembly=Xarial.XToolkit.Wpf"
+        xmlns:sys="clr-namespace:System;assembly=mscorlib"
+        xmlns:win="clr-namespace:System.Windows;assembly=PresentationCore"
+        mc:Ignorable="d"
+        d:DataContext="{x:Type vm:CommandManagerVM}"
+        Height="600" Width="800" WindowStartupLocation="CenterOwner" ShowInTaskbar="False"
+		Title="Toolbar+ Configuration" WindowStyle="ToolWindow">
+    <Window.Resources>
+        <conv:CommandContextMenuTitleConverter x:Key="menuTitleConv" />
+        <conv:FilePathToDirectoryPathConverter x:Key="filePathToDirConv"/>
+        <xconv:ObjectIsNotNullUniversalConverter x:Key="objIsNotNulToBool"/>
+        <xconv:MatchValueUniversalConverter x:Key="groupsIsEmpty" 
+                                           TrueValue="{x:Static win:Visibility.Visible}"
+                                           FalseValue="{x:Static win:Visibility.Collapsed}">
+            <xconv:MatchValueUniversalConverter.TargetValue>
+                <sys:Int32>0</sys:Int32>
+            </xconv:MatchValueUniversalConverter.TargetValue>
+        </xconv:MatchValueUniversalConverter>
+        <Style x:Key="ErrorTemplate" TargetType="Control">
+            <Style.Triggers>
+                <Trigger Property="Validation.HasError" Value="True">
+                    <Setter Property="ToolTip" >
+                        <Setter.Value>
+                            <ToolTip>
+                                <ToolTip.Content>
+                                    <Grid DataContext="{Binding Path=PlacementTarget.(Validation.Errors)[0], RelativeSource={RelativeSource AncestorType={x:Type ToolTip}}}" MaxWidth="200">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="16"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Image Source="/Toolbar.Module;component/Resources/error.png" VerticalAlignment="Top" Margin="2"/>
+                                        <TextBlock Grid.Column="1" Text="{Binding Path=ErrorContent}" TextWrapping="Wrap"/>
+                                    </Grid>
+                                </ToolTip.Content>
+                            </ToolTip>
+                        </Setter.Value>
+                    </Setter>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <Style TargetType="TextBox" BasedOn="{StaticResource ErrorTemplate}" />
+        <Style TargetType="CheckBox" BasedOn="{StaticResource ErrorTemplate}" />
+        <Style TargetType="ComboBox" BasedOn="{StaticResource ErrorTemplate}" />
+        <Style TargetType="{x:Type Button}"
+                                   x:Key="ToolbarButton"
+                                   BasedOn="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
+            <Setter Property="Width" Value="24"/>
+            <Setter Property="Height" Value="24"/>
+        </Style>
+    </Window.Resources>
+    <Window.InputBindings>
+        <KeyBinding Key="Delete" Command="{Binding Path=CommandRemoveCommand}" CommandParameter="{Binding Path=SelectedElement}"/>
+    </Window.InputBindings>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="0" Margin="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.Column="0" Text="Toolbar Path:" Margin="2" />
+            <TextBox Grid.Column="1" Margin="2">
+                <TextBox.Text>
+                    <Binding Path="ToolbarSpecificationPath" UpdateSourceTrigger="PropertyChanged">
+                        <Binding.ValidationRules>
+                            <val:LegalFilePathValidationRule ValidatesOnTargetUpdated="True"/>
+                        </Binding.ValidationRules>
+                    </Binding>
+                </TextBox.Text>
+            </TextBox>
+            <Button Grid.Column="2" Margin="2" Command="{Binding Path=BrowseToolbarSpecificationCommand}">
+                <TextBlock Text="Browse..." />
+            </Button>
+        </Grid>
+        <GroupBox Header="Commands" Grid.Row="1" IsEnabled="{Binding Path=IsEditable}">
+            <GroupBox.Style>
+                <Style TargetType="GroupBox">
+                    <Style.Triggers>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Opacity" Value="0.5" />
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </GroupBox.Style>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="2*" />
+                </Grid.ColumnDefinitions>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <StackPanel Orientation="Horizontal" Grid.Row="0" HorizontalAlignment="Right"
+                                VerticalAlignment="Top" Grid.Column="0"
+                                IsEnabled="{Binding Path=SelectedElement, Converter={StaticResource objIsNotNulToBool}}">
+                        <StackPanel.Style>
+                            <Style TargetType="{x:Type StackPanel}">
+                                <Style.Triggers>
+                                    <Trigger Property="IsEnabled" Value="False">
+                                        <Setter Property="Opacity" Value="0.5" />
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </StackPanel.Style>
+                        <Button Style="{StaticResource ToolbarButton}" Focusable="False"
+                                ToolTip="{Binding Path=SelectedElement, Converter={StaticResource menuTitleConv}, ConverterParameter={x:Static conv:CommandContextMenu_e.MoveUp}}"
+                                Command="{Binding Path=MoveCommandUpCommand}" CommandParameter="{Binding Path=SelectedElement}">
+                            <Image Source="/Toolbar.Module;component/Resources/icon-move-left.png"/>
+                        </Button>
+                        <Button Style="{StaticResource ToolbarButton}" Focusable="False"
+                                ToolTip="{Binding Path=SelectedElement, Converter={StaticResource menuTitleConv}, ConverterParameter={x:Static conv:CommandContextMenu_e.MoveDown}}"
+                                Command="{Binding Path=MoveCommandDownCommand}" CommandParameter="{Binding Path=SelectedElement}">
+                            <Image Source="/Toolbar.Module;component/Resources/icon-move-right.png"/>
+                        </Button>
+                        <Button Style="{StaticResource ToolbarButton}" Focusable="False"
+                                ToolTip="{Binding Path=SelectedElement, Converter={StaticResource menuTitleConv}, ConverterParameter={x:Static conv:CommandContextMenu_e.InsertBefore}}"
+                                Command="{Binding Path=InsertCommandBeforeCommand}" CommandParameter="{Binding Path=SelectedElement}">
+                            <Image Source="/Toolbar.Module;component/Resources/icon-add-after.png"/>
+                        </Button>
+                        <Button Style="{StaticResource ToolbarButton}" Focusable="False"
+                                ToolTip="{Binding Path=SelectedElement, Converter={StaticResource menuTitleConv}, ConverterParameter={x:Static conv:CommandContextMenu_e.InsertAfter}}"
+                                Command="{Binding Path=InsertCommandAfterCommand}" CommandParameter="{Binding Path=SelectedElement}">
+                            <Image Source="/Toolbar.Module;component/Resources/icon-add-before.png"/>
+                        </Button>
+                        <Button Style="{StaticResource ToolbarButton}" Focusable="False"
+                                ToolTip="{Binding Path=SelectedElement, Converter={StaticResource menuTitleConv}, ConverterParameter={x:Static conv:CommandContextMenu_e.Remove}}"
+                                Command="{Binding Path=CommandRemoveCommand}" CommandParameter="{Binding Path=SelectedElement}">
+                            <Image Source="/Toolbar.Module;component/Resources/icon-remove.png"/>
+                        </Button>
+                    </StackPanel>
+                    <views:CommandManagerView DataContext="{Binding}" Grid.Row="1" Margin="2" />
+                    <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Row="1" Margin="2"
+                               IsHitTestVisible="False"
+                               TextAlignment="Center"
+                               Text="Drag-n-drop macro or click + button to create new command"
+                               Visibility="{Binding Path=Groups.Commands.Count, Converter={StaticResource groupsIsEmpty}}"
+                               TextWrapping="Wrap" FontSize="15" />
+                </Grid>
+                <GridSplitter Grid.Column="1" Width="3"
+                      HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="Gray" />
+                <Grid Grid.Column="2">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                    </Grid>
+                    <ContentPresenter Content="{Binding Path=SelectedElement}" Grid.Row="0" Margin="2">
+                        <ContentPresenter.ContentTemplateSelector>
+                            <base:CommandPropertiesDataTemplateSelector>
+                                <base:CommandPropertiesDataTemplateSelector.CommandMacroTemplate>
+                                    <DataTemplate>
+                                        <views:CommandMacroView WorkingDirectory="{Binding Path=DataContext.ToolbarSpecificationPath, RelativeSource={RelativeSource AncestorType={x:Type local:CommandManagerForm}}, Converter={StaticResource filePathToDirConv}}" />
+                                    </DataTemplate>
+                                </base:CommandPropertiesDataTemplateSelector.CommandMacroTemplate>
+                                <base:CommandPropertiesDataTemplateSelector.CommandGroupTemplate>
+                                    <DataTemplate>
+                                        <views:CommandBaseView WorkingDirectory="{Binding Path=DataContext.ToolbarSpecificationPath, RelativeSource={RelativeSource AncestorType={x:Type local:CommandManagerForm}}, Converter={StaticResource filePathToDirConv}}"/>
+                                    </DataTemplate>
+                                </base:CommandPropertiesDataTemplateSelector.CommandGroupTemplate>
+                                <base:CommandPropertiesDataTemplateSelector.DefaultTemplate>
+                                    <DataTemplate>
+                                        <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center"
+                                           TextAlignment="Center"
+                                           Text="Select command or toolbar to change properties"
+                                           TextWrapping="Wrap" FontSize="15" />
+                                    </DataTemplate>
+                                </base:CommandPropertiesDataTemplateSelector.DefaultTemplate>
+                            </base:CommandPropertiesDataTemplateSelector>
+                        </ContentPresenter.ContentTemplateSelector>
+                    </ContentPresenter>
+                </Grid>
+            </Grid>
+        </GroupBox>
+        <Grid Grid.Row="2" HorizontalAlignment="Stretch">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="100" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="100" />
+            </Grid.ColumnDefinitions>
+            <Button Grid.Column="1" HorizontalAlignment="Right" Margin="5" Width="75" Click="OnOk">
+                <TextBlock Text="OK" Margin="5" />
+            </Button>
+            <Button Grid.Column="2" HorizontalAlignment="Left" Margin="5" Width="75" Click="OnCancel">
+                <TextBlock Text="Cancel" Margin="5" />
+            </Button>
+            <Button Style="{StaticResource ToolbarButton}" Focusable="False" Grid.Column="3" HorizontalAlignment="Right"
+                    ToolTip="About Toolbar+"
+                    Command="{Binding Path=HelpCommand}">
+                <Image Source="/Toolbar.Module;component/Resources/help-icon.png"/>
+            </Button>
+        </Grid>
+    </Grid>
+</Window>

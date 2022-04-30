@@ -1,6 +1,6 @@
 ﻿//*********************************************************************
 //CAD+ Toolset
-//Copyright(C) 2020 Xarial Pty Limited
+//Copyright(C) 2021 Xarial Pty Limited
 //Product URL: https://cadplus.xarial.com
 //License: https://cadplus.xarial.com/license/
 //*********************************************************************
@@ -15,5 +15,6 @@ namespace Xarial.CadPlus.Xport.Core
         public string[] Format { get; set; }
         public bool ContinueOnError { get; set; }
         public int Timeout { get; set; }
+        public int Version { get; set; }
     }
 }

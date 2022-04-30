@@ -1,6 +1,6 @@
 ﻿//*********************************************************************
 //CAD+ Toolset
-//Copyright(C) 2020 Xarial Pty Limited
+//Copyright(C) 2021 Xarial Pty Limited
 //Product URL: https://cadplus.xarial.com
 //License: https://cadplus.xarial.com/license/
 //*********************************************************************
@@ -10,6 +10,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Windows;
@@ -17,10 +18,16 @@ using System.Windows.Data;
 using System.Windows.Input;
 using WK.Libraries.BetterFolderBrowserNS;
 using Xarial.CadPlus.Common.Services;
+using Xarial.CadPlus.Plus.Services;
+using Xarial.CadPlus.Plus.Shared;
+using Xarial.CadPlus.Plus.Shared.Services;
 using Xarial.CadPlus.Xport.Core;
 using Xarial.CadPlus.Xport.Models;
+using Xarial.CadPlus.Xport.Properties;
+using Xarial.XCad.Base;
 using Xarial.XToolkit.Reflection;
 using Xarial.XToolkit.Wpf;
+using Xarial.XToolkit.Wpf.Dialogs;
 using Xarial.XToolkit.Wpf.Extensions;
 using Xarial.XToolkit.Wpf.Utils;
 
@@ -91,6 +98,8 @@ namespace Xarial.CadPlus.Xport.ViewModels
 
         public bool ContinueOnError { get; set; }
 
+        public EDrawingAppVersion_e Version { get; set; }
+
         public int Timeout { get; set; }
 
         public bool IsTimeoutEnabled
@@ -107,6 +116,9 @@ namespace Xarial.CadPlus.Xport.ViewModels
         public ICommand CancelExportCommand => m_CancelExportCommand ?? (m_CancelExportCommand = new RelayCommand(CancelExport, () => IsExportInProgress));
         public ICommand BrowseOutputDirectoryCommand => m_BrowseOutputDirectoryCommand ?? (m_BrowseOutputDirectoryCommand = new RelayCommand(BrowseOutputDirectory));
 
+        public ICommand AboutCommand { get; }
+        public ICommand HelpCommand { get; }
+
         public int ActiveTabIndex
         {
             get => m_ActiveTabIndex;
@@ -117,15 +129,23 @@ namespace Xarial.CadPlus.Xport.ViewModels
             }
         }
 
+        internal MainWindow ParentWindow { get; set; }
+
         private readonly IExporterModel m_Model;
         private readonly IMessageService m_MsgSvc;
+        private readonly IXLogger m_Logger;
 
         private readonly object m_Lock;
 
-        public ExporterVM(IExporterModel model, IMessageService msgSvc)
+        private readonly IAboutService m_AboutSvc;
+
+        public ExporterVM(IExporterModel model, IMessageService msgSvc, IXLogger logger, IAboutService aboutSvc)
         {
             m_Model = model;
             m_MsgSvc = msgSvc;
+            m_Logger = logger;
+
+            m_AboutSvc = aboutSvc;
 
             m_Lock = new object();
             Log = new ObservableCollection<string>();
@@ -138,6 +158,9 @@ namespace Xarial.CadPlus.Xport.ViewModels
             Filter = "*.*";
             IsTimeoutEnabled = true;
             Timeout = 600;
+
+            AboutCommand = new RelayCommand(ShowAbout);
+            HelpCommand = new RelayCommand(OpenHelp);
         }
 
         private void OnProgressChanged(double prg)
@@ -166,15 +189,17 @@ namespace Xarial.CadPlus.Xport.ViewModels
                     Format = ExtractFormats(),
                     OutputDirectory = IsSameDirectoryOutput ? "" : OutputDirectory,
                     ContinueOnError = ContinueOnError,
-                    Timeout = IsTimeoutEnabled ? Timeout : -1
+                    Timeout = IsTimeoutEnabled ? Timeout : -1,
+                    Version = (int)Version
                 };
 
                 await m_Model.Export(opts).ConfigureAwait(false);
 
                 m_MsgSvc.ShowInformation("Operation completed");
             }
-            catch
+            catch(Exception ex)
             {
+                m_Logger.Log(ex);
                 m_MsgSvc.ShowError("Processing error");
             }
             finally
@@ -204,6 +229,20 @@ namespace Xarial.CadPlus.Xport.ViewModels
         private void CancelExport()
         {
             m_Model.Cancel();
+        }
+
+        private void ShowAbout()
+            => m_AboutSvc.ShowAbout(this.GetType().Assembly, Resources.export_plus_icon);
+
+        private void OpenHelp()
+        {
+            try
+            {
+                Process.Start(Settings.Default.HelpLink);
+            }
+            catch
+            {
+            }
         }
 
         private void BrowseOutputDirectory()

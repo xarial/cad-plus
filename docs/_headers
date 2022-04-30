@@ -1,7 +1,0 @@
-/*
-  Content-Security-Policy: default-src 'self' 'unsafe-inline' www.google-analytics.com https://www.googletagmanager.com https://disqus.com https://www.youtube.com https://docs.google.com https://*.disqus.com https://*.disquscdn.com https://api.github.com; img-src 'self' https://cdn.viglink.com https://ce.lijit.com https://*.disqus.com https://www.google-analytics.com https://*.disquscdn.com; frame-ancestors 'self' https://docs.google.com/*;
-  X-Frame-Options: SAMEORIGIN
-  X-XSS-Protection: 1; mode=block
-  X-Content-Type-Options: nosniff
-  Referrer-Policy: no-referrer
-  Feature-Policy: vibrate 'none'
