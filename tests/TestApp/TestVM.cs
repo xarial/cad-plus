@@ -153,7 +153,7 @@ namespace TestApp
             descMock.Setup(x => x.ApplicationId).Returns("MockApp");
             Descriptor = descMock.Object;
 
-            var confMock = new Mock<IXConfiguration>();
+            var confMock = new Mock<IXPartConfiguration>();
             confMock.Setup(x => x.Name).Returns("Default");
             confMock.Setup(x => x.Preview).Returns(() => new MockImage(Resources.preview));
             Configuration = confMock.Object;
@@ -162,7 +162,7 @@ namespace TestApp
             cutListMock.Setup(x => x.Name).Returns("CutList-1");
             CutList = cutListMock.Object;
 
-            var confsMock = new Mock<IXConfigurationRepository>();
+            var confsMock = new Mock<IXPartConfigurationRepository>();
             confsMock.Setup(x => x.Active).Returns(confMock.Object);
 
             var partMock = new Mock<IXPart>();

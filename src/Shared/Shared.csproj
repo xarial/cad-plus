@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
   <PropertyGroup>
     <UseWpf>true</UseWpf>
-    <TargetFramework>net461</TargetFramework>
+    <TargetFramework>net472</TargetFramework>
     <RootNamespace>Xarial.CadPlus.Plus.Shared</RootNamespace>
     <AssemblyName>Xarial.CadPlusPlus.Shared</AssemblyName>
     <SignAssembly>false</SignAssembly>
