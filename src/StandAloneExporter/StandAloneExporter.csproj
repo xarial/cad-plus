@@ -9,7 +9,6 @@
     <OutputType>Exe</OutputType>
     <RootNamespace>Xarial.CadPlus.Xport.StandAloneExporter</RootNamespace>
     <AssemblyName>StandAloneExporter</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>

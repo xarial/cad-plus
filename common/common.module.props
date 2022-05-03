@@ -2,6 +2,7 @@
 <Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
      <OutputPath>$(SolutionDir)_build\Modules\$(ModuleName)</OutputPath>
+	 <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(SolutionDir)common\ProductInfo.cs">
