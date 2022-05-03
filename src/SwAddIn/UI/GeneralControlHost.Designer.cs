@@ -1,4 +1,11 @@
-﻿namespace Xarial.CadPlus.AddIn.Sw.UI
+﻿//*********************************************************************
+//CAD+ Toolset
+//Copyright(C) 2022 Xarial Pty Limited
+//Product URL: https://cadplus.xarial.com
+//License: https://cadplus.xarial.com/license/
+//*********************************************************************
+
+namespace Xarial.CadPlus.AddIn.Sw.UI
 {
     partial class GeneralControlHost
     {
