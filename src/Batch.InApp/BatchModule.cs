@@ -53,7 +53,7 @@ namespace Xarial.CadPlus.Batch.InApp
         {
             try
             {
-                return string.Equals(x.Path, y.Path, StringComparison.CurrentCultureIgnoreCase);
+                return string.Equals(x.ReferencedDocument.Path, y.ReferencedDocument.Path, StringComparison.CurrentCultureIgnoreCase);
             }
             catch 
             {
