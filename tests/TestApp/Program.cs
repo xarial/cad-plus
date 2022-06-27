@@ -1,5 +1,4 @@
-﻿using Autofac;
-using CommandLine;
+﻿using CommandLine;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,6 +6,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Xarial.CadPlus.Plus;
+using Xarial.CadPlus.Plus.DI;
 using Xarial.CadPlus.Plus.Services;
 using Xarial.CadPlus.Plus.Shared;
 using Xarial.XCad.Base;
@@ -54,7 +54,7 @@ namespace TestApp
         private void OnHostStartedStarted(IntPtr parentWnd)
             => m_Logger.Log("7 - Host started");
 
-        private void OnHostInitialized(IApplication app, IServiceContainer svcProvider, IModule[] modules)
+        private void OnHostInitialized(IApplication app, IServiceProvider svcProvider, IModule[] modules)
             => m_Logger.Log("4 - Host initiated");
 
         private void OnHostConnect()
@@ -115,9 +115,9 @@ namespace TestApp
             return true;
         }
 
-        private static void OnConfigureServices(ContainerBuilder builder, MyAppArgs args)
+        private static void OnConfigureServices(IContainerBuilder builder, MyAppArgs args)
         {
-            builder.RegisterType<AppLogger>().As<IXLogger>();
+            builder.RegisterSingleton<IXLogger, AppLogger>();
             m_Logger.Log("2 - Configure Services");
         }
     }

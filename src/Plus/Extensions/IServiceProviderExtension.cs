@@ -16,10 +16,7 @@ namespace Xarial.CadPlus.Plus.Extensions
 {
     public static class IServiceProviderExtension
     {
-        public static TSvc GetService<TSvc>(this IServiceProvider svcProv)
-            => (TSvc)svcProv.GetService(typeof(TSvc));
-
-        public static TSvc GetService<TSvc>(this IServiceContainer svcProv, string name)
-            => (TSvc)svcProv.GetService(typeof(TSvc), name);
+        public static TService GetService<TService>(this IServiceProvider svcProvider)
+            where TService : class => (TService)svcProvider.GetService(typeof(TService));
     }
 }

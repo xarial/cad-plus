@@ -5,7 +5,6 @@
 //License: https://cadplus.xarial.com/license/
 //*********************************************************************
 
-using Autofac;
 using CommandLine;
 using CommandLine.Text;
 using System;
@@ -21,10 +20,13 @@ using System.Windows.Threading;
 using Xarial.CadPlus.Plus.Extensions;
 using Xarial.CadPlus.Plus.Hosts;
 using Xarial.CadPlus.Plus.Services;
+using Xarial.CadPlus.Plus.Shared.DI;
 using Xarial.CadPlus.Plus.Shared.Services;
 using Xarial.XCad.Base;
 using Xarial.XCad.Base.Enums;
 using Xarial.XToolkit.Reporting;
+using Xarial.XToolkit.Services;
+using Xarial.CadPlus.Plus.DI;
 
 namespace Xarial.CadPlus.Plus.Shared
 {
@@ -90,7 +92,7 @@ namespace Xarial.CadPlus.Plus.Shared
     public delegate Task RunConsoleAsyncDelegate<TCliArgs>(TCliArgs args);
     public delegate void RunConsoleDelegate<TCliArgs>(TCliArgs args);
 
-    public delegate void ConfigureServicesDelegate<TCliArgs>(ContainerBuilder builder, TCliArgs args);
+    public delegate void ConfigureServicesDelegate<TCliArgs>(IContainerBuilder builder, TCliArgs args);
 
     public delegate void WriteHelpDelegate(Parser parser, string[] args);
 
@@ -102,7 +104,7 @@ namespace Xarial.CadPlus.Plus.Shared
     /// <typeparam name="TWindow">WPF window to create</typeparam>
     /// <remarks>To use: create new console project, set the STAThreadAttribute on the main class and change the output type to Window application. Create instance and call Start method</remarks>
     public class ApplicationLauncher<TApplication, TCliArgs, TWindow>
-        where TApplication : IApplication
+        where TApplication : class, IApplication
         where TWindow : Window, new()
     {
         public event WriteHelpDelegate WriteHelp;
@@ -122,7 +124,7 @@ namespace Xarial.CadPlus.Plus.Shared
         public IHost Host { get; private set; }
         private Application m_WpfApp;
 
-        public IContainer Container { get; private set; }
+        public IServiceProvider Container { get; private set; }
 
         public ApplicationLauncher(IInitiator initiator)
         {
@@ -331,30 +333,26 @@ namespace Xarial.CadPlus.Plus.Shared
         
         private IContainerBuilder CreateContainerBuilder(TCliArgs args)
         {
-            var builder = new ContainerBuilder();
+            var builder = new SimpleInjectorContainerBuilder();
+            builder.ContainerCreated += OnContainerCreated;
 
-            builder.RegisterType<GenericMessageService>()
-                .As<IMessageService>()
-                .WithParameter(new TypedParameter(typeof(string), "CAD+"));
+            builder.RegisterSingleton<IMessageService, GenericMessageService>();
 
             RegisterApplication(builder);
 
             ConfigureServices?.Invoke(builder, args);
 
-            var contWrapper = new ContainerBuilderWrapper(builder);
-            contWrapper.ContainerBuild += OnContainerBuild;
-
-            return contWrapper;
+            return builder;
         }
 
-        protected virtual void RegisterApplication(ContainerBuilder builder)
-            => builder.RegisterType<TApplication>()
-                .As<IApplication>()
-                .SingleInstance();
-
-        private void OnContainerBuild(IContainer cont)
+        private void OnContainerCreated(IContainerBuilder sender, IServiceProvider svcProvider)
         {
-            Container = cont;
+            Container = svcProvider;
+        }
+
+        protected virtual void RegisterApplication(IContainerBuilder builder)
+        {
+            builder.RegisterSingleton<IApplication, TApplication>();
         }
 
         private void OnDomainUnhandledException(object sender, UnhandledExceptionEventArgs e)

@@ -18,6 +18,7 @@ using Xarial.XCad.Base;
 using Xarial.CadPlus.Plus.Extensions;
 using Xarial.CadPlus.Plus.Delegates;
 using Xarial.XCad.Base.Enums;
+using Xarial.CadPlus.Plus.DI;
 
 namespace Xarial.CadPlus.Plus.Hosts
 {
@@ -40,7 +41,7 @@ namespace Xarial.CadPlus.Plus.Hosts
         private readonly IInitiator m_Initiator;
         private readonly IXLogger m_Logger;
 
-        private readonly IServiceContainer m_Services;
+        private readonly IServiceProvider m_Services;
 
         public HostWpf(Application wpfApp, 
             IContainerBuilder builder, IInitiator initiator, Type hostApplicationType)

@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Windows;
 using Xarial.CadPlus.Plus.Delegates;
 using Xarial.XCad;
+using Xarial.CadPlus.Plus.DI;
 
 namespace Xarial.CadPlus.Plus
 {
