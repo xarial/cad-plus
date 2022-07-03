@@ -29,9 +29,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Autofac, Version=6.0.0.0, Culture=neutral, PublicKeyToken=17863af14b0044da, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Autofac.6.0.0\lib\netstandard2.0\Autofac.dll</HintPath>
-    </Reference>
     <Reference Include="CommandLine, Version=2.8.0.0, Culture=neutral, PublicKeyToken=5a870481e358d379, processorArchitecture=MSIL">
       <HintPath>..\..\packages\CommandLineParser.2.8.0\lib\net461\CommandLine.dll</HintPath>
     </Reference>
@@ -44,14 +41,11 @@
     <Reference Include="MahApps.Metro, Version=2.0.0.0, Culture=neutral, PublicKeyToken=51482d6f650b2b3f, processorArchitecture=MSIL">
       <HintPath>..\..\packages\MahApps.Metro.2.4.9\lib\net46\MahApps.Metro.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Bcl.AsyncInterfaces, Version=1.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Microsoft.Bcl.AsyncInterfaces.1.1.0\lib\net461\Microsoft.Bcl.AsyncInterfaces.dll</HintPath>
-    </Reference>
     <Reference Include="Microsoft.Xaml.Behaviors, Version=1.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Microsoft.Xaml.Behaviors.Wpf.1.1.19\lib\net45\Microsoft.Xaml.Behaviors.dll</HintPath>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Newtonsoft.Json.12.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Newtonsoft.Json.13.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
@@ -63,9 +57,6 @@
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Diagnostics.DiagnosticSource, Version=4.0.5.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\System.Diagnostics.DiagnosticSource.4.7.1\lib\net46\System.Diagnostics.DiagnosticSource.dll</HintPath>
-    </Reference>
     <Reference Include="System.Memory, Version=4.0.1.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\..\packages\System.Memory.4.5.4\lib\net461\System.Memory.dll</HintPath>
     </Reference>
@@ -93,16 +84,16 @@
     <Reference Include="WindowsBase" />
     <Reference Include="WindowsFormsIntegration" />
     <Reference Include="Xarial.CadPlusPlus, Version=0.4.0.0, Culture=neutral, PublicKeyToken=60dcaf351d4060db, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Xarial.CadPlusPlus.0.4.0-20220531.4\lib\net472\Xarial.CadPlusPlus.dll</HintPath>
+      <HintPath>..\..\packages\Xarial.CadPlusPlus.0.4.0-20220703.2\lib\net472\Xarial.CadPlusPlus.dll</HintPath>
     </Reference>
     <Reference Include="Xarial.XCad, Version=0.8.0.0, Culture=neutral, PublicKeyToken=60dcaf351d4060db, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Xarial.XCad.0.8.0-20220531.4\lib\net461\Xarial.XCad.dll</HintPath>
+      <HintPath>..\..\packages\Xarial.XCad.0.8.0-20220702.1\lib\net461\Xarial.XCad.dll</HintPath>
     </Reference>
-    <Reference Include="Xarial.XToolkit, Version=0.3.2.0, Culture=neutral, PublicKeyToken=60dcaf351d4060db, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Xarial.XToolkit.0.3.2\lib\net461\Xarial.XToolkit.dll</HintPath>
+    <Reference Include="Xarial.XToolkit, Version=0.4.0.0, Culture=neutral, PublicKeyToken=60dcaf351d4060db, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Xarial.XToolkit.0.4.0-20220627.10\lib\net461\Xarial.XToolkit.dll</HintPath>
     </Reference>
-    <Reference Include="Xarial.XToolkit.Wpf, Version=0.3.2.0, Culture=neutral, PublicKeyToken=60dcaf351d4060db, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Xarial.XToolkit.Wpf.0.3.2\lib\net461\Xarial.XToolkit.Wpf.dll</HintPath>
+    <Reference Include="Xarial.XToolkit.Wpf, Version=0.4.0.0, Culture=neutral, PublicKeyToken=60dcaf351d4060db, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Xarial.XToolkit.Wpf.0.4.0-20220627.10\lib\net461\Xarial.XToolkit.Wpf.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

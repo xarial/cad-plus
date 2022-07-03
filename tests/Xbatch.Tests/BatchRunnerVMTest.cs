@@ -27,17 +27,18 @@ using Xarial.XCad.SolidWorks;
 using Xarial.XCad.SolidWorks.Enums;
 using Xarial.XToolkit.Wpf.Utils;
 using Xarial.CadPlus.Batch.Base.Services;
+using Xarial.XToolkit.Services;
 
 namespace Xbatch.Tests
 {
 
     public class BatchDocumentMockVM : BatchDocumentVM
     {
-        public BatchDocumentMockVM(string name, BatchJob job, ICadApplicationInstanceProvider[] appProviders,
+        public BatchDocumentMockVM(string name, BatchJob job, ICadApplicationInstanceProvider appProvider,
             IJournalExporter[] journalExporters, IResultsSummaryExcelExporter[] resultsExporters,
-            IMessageService msgSvc, IXLogger logger, Func<BatchJob, IBatchRunJobExecutor> execFact,
+            IMessageService msgSvc, IXLogger logger, IBatchRunJobExecutorFactory execFact,
             IBatchApplicationProxy batchAppProxy, MainWindow parentWnd, IRibbonButtonCommand[] backstageCmds) 
-            : base(name, job, appProviders, journalExporters, resultsExporters,
+            : base(name, job, appProvider, journalExporters, resultsExporters,
                   msgSvc, logger, execFact, batchAppProxy, parentWnd, backstageCmds)
         {
         }
@@ -132,15 +133,12 @@ namespace Xbatch.Tests
             var msgSvcMock = new Mock<IMessageService>().Object;
             
             var docVm = new BatchDocumentMockVM("", new BatchJob(),
-                new ICadApplicationInstanceProvider[] { appProviderMock.Object },
+                appProviderMock.Object,
                 new IJournalExporter[] { new Mock<IJournalExporter>().Object },
                 new IResultsSummaryExcelExporter[] { new Mock<IResultsSummaryExcelExporter>().Object },
                 msgSvcMock, new Mock<IXLogger>().Object,
-                j =>
-                {
-                    opts = j;
-                    return new Mock<IBatchRunJobExecutor>().Object;
-                }, new Mock<IBatchApplicationProxy>().Object, null, null);
+                new Mock<IBatchRunJobExecutorFactory>().Object,
+                new Mock<IBatchApplicationProxy>().Object, null, null);
 
             action.Invoke(docVm);
 

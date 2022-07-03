@@ -13,6 +13,8 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Xarial.CadPlus.Batch.Base.Core;
+using Xarial.CadPlus.Batch.StandAlone.Services;
 
 namespace Xarial.CadPlus.Batch.Base.Services
 {
@@ -70,5 +72,18 @@ namespace Xarial.CadPlus.Batch.Base.Services
 
         private void OnRetry(Exception err, int attempt, Context context)
             => Retry?.Invoke(err, attempt, GetContext(context));
+    }
+
+    public class PollyJobContectResilientWorkerFactory : IJobContectResilientWorkerFactory
+    {
+        private readonly int m_Retries;
+
+        public PollyJobContectResilientWorkerFactory(int retries) 
+        {
+            m_Retries = retries;
+        }
+
+        public IResilientWorker<BatchJobContext> Create(TimeSpan? timeout)
+            => new PollyResilientWorker<BatchJobContext>(m_Retries, timeout);
     }
 }

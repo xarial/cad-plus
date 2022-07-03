@@ -21,6 +21,7 @@ using Xarial.CadPlus.Plus.Modules;
 using Xarial.CadPlus.Plus.Services;
 using Xarial.CadPlus.Toolbar.Services;
 using Xarial.XCad.Base;
+using Xarial.XToolkit.Services;
 using Xarial.XToolkit.Wpf;
 using Xarial.XToolkit.Wpf.Extensions;
 using Xarial.XToolkit.Wpf.Utils;

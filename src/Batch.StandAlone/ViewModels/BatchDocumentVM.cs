@@ -38,6 +38,7 @@ using Xarial.XToolkit.Wpf.Extensions;
 using Xarial.XToolkit.Wpf.Utils;
 using Xarial.CadPlus.Batch.Base.Services;
 using Xarial.CadPlus.Batch.Base.ViewModels;
+using Xarial.XToolkit.Services;
 
 namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
 {
@@ -102,7 +103,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
 
         public string FilePath => m_FilePath;
 
-        private readonly Func<BatchJob, IBatchRunJobExecutor> m_ExecFact;
+        private readonly IBatchRunJobExecutorFactory m_ExecFact;
         private readonly ICadApplicationInstanceProvider m_AppProvider;
 
         public event Action<BatchDocumentVM, BatchJob, string> Save;
@@ -116,12 +117,12 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
         private readonly IJournalExporter[] m_JournalExporters;
         private readonly IResultsSummaryExcelExporter[] m_ResultsExporters;
 
-        public BatchDocumentVM(FileInfo file, BatchJob job, ICadApplicationInstanceProvider[] appProviders,
+        public BatchDocumentVM(FileInfo file, BatchJob job, ICadApplicationInstanceProvider appProvider,
             IJournalExporter[] journalExporters, IResultsSummaryExcelExporter[] resultsExporters,
             IMessageService msgSvc, IXLogger logger,
-            Func<BatchJob, IBatchRunJobExecutor> execFact,
+            IBatchRunJobExecutorFactory execFact,
             IBatchApplicationProxy batchAppProxy, MainWindow parentWnd, IRibbonButtonCommand[] backstageCmds)
-            : this(Path.GetFileNameWithoutExtension(file.FullName), job, appProviders, journalExporters, resultsExporters,
+            : this(Path.GetFileNameWithoutExtension(file.FullName), job, appProvider, journalExporters, resultsExporters,
                   msgSvc, logger, execFact, batchAppProxy, parentWnd, backstageCmds)
         {
             m_FilePath = file.FullName;
@@ -129,13 +130,13 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
         }
 
         public BatchDocumentVM(string name, BatchJob job,
-            ICadApplicationInstanceProvider[] appProviders,
+            ICadApplicationInstanceProvider appProvider,
             IJournalExporter[] journalExporters, IResultsSummaryExcelExporter[] resultsExporters,
-            IMessageService msgSvc, IXLogger logger, Func<BatchJob, IBatchRunJobExecutor> execFact,
+            IMessageService msgSvc, IXLogger logger, IBatchRunJobExecutorFactory execFact,
             IBatchApplicationProxy batchAppProxy, MainWindow parentWnd, IRibbonButtonCommand[] backstageCmds)
         {
             m_ExecFact = execFact;
-            m_AppProvider = job.FindApplicationProvider(appProviders);
+            m_AppProvider = appProvider;
             
             m_JournalExporters = journalExporters;
             m_ResultsExporters = resultsExporters;

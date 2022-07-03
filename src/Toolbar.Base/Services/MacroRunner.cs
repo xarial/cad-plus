@@ -18,6 +18,7 @@ using Xarial.XCad.Base.Enums;
 using Xarial.XCad.Documents;
 using Xarial.XCad.Enums;
 using Xarial.XCad.Structures;
+using Xarial.XToolkit.Services;
 
 namespace Xarial.CadPlus.CustomToolbar.Services
 {

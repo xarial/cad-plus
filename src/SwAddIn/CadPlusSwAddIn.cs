@@ -20,7 +20,6 @@ using Xarial.XCad.UI.PropertyPage;
 using System.Reflection;
 using Xarial.XToolkit.Reflection;
 using Xarial.CadPlus.Plus;
-using Autofac;
 using Xarial.CadPlus.Common;
 using Xarial.CadPlus.Init;
 using Xarial.CadPlus.Plus.Applications;
@@ -33,6 +32,10 @@ using System.Windows.Threading;
 using Xarial.XCad.Base.Enums;
 using Xarial.CadPlus.Plus.Shared.Services;
 using Xarial.XToolkit.Helpers;
+using Xarial.CadPlus.Plus.DI;
+using Xarial.XToolkit.Services;
+using Xarial.CadPlus.Plus.Shared.DI;
+using Xarial.CadPlus.Common.Sw.Services;
 
 namespace Xarial.CadPlus.AddIn.Sw
 {
@@ -87,18 +90,19 @@ namespace Xarial.CadPlus.AddIn.Sw
                 new Initiator());
             m_Host.ConfigureServices += OnConfigureModuleServices;
         }
-        
+
+        protected override IXServiceCollection CreateServiceCollection()
+            => new SimpleInjectorServiceCollectionContainerBuilder();
+
         private void OnConfigureModuleServices(IContainerBuilder builder)
         {
-            var svc = ((ContainerBuilderWrapper)builder).Builder;
-
-            svc.RegisterType<CadPlusPropertyPageHandlerProvider>().As<IPropertyPageHandlerProvider>();
-            svc.RegisterType<CadPlusTaskPaneControlProvider>().As<ITaskPaneControlProvider>();
-            svc.RegisterType<CadPlusTriadHandlerProvider>().As<ITriadHandlerProvider>();
+            builder.RegisterSingleton<IPropertyPageHandlerProvider, CadPlusPropertyPageHandlerProvider>();
+            builder.RegisterSingleton<ITaskPaneControlProvider, CadPlusTaskPaneControlProvider>();
+            builder.RegisterSingleton<ITriadHandlerProvider, CadPlusTriadHandlerProvider>();
             
-            builder.RegisterAdapter<IXApplication, ISwApplication>(a => (ISwApplication)a);
-            builder.Register(x => x.GetService<IMacroExecutor>(CadApplicationIds.SolidWorks));
-            builder.Register(x => x.GetService<ICadDescriptor>(CadApplicationIds.SolidWorks));
+            builder.RegisterAdapter<IXApplication, ISwApplication>(a => (ISwApplication)a, LifetimeScope_e.Singleton);
+            builder.RegisterSingleton<IMacroExecutor, SwMacroExecutor>();
+            builder.RegisterSingleton<ICadDescriptor, SwDescriptor>();
         }
 
         private void OnDomainUnhandledException(object sender, UnhandledExceptionEventArgs e)

@@ -9,6 +9,7 @@ using System;
 using Xarial.CadPlus.Plus.Services;
 using Xarial.XCad;
 using Xarial.XCad.Base.Enums;
+using Xarial.XToolkit.Services;
 
 namespace Xarial.CadPlus.Common.Services
 {

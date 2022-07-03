@@ -36,6 +36,8 @@ using Xarial.CadPlus.Plus.UI;
 using Xarial.CadPlus.Plus.Shared;
 using Xarial.XCad.Base;
 using Xarial.XToolkit;
+using Xarial.XToolkit.Services;
+using Xarial.CadPlus.Batch.StandAlone.Services;
 
 namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
 {
@@ -66,22 +68,19 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
 
         public ICadApplicationInstanceProvider[] AppProviders { get; }
 
-        private readonly Func<System.IO.FileInfo, BatchJob, MainWindow, IRibbonButtonCommand[], BatchDocumentVM> m_OpenDocFunc;
-        private readonly Func<string, BatchJob, MainWindow, IRibbonButtonCommand[], BatchDocumentVM> m_NewDocFunc;
+        private readonly IBatchDocumentVMFactory m_BatchDocumentFactory;
 
         private readonly IAboutService m_AboutSvc;
 
         public BatchManagerVM(ICadApplicationInstanceProvider[] appProviders,
             IBatchRunnerModel model, IMessageService msgSvc, IXLogger logger,
-            Func<System.IO.FileInfo, BatchJob, MainWindow, IRibbonButtonCommand[], BatchDocumentVM> openDocFunc,
-            Func<string, BatchJob, MainWindow, IRibbonButtonCommand[], BatchDocumentVM> newDocFunc, IAboutService aboutSvc)
+            IBatchDocumentVMFactory batchDocVmFact, IAboutService aboutSvc)
         {
             AppProviders = appProviders;
             m_Model = model;
             m_MsgSvc = msgSvc;
             m_Logger = logger;
-            m_OpenDocFunc = openDocFunc;
-            m_NewDocFunc = newDocFunc;
+            m_BatchDocumentFactory = batchDocVmFact;
 
             m_AboutSvc = aboutSvc;
 
@@ -161,7 +160,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
                         if (Document == null)
                         {
                             var batchJob = m_Model.LoadJobFromFile(filePath);
-                            Document = m_OpenDocFunc.Invoke(new System.IO.FileInfo(filePath),
+                            Document = m_BatchDocumentFactory.CreateOpen(new System.IO.FileInfo(filePath),
                                 batchJob, ParentWindow,
                                 GetBackstageCommands());
                             Document.Save += OnSaveDocument;
@@ -198,7 +197,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
             {
                 var job = m_Model.CreateNewJobDocument(appId);
 
-                Document = m_NewDocFunc.Invoke($"Batch+ Document",
+                Document = m_BatchDocumentFactory.CreateNew($"Batch+ Document",
                     job, ParentWindow, GetBackstageCommands());
                 Document.Save += OnSaveDocument;
             }

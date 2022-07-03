@@ -25,6 +25,7 @@ using Xarial.XCad;
 using Xarial.XCad.Base;
 using Xarial.XCad.Extensions;
 using Xarial.XCad.UI.Commands.Structures;
+using Xarial.XToolkit.Services;
 
 namespace Xarial.CadPlus.CustomToolbar.Services
 {

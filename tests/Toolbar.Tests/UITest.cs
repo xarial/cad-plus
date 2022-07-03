@@ -5,7 +5,6 @@
 //License: https://cadplus.xarial.com/license/
 //*********************************************************************
 
-using Autofac;
 using Moq;
 using NUnit.Framework;
 using System;
@@ -23,6 +22,7 @@ using Xarial.XCad;
 using Xarial.XCad.Base;
 using Xarial.XCad.Extensions;
 using Xarial.XCad.UI.Commands;
+using Xarial.XToolkit.Services;
 
 namespace CustomToolbar.Tests
 {
@@ -43,15 +43,15 @@ namespace CustomToolbar.Tests
 
         public class CustomToolbarModuleMock : ToolbarModule 
         {
-            protected override void CreateContainer()
-            {
-                var builder = new ContainerBuilder();
+            //protected override void CreateContainer()
+            //{
+            //    var builder = new ContainerBuilder();
 
-                builder.RegisterType<MacroEntryPointsExtractorMock>()
-                    .As<IMacroEntryPointsExtractor>();
+            //    builder.RegisterType<MacroEntryPointsExtractorMock>()
+            //        .As<IMacroEntryPointsExtractor>();
 
-                m_Container = builder.Build();
-            }
+            //    m_Container = builder.Build();
+            //}
         }
 
         [SetUp]

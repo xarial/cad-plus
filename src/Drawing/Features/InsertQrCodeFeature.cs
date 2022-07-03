@@ -23,6 +23,7 @@ using Xarial.XCad.UI.PropertyPage.Enums;
 using Xarial.XCad.UI.PropertyPage.Structures;
 using Xarial.XToolkit.Reporting;
 using Xarial.CadPlus.Plus.Extensions;
+using Xarial.XToolkit.Services;
 
 namespace Xarial.CadPlus.Drawing.Features
 {

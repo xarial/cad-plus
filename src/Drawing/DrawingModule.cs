@@ -37,6 +37,7 @@ using SolidWorks.Interop.swconst;
 using System.Linq;
 using Xarial.XCad.SolidWorks.Features;
 using Xarial.CadPlus.Drawing.Features;
+using Xarial.XToolkit.Services;
 
 namespace Xarial.CadPlus.Drawing
 {
@@ -97,7 +98,7 @@ namespace Xarial.CadPlus.Drawing
             m_Host.Connect += OnConnect;
         }
 
-        private void OnHostInitialized(IApplication app, IServiceContainer svcProvider, IModule[] modules)
+        private void OnHostInitialized(IApplication app, IServiceProvider svcProvider, IModule[] modules)
         {
             m_SvcProvider = svcProvider;
 

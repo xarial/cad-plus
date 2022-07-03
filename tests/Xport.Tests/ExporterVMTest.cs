@@ -16,6 +16,7 @@ using Xarial.CadPlus.Common.Services;
 using Xarial.CadPlus.Plus.Services;
 using Xarial.CadPlus.Plus.Shared.Services;
 using Xarial.XCad.Base;
+using Xarial.XToolkit.Services;
 
 namespace Xport.Tests
 {

@@ -20,6 +20,7 @@ using Xarial.CadPlus.Plus.Services;
 using Xarial.XCad.Base;
 using Xarial.XCad.Base.Attributes;
 using Xarial.XCad.Documents;
+using Xarial.XToolkit.Services;
 using Xarial.XToolkit.Wpf.Extensions;
 
 namespace Xarial.CadPlus.Batch.Extensions.ViewModels

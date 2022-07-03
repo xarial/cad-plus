@@ -16,6 +16,8 @@ using Xarial.CadPlus.Plus.Attributes;
 using Xarial.XCad.Base;
 using Xarial.CadPlus.Plus.Extensions;
 using Xarial.CadPlus.Plus.Services;
+using Xarial.CadPlus.Common.Sw.Services;
+using Xarial.CadPlus.Common.Services;
 
 namespace Xarial.CadPlus.Batch.Sw
 {
@@ -24,7 +26,7 @@ namespace Xarial.CadPlus.Batch.Sw
     {
         private IHost m_Host;
         private IBatchApplication m_App;
-        private IServiceContainer m_Services;
+        private IServiceProvider m_Services;
 
         public void Init(IHost host)
         {
@@ -33,7 +35,7 @@ namespace Xarial.CadPlus.Batch.Sw
             m_Host.Initialized += OnHostInitialized;
         }
 
-        private void OnHostInitialized(IApplication app, IServiceContainer svcProvider, IModule[] modules)
+        private void OnHostInitialized(IApplication app, IServiceProvider svcProvider, IModule[] modules)
         {
             if (!(app is IBatchApplication))
             {
@@ -47,10 +49,9 @@ namespace Xarial.CadPlus.Batch.Sw
         private void OnConnect()
         {
             var logger = m_Services.GetService<IXLogger>();
-            var macroRunner = m_Services.GetService<IMacroExecutor>(CadApplicationIds.SolidWorks);
-            var entDesc = m_Services.GetService<ICadDescriptor>(CadApplicationIds.SolidWorks);
+            var xCadMacroProvider = m_Services.GetService<IXCadMacroProvider>();
 
-            m_App.RegisterApplicationProvider(new SwApplicationProvider(logger, macroRunner, entDesc));
+            m_App.RegisterApplicationProvider(new SwApplicationProvider(logger, new SwMacroExecutor(xCadMacroProvider, logger), new SwDescriptor()));
         }
 
         public void Dispose()
