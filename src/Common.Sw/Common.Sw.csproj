@@ -1,7 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
-  <Import Project="$(SolutionDir)common\common.module.props" />
   <PropertyGroup>
     <ModuleName>CommonSwServices</ModuleName>
     <XCadRegDll>false</XCadRegDll>
@@ -137,6 +136,7 @@
   <ItemGroup>
     <None Include="Resources\sheet-icon.png" />
   </ItemGroup>
+  <Import Project="$(SolutionDir)common\common.module.props" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\..\packages\Xarial.XCad.SolidWorks.0.8.0-20220703.2\build\Xarial.XCad.SolidWorks.targets" Condition="Exists('..\..\packages\Xarial.XCad.SolidWorks.0.8.0-20220703.2\build\Xarial.XCad.SolidWorks.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
