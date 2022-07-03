@@ -6,13 +6,20 @@ using Xarial.CadPlus.Plus.DI;
 
 namespace Xarial.CadPlus.Plus.DI
 {
+    public enum RegistrationConflictResolveStrategy_e 
+    {
+        Replace,
+        KeepOriginal,
+        ThrownError
+    }
+
     public interface IContainerBuilder
     {
         event Action<IContainerBuilder, IServiceProvider> ContainerCreated;
 
         IServiceProvider Build();
 
-        void Register(IRegistration registration);
+        void Register(IRegistration registration, RegistrationConflictResolveStrategy_e conflictResolveStrategy);
 
         void RegisterAdapter(Type fromSvcType, Type toSvcType, Func<object, object> adapter, LifetimeScope_e scope);
 
@@ -23,26 +30,32 @@ namespace Xarial.CadPlus.Plus.DI
 
     public static class ContainerBuilderExtension
     {
-        public static IRegistration Register(this IContainerBuilder contBuilder, Type svcType, Type impType)
+        public static void Register(this IContainerBuilder contBuilder, IRegistration registration)
+            => contBuilder.Register(registration, RegistrationConflictResolveStrategy_e.Replace);
+
+        public static IRegistration Register(this IContainerBuilder contBuilder, Type svcType, Type impType,
+            RegistrationConflictResolveStrategy_e conflictResolveStrategy = RegistrationConflictResolveStrategy_e.Replace)
         {
             var reg = new Registration(svcType, impType);
-            contBuilder.Register(reg);
+            contBuilder.Register(reg, conflictResolveStrategy);
             return reg;
         }
 
-        public static IRegistration Register(this IContainerBuilder contBuilder, Type svcType, Func<object> factory)
+        public static IRegistration Register(this IContainerBuilder contBuilder, Type svcType, Func<object> factory,
+            RegistrationConflictResolveStrategy_e conflictResolveStrategy = RegistrationConflictResolveStrategy_e.Replace)
         {
             var reg = new Registration(svcType, factory);
-            contBuilder.Register(reg);
+            contBuilder.Register(reg, conflictResolveStrategy);
             return reg;
         }
 
-        public static IRegistration<TService, TImplementation> Register<TService, TImplementation>(this IContainerBuilder contBuilder)
+        public static IRegistration<TService, TImplementation> Register<TService, TImplementation>(this IContainerBuilder contBuilder,
+            RegistrationConflictResolveStrategy_e conflictResolveStrategy = RegistrationConflictResolveStrategy_e.Replace)
             where TService : class
             where TImplementation : class, TService
         {
             var reg = new Registration<TService, TImplementation>();
-            contBuilder.Register(reg);
+            contBuilder.Register(reg, conflictResolveStrategy);
             return reg;
         }
 
@@ -60,22 +73,26 @@ namespace Xarial.CadPlus.Plus.DI
             where TDecorator : class, TService
             => contBuilder.RegisterDecorator(typeof(TService), typeof(TDecorator), scope);
 
-        public static IRegistration<TService, TImplementation> RegisterSingleton<TService, TImplementation>(this IContainerBuilder contBuilder)
+        public static IRegistration<TService, TImplementation> RegisterSingleton<TService, TImplementation>(this IContainerBuilder contBuilder,
+            RegistrationConflictResolveStrategy_e conflictResolveStrategy = RegistrationConflictResolveStrategy_e.Replace)
             where TService : class
             where TImplementation : class, TService
-            => contBuilder.Register<TService, TImplementation>().UsingLifetime(LifetimeScope_e.Singleton);
+            => contBuilder.Register<TService, TImplementation>(conflictResolveStrategy).UsingLifetime(LifetimeScope_e.Singleton);
 
-        public static IRegistration<TService, TImplementation> RegisterTransient<TService, TImplementation>(this IContainerBuilder contBuilder)
+        public static IRegistration<TService, TImplementation> RegisterTransient<TService, TImplementation>(this IContainerBuilder contBuilder,
+            RegistrationConflictResolveStrategy_e conflictResolveStrategy = RegistrationConflictResolveStrategy_e.Replace)
             where TService : class
             where TImplementation : class, TService
-            => contBuilder.Register<TService, TImplementation>().UsingLifetime(LifetimeScope_e.Transient);
+            => contBuilder.Register<TService, TImplementation>(conflictResolveStrategy).UsingLifetime(LifetimeScope_e.Transient);
 
-        public static IRegistration<TImplementation, TImplementation> RegisterSelfSingleton<TImplementation>(this IContainerBuilder contBuilder)
+        public static IRegistration<TImplementation, TImplementation> RegisterSelfSingleton<TImplementation>(this IContainerBuilder contBuilder,
+            RegistrationConflictResolveStrategy_e conflictResolveStrategy = RegistrationConflictResolveStrategy_e.Replace)
             where TImplementation : class
-            => contBuilder.Register<TImplementation, TImplementation>().UsingLifetime(LifetimeScope_e.Singleton);
+            => contBuilder.Register<TImplementation, TImplementation>(conflictResolveStrategy).UsingLifetime(LifetimeScope_e.Singleton);
 
-        public static IRegistration<TImplementation, TImplementation> RegisterSelfTransient<TImplementation>(this IContainerBuilder contBuilder)
+        public static IRegistration<TImplementation, TImplementation> RegisterSelfTransient<TImplementation>(this IContainerBuilder contBuilder,
+            RegistrationConflictResolveStrategy_e conflictResolveStrategy = RegistrationConflictResolveStrategy_e.Replace)
             where TImplementation : class
-            => contBuilder.Register<TImplementation, TImplementation>().UsingLifetime(LifetimeScope_e.Transient);
+            => contBuilder.Register<TImplementation, TImplementation>(conflictResolveStrategy).UsingLifetime(LifetimeScope_e.Transient);
     }
 }

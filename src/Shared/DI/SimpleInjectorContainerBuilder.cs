@@ -122,11 +122,33 @@ namespace Xarial.CadPlus.Plus.Shared.DI
             return lifestyle;
         }
 
-        public void Register(IRegistration registration)
+        public void Register(IRegistration registration, RegistrationConflictResolveStrategy_e conflictResolveStrategy)
         {
             ValidateStateIsBuilding();
 
-            m_Registrations.Add(registration);
+            var existingRegInd = m_Registrations.FindIndex(r => r.ServiceType == registration.ServiceType);
+
+            if (existingRegInd == -1)
+            {
+                m_Registrations.Add(registration);
+            }
+            else 
+            {
+                switch (conflictResolveStrategy) 
+                {
+                    case RegistrationConflictResolveStrategy_e.Replace:
+                        m_Registrations[existingRegInd] = registration;
+                        break;
+
+                    case RegistrationConflictResolveStrategy_e.KeepOriginal:
+                        //Do nothing
+                        break;
+
+                    case RegistrationConflictResolveStrategy_e.ThrownError:
+                        throw new Exception($"'{registration.ServiceType.FullName}' is already registered");
+                }
+                
+            }
         }
 
         public void RegisterAdapter(Type fromSvcType, Type toSvcType, Func<object, object> adapter, LifetimeScope_e scope)
@@ -180,7 +202,7 @@ namespace Xarial.CadPlus.Plus.Shared.DI
                     }
                     else
                     {
-                        throw new Exception("Multiple constructors were matched based on the input parameters");
+                        throw new Exception($"Multiple constructors were matched for the type '{imptType.FullName}' based on the input parameters");
                     }
                 }
             }
@@ -248,23 +270,21 @@ namespace Xarial.CadPlus.Plus.Shared.DI
     {
         public void Add(Type svcType, Func<object> svcFactory, ServiceLifetimeScope_e lifetime = ServiceLifetimeScope_e.Singleton, bool replace = true)
         {
-            if (replace || !m_Registrations.Any(r => r.ServiceType == svcType))
+            var reg = this.Register(svcType, svcFactory,
+                replace ? RegistrationConflictResolveStrategy_e.Replace : RegistrationConflictResolveStrategy_e.KeepOriginal);
+
+            switch (lifetime)
             {
-                var reg = this.Register(svcType, svcFactory);
+                case ServiceLifetimeScope_e.Singleton:
+                    reg.Lifetime = LifetimeScope_e.Singleton;
+                    break;
 
-                switch (lifetime)
-                {
-                    case ServiceLifetimeScope_e.Singleton:
-                        reg.Lifetime = LifetimeScope_e.Singleton;
-                        break;
+                case ServiceLifetimeScope_e.Transient:
+                    reg.Lifetime = LifetimeScope_e.Transient;
+                    break;
 
-                    case ServiceLifetimeScope_e.Transient:
-                        reg.Lifetime = LifetimeScope_e.Transient;
-                        break;
-
-                    default:
-                        throw new NotSupportedException();
-                }
+                default:
+                    throw new NotSupportedException();
             }
         }
 
