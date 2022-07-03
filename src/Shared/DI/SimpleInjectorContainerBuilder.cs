@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using Xarial.XToolkit.Reflection;
 using Xarial.CadPlus.Plus.DI;
+using Xarial.XCad;
 
 namespace Xarial.CadPlus.Plus.Shared.DI
 {
@@ -21,9 +22,9 @@ namespace Xarial.CadPlus.Plus.Shared.DI
     {
         public event Action<IContainerBuilder, IServiceProvider> ContainerCreated;
 
-        private SimpleInjectorServiceProvider m_Provider;
+        protected SimpleInjectorServiceProvider m_Provider;
 
-        private readonly List<IRegistration> m_Registrations;
+        protected readonly List<IRegistration> m_Registrations;
 
         private readonly SimpleInjector.Container m_Container;
 
@@ -85,7 +86,7 @@ namespace Xarial.CadPlus.Plus.Shared.DI
                 {
                     if (reg.Factory == null)
                     {
-                        m_Container.RegisterInitializer(reg.ServiceType, reg.Initializer);
+                        m_Container.RegisterInitializer(reg.ImplementationType, reg.Initializer);
                     }
                     else
                     {
@@ -240,6 +241,46 @@ namespace Xarial.CadPlus.Plus.Shared.DI
             }
 
             return true;
+        }
+    }
+
+    public class SimpleInjectorServiceCollectionContainerBuilder : SimpleInjectorContainerBuilder, IXServiceCollection
+    {
+        public void Add(Type svcType, Func<object> svcFactory, ServiceLifetimeScope_e lifetime = ServiceLifetimeScope_e.Singleton, bool replace = true)
+        {
+            if (replace || !m_Registrations.Any(r => r.ServiceType == svcType))
+            {
+                var reg = this.Register(svcType, svcFactory);
+
+                switch (lifetime)
+                {
+                    case ServiceLifetimeScope_e.Singleton:
+                        reg.Lifetime = LifetimeScope_e.Singleton;
+                        break;
+
+                    case ServiceLifetimeScope_e.Transient:
+                        reg.Lifetime = LifetimeScope_e.Transient;
+                        break;
+
+                    default:
+                        throw new NotSupportedException();
+                }
+            }
+        }
+
+        //NOTE: implement this if macro features are added to CAD+
+        public IXServiceCollection Clone() => throw new NotSupportedException();
+
+        public IServiceProvider CreateProvider()
+        {
+            if (m_Provider != null)
+            {
+                return m_Provider;
+            }
+            else 
+            {
+                throw new Exception("Provider is not built");
+            }
         }
     }
 }

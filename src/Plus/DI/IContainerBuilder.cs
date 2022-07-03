@@ -23,6 +23,20 @@ namespace Xarial.CadPlus.Plus.DI
 
     public static class ContainerBuilderExtension
     {
+        public static IRegistration Register(this IContainerBuilder contBuilder, Type svcType, Type impType)
+        {
+            var reg = new Registration(svcType, impType);
+            contBuilder.Register(reg);
+            return reg;
+        }
+
+        public static IRegistration Register(this IContainerBuilder contBuilder, Type svcType, Func<object> factory)
+        {
+            var reg = new Registration(svcType, factory);
+            contBuilder.Register(reg);
+            return reg;
+        }
+
         public static IRegistration<TService, TImplementation> Register<TService, TImplementation>(this IContainerBuilder contBuilder)
             where TService : class
             where TImplementation : class, TService
@@ -55,5 +69,13 @@ namespace Xarial.CadPlus.Plus.DI
             where TService : class
             where TImplementation : class, TService
             => contBuilder.Register<TService, TImplementation>().UsingLifetime(LifetimeScope_e.Transient);
+
+        public static IRegistration<TImplementation, TImplementation> RegisterSelfSingleton<TImplementation>(this IContainerBuilder contBuilder)
+            where TImplementation : class
+            => contBuilder.Register<TImplementation, TImplementation>().UsingLifetime(LifetimeScope_e.Singleton);
+
+        public static IRegistration<TImplementation, TImplementation> RegisterSelfTransient<TImplementation>(this IContainerBuilder contBuilder)
+            where TImplementation : class
+            => contBuilder.Register<TImplementation, TImplementation>().UsingLifetime(LifetimeScope_e.Transient);
     }
 }

@@ -37,6 +37,12 @@ namespace Xarial.CadPlus.Plus.DI
             ServiceType = svcType;
             ImplementationType = impType;
         }
+
+        internal Registration(Type svcType, Delegate factory)
+        {
+            ServiceType = svcType;
+            Factory = factory;
+        }
     }
 
     internal class Registration<TService, TImplementation> : Registration, IRegistration<TService, TImplementation>
@@ -74,7 +80,7 @@ namespace Xarial.CadPlus.Plus.DI
             return reg;
         }
 
-        public static IRegistration<TService, TImplementation> UsingInitializer<TService, TImplementation>(this IRegistration<TService, TImplementation> reg, Action<TService> init)
+        public static IRegistration<TService, TImplementation> UsingInitializer<TService, TImplementation>(this IRegistration<TService, TImplementation> reg, Action<TImplementation> init)
             where TService : class
             where TImplementation : class, TService
         {
