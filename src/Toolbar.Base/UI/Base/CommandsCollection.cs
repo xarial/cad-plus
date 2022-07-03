@@ -23,20 +23,24 @@ namespace Xarial.CadPlus.CustomToolbar.UI.Base
     }
 
     public class CommandsCollection<TCommandVM> : CompositeCollection, ICommandsCollection, IEnumerable<TCommandVM>
-            where TCommandVM : ICommandVM, new()
+            where TCommandVM : ICommandVM
     {
         public event Action<ICommandVM> NewCommandCreated;
 
         public event Action<IEnumerable<TCommandVM>> CommandsChanged;
 
+        IList ICommandsCollection.Commands => Commands;
+
         private readonly List<int> m_UsedIds;
 
         public ObservableCollection<TCommandVM> Commands { get; }
 
-        IList ICommandsCollection.Commands => Commands;
+        private readonly Func<TCommandVM> m_NewCmdFactory;
 
-        public CommandsCollection(IEnumerable<TCommandVM> commands)
+        public CommandsCollection(IEnumerable<TCommandVM> commands, Func<TCommandVM> newCmdFactory)
         {
+            m_NewCmdFactory = newCmdFactory;
+
             Commands = new ObservableCollection<TCommandVM>(commands);
             Commands.CollectionChanged += OnCommandsCollectionChanged;
 
@@ -60,7 +64,7 @@ namespace Xarial.CadPlus.CustomToolbar.UI.Base
 
         public ICommandVM AddNewCommand(int index)
         {
-            var newCmd = new TCommandVM();
+            var newCmd = m_NewCmdFactory.Invoke();
 
             var id = GetNextId();
             newCmd.Command.Id = id;

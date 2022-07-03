@@ -86,8 +86,7 @@ namespace Xarial.CadPlus.AddIn.Sw
             }
             AppDomain.CurrentDomain.UnhandledException += OnDomainUnhandledException;
 
-            m_Host = new AddInHost(new SwAddInApplication(this), 
-                new Initiator());
+            m_Host = new AddInHost(new SwAddInApplication(this), new Initiator());
             m_Host.ConfigureServices += OnConfigureModuleServices;
         }
 
@@ -105,10 +104,19 @@ namespace Xarial.CadPlus.AddIn.Sw
             builder.RegisterSingleton<ICadDescriptor, SwDescriptor>();
         }
 
+        protected override void HandleConnectException(Exception ex)
+        {
+            HandleException(ex);
+        }
+
         private void OnDomainUnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
             var ex = e.ExceptionObject as Exception ?? new Exception("");
+            HandleException(ex);
+        }
 
+        private void HandleException(Exception ex)
+        {
             var logger = m_Host?.Services?.GetService<IXLogger>() ?? new AppLogger();
             var msg = m_Host?.Services?.GetService<IMessageService>() ?? new GenericMessageService();
 

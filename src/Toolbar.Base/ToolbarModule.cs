@@ -146,8 +146,8 @@ namespace Xarial.CadPlus.CustomToolbar
 
             builder.RegisterSelfSingleton<CommandManagerVM>();
 
-            builder.RegisterSelfSingleton<CommandGroupVM>();
-            builder.RegisterSelfSingleton<CommandMacroVM>();
+            builder.RegisterSingleton<ICommandMacroVMFactory, CommandMacroVMFactory>();
+            builder.RegisterSingleton<ICommandGroupVMFactory, CommandGroupVMFactory>();
 
             builder.RegisterSingleton<ICommandsManager, CommandsManager>();
 

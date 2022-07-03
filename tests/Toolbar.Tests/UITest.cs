@@ -119,9 +119,7 @@ namespace CustomToolbar.Tests
 
             var vm = new CommandManagerVM(confProviderMock.Object,
                 new Mock<IMessageService>().Object, new Mock<IXLogger>().Object,
-                new Mock<ICadDescriptor>().Object,
-                c => new CommandGroupVM(c, new Mock<IIconsProvider[]>().Object, new Mock<IFilePathResolver>().Object,
-                x => new CommandMacroVM(x, new Mock<IIconsProvider[]>().Object, new Mock<IFilePathResolver>().Object, new Mock<IMacroEntryPointsExtractor>().Object)));
+                new Mock<ICadDescriptor>().Object, new Mock<ICommandGroupVMFactory>().Object);
 
             var form = new CommandManagerForm();
             form.DataContext = vm;
