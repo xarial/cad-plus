@@ -14,6 +14,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Interop;
+using Xarial.CadPlus.Plus.Services;
 using Xarial.XToolkit.Wpf.Dialogs;
 
 namespace Xarial.CadPlus.Plus.Shared.Services
@@ -25,29 +26,18 @@ namespace Xarial.CadPlus.Plus.Shared.Services
 
     public class AboutService : IAboutService
     {
-        private readonly Window m_Wnd;
-        private readonly IntPtr m_Parent;
-        private readonly Func<ILicenseInfo> m_GetLicense;
+        private readonly IParentWindowProvider m_WndProvider;
+        private readonly ILicenseInfoProvider m_LicProvider;
 
-        public AboutService(Func<ILicenseInfo> getLicense) : this(IntPtr.Zero, getLicense)
+        public AboutService(IParentWindowProvider parentWndProvider, ILicenseInfoProvider licProvider) 
         {
-        }
-
-        public AboutService(Window wnd, Func<ILicenseInfo> getLicense) 
-        {
-            m_Wnd = wnd;
-            m_GetLicense = getLicense;
-        }
-
-        public AboutService(IntPtr parent, Func<ILicenseInfo> getLicense)
-        {
-            m_Parent = parent;
-            m_GetLicense = getLicense;
+            m_WndProvider = parentWndProvider;
+            m_LicProvider = licProvider;
         }
 
         public void ShowAbout(Assembly assm, Image icon) 
         {
-            var licInfo = m_GetLicense.Invoke();
+            var licInfo = m_LicProvider.ProvideLicense();
 
             var vers = assm.GetName().Version;
 
@@ -102,14 +92,14 @@ namespace Xarial.CadPlus.Plus.Shared.Services
 
             var aboutDlg = new AboutDialog(spec);
 
-            if (m_Wnd != null)
+            if (m_WndProvider.Window != null)
             {
-                aboutDlg.Owner = m_Wnd;
+                aboutDlg.Owner = m_WndProvider.Window;
             }
-            else if (!IntPtr.Zero.Equals(m_Parent)) 
+            else if (!IntPtr.Zero.Equals(m_WndProvider.Handle)) 
             {
                 var interopHelper = new WindowInteropHelper(aboutDlg);
-                interopHelper.Owner = m_Parent;
+                interopHelper.Owner = m_WndProvider.Handle;
             }
 
             aboutDlg.ShowDialog();

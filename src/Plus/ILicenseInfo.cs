@@ -28,4 +28,9 @@ namespace Xarial.CadPlus.Plus
         EditionType_e Edition { get; }
         DateTime? TrialExpiryDate { get; }
     }
+
+    public interface ILicenseInfoProvider 
+    {
+        ILicenseInfo ProvideLicense();
+    }
 }
