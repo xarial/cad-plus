@@ -16,7 +16,6 @@ using Xarial.CadPlus.Plus.Attributes;
 using Xarial.XCad.Base;
 using Xarial.CadPlus.Plus.Extensions;
 using Xarial.CadPlus.Plus.Services;
-using Xarial.CadPlus.Common.Sw.Services;
 using Xarial.CadPlus.Common.Services;
 
 namespace Xarial.CadPlus.Batch.Sw
@@ -48,10 +47,10 @@ namespace Xarial.CadPlus.Batch.Sw
 
         private void OnConnect()
         {
-            var logger = m_Services.GetService<IXLogger>();
-            var xCadMacroProvider = m_Services.GetService<IXCadMacroProvider>();
-
-            m_App.RegisterApplicationProvider(new SwApplicationProvider(logger, new SwMacroExecutor(xCadMacroProvider, logger), new SwDescriptor()));
+            m_App.RegisterApplicationProvider(
+                new SwApplicationProvider(m_Services.GetService<IXLogger>(),
+                m_Services.GetService<ICadSpecificServiceFactory<IMacroExecutor>>().GetService(CadApplicationIds.SolidWorks),
+                m_Services.GetService<ICadSpecificServiceFactory<ICadDescriptor>>().GetService(CadApplicationIds.SolidWorks)));
         }
 
         public void Dispose()

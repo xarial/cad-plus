@@ -35,7 +35,6 @@ using Xarial.XToolkit.Helpers;
 using Xarial.CadPlus.Plus.DI;
 using Xarial.XToolkit.Services;
 using Xarial.CadPlus.Plus.Shared.DI;
-using Xarial.CadPlus.Common.Sw.Services;
 
 namespace Xarial.CadPlus.AddIn.Sw
 {
@@ -100,8 +99,9 @@ namespace Xarial.CadPlus.AddIn.Sw
             builder.RegisterSingleton<ITriadHandlerProvider, CadPlusTriadHandlerProvider>();
             
             builder.RegisterAdapter<IXApplication, ISwApplication>(a => (ISwApplication)a, LifetimeScope_e.Singleton);
-            builder.RegisterSingleton<IMacroExecutor, SwMacroExecutor>();
-            builder.RegisterSingleton<ICadDescriptor, SwDescriptor>();
+
+            builder.RegisterAdapter<ICadSpecificServiceFactory<IMacroExecutor>, IMacroExecutor>(f => f.GetService(CadApplicationIds.SolidWorks), LifetimeScope_e.Singleton);
+            builder.RegisterAdapter<ICadSpecificServiceFactory<ICadDescriptor>, ICadDescriptor>(f => f.GetService(CadApplicationIds.SolidWorks), LifetimeScope_e.Singleton);
         }
 
         protected override void HandleConnectException(Exception ex)

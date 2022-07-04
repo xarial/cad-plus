@@ -72,6 +72,8 @@ namespace Xarial.CadPlus.Init
             builder.RegisterSingleton<IExcelWriter, ExcelWriter>();
             builder.RegisterSingleton<IExcelReader, ExcelReader>();
             builder.RegisterSingleton<ILicenseInfoProvider, LicenseInfoProvider>();
+            builder.RegisterSingleton<ICadSpecificServiceFactory<IMacroExecutor>, CadSpecificServiceFactory<IMacroExecutor>>();
+            builder.RegisterSingleton<ICadSpecificServiceFactory<ICadDescriptor>, CadSpecificServiceFactory<ICadDescriptor>>();
         }
 
         public void Dispose()

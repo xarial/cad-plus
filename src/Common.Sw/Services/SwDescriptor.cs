@@ -14,11 +14,13 @@ using System.Text;
 using System.Threading.Tasks;
 using Xarial.CadPlus.Common.Sw.Properties;
 using Xarial.CadPlus.Plus;
+using Xarial.CadPlus.Plus.Attributes;
 using Xarial.CadPlus.Plus.Data;
 using Xarial.CadPlus.Plus.Services;
 
 namespace Xarial.CadPlus.Common.Sw.Services
 {
+    [CadSpecificService(CadApplicationIds.SolidWorks)]
     public class SwDescriptor : ICadDescriptor
     {
         public string ApplicationId => CadApplicationIds.SolidWorks;

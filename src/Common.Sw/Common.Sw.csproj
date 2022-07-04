@@ -71,7 +71,7 @@
     <Reference Include="WindowsBase" />
     <Reference Include="WindowsFormsIntegration" />
     <Reference Include="Xarial.CadPlusPlus, Version=0.4.0.0, Culture=neutral, PublicKeyToken=60dcaf351d4060db, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Xarial.CadPlusPlus.0.4.0-20220703.5\lib\net472\Xarial.CadPlusPlus.dll</HintPath>
+      <HintPath>..\..\packages\Xarial.CadPlusPlus.0.4.0-20220704.1\lib\net472\Xarial.CadPlusPlus.dll</HintPath>
     </Reference>
     <Reference Include="Xarial.XCad, Version=0.8.0.0, Culture=neutral, PublicKeyToken=60dcaf351d4060db, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Xarial.XCad.0.8.0-20220703.2\lib\net461\Xarial.XCad.dll</HintPath>
@@ -83,13 +83,14 @@
       <HintPath>..\..\packages\Xarial.XCad.Toolkit.0.8.0-20220703.2\lib\net461\Xarial.XCad.Toolkit.dll</HintPath>
     </Reference>
     <Reference Include="Xarial.XToolkit, Version=0.4.0.0, Culture=neutral, PublicKeyToken=60dcaf351d4060db, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Xarial.XToolkit.0.4.0-20220627.10\lib\net461\Xarial.XToolkit.dll</HintPath>
+      <HintPath>..\..\packages\Xarial.XToolkit.0.4.0-20220704.1\lib\net461\Xarial.XToolkit.dll</HintPath>
     </Reference>
     <Reference Include="Xarial.XToolkit.Wpf, Version=0.4.0.0, Culture=neutral, PublicKeyToken=60dcaf351d4060db, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Xarial.XToolkit.Wpf.0.4.0-20220627.10\lib\net461\Xarial.XToolkit.Wpf.dll</HintPath>
+      <HintPath>..\..\packages\Xarial.XToolkit.Wpf.0.4.0-20220704.1\lib\net461\Xarial.XToolkit.Wpf.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CommonSwServicesModule.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
