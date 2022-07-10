@@ -27,7 +27,7 @@ namespace Xarial.CadPlus.CustomToolbar.Services
         bool TryRunMacroCommand(Triggers_e trigger, CommandMacroInfo macroInfo, IXDocument targetDoc, string workDir);
     }
 
-    public class MacroRunner : IMacroRunner
+    public class CadMacroRunner : IMacroRunner
     {
         private readonly IXApplication m_App;
         private readonly IMacroExecutor m_Runner;
@@ -37,7 +37,7 @@ namespace Xarial.CadPlus.CustomToolbar.Services
         private readonly IXLogger m_Logger;
         private readonly IFilePathResolver m_FilePathResolver;
 
-        public MacroRunner(IXApplication app, IMacroExecutor runner, IMessageService msgSvc, IXLogger logger,
+        public CadMacroRunner(IXApplication app, IMacroExecutor runner, IMessageService msgSvc, IXLogger logger,
             IToolbarModuleProxy toolbarModuleProxy, IFilePathResolver filePathResolver)
         {
             m_App = app;

@@ -136,7 +136,7 @@ namespace Xarial.CadPlus.CustomToolbar
 
             builder.RegisterSingleton<IFilePathResolver, FilePathResolver>();
 
-            builder.RegisterSingleton<IMacroRunner, MacroRunner>();
+            builder.RegisterSingleton<IMacroRunner, CadMacroRunner>();
 
             builder.RegisterSingleton<IToolbarModuleProxy, ToolbarModuleProxy>();
 
