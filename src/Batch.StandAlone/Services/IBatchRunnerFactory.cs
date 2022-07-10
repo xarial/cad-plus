@@ -18,7 +18,8 @@ namespace Xarial.CadPlus.Batch.StandAlone.Services
 
     public class BatchRunnerFactory : IBatchRunnerFactory
     {
-        private readonly ICadApplicationInstanceProvider[] m_AppProviders;
+        private readonly IJobApplicationProvider m_JobAppProvider;
+
 
         private readonly IXLogger m_Logger;
         private readonly IJobManager m_JobMgr;
@@ -29,12 +30,12 @@ namespace Xarial.CadPlus.Batch.StandAlone.Services
 
         private readonly IBatchApplicationProxy m_BatchAppProxy;
 
-        public BatchRunnerFactory(ICadApplicationInstanceProvider[] appProviders,
+        public BatchRunnerFactory(IJobApplicationProvider jobAppProvider,
             IBatchApplicationProxy batchAppProxy,
             IJobManager jobMgr, IXLogger logger,
             IJobContectResilientWorkerFactory workerFact, IPopupKillerFactory popupKillerFactory)
         {
-            m_AppProviders = appProviders;
+            m_JobAppProvider = jobAppProvider;
 
             m_WorkerFact = workerFact;
             m_BatchAppProxy = batchAppProxy;
@@ -48,7 +49,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.Services
 
         public BatchRunner Create(BatchJob job, TextWriter journalWriter, IProgressHandler progressHandler)
             => new BatchRunner(job, journalWriter, progressHandler,
-                job.FindApplicationProvider(m_AppProviders),
+                m_JobAppProvider.GetApplicationProvider(job),
                 m_BatchAppProxy, m_JobMgr, m_Logger,
                 m_WorkerFact.Create(job.Timeout > 0 ? TimeSpan.FromSeconds(job.Timeout) : default),
                 m_PopupKillerFact.Create());

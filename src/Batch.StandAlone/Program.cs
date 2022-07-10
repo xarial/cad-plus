@@ -98,8 +98,10 @@ namespace Xarial.CadPlus.Batch.StandAlone
             builder.RegisterSingleton<IParentWindowProvider, ParentWindowProvider>().UsingFactory(() => new ParentWindowProvider(m_Window));
 
             builder.Register<IBatchApplicationProxy, BatchApplicationProxy>();
-            
-            builder.RegisterAdapter<IApplication, ICadApplicationInstanceProvider[]>(x => ((IBatchApplication)x).ApplicationProviders, LifetimeScope_e.Singleton);
+
+            builder.RegisterAdapter<IApplication, IBatchApplication>(LifetimeScope_e.Singleton);
+
+            builder.RegisterSingleton<IJobApplicationProvider, JobApplicationProvider>();
 
             builder.RegisterSingleton<IXCadMacroProvider, XCadMacroProvider>();
 

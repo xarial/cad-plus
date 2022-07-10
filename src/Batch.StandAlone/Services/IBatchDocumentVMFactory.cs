@@ -27,7 +27,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.Services
         private readonly IMessageService m_MsgSvc;
 
         private readonly IBatchRunJobExecutorFactory m_ExecFact;
-        private readonly ICadApplicationInstanceProvider[] m_AppProviders;
+        private readonly IJobApplicationProvider m_JobAppProvider;
 
         private readonly IBatchApplicationProxy m_BatchAppProxy;
 
@@ -36,13 +36,13 @@ namespace Xarial.CadPlus.Batch.StandAlone.Services
         private readonly IJournalExporter[] m_JournalExporters;
         private readonly IResultsSummaryExcelExporter[] m_ResultsExporters;
 
-        public BatchDocumentVMFactory(ICadApplicationInstanceProvider[] appProviders,
+        public BatchDocumentVMFactory(IJobApplicationProvider jobAppProvider,
             IEnumerable<IJournalExporter> journalExporters, IEnumerable<IResultsSummaryExcelExporter> resultsExporters,
             IMessageService msgSvc, IXLogger logger, IBatchRunJobExecutorFactory execFact,
             IBatchApplicationProxy batchAppProxy)
         {
             m_ExecFact = execFact;
-            m_AppProviders = appProviders;
+            m_JobAppProvider = jobAppProvider;
 
             m_JournalExporters = journalExporters.ToArray();
             m_ResultsExporters = resultsExporters.ToArray();
@@ -53,11 +53,11 @@ namespace Xarial.CadPlus.Batch.StandAlone.Services
         }
 
         public BatchDocumentVM CreateNew(string name, BatchJob job, MainWindow parentWindow, IRibbonButtonCommand[] ribbonButtonCommands)
-            => new BatchDocumentVM(name, job, job.FindApplicationProvider(m_AppProviders), m_JournalExporters,
+            => new BatchDocumentVM(name, job, m_JobAppProvider.GetApplicationProvider(job), m_JournalExporters,
                 m_ResultsExporters, m_MsgSvc, m_Logger, m_ExecFact, m_BatchAppProxy, parentWindow, ribbonButtonCommands);
 
         public BatchDocumentVM CreateOpen(FileInfo fileInfo, BatchJob job, MainWindow parentWindow, IRibbonButtonCommand[] ribbonButtonCommands)
-            => new BatchDocumentVM(fileInfo, job, job.FindApplicationProvider(m_AppProviders), m_JournalExporters,
+            => new BatchDocumentVM(fileInfo, job, m_JobAppProvider.GetApplicationProvider(job), m_JournalExporters,
                 m_ResultsExporters, m_MsgSvc, m_Logger, m_ExecFact, m_BatchAppProxy, parentWindow, ribbonButtonCommands);
     }
 }

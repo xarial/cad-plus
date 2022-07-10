@@ -91,22 +91,22 @@
     <Reference Include="PresentationFramework" />
     <Reference Include="WindowsFormsIntegration" />
     <Reference Include="Xarial.CadPlusPlus, Version=0.4.0.0, Culture=neutral, PublicKeyToken=60dcaf351d4060db, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Xarial.CadPlusPlus.0.4.0-20220704.1\lib\net472\Xarial.CadPlusPlus.dll</HintPath>
+      <HintPath>..\..\packages\Xarial.CadPlusPlus.0.4.0-20220710.2\lib\net472\Xarial.CadPlusPlus.dll</HintPath>
     </Reference>
     <Reference Include="Xarial.CadPlusPlus.Shared, Version=0.4.0.0, Culture=neutral, PublicKeyToken=60dcaf351d4060db, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Xarial.CadPlusPlus.Shared.0.4.0-20220704.1\lib\net472\Xarial.CadPlusPlus.Shared.dll</HintPath>
+      <HintPath>..\..\packages\Xarial.CadPlusPlus.Shared.0.4.0-20220710.2\lib\net472\Xarial.CadPlusPlus.Shared.dll</HintPath>
     </Reference>
     <Reference Include="Xarial.XCad, Version=0.8.0.0, Culture=neutral, PublicKeyToken=60dcaf351d4060db, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Xarial.XCad.0.8.0-20220703.2\lib\net461\Xarial.XCad.dll</HintPath>
+      <HintPath>..\..\packages\Xarial.XCad.0.8.0-20220708.1\lib\net461\Xarial.XCad.dll</HintPath>
     </Reference>
     <Reference Include="Xarial.XCad.Toolkit, Version=0.8.0.0, Culture=neutral, PublicKeyToken=60dcaf351d4060db, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Xarial.XCad.Toolkit.0.8.0-20220703.2\lib\net461\Xarial.XCad.Toolkit.dll</HintPath>
     </Reference>
     <Reference Include="Xarial.XToolkit, Version=0.4.0.0, Culture=neutral, PublicKeyToken=60dcaf351d4060db, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Xarial.XToolkit.0.4.0-20220704.1\lib\net461\Xarial.XToolkit.dll</HintPath>
+      <HintPath>..\..\packages\Xarial.XToolkit.0.4.0-20220708.1\lib\net461\Xarial.XToolkit.dll</HintPath>
     </Reference>
     <Reference Include="Xarial.XToolkit.Wpf, Version=0.4.0.0, Culture=neutral, PublicKeyToken=60dcaf351d4060db, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Xarial.XToolkit.Wpf.0.4.0-20220704.1\lib\net461\Xarial.XToolkit.Wpf.dll</HintPath>
+      <HintPath>..\..\packages\Xarial.XToolkit.Wpf.0.4.0-20220708.1\lib\net461\Xarial.XToolkit.Wpf.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -156,6 +156,7 @@
     </Compile>
     <Compile Include="Services\IBatchDocumentVMFactory.cs" />
     <Compile Include="Services\IBatchRunnerFactory.cs" />
+    <Compile Include="Services\IJobApplicationProvider.cs" />
     <Compile Include="Services\IJobContectResilientWorkerFactory.cs" />
     <Compile Include="Services\IPopupKillerFactory.cs" />
     <Compile Include="Services\IResilientWorker.cs" />

@@ -66,17 +66,19 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
         private readonly IMessageService m_MsgSvc;
         private readonly IXLogger m_Logger;
 
-        public ICadApplicationInstanceProvider[] AppProviders { get; }
+        public ICadApplicationInstanceProvider[] AppProviders => m_BatchApp.ApplicationProviders;
 
         private readonly IBatchDocumentVMFactory m_BatchDocumentFactory;
 
         private readonly IAboutService m_AboutSvc;
 
-        public BatchManagerVM(ICadApplicationInstanceProvider[] appProviders,
+        private readonly IBatchApplication m_BatchApp;
+
+        public BatchManagerVM(IBatchApplication batchApp,
             IBatchRunnerModel model, IMessageService msgSvc, IXLogger logger,
             IBatchDocumentVMFactory batchDocVmFact, IAboutService aboutSvc)
         {
-            AppProviders = appProviders;
+            m_BatchApp = batchApp;
             m_Model = model;
             m_MsgSvc = msgSvc;
             m_Logger = logger;

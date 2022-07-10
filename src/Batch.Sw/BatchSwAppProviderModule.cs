@@ -17,6 +17,7 @@ using Xarial.XCad.Base;
 using Xarial.CadPlus.Plus.Extensions;
 using Xarial.CadPlus.Plus.Services;
 using Xarial.CadPlus.Common.Services;
+using Xarial.CadPlus.Plus.DI;
 
 namespace Xarial.CadPlus.Batch.Sw
 {

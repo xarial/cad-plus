@@ -97,8 +97,8 @@ namespace Xarial.CadPlus.AddIn.Sw
             builder.RegisterSingleton<IPropertyPageHandlerProvider, CadPlusPropertyPageHandlerProvider>();
             builder.RegisterSingleton<ITaskPaneControlProvider, CadPlusTaskPaneControlProvider>();
             builder.RegisterSingleton<ITriadHandlerProvider, CadPlusTriadHandlerProvider>();
-            
-            builder.RegisterAdapter<IXApplication, ISwApplication>(a => (ISwApplication)a, LifetimeScope_e.Singleton);
+
+            builder.RegisterAdapter<IXApplication, ISwApplication>(LifetimeScope_e.Singleton);
 
             builder.RegisterAdapter<ICadSpecificServiceFactory<IMacroExecutor>, IMacroExecutor>(f => f.GetService(CadApplicationIds.SolidWorks), LifetimeScope_e.Singleton);
             builder.RegisterAdapter<ICadSpecificServiceFactory<ICadDescriptor>, ICadDescriptor>(f => f.GetService(CadApplicationIds.SolidWorks), LifetimeScope_e.Singleton);
