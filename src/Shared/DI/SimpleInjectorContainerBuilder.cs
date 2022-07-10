@@ -39,6 +39,9 @@ namespace Xarial.CadPlus.Plus.Shared.DI
         {
             ValidateStateIsBuilding();
 
+            //NOTE: creating the service provider so it can be passed to parameters selector
+            m_Provider = new SimpleInjectorServiceProvider(m_Container);
+
             foreach (var reg in m_Registrations)
             {
                 var lifestyle = GetLifestyle(reg.Lifetime);
@@ -58,7 +61,7 @@ namespace Xarial.CadPlus.Plus.Shared.DI
                     }
                     else
                     {
-                        var instanceCreator = CreateInstanceFactoryWithParameters(m_Container, reg.ImplementationType, reg.Parameters);
+                        var instanceCreator = CreateInstanceFactoryWithParameters(m_Container, m_Provider, reg.ImplementationType, reg.Parameters);
 
                         if (!reg.IsCollectionItem)
                         {
@@ -95,7 +98,6 @@ namespace Xarial.CadPlus.Plus.Shared.DI
                 }
             }
 
-            m_Provider = new SimpleInjectorServiceProvider(m_Container);
             ContainerCreated?.Invoke(this, m_Provider);
 
             return m_Provider;
@@ -184,7 +186,7 @@ namespace Xarial.CadPlus.Plus.Shared.DI
             }
         }
 
-        private Func<object> CreateInstanceFactoryWithParameters(SimpleInjector.Container container, Type imptType, IParameter[] paramSelectors)
+        private Func<object> CreateInstanceFactoryWithParameters(SimpleInjector.Container container, IServiceProvider svcProvider, Type imptType, IParameter[] paramSelectors)
         {
             var constructors = imptType.GetConstructors();
 
@@ -193,7 +195,7 @@ namespace Xarial.CadPlus.Plus.Shared.DI
 
             foreach (var constructor in constructors)
             {
-                if (IsConstructorMatch(constructor, container, paramSelectors, out Func<object>[] parameters))
+                if (IsConstructorMatch(constructor, container, svcProvider, paramSelectors, out Func<object>[] parameters))
                 {
                     if (targetConstructor == null)
                     {
@@ -215,7 +217,8 @@ namespace Xarial.CadPlus.Plus.Shared.DI
             return new Func<object>(() => targetConstructor.Invoke(targetParameters.Select(p => p.Invoke()).ToArray()));
         }
 
-        private bool IsConstructorMatch(ConstructorInfo constructor, SimpleInjector.Container container, IParameter[] paramSelectors, out Func<object>[] paramsProviders)
+        private bool IsConstructorMatch(ConstructorInfo constructor, SimpleInjector.Container container, IServiceProvider svcProvider,
+            IParameter[] paramSelectors, out Func<object>[] paramsProviders)
         {
             var constructorParameters = constructor.GetParameters() ?? new ParameterInfo[0];
 
@@ -245,12 +248,12 @@ namespace Xarial.CadPlus.Plus.Shared.DI
                 }
                 else if (scopedParamSelectors.Length == 1)
                 {
-                    paramsProviders[i] = new Func<object>(() => scopedParamSelectors.First().ProvideValue(parameter));
+                    paramsProviders[i] = new Func<object>(() => scopedParamSelectors.First().ProvideValue(parameter, svcProvider));
                 }
                 else
                 {
                     var instProducer = container.GetRegistration(parameter.ParameterType, false);
-
+                    
                     if (instProducer != null)
                     {
                         paramsProviders[i] = new Func<object>(() => instProducer.GetInstance());

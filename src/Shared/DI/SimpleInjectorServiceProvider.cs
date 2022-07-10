@@ -9,6 +9,7 @@ namespace Xarial.CadPlus.Plus.Shared.DI
         public SimpleInjectorServiceProvider(SimpleInjector.Container container)
         {
             m_Containter = container;
+            //NOTE: do not do any validations here as this service will be passed before constructors registered
         }
 
         public object GetService(Type serviceType)

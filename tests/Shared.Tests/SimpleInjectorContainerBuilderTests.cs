@@ -136,15 +136,58 @@ namespace Shared.Tests
 
     public interface I9
     {
+        I10 I10Inst { get; }
     }
 
     public class C9 : I9
     {
         public bool Val { get; }
+        public I10 I10Inst { get; }
 
         public C9(bool val)
         {
             Val = val;
+            I10Inst = new C10();
+        }
+    }
+
+    public interface I10 
+    {
+    }
+
+    public class C10 : I10 
+    {
+    }
+
+    public interface I11 
+    {
+        string Test1 { get; }
+    }
+
+    public class C11 : I11 
+    {
+        private readonly I10 m_I10;
+
+        public string Test1 { get; }
+
+        public C11(I10 i10) 
+        {
+            m_I10 = i10;
+            Test1 = "ABC";
+        }
+    }
+
+    public interface I12 
+    {
+    }
+
+    public class C12 : I12 
+    {
+        private readonly string m_Test1;
+
+        public C12(string test1) 
+        {
+            m_Test1 = test1;
         }
     }
 
@@ -154,9 +197,11 @@ namespace Shared.Tests
         public void Test1() 
         {
             var cb1 = new SimpleInjectorContainerBuilder();
+
             cb1.RegisterSingleton<I1, C1>();
             cb1.RegisterInstance<I2>(new C2());
-            cb1.RegisterAdapter<I2, I3>(x => (I3)x, LifetimeScope_e.Singleton);
+            cb1.RegisterAdapter<I9, I10>(x => x.I10Inst, LifetimeScope_e.Singleton);
+            cb1.RegisterAdapter<I2, I3>(LifetimeScope_e.Singleton);
             cb1.RegisterSingleton<I4, C4>().UsingInitializer(s => s.Init());
             cb1.RegisterTransient<I5, C5>();
             cb1.RegisterSingleton<I6, C6>().UsingParameters(Parameter<string>.Named("test", "ABC"));
@@ -171,6 +216,9 @@ namespace Shared.Tests
 
             cb1.RegisterSingleton<I9, C9>().UsingFactory(() => new C9(true));
 
+            cb1.RegisterSingleton<I11, C11>();
+            cb1.RegisterSingleton<I12, C12>().UsingParameters(Parameter<string>.Indexed(0, s => s.GetService<I11>().Test1));
+
             var sp1 = cb1.Build();
 
             var s1 = sp1.GetService<I1>();
@@ -180,6 +228,9 @@ namespace Shared.Tests
             var s6 = sp1.GetService<I6>();
             var s8 = sp1.GetService<I8>();
             var s9 = sp1.GetService<I9>();
+            var s10 = sp1.GetService<I10>();
+            var s11 = sp1.GetService<I11>();
+            var s12 = sp1.GetService<I12>();
         }
     }
 }

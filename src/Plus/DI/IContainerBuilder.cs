@@ -64,6 +64,11 @@ namespace Xarial.CadPlus.Plus.DI
             where TToService : class
             => contBuilder.RegisterAdapter(typeof(TFromService), typeof(TToService), x => adapter.Invoke((TFromService)x), scope);
 
+        public static void RegisterAdapter<TFromService, TToService>(this IContainerBuilder contBuilder, LifetimeScope_e scope)
+            where TFromService : class, TToService
+            where TToService : class
+            => contBuilder.RegisterAdapter(typeof(TFromService), typeof(TToService), x => (TToService)x, scope);
+
         public static void RegisterInstance<TService>(this IContainerBuilder contBuilder, TService inst)
             where TService : class
             => contBuilder.RegisterInstance(typeof(TService), inst);
