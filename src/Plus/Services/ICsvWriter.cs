@@ -10,6 +10,6 @@ namespace Xarial.CadPlus.Plus.Services
 {
     public interface ICsvWriter
     {
-        void Write(CsvRow[] rows, TextWriter writer);
+        void Write(CsvRow[] rows, TextWriter writer, char separator = ',');
     }
 }
