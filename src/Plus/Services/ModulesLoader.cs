@@ -30,6 +30,10 @@ namespace Xarial.CadPlus.Plus.Services
 
     public class ModulesLoader : IModulesLoader
     {
+        private const string LOCAL_MODULES_FOLDER_NAME = "Modules";
+        private const string USER_MODULES_FOLDER_NAME = "Plus";
+        private const string MODULES_FILTER = "*.Module.dll";
+
         private readonly ISettingsProvider m_SettsProvider;
 
         public ModulesLoader()
@@ -39,13 +43,13 @@ namespace Xarial.CadPlus.Plus.Services
 
         public IModule[] Load(IHost host, Type hostApplicationType)
         {
-            var modulesDir = Path.Combine(Path.GetDirectoryName(this.GetType().Assembly.Location), "Modules");
+            var modulesDir = Path.Combine(Path.GetDirectoryName(this.GetType().Assembly.Location), LOCAL_MODULES_FOLDER_NAME);
 
             var modulePaths = new List<string>();
 
             modulePaths.Add(modulesDir);
 
-            var plusDir = Path.Combine(Locations.AppDirectoryPath, "Plus");
+            var plusDir = Path.Combine(Locations.AppDirectoryPath, USER_MODULES_FOLDER_NAME);
 
             if (Directory.Exists(plusDir))
             {
@@ -59,8 +63,7 @@ namespace Xarial.CadPlus.Plus.Services
                 modulePaths.AddRange(hostSettings.AdditionalModuleFolders);
             }
 
-            var catalog = CreateDirectoryCatalog(FileSystemUtils.GetTopFolders(modulePaths),
-                "*.Module.dll");
+            var catalog = CreateDirectoryCatalog(FileSystemUtils.GetTopFolders(modulePaths), MODULES_FILTER);
 
             var container = new CompositionContainer(catalog);
 
@@ -103,7 +106,7 @@ namespace Xarial.CadPlus.Plus.Services
                 if (Directory.Exists(path))
                 {
                     catalog.Catalogs.Add(new DirectoryCatalog(path, searchPattern));
-
+                    
                     foreach (var subDir in Directory.GetDirectories(path, "*.*", SearchOption.AllDirectories))
                     {
                         catalog.Catalogs.Add(new DirectoryCatalog(subDir, searchPattern));

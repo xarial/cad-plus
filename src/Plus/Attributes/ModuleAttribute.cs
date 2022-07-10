@@ -20,7 +20,7 @@ namespace Xarial.CadPlus.Plus.Attributes
         Type[] TargetApplicationTypes { get; }
     }
 
-    [AttributeUsage(AttributeTargets.Class), MetadataAttribute]
+    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false), MetadataAttribute]
     public class ModuleAttribute : ExportAttribute, IModuleMetadata
     {
         public Type[] TargetApplicationTypes { get; }

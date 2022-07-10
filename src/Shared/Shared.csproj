@@ -38,8 +38,8 @@
     <PackageReference Include="Fluent.Ribbon" Version="9.0.4" />
     <PackageReference Include="MahApps.Metro" Version="2.4.9" />
     <PackageReference Include="SimpleInjector" Version="5.3.3" />
-    <PackageReference Include="Xarial.XToolkit" Version="0.4.0-20220708.1" />
-    <PackageReference Include="Xarial.XToolkit.Wpf" Version="0.4.0-20220708.1" />
+    <PackageReference Include="Xarial.XToolkit" Version="0.4.0-20220710.2" />
+    <PackageReference Include="Xarial.XToolkit.Wpf" Version="0.4.0-20220710.2" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Plus\Plus.csproj" />
