@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <ModuleName>Toolbar</ModuleName>
-    <AssemblyName>$(ModuleName).Module</AssemblyName>
+    <AssemblyName>Toolbar.Module</AssemblyName>
     <RootNamespace>Xarial.CadPlus.Toolbar</RootNamespace>
     <AssemblyTitle>CustomToolbar</AssemblyTitle>
   </PropertyGroup>
@@ -28,11 +28,11 @@
     <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="4.7.0" />
     <PackageReference Include="System.Text.Encoding.CodePages" Version="4.5.1" />
     <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.3" />
-    <PackageReference Include="Xarial.CadPlusPlus" Version="0.4.0-20220710.2" />
-    <PackageReference Include="Xarial.CadPlusPlus.Shared" Version="0.4.0-20220710.2" />
+    <PackageReference Include="Xarial.CadPlusPlus" Version="0.4.0-20220711.3" />
+    <PackageReference Include="Xarial.CadPlusPlus.Shared" Version="0.4.0-20220711.3" />
     <PackageReference Include="Xarial.XCad" Version="0.8.0-20220708.1" />
-    <PackageReference Include="Xarial.XToolkit" Version="0.4.0-20220708.1" />
-    <PackageReference Include="Xarial.XToolkit.Wpf" Version="0.4.0-20220708.1" />
+    <PackageReference Include="Xarial.XToolkit" Version="0.4.0-20220710.2" />
+    <PackageReference Include="Xarial.XToolkit.Wpf" Version="0.4.0-20220710.2" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Microsoft.VisualBasic" />

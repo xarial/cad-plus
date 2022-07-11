@@ -4,7 +4,6 @@
     <OutputType>WinExe</OutputType>
     <RootNamespace>Xarial.CadPlus.Xport</RootNamespace>
     <AssemblyName>exportplus</AssemblyName>
-    <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <AssemblyTitle>eXport+</AssemblyTitle>
     <Description>@"eXport+ is a part of CAD+ toolset and enables exporting of SOLIDWORKS files to foreign formats via eDrawings</Description>
@@ -26,11 +25,11 @@
     <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.31" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="SimpleInjector" Version="5.3.3" />
-    <PackageReference Include="Xarial.CadPlusPlus" Version="0.4.0-20220710.2" />
-    <PackageReference Include="Xarial.CadPlusPlus.Shared" Version="0.4.0-20220710.2" />
+    <PackageReference Include="Xarial.CadPlusPlus" Version="0.4.0-20220711.3" />
+    <PackageReference Include="Xarial.CadPlusPlus.Shared" Version="0.4.0-20220711.3" />
     <PackageReference Include="Xarial.XCad" Version="0.8.0-20220708.1" />
-    <PackageReference Include="Xarial.XToolkit" Version="0.4.0-20220708.1" />
-    <PackageReference Include="Xarial.XToolkit.Wpf" Version="0.4.0-20220708.1" />
+    <PackageReference Include="Xarial.XToolkit" Version="0.4.0-20220710.2" />
+    <PackageReference Include="Xarial.XToolkit.Wpf" Version="0.4.0-20220710.2" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System.ComponentModel.Composition" />

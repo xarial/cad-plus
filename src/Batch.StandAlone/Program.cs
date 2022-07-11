@@ -95,7 +95,7 @@ namespace Xarial.CadPlus.Batch.StandAlone
             builder.RegisterSingleton<IPopupKillerFactory, PopupKillerFactory>();
             builder.RegisterSingleton<IBatchDocumentVMFactory, BatchDocumentVMFactory>();
             builder.RegisterSingleton<IAboutService, AboutService>();
-            builder.RegisterSingleton<IParentWindowProvider, ParentWindowProvider>().UsingFactory(() => new ParentWindowProvider(m_Window));
+            builder.RegisterSingleton<IParentWindowProvider, ParentWindowProvider>().UsingFactory(() => new ParentWindowProvider(() => m_Window));
 
             builder.Register<IBatchApplicationProxy, BatchApplicationProxy>();
 
