@@ -20,17 +20,29 @@ namespace Xarial.CadPlus.Plus.Shared.DI
 
     public class SimpleInjectorContainerBuilder : IContainerBuilder
     {
+        private class RegistrationInfo 
+        {
+            internal IRegistration Registration { get; }
+            internal RegistrationConflictResolveStrategy_e ConflictResolve { get; }
+
+            internal RegistrationInfo(IRegistration registration, RegistrationConflictResolveStrategy_e conflictResolve)
+            {
+                Registration = registration;
+                ConflictResolve = conflictResolve;
+            }
+        }
+
         public event Action<IContainerBuilder, IServiceProvider> ContainerCreated;
 
         protected SimpleInjectorServiceProvider m_Provider;
 
-        protected readonly List<IRegistration> m_Registrations;
+        private readonly List<RegistrationInfo> m_Registrations;
 
         private readonly SimpleInjector.Container m_Container;
 
         public SimpleInjectorContainerBuilder()
         {
-            m_Registrations = new List<IRegistration>();
+            m_Registrations = new List<RegistrationInfo>();
             m_Container = new SimpleInjector.Container();
             m_Container.Options.EnableAutoVerification = false;
         }
@@ -42,7 +54,9 @@ namespace Xarial.CadPlus.Plus.Shared.DI
             //NOTE: creating the service provider so it can be passed to parameters selector
             m_Provider = new SimpleInjectorServiceProvider(m_Container);
 
-            foreach (var reg in m_Registrations)
+            var registrations = ResolveRegistrations();
+
+            foreach (var reg in registrations)
             {
                 var lifestyle = GetLifestyle(reg.Lifetime);
 
@@ -103,6 +117,39 @@ namespace Xarial.CadPlus.Plus.Shared.DI
             return m_Provider;
         }
 
+        private IReadOnlyList<IRegistration> ResolveRegistrations() 
+        {
+            var registrations = new List<IRegistration>();
+
+            foreach (var regInfo in m_Registrations) 
+            {
+                var existingRegInd = regInfo.Registration.IsCollectionItem ? -1 : registrations.FindIndex(r => r.ServiceType == regInfo.Registration.ServiceType);
+
+                if (existingRegInd == -1)
+                {
+                    registrations.Add(regInfo.Registration);
+                }
+                else
+                {
+                    switch (regInfo.ConflictResolve)
+                    {
+                        case RegistrationConflictResolveStrategy_e.Replace:
+                            registrations[existingRegInd] = regInfo.Registration;
+                            break;
+
+                        case RegistrationConflictResolveStrategy_e.KeepOriginal:
+                            //Do nothing
+                            break;
+
+                        case RegistrationConflictResolveStrategy_e.ThrownError:
+                            throw new Exception($"'{regInfo.Registration.ServiceType.FullName}' is already registered");
+                    }
+                }
+            }
+
+            return registrations;
+        }
+
         private static SimpleInjector.Lifestyle GetLifestyle(LifetimeScope_e scope)
         {
             SimpleInjector.Lifestyle lifestyle;
@@ -128,29 +175,7 @@ namespace Xarial.CadPlus.Plus.Shared.DI
         {
             ValidateStateIsBuilding();
 
-            var existingRegInd = m_Registrations.FindIndex(r => r.ServiceType == registration.ServiceType);
-
-            if (existingRegInd == -1)
-            {
-                m_Registrations.Add(registration);
-            }
-            else 
-            {
-                switch (conflictResolveStrategy) 
-                {
-                    case RegistrationConflictResolveStrategy_e.Replace:
-                        m_Registrations[existingRegInd] = registration;
-                        break;
-
-                    case RegistrationConflictResolveStrategy_e.KeepOriginal:
-                        //Do nothing
-                        break;
-
-                    case RegistrationConflictResolveStrategy_e.ThrownError:
-                        throw new Exception($"'{registration.ServiceType.FullName}' is already registered");
-                }
-                
-            }
+            m_Registrations.Add(new RegistrationInfo(registration, conflictResolveStrategy));
         }
 
         public void RegisterAdapter(Type fromSvcType, Type toSvcType, Func<object, object> adapter, LifetimeScope_e scope)
