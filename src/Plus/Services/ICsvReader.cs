@@ -10,6 +10,6 @@ namespace Xarial.CadPlus.Plus.Services
 {
     public interface ICsvReader
     {
-        CsvRow[] Read(TextReader reader, char separator = ',');
+        CsvRow[] Read(TextReader reader, char delimeter = ',');
     }
 }

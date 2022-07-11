@@ -186,9 +186,9 @@ namespace Xarial.CadPlus.Plus.Shared.DI
             }
         }
 
-        private Func<object> CreateInstanceFactoryWithParameters(SimpleInjector.Container container, IServiceProvider svcProvider, Type imptType, IParameter[] paramSelectors)
+        private Func<object> CreateInstanceFactoryWithParameters(SimpleInjector.Container container, IServiceProvider svcProvider, Type impType, IParameter[] paramSelectors)
         {
-            var constructors = imptType.GetConstructors();
+            var constructors = impType.GetConstructors();
 
             ConstructorInfo targetConstructor = null;
             Func<object>[] targetParameters = null;
@@ -204,14 +204,14 @@ namespace Xarial.CadPlus.Plus.Shared.DI
                     }
                     else
                     {
-                        throw new Exception($"Multiple constructors were matched for the type '{imptType.FullName}' based on the input parameters");
+                        throw new Exception($"Multiple constructors were matched for the type '{impType.FullName}' based on the input parameters");
                     }
                 }
             }
 
             if (targetConstructor == null)
             {
-                throw new Exception("Failed to find the constructor matching the parameters");
+                throw new Exception($"Failed to find the constructor for type '{impType.FullName}' matching the parameters");
             }
 
             return new Func<object>(() => targetConstructor.Invoke(targetParameters.Select(p => p.Invoke()).ToArray()));

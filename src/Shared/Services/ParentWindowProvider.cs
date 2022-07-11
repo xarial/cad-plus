@@ -10,18 +10,28 @@ namespace Xarial.CadPlus.Plus.Shared.Services
 {
     public class ParentWindowProvider : IParentWindowProvider
     {
-        public Window Window { get; }
+        public Window Window => m_WindowFactory?.Invoke();
+        public IntPtr Handle => m_HandleFactory?.Invoke() ?? IntPtr.Zero;
 
-        public IntPtr Handle { get; }
+        private readonly Func<Window> m_WindowFactory;
+        private readonly Func<IntPtr> m_HandleFactory;
 
-        public ParentWindowProvider(Window window) 
+        public ParentWindowProvider(Window window) : this(() => window)
         {
-            Window = window;
         }
 
-        public ParentWindowProvider(IntPtr handle)
+        public ParentWindowProvider(Func<Window> windowFact)
         {
-            Handle = handle;
+            m_WindowFactory = windowFact;
+        }
+
+        public ParentWindowProvider(IntPtr handle) : this(() => handle)
+        {
+        }
+
+        public ParentWindowProvider(Func<IntPtr> handleFact)
+        {
+            m_HandleFactory = handleFact;
         }
     }
 }
