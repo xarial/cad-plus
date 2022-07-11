@@ -191,6 +191,17 @@ namespace Shared.Tests
         }
     }
 
+    public interface I13 
+    {
+    }
+
+    public class C13 : I13 
+    {
+        public C13(I10 i, Dictionary<string, string> map) 
+        {
+        }
+    }
+
     public class SimpleInjectorContainerBuilderTests
     {
         [Test]
@@ -231,6 +242,17 @@ namespace Shared.Tests
             var s10 = sp1.GetService<I10>();
             var s11 = sp1.GetService<I11>();
             var s12 = sp1.GetService<I12>();
+        }
+
+        [Test]
+        public void Test2()
+        {
+            var cb1 = new SimpleInjectorContainerBuilder();
+            cb1.RegisterSingleton<I10, C10>();
+            cb1.RegisterSingleton<I13, C13>().UsingParameters(Parameter<Dictionary<string, string>>.Any(new Dictionary<string, string>()));
+
+            var svc1 = cb1.Build();
+            var i13 = svc1.GetService<I13>();
         }
     }
 }

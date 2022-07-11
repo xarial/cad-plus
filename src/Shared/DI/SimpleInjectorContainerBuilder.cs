@@ -186,12 +186,21 @@ namespace Xarial.CadPlus.Plus.Shared.DI
             }
         }
 
-        private Func<object> CreateInstanceFactoryWithParameters(SimpleInjector.Container container, IServiceProvider svcProvider, Type impType, IParameter[] paramSelectors)
+        private Func<object> CreateInstanceFactoryWithParameters(SimpleInjector.Container container, IServiceProvider svcProvider, 
+            Type impType, IParameter[] paramSelectors)
+            => new Func<object>(() =>
+            {
+                var targetConstructor = FindConstructor(container, svcProvider, impType, paramSelectors, out var targetParameters);
+                return targetConstructor.Invoke(targetParameters.Select(p => p.Invoke()).ToArray());
+            });
+
+        private ConstructorInfo FindConstructor(SimpleInjector.Container container, IServiceProvider svcProvider,
+            Type impType, IParameter[] paramSelectors, out Func<object>[] targetParameters) 
         {
             var constructors = impType.GetConstructors();
 
             ConstructorInfo targetConstructor = null;
-            Func<object>[] targetParameters = null;
+            targetParameters = null;
 
             foreach (var constructor in constructors)
             {
@@ -214,7 +223,7 @@ namespace Xarial.CadPlus.Plus.Shared.DI
                 throw new Exception($"Failed to find the constructor for type '{impType.FullName}' matching the parameters");
             }
 
-            return new Func<object>(() => targetConstructor.Invoke(targetParameters.Select(p => p.Invoke()).ToArray()));
+            return targetConstructor;
         }
 
         private bool IsConstructorMatch(ConstructorInfo constructor, SimpleInjector.Container container, IServiceProvider svcProvider,
@@ -228,19 +237,7 @@ namespace Xarial.CadPlus.Plus.Shared.DI
             {
                 var parameter = constructorParameters[i];
 
-                var scopedParamSelectors = paramSelectors.Where(s =>
-                {
-                    var expParamType = s.TargetType;
-
-                    if (parameter.ParameterType.IsAssignableFrom(expParamType))
-                    {
-                        return s.Matches(parameter, i);
-                    }
-                    else
-                    {
-                        return false;
-                    }
-                }).ToArray();
+                var scopedParamSelectors = paramSelectors.Where(s => s.Matches(parameter, i)).ToArray();
 
                 if (scopedParamSelectors.Length > 1)
                 {
