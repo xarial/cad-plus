@@ -102,9 +102,9 @@
                 <ctrls:FlagEnumComboBox Grid.Column="1" Grid.Row="2" Margin="2" Value="{Binding Path=Location}"
                             Visibility="{Binding Path=Triggers, Converter={StaticResource hasEnumToVisConv}, ConverterParameter={x:Static enums:Triggers_e.Button}}"/>
 
-                <CheckBox Grid.Column="0" Grid.Row="3" Margin="2" IsChecked="{Binding Path=EnableToggleButtonStateExpression}">
-                    <TextBlock Text="Toggle Button State Expression:" TextWrapping="Wrap" VerticalAlignment="Top"
-                               Visibility="{Binding Path=Triggers, Converter={StaticResource hasEnumToVisConv}, ConverterParameter={x:Static enums:Triggers_e.ToggleButton}}"/>
+                <CheckBox Grid.Column="0" Grid.Row="3" Margin="2" IsChecked="{Binding Path=EnableToggleButtonStateExpression}"
+                          Visibility="{Binding Path=Triggers, Converter={StaticResource hasEnumToVisConv}, ConverterParameter={x:Static enums:Triggers_e.ToggleButton}}">
+                    <TextBlock Text="Toggle Button State Expression:" TextWrapping="Wrap" VerticalAlignment="Top"/>
                 </CheckBox>
                 <Grid Grid.Column="1" Grid.Row="3"
                       Visibility="{Binding Path=Triggers, Converter={StaticResource hasEnumToVisConv}, ConverterParameter={x:Static enums:Triggers_e.ToggleButton}}">

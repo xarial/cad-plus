@@ -28,7 +28,7 @@ namespace Xarial.CadPlus.CustomToolbar.Structs
         public string Arguments { get; set; }
 
         public bool EnableToggleButtonStateExpression { get; set; }
-        public string ToggleButtonStateExpression { get; set; } = "";
+        public string ToggleButtonStateExpression { get; set; }
         public bool CacheToggleState { get; set; } = true;
 
         internal CommandMacroInfo Clone()
