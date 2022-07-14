@@ -4,14 +4,9 @@
     <RootNamespace>Xarial.CadPlus.Xport.StandAloneExporter</RootNamespace>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <AssemblyTitle>Exporter</AssemblyTitle>
+    <UseWindowsForms>true</UseWindowsForms>
   </PropertyGroup>
   <Import Project="$(SolutionDir)common\common.props" />
-  <ItemGroup>
-    <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Net.Http" />
-  </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SwEDrawingsHost\SwEDrawingsHost.csproj" />
   </ItemGroup>

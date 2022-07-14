@@ -6,7 +6,7 @@
     <AssemblyName>exportplus</AssemblyName>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <AssemblyTitle>eXport+</AssemblyTitle>
-    <Description>@"eXport+ is a part of CAD+ toolset and enables exporting of SOLIDWORKS files to foreign formats via eDrawings</Description>
+    <Description>eXport+ is a part of CAD+ toolset and enables exporting of SOLIDWORKS files to foreign formats via eDrawings</Description>
     <UseWPF>true</UseWPF>
   </PropertyGroup>
   <PropertyGroup>
@@ -19,10 +19,8 @@
   <ItemGroup>
     <PackageReference Include="BetterFolderBrowser" Version="1.2.0" />
     <PackageReference Include="CommandLineParser" Version="2.9.1" />
-    <PackageReference Include="ControlzEx" Version="5.0.1" />
     <PackageReference Include="Fluent.Ribbon" Version="9.0.4" />
     <PackageReference Include="MahApps.Metro" Version="2.4.9" />
-    <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.39" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="SimpleInjector" Version="5.3.3" />
     <PackageReference Include="Xarial.CadPlusPlus" Version="0.4.0-20220714.2" />
@@ -30,23 +28,6 @@
     <PackageReference Include="Xarial.XCad" Version="0.8.0-20220708.1" />
     <PackageReference Include="Xarial.XToolkit" Version="0.4.0-20220710.2" />
     <PackageReference Include="Xarial.XToolkit.Wpf" Version="0.4.0-20220710.2" />
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Include="System.ComponentModel.Composition" />
-    <Reference Include="System.ComponentModel.DataAnnotations" />
-    <Reference Include="System.Configuration" />
-    <Reference Include="System.Web" />
-    <Reference Include="System.Web.Extensions" />
-    <Reference Include="System.Windows.Forms" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="System.Xaml" />
-    <Reference Include="UIAutomationProvider" />
-    <Reference Include="UIAutomationTypes" />
-    <Reference Include="WindowsBase" />
-    <Reference Include="PresentationCore" />
-    <Reference Include="PresentationFramework" />
-    <Reference Include="WindowsFormsIntegration" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="xport.ico" />
