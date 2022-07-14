@@ -20,7 +20,6 @@ using Xarial.XCad.UI.PropertyPage;
 using System.Reflection;
 using Xarial.XToolkit.Reflection;
 using Xarial.CadPlus.Plus;
-using Autofac;
 using Xarial.CadPlus.Common;
 using Xarial.CadPlus.Init;
 using Xarial.CadPlus.Plus.Applications;
@@ -33,6 +32,9 @@ using System.Windows.Threading;
 using Xarial.XCad.Base.Enums;
 using Xarial.CadPlus.Plus.Shared.Services;
 using Xarial.XToolkit.Helpers;
+using Xarial.CadPlus.Plus.DI;
+using Xarial.XToolkit.Services;
+using Xarial.CadPlus.Plus.Shared.DI;
 
 namespace Xarial.CadPlus.AddIn.Sw
 {
@@ -83,28 +85,38 @@ namespace Xarial.CadPlus.AddIn.Sw
             }
             AppDomain.CurrentDomain.UnhandledException += OnDomainUnhandledException;
 
-            m_Host = new AddInHost(new SwAddInApplication(this), 
-                new Initiator());
+            m_Host = new AddInHost(new SwAddInApplication(this), new Initiator());
             m_Host.ConfigureServices += OnConfigureModuleServices;
         }
-        
+
+        protected override IXServiceCollection CreateServiceCollection()
+            => new SimpleInjectorServiceCollectionContainerBuilder();
+
         private void OnConfigureModuleServices(IContainerBuilder builder)
         {
-            var svc = ((ContainerBuilderWrapper)builder).Builder;
+            builder.RegisterSingleton<IPropertyPageHandlerProvider, CadPlusPropertyPageHandlerProvider>();
+            builder.RegisterSingleton<ITaskPaneControlProvider, CadPlusTaskPaneControlProvider>();
+            builder.RegisterSingleton<ITriadHandlerProvider, CadPlusTriadHandlerProvider>();
 
-            svc.RegisterType<CadPlusPropertyPageHandlerProvider>().As<IPropertyPageHandlerProvider>();
-            svc.RegisterType<CadPlusTaskPaneControlProvider>().As<ITaskPaneControlProvider>();
-            svc.RegisterType<CadPlusTriadHandlerProvider>().As<ITriadHandlerProvider>();
-            
-            builder.RegisterAdapter<IXApplication, ISwApplication>(a => (ISwApplication)a);
-            builder.Register(x => x.GetService<IMacroExecutor>(CadApplicationIds.SolidWorks));
-            builder.Register(x => x.GetService<ICadDescriptor>(CadApplicationIds.SolidWorks));
+            builder.RegisterAdapter<IXApplication, ISwApplication>(LifetimeScope_e.Singleton);
+
+            builder.RegisterAdapter<ICadSpecificServiceFactory<IMacroExecutor>, IMacroExecutor>(f => f.GetService(CadApplicationIds.SolidWorks), LifetimeScope_e.Singleton);
+            builder.RegisterAdapter<ICadSpecificServiceFactory<ICadDescriptor>, ICadDescriptor>(f => f.GetService(CadApplicationIds.SolidWorks), LifetimeScope_e.Singleton);
+        }
+
+        protected override void HandleConnectException(Exception ex)
+        {
+            HandleException(ex);
         }
 
         private void OnDomainUnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
             var ex = e.ExceptionObject as Exception ?? new Exception("");
+            HandleException(ex);
+        }
 
+        private void HandleException(Exception ex)
+        {
             var logger = m_Host?.Services?.GetService<IXLogger>() ?? new AppLogger();
             var msg = m_Host?.Services?.GetService<IMessageService>() ?? new GenericMessageService();
 

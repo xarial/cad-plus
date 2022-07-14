@@ -64,37 +64,42 @@ namespace Xarial.CadPlus.Batch.Base.Core
     {
         private const double POPUP_KILLER_PING_SECS = 2;
 
-        private readonly TextWriter m_JournalWriter;
-        private readonly IProgressHandler m_ProgressHandler;
-        private readonly ICadApplicationInstanceProvider m_AppProvider;
-        private readonly IMacroExecutor m_MacroRunnerSvc;
-
         private readonly IXLogger m_Logger;
         private readonly IJobManager m_JobMgr;
 
-        private readonly Func<TimeSpan?, IResilientWorker<BatchJobContext>> m_WorkerFact;
+        private readonly IResilientWorker<BatchJobContext> m_Worker;
 
         private readonly IPopupKiller m_PopupKiller;
 
         private readonly IBatchApplicationProxy m_BatchAppProxy;
 
+        private readonly TextWriter m_JournalWriter;
+        private readonly IProgressHandler m_ProgressHandler;
+        private readonly ICadApplicationInstanceProvider m_AppProvider;
+        private readonly IMacroExecutor m_MacroRunnerSvc;
         private readonly BatchJob m_Job;
 
-        private BatchJobContext m_CurrentContext;
+        private readonly BatchJobContext m_CurrentContext;
 
-        public BatchRunner(BatchJob job, ICadApplicationInstanceProvider[] appProviders, 
-            TextWriter journalWriter, IProgressHandler progressHandler,
+        private bool m_IsRun;
+
+        public BatchRunner(BatchJob job, TextWriter journalWriter, IProgressHandler progressHandler, ICadApplicationInstanceProvider appProvider,
             IBatchApplicationProxy batchAppProxy,
             IJobManager jobMgr, IXLogger logger,
-            Func<TimeSpan?, IResilientWorker<BatchJobContext>> workerFact, IPopupKiller popupKiller)
+            IResilientWorker<BatchJobContext> worker, IPopupKiller popupKiller)
         {
             m_Job = job;
+            m_AppProvider = appProvider;
+            m_MacroRunnerSvc = m_AppProvider.MacroRunnerService;
+
             m_JournalWriter = journalWriter;
             m_ProgressHandler = progressHandler;
-            m_AppProvider = job.FindApplicationProvider(appProviders);
-            m_MacroRunnerSvc = m_AppProvider.MacroRunnerService;
-            
-            m_WorkerFact = workerFact;
+
+            m_Worker = worker;
+
+            m_Worker.Retry += OnRetry;
+            m_Worker.Timeout += OnTimeout;
+
             m_BatchAppProxy = batchAppProxy;
 
             m_PopupKiller = popupKiller;
@@ -104,107 +109,113 @@ namespace Xarial.CadPlus.Batch.Base.Core
             m_Logger = logger;
 
             m_JobMgr = jobMgr;
-        }
-
-        public async Task<bool> BatchRunAsync(CancellationToken cancellationToken = default)
-        {
-            m_JournalWriter.WriteLine($"Batch macro running started");
-
-            var batchStartTime = DateTime.Now;
-            
-            TimeSpan? timeout = null;
-
-            if (m_Job.Timeout > 0)
-            {
-                timeout = TimeSpan.FromSeconds(m_Job.Timeout);
-            }
-
-            var worker = m_WorkerFact.Invoke(timeout);
-
-            worker.Retry += OnRetry;
-            worker.Timeout += OnTimeout;
 
             m_CurrentContext = new BatchJobContext()
             {
                 Job = m_Job
             };
 
-            var jobResult = false;
+            m_IsRun = false;
+        }
 
-            try
+        public async Task<bool> BatchRunAsync(CancellationToken cancellationToken = default)
+        {
+            if (!m_IsRun)
             {
-                await TaskEx.Run(() =>
+                m_IsRun = true;
+
+                m_JournalWriter.WriteLine($"Batch macro running started");
+
+                var batchStartTime = DateTime.Now;
+
+                TimeSpan? timeout = null;
+
+                if (m_Job.Timeout > 0)
                 {
-                    m_JournalWriter.WriteLine($"Collecting files for processing");
+                    timeout = TimeSpan.FromSeconds(m_Job.Timeout);
+                }
 
-                    var app = EnsureApplication(m_CurrentContext, cancellationToken);
+                var jobResult = false;
 
-                    var allFiles = PrepareJobScope(app, m_Job.Input, m_Job.Filters, m_Job.TopLevelFilesOnly, m_Job.Macros);
-
-                    m_JournalWriter.WriteLine($"Running batch processing for {allFiles.Length} file(s)");
-
-                    m_ProgressHandler.SetJobScope(allFiles, batchStartTime);
-
-                    if (!allFiles.Any())
+                try
+                {
+                    await TaskEx.Run(() =>
                     {
-                        throw new UserException("Empty job. No files matching specified filter");
-                    }
+                        m_JournalWriter.WriteLine($"Collecting files for processing");
 
-                    var curBatchSize = 0;
+                        var app = EnsureApplication(m_CurrentContext, cancellationToken);
 
-                    for (int i = 0; i < allFiles.Length; i++)
-                    {
-                        var curAppPrc = m_CurrentContext.CurrentApplicationProcess?.Id;
+                        var allFiles = PrepareJobScope(app, m_Job.Input, m_Job.Filters, m_Job.TopLevelFilesOnly, m_Job.Macros);
 
-                        m_CurrentContext.CurrentJobItem = allFiles[i];
-                        var res = TryProcessFile(m_CurrentContext, worker, cancellationToken);
-                        
-                        TryCloseDocument(m_CurrentContext.CurrentDocument);
+                        m_JournalWriter.WriteLine($"Running batch processing for {allFiles.Length} file(s)");
 
-                        m_CurrentContext.CurrentDocument = null;
+                        m_ProgressHandler.SetJobScope(allFiles, batchStartTime);
 
-                        m_ProgressHandler?.ReportProgress(m_CurrentContext.CurrentJobItem, res);
-
-                        if (!res && !m_Job.ContinueOnError)
+                        if (!allFiles.Any())
                         {
-                            throw new UserException("Cancelling the job. Set 'Continue On Error' option to continue job if file failed");
+                            throw new UserException("Empty job. No files matching specified filter");
                         }
 
-                        if (m_CurrentContext.CurrentApplicationProcess?.Id != curAppPrc)
-                        {
-                            curBatchSize = 1;
-                        }
-                        else
-                        {
-                            curBatchSize++;
-                        }
+                        var curBatchSize = 0;
 
-                        if (m_Job.BatchSize > 0 && curBatchSize >= m_Job.BatchSize) 
+                        for (int i = 0; i < allFiles.Length; i++)
                         {
-                            m_JournalWriter.WriteLine("Closing application as batch size reached the limit");
-                            TryShutDownApplication(m_CurrentContext.CurrentApplicationProcess);
-                            curBatchSize = 0;
+                            var curAppPrc = m_CurrentContext.CurrentApplicationProcess?.Id;
+
+                            m_CurrentContext.CurrentJobItem = allFiles[i];
+                            var res = TryProcessFile(m_CurrentContext, m_Worker, cancellationToken);
+
+                            TryCloseDocument(m_CurrentContext.CurrentDocument);
+
+                            m_CurrentContext.CurrentDocument = null;
+
+                            m_ProgressHandler?.ReportProgress(m_CurrentContext.CurrentJobItem, res);
+
+                            if (!res && !m_Job.ContinueOnError)
+                            {
+                                throw new UserException("Cancelling the job. Set 'Continue On Error' option to continue job if file failed");
+                            }
+
+                            if (m_CurrentContext.CurrentApplicationProcess?.Id != curAppPrc)
+                            {
+                                curBatchSize = 1;
+                            }
+                            else
+                            {
+                                curBatchSize++;
+                            }
+
+                            if (m_Job.BatchSize > 0 && curBatchSize >= m_Job.BatchSize)
+                            {
+                                m_JournalWriter.WriteLine("Closing application as batch size reached the limit");
+                                TryShutDownApplication(m_CurrentContext.CurrentApplicationProcess);
+                                curBatchSize = 0;
+                            }
                         }
-                    }
-                }, new StaTaskScheduler(m_Logger)).ConfigureAwait(false);
-                jobResult = true;
+                    }, new StaTaskScheduler(m_Logger)).ConfigureAwait(false);
+                    jobResult = true;
+                }
+                catch (OperationCanceledException)
+                {
+                    throw new JobCancelledException();
+                }
+                finally
+                {
+                    TryShutDownApplication(m_CurrentContext.CurrentApplicationProcess);
+                }
+
+                var duration = DateTime.Now.Subtract(batchStartTime);
+
+                m_ProgressHandler.ReportCompleted(duration);
+
+                m_JournalWriter.WriteLine($"Batch running completed in {duration.ToString(@"hh\:mm\:ss")}");
+
+                return jobResult;
             }
-            catch (OperationCanceledException)
+            else 
             {
-                throw new JobCancelledException();
+                throw new Exception("This is a transient service and can only be run once");
             }
-            finally
-            {
-                TryShutDownApplication(m_CurrentContext.CurrentApplicationProcess);
-            }
-
-            var duration = DateTime.Now.Subtract(batchStartTime);
-
-            m_ProgressHandler.ReportCompleted(duration);
-
-            m_JournalWriter.WriteLine($"Batch running completed in {duration.ToString(@"hh\:mm\:ss")}");
-
-            return jobResult;
         }
 
         public void TryCancel() 

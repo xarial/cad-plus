@@ -42,13 +42,13 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
 
         private readonly BatchJob m_Job;
 
-        private readonly Func<BatchJob, IBatchRunJobExecutor> m_ExecFact;
+        private readonly IBatchRunJobExecutorFactory m_ExecFact;
 
         private readonly ICadDescriptor m_CadDesc;
         private readonly IXLogger m_Logger;
 
-        public JobResultsVM(BatchJob job, 
-            Func<BatchJob, IBatchRunJobExecutor> execFact, ICadDescriptor cadDesc, IXLogger logger) 
+        public JobResultsVM(BatchJob job,
+            IBatchRunJobExecutorFactory execFact, ICadDescriptor cadDesc, IXLogger logger) 
         {
             m_Job = job;
 
@@ -61,7 +61,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
 
         public void StartNewJob()
         {
-            var newRes = new JobResultVM($"Job #{Items.Count + 1}", m_ExecFact.Invoke(m_Job), m_CadDesc, m_Logger);
+            var newRes = new JobResultVM($"Job #{Items.Count + 1}", m_ExecFact.Create(m_Job), m_CadDesc, m_Logger);
             Items.Add(newRes);
             Selected = newRes;
             newRes.TryRunBatchAsync();

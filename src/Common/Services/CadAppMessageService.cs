@@ -9,6 +9,7 @@ using System;
 using Xarial.CadPlus.Plus.Services;
 using Xarial.XCad;
 using Xarial.XCad.Base.Enums;
+using Xarial.XToolkit.Services;
 
 namespace Xarial.CadPlus.Common.Services
 {
@@ -18,13 +19,9 @@ namespace Xarial.CadPlus.Common.Services
 
         public Type[] UserErrors { get; }
 
-        public CadAppMessageService(IXApplication app) 
+        public CadAppMessageService(IXApplication app, Type[] userErrors)
         {
             m_App = app;
-        }
-
-        public CadAppMessageService(IXApplication app, Type[] userErrors) : this(app)
-        {
             UserErrors = userErrors;
         }
 

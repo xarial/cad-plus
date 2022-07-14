@@ -92,10 +92,44 @@ namespace Xarial.CadPlus.CustomToolbar.Structs
 
                     return t;
                 });
+
+            Add(new Version("3.2"), new Version("3.3"),
+                t =>
+                {
+                    foreach (var group in t["Groups"])
+                    {
+                        foreach (JObject cmd in group["Commands"])
+                        {
+                            var stateCodeType = cmd.Children<JProperty>().FirstOrDefault(p => p.Name == "ToggleButtonStateCodeType");
+                            
+                            if (stateCodeType != null) 
+                            {
+                                var val = stateCodeType.Value?.ToString() != "0";
+                                stateCodeType.Replace(new JProperty("EnableToggleButtonStateExpression", val));
+                            }
+
+                            var stateCodeExp = cmd.Children<JProperty>().FirstOrDefault(p => p.Name == "ToggleButtonStateCode");
+
+                            if (stateCodeExp != null)
+                            {
+                                stateCodeExp.Replace(new JProperty("ToggleButtonStateExpression", stateCodeExp.Value));
+                            }
+
+                            var stateCodeResOnce = cmd.Children<JProperty>().FirstOrDefault(p => p.Name == "ResolveButtonStateCodeOnce");
+
+                            if (stateCodeResOnce != null)
+                            {
+                                stateCodeResOnce.Replace(new JProperty("CacheToggleState", stateCodeResOnce.Value));
+                            }
+                        }
+                    }
+
+                    return t;
+                });
         }
     }
 
-    [UserSettingVersion("3.2", typeof(CustomToolbarInfoVersionTransformer))]
+    [UserSettingVersion("3.3", typeof(CustomToolbarInfoVersionTransformer))]
     public class CustomToolbarInfo
     {
         public CommandGroupInfo[] Groups { get; set; }

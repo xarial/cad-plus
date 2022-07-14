@@ -5,6 +5,7 @@
 //License: https://cadplus.xarial.com/license/
 //*********************************************************************
 
+using SolidWorks.Interop.sldworks;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -14,11 +15,15 @@ using System.Text;
 using System.Threading.Tasks;
 using Xarial.CadPlus.Common.Sw.Properties;
 using Xarial.CadPlus.Plus;
+using Xarial.CadPlus.Plus.Attributes;
 using Xarial.CadPlus.Plus.Data;
 using Xarial.CadPlus.Plus.Services;
+using Xarial.XCad;
+using Xarial.XCad.SolidWorks;
 
 namespace Xarial.CadPlus.Common.Sw.Services
 {
+    [CadSpecificService(CadApplicationIds.SolidWorks)]
     public class SwDescriptor : ICadDescriptor
     {
         public string ApplicationId => CadApplicationIds.SolidWorks;

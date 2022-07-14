@@ -44,6 +44,7 @@ using Xarial.CadPlus.Plus.Data;
 using Xarial.XCad.Base.Enums;
 using Xarial.CadPlus.Batch.InApp.Services;
 using System.Windows.Threading;
+using Xarial.XToolkit.Services;
 
 namespace Xarial.CadPlus.Batch.InApp
 {
@@ -116,7 +117,7 @@ namespace Xarial.CadPlus.Batch.InApp
             m_Host.Initialized += OnHostInitialized;
         }
 
-        private void OnHostInitialized(IApplication app, IServiceContainer svcProvider, IModule[] modules)
+        private void OnHostInitialized(IApplication app, IServiceProvider svcProvider, IModule[] modules)
         {
             m_MacroRunnerSvc = svcProvider.GetService<IMacroExecutor>();
             m_Msg = svcProvider.GetService<IMessageService>();

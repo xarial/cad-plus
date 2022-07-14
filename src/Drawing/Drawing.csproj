@@ -1,127 +1,31 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <ModuleName>Drawing</ModuleName>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{D3CF2344-FF9E-499A-9519-1E00C33F8457}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Xarial.CadPlus.Drawing</RootNamespace>
     <AssemblyName>Xarial.CadPlus.Drawing.Module</AssemblyName>
-    <FileAlignment>512</FileAlignment>
-    <Deterministic>true</Deterministic>
-    <NuGetPackageImportStamp>
-    </NuGetPackageImportStamp>
+    <AssemblyTitle>Drawing</AssemblyTitle>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
+  <Import Project="$(SolutionDir)common\common.module.props" />
   <ItemGroup>
-    <Reference Include="EPDM.Interop.epdm, Version=5.24.0.0, Culture=neutral, PublicKeyToken=0625a0c4bb5de148, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Xarial.XCad.SolidWorks.Pdm.Interops.0.1.0\lib\net40\EPDM.Interop.epdm.dll</HintPath>
-      <EmbedInteropTypes>False</EmbedInteropTypes>
-    </Reference>
-    <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Newtonsoft.Json.12.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
-    </Reference>
-    <Reference Include="PresentationCore" />
-    <Reference Include="PresentationFramework" />
-    <Reference Include="QRCoder, Version=1.4.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\QRCoder.1.4.1\lib\net40\QRCoder.dll</HintPath>
-    </Reference>
-    <Reference Include="SolidWorks.Interop.sldworks, Version=30.0.0.5041, Culture=neutral, PublicKeyToken=7c4797c3e4eeac03, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Xarial.XCad.SolidWorks.Interops.0.4.0\lib\net40\SolidWorks.Interop.sldworks.dll</HintPath>
-      <EmbedInteropTypes>False</EmbedInteropTypes>
-    </Reference>
-    <Reference Include="SolidWorks.Interop.swconst, Version=30.0.0.5041, Culture=neutral, PublicKeyToken=19f43e188e4269d8, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Xarial.XCad.SolidWorks.Interops.0.4.0\lib\net40\SolidWorks.Interop.swconst.dll</HintPath>
-      <EmbedInteropTypes>False</EmbedInteropTypes>
-    </Reference>
-    <Reference Include="SolidWorks.Interop.swpublished, Version=30.0.0.5041, Culture=neutral, PublicKeyToken=89a97bdc5284e6d8, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Xarial.XCad.SolidWorks.Interops.0.4.0\lib\net40\SolidWorks.Interop.swpublished.dll</HintPath>
-      <EmbedInteropTypes>False</EmbedInteropTypes>
-    </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.ComponentModel.Composition" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xaml" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Net.Http" />
-    <Reference Include="System.Xml" />
-    <Reference Include="WindowsBase" />
-    <Reference Include="WindowsFormsIntegration" />
-    <Reference Include="Xarial.CadPlusPlus, Version=0.4.0.0, Culture=neutral, PublicKeyToken=60dcaf351d4060db, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Xarial.CadPlusPlus.0.4.0-20220531.4\lib\net472\Xarial.CadPlusPlus.dll</HintPath>
-    </Reference>
-    <Reference Include="Xarial.XCad, Version=0.8.0.0, Culture=neutral, PublicKeyToken=60dcaf351d4060db, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Xarial.XCad.0.8.0-20220531.4\lib\net461\Xarial.XCad.dll</HintPath>
-    </Reference>
-    <Reference Include="Xarial.XCad.SolidWorks, Version=0.8.0.0, Culture=neutral, PublicKeyToken=60dcaf351d4060db, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Xarial.XCad.SolidWorks.0.8.0-20220531.4\lib\net461\Xarial.XCad.SolidWorks.dll</HintPath>
-    </Reference>
-    <Reference Include="Xarial.XCad.Toolkit, Version=0.8.0.0, Culture=neutral, PublicKeyToken=60dcaf351d4060db, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Xarial.XCad.Toolkit.0.8.0-20220531.4\lib\net461\Xarial.XCad.Toolkit.dll</HintPath>
-    </Reference>
-    <Reference Include="Xarial.XToolkit, Version=0.3.2.0, Culture=neutral, PublicKeyToken=60dcaf351d4060db, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Xarial.XToolkit.0.3.2\lib\net461\Xarial.XToolkit.dll</HintPath>
-    </Reference>
+    <PackageReference Include="QRCoder" Version="1.4.3" />
+    <PackageReference Include="Xarial.CadPlusPlus" Version="0.4.0-20220714.2" />
+    <PackageReference Include="Xarial.XCad.SolidWorks" Version="0.8.0-20220708.1" />
+    <PackageReference Include="Xarial.XCad.SolidWorks.Pdm.Interops" Version="0.1.0" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Data\Dock_e.cs" />
-    <Compile Include="Data\LocationData.cs" />
-    <Compile Include="Data\QrCodeInfo.cs" />
-    <Compile Include="Data\SourceData.cs" />
-    <Compile Include="Data\Source_e.cs" />
-    <Compile Include="DrawingModule.cs" />
-    <Compile Include="Data\QrCodeData.cs" />
-    <Compile Include="Features\EditQrCodeFeature.cs" />
-    <Compile Include="Features\InsertQrCodeFeature.cs" />
-    <Compile Include="OpenGL.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Properties\Resources.Designer.cs">
+    <Compile Update="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="QrCodeDrawingHandler.cs" />
-    <Compile Include="Services\QrCodePictureManager.cs" />
-    <Compile Include="Services\QrCodePreviewer.cs" />
-    <Compile Include="Services\QrDataProvider.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="app.config" />
-    <None Include="packages.config" />
     <None Include="Resources\dock-vector.svg" />
     <None Include="Resources\offsetx-vector.svg" />
     <None Include="Resources\offsety-vector.svg" />
     <None Include="Resources\qrcode-vector.svg" />
     <None Include="Resources\size-vector.svg" />
     <None Include="Resources\source-vector.svg" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\dock-icon.png" />
@@ -165,13 +69,4 @@
   <ItemGroup>
     <None Include="Resources\qr-code-update-in-place-vector.svg" />
   </ItemGroup>
-  <Import Project="$(SolutionDir)common\common.module.props" />
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Import Project="..\..\packages\Xarial.XCad.SolidWorks.0.8.0-20220531.4\build\Xarial.XCad.SolidWorks.targets" Condition="Exists('..\..\packages\Xarial.XCad.SolidWorks.0.8.0-20220531.4\build\Xarial.XCad.SolidWorks.targets')" />
-  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
-    <PropertyGroup>
-      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
-    </PropertyGroup>
-    <Error Condition="!Exists('..\..\packages\Xarial.XCad.SolidWorks.0.8.0-20220531.4\build\Xarial.XCad.SolidWorks.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Xarial.XCad.SolidWorks.0.8.0-20220531.4\build\Xarial.XCad.SolidWorks.targets'))" />
-  </Target>
 </Project>

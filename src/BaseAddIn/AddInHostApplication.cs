@@ -15,33 +15,20 @@ using System.Linq;
 using System.Collections.Generic;
 using Xarial.XCad.UI.PropertyPage;
 using Xarial.XToolkit.Reflection;
-using System.Reflection;
-using System.ComponentModel.Composition;
-using System.IO;
-using System.ComponentModel.Composition.Primitives;
-using System.ComponentModel.Composition.Hosting;
-using Xarial.XToolkit.Wpf.Dialogs;
 using Xarial.CadPlus.AddIn.Base.Properties;
 using Xarial.XCad.Base;
 using Xarial.CadPlus.Common.Services;
-using Autofac;
-using Xarial.CadPlus.Common;
-using Autofac.Core.Registration;
 using Xarial.CadPlus.Plus.Services;
 using Xarial.CadPlus.Plus.Applications;
-using Xarial.CadPlus.Init;
-using Xarial.CadPlus.Plus.Shared;
 using Xarial.CadPlus.Plus.Shared.Services;
-using Xarial.CadPlus.Plus.Shared.Extensions;
 using System.Windows;
 using System.Windows.Interop;
-using Xarial.XCad.UI.PropertyPage.Delegates;
 using Xarial.CadPlus.Plus.Delegates;
-using Xarial.XCad.UI.Structures;
 using Xarial.CadPlus.Plus.Attributes;
-using Xarial.XCad.Exceptions;
 using Xarial.CadPlus.Plus.Extensions;
 using Xarial.CadPlus.Plus.Exceptions;
+using Xarial.CadPlus.Plus.DI;
+using Xarial.XToolkit.Services;
 
 namespace Xarial.CadPlus.AddIn.Base
 {
@@ -61,7 +48,7 @@ namespace Xarial.CadPlus.AddIn.Base
         
         public IServiceProvider Services => m_SvcProvider;
 
-        private ServiceProvider m_SvcProvider;
+        private IServiceProvider m_SvcProvider;
 
         private readonly IModulesLoader m_ModulesLoader;
 
@@ -101,7 +88,7 @@ namespace Xarial.CadPlus.AddIn.Base
             }
             catch (Exception ex)
             {
-                new GenericMessageService("CAD+").ShowError(ex, "Failed to init add-in");
+                new GenericMessageService().ShowError(ex, "Failed to init add-in");
                 new AppLogger().Log(ex);
                 throw;
             }
@@ -194,42 +181,40 @@ namespace Xarial.CadPlus.AddIn.Base
             catch (Exception ex)
             {
                 new AppLogger().Log(ex);
-                new GenericMessageService("CAD+").ShowError("Failed to connect add-in");
+                new GenericMessageService().ShowError("Failed to connect add-in");
                 throw;
             }
         }
         
         private void OnConfigureExtensionServices(IXServiceConsumer sender, IXServiceCollection svcColl)
         {
-            var builder = new ContainerBuilder();
+            if (!(svcColl is IContainerBuilder))
+            {
+                throw new InvalidCastException($"{nameof(IXServiceCollection)} is not replaced with {nameof(IContainerBuilder)}");
+            }
 
-            builder.Populate(svcColl);
+            var builder = (IContainerBuilder)svcColl;
 
             ConfigureHostServices(builder);
 
-            ConfigureServices?.Invoke(new ContainerBuilderWrapper(builder));
+            ConfigureServices?.Invoke(builder);
 
-            m_SvcProvider = new ServiceProvider(builder.Build());
-
-            svcColl.Populate(m_SvcProvider.Context);
+            m_SvcProvider = builder.Build();
 
             Initialized?.Invoke(m_App, m_SvcProvider, m_Modules);
         }
 
-        private void ConfigureHostServices(ContainerBuilder builder) 
+        private void ConfigureHostServices(IContainerBuilder builder) 
         {
             builder.RegisterInstance(Extension);
             builder.RegisterInstance(Extension.Application);
-            builder.RegisterType<CadAppMessageService>()
-                .As<IMessageService>().WithParameter(new TypedParameter(typeof(Type[]), UserException.AdditionalUserExceptions));
-            builder.RegisterType<AboutService>().As<IAboutService>().WithParameter(
-                new TypedParameter(typeof(IntPtr), Extension.Application.WindowHandle));
-            builder.RegisterType<DefaultDocumentAdapter>()
-                .As<IDocumentAdapter>();
-            builder.RegisterType<SettingsProvider>()
-                .As<ISettingsProvider>();
-            builder.RegisterType<XCadMacroProvider>()
-                .As<IXCadMacroProvider>();
+            builder.RegisterSingleton<IMessageService, CadAppMessageService>().UsingParameters(Parameter<Type[]>.Any(UserException.AdditionalUserExceptions));
+            builder.RegisterSingleton<IParentWindowProvider, CadParentWindowProvider>();
+            builder.RegisterSingleton<IAboutService, AboutService>();
+
+            builder.RegisterSingleton<IDocumentAdapter, DefaultDocumentAdapter>();
+            builder.RegisterSingleton<ISettingsProvider, SettingsProvider>();
+            builder.RegisterSingleton<IXCadMacroProvider, XCadMacroProvider>();
         }
 
         public void RegisterCommands<TCmd>(CommandHandler<TCmd> handler)

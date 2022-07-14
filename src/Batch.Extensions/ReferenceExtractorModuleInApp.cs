@@ -24,6 +24,7 @@ using Xarial.XCad;
 using Xarial.XCad.Documents;
 using Xarial.CadPlus.Plus.Extensions;
 using Xarial.XCad.Base;
+using Xarial.XToolkit.Services;
 
 namespace Xarial.CadPlus.Batch.Extensions
 {
@@ -45,7 +46,7 @@ namespace Xarial.CadPlus.Batch.Extensions
             m_Host.Connect += OnConnect;
         }
 
-        private void OnInitialized(IApplication app, IServiceContainer svcProvider, IModule[] modules)
+        private void OnInitialized(IApplication app, IServiceProvider svcProvider, IModule[] modules)
         {
             m_BatchInAppModule = modules.OfType<IBatchInAppModule>().FirstOrDefault();
 

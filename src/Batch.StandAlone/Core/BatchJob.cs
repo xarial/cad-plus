@@ -102,21 +102,4 @@ namespace Xarial.CadPlus.Batch.Base.Core
             Actions = Actions_e.None;
         }
     }
-
-    public static class BatchJobExtension 
-    {
-        public static ICadApplicationInstanceProvider FindApplicationProvider(this BatchJob job, ICadApplicationInstanceProvider[] appProviders)
-        {
-            var appProvider = appProviders.FirstOrDefault(
-                p => string.Equals(p.Descriptor.ApplicationId, job.ApplicationId,
-                StringComparison.CurrentCultureIgnoreCase));
-
-            if (appProvider == null)
-            {
-                throw new UserException("Failed to find the application provider for this job file");
-            }
-
-            return appProvider;
-        }
-    }
 }

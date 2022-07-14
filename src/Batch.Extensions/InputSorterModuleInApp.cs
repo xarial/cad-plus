@@ -49,7 +49,7 @@ namespace Xarial.CadPlus.Batch.Extensions
             m_Host.Connect += OnConnect;
         }
 
-        private void OnInitialized(IApplication app, IServiceContainer svcProvider, IModule[] modules)
+        private void OnInitialized(IApplication app, IServiceProvider svcProvider, IModule[] modules)
         {
             m_BatchInAppModule = modules.OfType<IBatchInAppModule>().FirstOrDefault();
 

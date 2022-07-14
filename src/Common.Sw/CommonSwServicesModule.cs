@@ -1,4 +1,4 @@
-﻿//*********************************************************************
+//*********************************************************************
 //CAD+ Toolset
 //Copyright(C) 2022 Xarial Pty Limited
 //Product URL: https://cadplus.xarial.com
@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 using Xarial.CadPlus.Common.Sw.Services;
 using Xarial.CadPlus.Plus;
 using Xarial.CadPlus.Plus.Attributes;
+using Xarial.CadPlus.Plus.DI;
 using Xarial.CadPlus.Plus.Services;
 using Xarial.XCad;
 using Xarial.XCad.SolidWorks;
@@ -30,10 +31,10 @@ namespace Xarial.CadPlus.Common.Sw
             m_Host.ConfigureServices += OnConfigureServices;
         }
 
-        private void OnConfigureServices(IContainerBuilder contBuilder)
+        private void OnConfigureServices(IContainerBuilder builder)
         {
-            contBuilder.Register<SwMacroExecutor, IMacroExecutor>(CadApplicationIds.SolidWorks);
-            contBuilder.Register<SwDescriptor, ICadDescriptor>(CadApplicationIds.SolidWorks);
+            builder.RegisterSingleton<IMacroExecutor, SwMacroExecutor>().AsCollectionItem();
+            builder.RegisterSingleton<ICadDescriptor, SwDescriptor>().AsCollectionItem();
         }
 
         public void Dispose()

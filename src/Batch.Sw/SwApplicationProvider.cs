@@ -46,7 +46,7 @@ namespace Xarial.CadPlus.Batch.Sw
             MacroRunnerService = svc;
             Descriptor = entDesc;
             m_CustomServices = new ServiceCollection();
-            m_CustomServices.AddOrReplace<IXLogger>(() => m_Logger);
+            m_CustomServices.Add(() => m_Logger);
 
             m_ForceDisabledAddIns = new Dictionary<Process, List<string>>();
         }

@@ -1,28 +1,24 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net472</TargetFramework>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <IsPackable>false</IsPackable>
     <XCadRegDll>false</XCadRegDll>
   </PropertyGroup>
-
+  <Import Project="$(SolutionDir)common\common.tests.props" />
   <ItemGroup>
-    <PackageReference Include="Moq" Version="4.14.1" />
-    <PackageReference Include="nunit" Version="3.12.0" />
-    <PackageReference Include="NUnit3TestAdapter" Version="3.15.1" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.2.0" />
-    <PackageReference Include="Xarial.CadPlusPlus" Version="0.4.0-20220531.4" />
-    <PackageReference Include="Xarial.XCad.SolidWorks" Version="0.8.0-20220531.4" />
-    <PackageReference Include="Xarial.XToolkit.Wpf" Version="0.3.2" />
+    <PackageReference Include="Moq" Version="4.18.1" />
+    <PackageReference Include="nunit" Version="3.13.3" />
+    <PackageReference Include="NUnit3TestAdapter" Version="4.2.1" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.2.0" />
+    <PackageReference Include="Xarial.CadPlusPlus" Version="0.4.0-20220714.2" />
+    <PackageReference Include="Xarial.XCad.SolidWorks" Version="0.8.0-20220708.1" />
+    <PackageReference Include="Xarial.XToolkit.Wpf" Version="0.4.0-20220710.2" />
   </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\..\src\Batch.Base\Batch.Base.csproj" />
     <ProjectReference Include="..\..\src\Batch.StandAlone\Batch.StandAlone.csproj" />
     <ProjectReference Include="..\..\src\Common\Common.csproj" />
     <ProjectReference Include="..\..\src\MacroRunner\MacroRunner.csproj" />
   </ItemGroup>
-
-  <Import Project="$(SolutionDir)common\common.tests.props" />
-
 </Project>
