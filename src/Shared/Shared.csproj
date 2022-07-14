@@ -22,6 +22,8 @@
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <PackageIcon>icon.png</PackageIcon>
     <PackageIconUrl>https://cadplus.xarial.com/icon-api.png</PackageIconUrl>
+    <UseWPF>true</UseWPF>
+    <UseWindowsForms>true</UseWindowsForms>
   </PropertyGroup>
   <ItemGroup>
     <None Include="..\..\LICENSE.md">
@@ -38,19 +40,10 @@
     <PackageReference Include="Fluent.Ribbon" Version="9.0.4" />
     <PackageReference Include="MahApps.Metro" Version="2.4.9" />
     <PackageReference Include="SimpleInjector" Version="5.3.3" />
-    <PackageReference Include="Xarial.XToolkit" Version="0.4.0-20220710.2" />
     <PackageReference Include="Xarial.XToolkit.Wpf" Version="0.4.0-20220710.2" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Plus\Plus.csproj" />
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Include="PresentationCore" />
-    <Reference Include="PresentationFramework" />
-    <Reference Include="System.ComponentModel.Composition" />
-    <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xaml" />
-    <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
     <Compile Update="Properties\Resources.Designer.cs">
