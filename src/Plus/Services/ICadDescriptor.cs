@@ -12,6 +12,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Xarial.CadPlus.Plus.Data;
+using Xarial.XCad;
 
 namespace Xarial.CadPlus.Plus.Services
 {
@@ -20,6 +21,7 @@ namespace Xarial.CadPlus.Plus.Services
         string ApplicationId { get; }
         string ApplicationName { get; }
         Image ApplicationIcon { get; }
+        Type ApplicationDispatchType { get; }
 
         Image PartIcon { get; }
         Image AssemblyIcon { get; }
@@ -35,5 +37,8 @@ namespace Xarial.CadPlus.Plus.Services
         FileTypeFilter[] MacroFileFilters { get; }
 
         bool IsSystemFile(string filePath);
+
+        object GeApplicationDispatch(IXApplication app);
+        object GetObjectDispatch(IXObject obj);
     }
 }
