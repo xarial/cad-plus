@@ -118,7 +118,7 @@ namespace Xbatch.Tests
         private BatchJob WithDocumentMock(Action<BatchDocumentVM> action)
         {
             var mock = new Mock<IBatchRunnerModel>();
-            BatchJob opts = null;
+            var job = new BatchJob();
 
             var cadEntDescMock = new Mock<ICadDescriptor>();
             cadEntDescMock.Setup(m => m.MacroFileFilters).Returns(new FileTypeFilter[0]);
@@ -131,20 +131,23 @@ namespace Xbatch.Tests
 
             var modelMock = mock.Object;
             var msgSvcMock = new Mock<IMessageService>().Object;
-            
-            var docVm = new BatchDocumentMockVM("", new BatchJob(),
+
+            var jobExecFactMock = new Mock<IBatchRunJobExecutorFactory>();
+            jobExecFactMock.Setup(m => m.Create(It.IsAny<BatchJob>())).Returns(new Mock<IBatchRunJobExecutor>().Object);
+
+            var docVm = new BatchDocumentMockVM("", job,
                 appProviderMock.Object,
                 new IJournalExporter[] { new Mock<IJournalExporter>().Object },
                 new IResultsSummaryExcelExporter[] { new Mock<IResultsSummaryExcelExporter>().Object },
                 msgSvcMock, new Mock<IXLogger>().Object,
-                new Mock<IBatchRunJobExecutorFactory>().Object,
+                jobExecFactMock.Object,
                 new Mock<IBatchApplicationProxy>().Object, null, null);
 
             action.Invoke(docVm);
 
             docVm.RunJobCommand.Execute(null);
 
-            return opts;
+            return job;
         }
     }
 }
