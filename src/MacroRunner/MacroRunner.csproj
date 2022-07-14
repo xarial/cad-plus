@@ -14,7 +14,7 @@
   </Target>
   <ItemGroup>
     <PackageReference Include="Xarial.XCad" Version="0.8.0-20220708.1" />
-    <PackageReference Include="Xarial.XCad.Toolkit" Version="0.8.0-20220703.2" />
+    <PackageReference Include="Xarial.XCad.Toolkit" Version="0.8.0-20220708.1" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="PresentationCore" />

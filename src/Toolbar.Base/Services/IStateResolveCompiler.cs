@@ -13,6 +13,6 @@ namespace Xarial.CadPlus.CustomToolbar.Services
 {
     public interface IStateResolveCompiler
     {
-        Dictionary<CommandMacroInfo, IToggleButtonStateResolver> CreateResolvers(IEnumerable<CommandMacroInfo> macroInfos);
+        IReadOnlyDictionary<CommandMacroInfo, IToggleButtonStateResolver> CreateResolvers(IEnumerable<CommandMacroInfo> macroInfos);
     }
 }

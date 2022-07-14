@@ -153,6 +153,8 @@ namespace Xarial.CadPlus.CustomToolbar
 
             builder.RegisterSingleton<ITriggersManager, TriggersManager>();
 
+            builder.RegisterSingleton<IStateResolveCompiler, LambdaExpressionStateResolveCompiler>();
+
             builder.RegisterSelfSingleton<UserSettingsService>();
 
             builder.RegisterInstance(m_IconsProviders.ToArray());

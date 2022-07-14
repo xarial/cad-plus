@@ -18,18 +18,6 @@
     <UserControl.Resources>
         <wpf:BindingProxy x:Key="this" Data="{Binding RelativeSource={RelativeSource AncestorType={x:Type local:CommandMacroView}}}"/>
         <conv:HasEnumFlagToVisibilityConverter x:Key="hasEnumToVisConv"/>
-        <xconv:MatchValueUniversalConverter TargetValue="{x:Static enums:ToggleButtonStateCode_e.None}" x:Key="stateCodeEnabledConv">
-            <xconv:MatchValueUniversalConverter.TrueValue>
-                <sys:Boolean>
-                    False
-                </sys:Boolean>
-            </xconv:MatchValueUniversalConverter.TrueValue>
-            <xconv:MatchValueUniversalConverter.FalseValue>
-                <sys:Boolean>
-                    True
-                </sys:Boolean>
-            </xconv:MatchValueUniversalConverter.FalseValue>
-        </xconv:MatchValueUniversalConverter>
     </UserControl.Resources>
     <StackPanel Orientation="Vertical" Grid.IsSharedSizeScope="True">
         <GroupBox Header="Style">
@@ -114,23 +102,21 @@
                 <ctrls:FlagEnumComboBox Grid.Column="1" Grid.Row="2" Margin="2" Value="{Binding Path=Location}"
                             Visibility="{Binding Path=Triggers, Converter={StaticResource hasEnumToVisConv}, ConverterParameter={x:Static enums:Triggers_e.Button}}"/>
 
-                <TextBlock Text="Toggle Button State Code:" TextWrapping="Wrap" VerticalAlignment="Top" Grid.Column="0" Grid.Row="3" Margin="2"
-                           Visibility="{Binding Path=Triggers, Converter={StaticResource hasEnumToVisConv}, ConverterParameter={x:Static enums:Triggers_e.ToggleButton}}"/>
-                
+                <CheckBox Grid.Column="0" Grid.Row="3" Margin="2" IsChecked="{Binding Path=EnableToggleButtonStateExpression}">
+                    <TextBlock Text="Toggle Button State Expression:" TextWrapping="Wrap" VerticalAlignment="Top"
+                               Visibility="{Binding Path=Triggers, Converter={StaticResource hasEnumToVisConv}, ConverterParameter={x:Static enums:Triggers_e.ToggleButton}}"/>
+                </CheckBox>
                 <Grid Grid.Column="1" Grid.Row="3"
                       Visibility="{Binding Path=Triggers, Converter={StaticResource hasEnumToVisConv}, ConverterParameter={x:Static enums:Triggers_e.ToggleButton}}">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
-                    <ctrls:EnumComboBox Margin="2" Grid.Row="0" Value="{Binding Path=ToggleButtonStateCodeType}"/>
-
-                    <TextBox Grid.Row="1" Margin="2" 
-                         IsEnabled="{Binding Path=ToggleButtonStateCodeType, Converter={StaticResource stateCodeEnabledConv}}" 
-                         AcceptsReturn="True" Text="{Binding Path=ToggleButtonStateCode}" Height="40"></TextBox>
-                    <CheckBox Grid.Row="2" 
-                          IsEnabled="{Binding Path=ToggleButtonStateCodeType, Converter={StaticResource stateCodeEnabledConv}}" IsChecked="{Binding Path=ResolveButtonStateCodeOnce}" Margin="2">Cache State Value</CheckBox>
+                    <TextBox Grid.Row="0" Margin="2" 
+                         IsEnabled="{Binding Path=EnableToggleButtonStateExpression}" 
+                         AcceptsReturn="True" Text="{Binding Path=ToggleButtonStateExpression}" Height="40"></TextBox>
+                    <CheckBox Grid.Row="1" 
+                          IsEnabled="{Binding Path=EnableToggleButtonStateExpression}" IsChecked="{Binding Path=CacheToggleState}" Margin="2">Cache State Value</CheckBox>
                 </Grid>
 
                 <CheckBox Margin="2" IsChecked="{Binding Path=UnloadAfterRun}" Grid.Row="4" Grid.ColumnSpan="2">Unload After Run</CheckBox>

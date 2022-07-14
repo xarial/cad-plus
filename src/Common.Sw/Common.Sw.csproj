@@ -9,7 +9,7 @@
   <Import Project="$(SolutionDir)common\common.module.props" />
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-    <PackageReference Include="Xarial.CadPlusPlus" Version="0.4.0-20220711.3" />
+    <PackageReference Include="Xarial.CadPlusPlus" Version="0.4.0-20220714.2" />
     <PackageReference Include="Xarial.XCad.SolidWorks" Version="0.8.0-20220708.1" />
     <PackageReference Include="Xarial.XToolkit" Version="0.4.0-20220710.2" />
     <PackageReference Include="Xarial.XToolkit.Wpf" Version="0.4.0-20220710.2" />

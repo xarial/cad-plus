@@ -179,32 +179,32 @@ namespace Xarial.CadPlus.CustomToolbar.UI.ViewModels
             }
         }
                 
-        public ToggleButtonStateCode_e ToggleButtonStateCodeType
+        public bool EnableToggleButtonStateExpression
         {
-            get => Command.ToggleButtonStateCodeType;
+            get => Command.EnableToggleButtonStateExpression;
             set 
             {
-                Command.ToggleButtonStateCodeType = value;
+                Command.EnableToggleButtonStateExpression = value;
                 this.NotifyChanged();
             }
         }
         
-        public string ToggleButtonStateCode 
+        public string ToggleButtonStateExpression
         {
-            get => Command.ToggleButtonStateCode;
+            get => Command.ToggleButtonStateExpression;
             set
             {
-                Command.ToggleButtonStateCode = value;
+                Command.ToggleButtonStateExpression = value;
                 this.NotifyChanged();
             }
         }
 
-        public bool ResolveButtonStateCodeOnce
+        public bool CacheToggleState
         {
-            get => Command.ResolveButtonStateCodeOnce;
+            get => Command.CacheToggleState;
             set
             {
-                Command.ResolveButtonStateCodeOnce = value;
+                Command.CacheToggleState = value;
                 this.NotifyChanged();
             }
         }
