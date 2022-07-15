@@ -12,7 +12,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Xarial.XCad.Base.Attributes;
 
-namespace Xarial.CadPlus.Drawing.Data
+namespace Xarial.CadPlus.Drawing.QrCode.Data
 {
     public enum Source_e
     {

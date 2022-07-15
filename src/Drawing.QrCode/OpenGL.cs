@@ -12,7 +12,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Xarial.CadPlus.Drawing
+namespace Xarial.CadPlus.Drawing.QrCode
 {
     public static class OpenGL
     {

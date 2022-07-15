@@ -14,7 +14,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Xarial.CadPlus.Drawing.Data;
+using Xarial.CadPlus.Drawing.QrCode.Data;
 using Xarial.CadPlus.Plus.Exceptions;
 using Xarial.XCad;
 using Xarial.XCad.Documents;
@@ -24,7 +24,7 @@ using Xarial.XCad.SolidWorks;
 using Xarial.XCad.SolidWorks.Documents;
 using Xarial.XCad.SolidWorks.Features;
 
-namespace Xarial.CadPlus.Drawing.Services
+namespace Xarial.CadPlus.Drawing.QrCode.Services
 {
     public class QrCodePictureManager
     {
@@ -53,7 +53,7 @@ namespace Xarial.CadPlus.Drawing.Services
         private readonly QrDataProvider m_QrCodeProvider;
         private readonly QRCodeGenerator m_QrGenerator;
 
-        public QrCodePictureManager(IXApplication app, QrDataProvider dataProvider) 
+        public QrCodePictureManager(IXApplication app, QrDataProvider dataProvider)
         {
             m_App = app;
             m_QrCodeProvider = dataProvider;
@@ -68,19 +68,19 @@ namespace Xarial.CadPlus.Drawing.Services
             }
         }
 
-        public IXObject Reload(IXObject pict, LocationData location, SourceData data, IXDrawing drw) 
+        public IXObject Reload(IXObject pict, LocationData location, SourceData data, IXDrawing drw)
         {
-            using (var freeze = new ViewFreeze(drw)) 
+            using (var freeze = new ViewFreeze(drw))
             {
                 DeletePicture(pict, drw);
                 return CalculateLocationAndInsert(drw, location, data);
             }
         }
 
-        public IXObject UpdateInPlace(IXObject pict, SourceData data, IXDrawing drw) 
-        {   
+        public IXObject UpdateInPlace(IXObject pict, SourceData data, IXDrawing drw)
+        {
             var skPict = (ISketchPicture)((ISwObject)pict).Dispatch;
-            
+
             double width = -1;
             double height = -1;
             double x = -1;
@@ -89,7 +89,7 @@ namespace Xarial.CadPlus.Drawing.Services
             skPict.GetSize(ref width, ref height);
             skPict.GetOrigin(ref x, ref y);
 
-            using (var freeze = new ViewFreeze(drw)) 
+            using (var freeze = new ViewFreeze(drw))
             {
                 DeletePicture(pict, drw);
 
@@ -154,7 +154,7 @@ namespace Xarial.CadPlus.Drawing.Services
         private void DeletePicture(IXObject pict, IXDocument doc)
         {
             var skPict = (ISketchPicture)((ISwObject)pict).Dispatch;
-            
+
             if (skPict.GetFeature().Select2(false, -1))
             {
                 if (!((ISwDocument)doc).Model.Extension.DeleteSelection2((int)swDeleteSelectionOptions_e.swDelete_Absorbed))

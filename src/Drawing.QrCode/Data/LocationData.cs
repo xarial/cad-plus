@@ -5,14 +5,14 @@
 //License: https://cadplus.xarial.com/license/
 //*********************************************************************
 
-using Xarial.CadPlus.Drawing.Properties;
+using Xarial.CadPlus.Drawing.QrCode.Properties;
 using Xarial.CadPlus.Plus.Attributes;
 using Xarial.XCad.UI.PropertyPage.Attributes;
 using Xarial.XCad.UI.PropertyPage.Enums;
 
-namespace Xarial.CadPlus.Drawing.Data
+namespace Xarial.CadPlus.Drawing.QrCode.Data
 {
-    public class LocationData 
+    public class LocationData
     {
         [NumberBoxOptions(NumberBoxUnitType_e.Length, 0, 100, 0.01, false, 0.02, 0.001)]
         [StandardControlIcon(BitmapLabelType_e.Width)]
@@ -21,7 +21,7 @@ namespace Xarial.CadPlus.Drawing.Data
 
         [IconEx(typeof(Resources), nameof(Resources.dock_vector), nameof(Resources.dock_icon))]
         public Dock_e Dock { get; set; }
-        
+
         [NumberBoxOptions(NumberBoxUnitType_e.Length, -1000, 1000, 0.01, false, 0.02, 0.001)]
         [IconEx(typeof(Resources), nameof(Resources.offsetx_vector), nameof(Resources.offsetx_icon))]
         public double OffsetX { get; set; }
@@ -30,7 +30,7 @@ namespace Xarial.CadPlus.Drawing.Data
         [IconEx(typeof(Resources), nameof(Resources.offsety_vector), nameof(Resources.offsety_icon))]
         public double OffsetY { get; set; }
 
-        public LocationData() 
+        public LocationData()
         {
             Dock = Dock_e.BottomRight;
             Size = 0.1;

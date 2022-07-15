@@ -9,8 +9,8 @@ using QRCoder;
 using System;
 using System.Drawing;
 using System.IO;
-using Xarial.CadPlus.Drawing.Properties;
-using Xarial.CadPlus.Drawing.Services;
+using Xarial.CadPlus.Drawing.QrCode.Properties;
+using Xarial.CadPlus.Drawing.QrCode.Services;
 using Xarial.CadPlus.Plus;
 using Xarial.CadPlus.Plus.Applications;
 using Xarial.CadPlus.Plus.Attributes;
@@ -27,7 +27,7 @@ using Xarial.XCad.UI.PropertyPage.Enums;
 using Xarial.XCad.UI.PropertyPage.Structures;
 using Xarial.XToolkit.Reporting;
 using Xarial.CadPlus.Plus.Extensions;
-using Xarial.CadPlus.Drawing.Data;
+using Xarial.CadPlus.Drawing.QrCode.Data;
 using System.ComponentModel;
 using Xarial.CadPlus.Plus.Modules;
 using Xarial.XCad.Base;
@@ -36,27 +36,27 @@ using Xarial.XCad.Base.Enums;
 using SolidWorks.Interop.swconst;
 using System.Linq;
 using Xarial.XCad.SolidWorks.Features;
-using Xarial.CadPlus.Drawing.Features;
 using Xarial.XToolkit.Services;
+using Xarial.CadPlus.Drawing.QrCode.Features;
 
-namespace Xarial.CadPlus.Drawing
+namespace Xarial.CadPlus.Drawing.QrCode
 {
     [Title("Drawing+")]
     [IconEx(typeof(Resources), nameof(Resources.drawing_vector), nameof(Resources.drawing_icon))]
     [CommandGroupInfo((int)CadCommandGroupIds_e.Drawing)]
     [CommandOrder(3)]
-    public enum Commands_e 
+    public enum Commands_e
     {
         [CommandItemInfo(true, true, WorkspaceTypes_e.Drawing, true)]
         [IconEx(typeof(Resources), nameof(Resources.qrcode_vector), nameof(Resources.qrcode_icon))]
         [Title("Insert QR Code")]
         [Description("Inserts QR code based on custom data source into the current drawing")]
-        InsertQrCode
+        InsertQrCode = 0
     }
 
     [Title("Drawing+ QR Code")]
     [CommandGroupInfo((int)CadCommandGroupIds_e.QrCodeContextMenu)]
-    public enum PictureContextMenuCommands_e 
+    public enum PictureContextMenuCommands_e
     {
         [Title("Edit")]
         [Description("Edits the QR code data of this QR code feature")]
@@ -79,7 +79,7 @@ namespace Xarial.CadPlus.Drawing
 
     //TODO: remove the dependency on application once the common APIs are used
     [Module(typeof(IHostExtension), typeof(ISwAddInApplication))]
-    public class DrawingModule : IModule
+    public class DrawingQrCodeModule : IModule
     {
         private IHostExtension m_Host;
 
@@ -122,9 +122,9 @@ namespace Xarial.CadPlus.Drawing
             m_Host.Extension.Application.Documents.RegisterHandler(() => new QrCodeDrawingHandler(m_Logger));
         }
 
-        private void OnCommandClick(Commands_e cmd) 
+        private void OnCommandClick(Commands_e cmd)
         {
-            switch (cmd) 
+            switch (cmd)
             {
                 case Commands_e.InsertQrCode:
                     m_InsertQrCodeFeature.Insert((IXDrawing)m_Host.Extension.Application.Documents.Active);
@@ -171,7 +171,7 @@ namespace Xarial.CadPlus.Drawing
         }
 
         private ISwObject GetSelectedPicture(ISwDrawing drw)
-        {   
+        {
             var pict = (ISwObject)drw.Selections.Last();
 
             if (pict is ISwFeature)

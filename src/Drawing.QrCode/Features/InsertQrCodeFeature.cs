@@ -10,8 +10,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Xarial.CadPlus.Drawing.Data;
-using Xarial.CadPlus.Drawing.Services;
 using Xarial.CadPlus.Plus.Exceptions;
 using Xarial.CadPlus.Plus.Services;
 using Xarial.XCad;
@@ -24,8 +22,11 @@ using Xarial.XCad.UI.PropertyPage.Structures;
 using Xarial.XToolkit.Reporting;
 using Xarial.CadPlus.Plus.Extensions;
 using Xarial.XToolkit.Services;
+using Xarial.CadPlus.Drawing.QrCode;
+using Xarial.CadPlus.Drawing.QrCode.Services;
+using Xarial.CadPlus.Drawing.QrCode.Data;
 
-namespace Xarial.CadPlus.Drawing.Features
+namespace Xarial.CadPlus.Drawing.QrCode.Features
 {
     public interface IInsertQrCodeFeature : IDisposable
     {
@@ -48,7 +49,7 @@ namespace Xarial.CadPlus.Drawing.Features
         private readonly IMessageService m_MsgSvc;
         private readonly IXLogger m_Logger;
 
-        public InsertQrCodeFeature(IXExtension ext, IMessageService msgSvc, IXLogger logger, IDocumentAdapter docAdapter) 
+        public InsertQrCodeFeature(IXExtension ext, IMessageService msgSvc, IXLogger logger, IDocumentAdapter docAdapter)
         {
             m_App = ext.Application;
             m_MsgSvc = msgSvc;
@@ -109,7 +110,7 @@ namespace Xarial.CadPlus.Drawing.Features
             }
         }
 
-        protected virtual void OnInsertQrCode() 
+        protected virtual void OnInsertQrCode()
         {
             var pict = m_QrCodeManager.Insert(m_CurDrawing, m_CurInsertQrCodePageData.Location, m_CurInsertQrCodePageData.Source);
 
@@ -121,7 +122,7 @@ namespace Xarial.CadPlus.Drawing.Features
             handler.QrCodes.Add(data);
         }
 
-        protected virtual void OnCancelInsertQrCode() 
+        protected virtual void OnCancelInsertQrCode()
         {
         }
 

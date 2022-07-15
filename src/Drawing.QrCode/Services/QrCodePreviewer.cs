@@ -11,13 +11,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Xarial.CadPlus.Drawing.Data;
+using Xarial.CadPlus.Drawing.QrCode.Data;
 using Xarial.XCad.Documents;
 using Xarial.XCad.Geometry.Structures;
 using Xarial.XCad.SolidWorks.Documents;
-using static Xarial.CadPlus.Drawing.OpenGL;
+using static Xarial.CadPlus.Drawing.QrCode.OpenGL;
 
-namespace Xarial.CadPlus.Drawing.Services
+namespace Xarial.CadPlus.Drawing.QrCode.Services
 {
     public class QrCodePreviewer : IDisposable
     {
@@ -40,7 +40,7 @@ namespace Xarial.CadPlus.Drawing.Services
             m_View.BufferSwapNotify += OnBufferSwapNotify;
         }
 
-        public void Preview(Dock_e dock, double size, double offsetX, double offsetY) 
+        public void Preview(Dock_e dock, double size, double offsetX, double offsetY)
         {
             m_Dock = dock;
             m_Size = size;
@@ -61,7 +61,7 @@ namespace Xarial.CadPlus.Drawing.Services
             m_View.BufferSwapNotify -= OnBufferSwapNotify;
             ((ISwDrawing)m_Drw).Model.GraphicsRedraw2();
         }
-        
+
         private void RenderQrCodeTemplate(Point centerPt, double size)
         {
             glDisable(GL_LIGHTING);

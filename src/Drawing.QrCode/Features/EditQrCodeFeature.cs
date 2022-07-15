@@ -12,8 +12,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Xarial.CadPlus.Drawing.Data;
-using Xarial.CadPlus.Drawing.Services;
+using Xarial.CadPlus.Drawing.QrCode;
+using Xarial.CadPlus.Drawing.QrCode.Data;
+using Xarial.CadPlus.Drawing.QrCode.Services;
 using Xarial.CadPlus.Plus.Exceptions;
 using Xarial.CadPlus.Plus.Services;
 using Xarial.XCad;
@@ -28,7 +29,7 @@ using Xarial.XCad.UI.PropertyPage.Structures;
 using Xarial.XToolkit.Reporting;
 using Xarial.XToolkit.Services;
 
-namespace Xarial.CadPlus.Drawing.Features
+namespace Xarial.CadPlus.Drawing.QrCode.Features
 {
     public interface IEditQrCodeFeature : IDisposable
     {
@@ -44,11 +45,11 @@ namespace Xarial.CadPlus.Drawing.Features
 
         private Tuple<int, double, int, double> m_CurPictTrans;
 
-        public EditQrCodeFeature(IXExtension ext, IMessageService msgSvc, IXLogger logger, IDocumentAdapter docAdapter) 
+        public EditQrCodeFeature(IXExtension ext, IMessageService msgSvc, IXLogger logger, IDocumentAdapter docAdapter)
             : base(ext, msgSvc, logger, docAdapter)
         {
         }
-        
+
         protected override void OnInsertQrCode()
         {
             var pict = m_QrCodeManager.Reload(m_CurPict,
@@ -74,7 +75,7 @@ namespace Xarial.CadPlus.Drawing.Features
 
             HidePicture(m_CurPict, true);
 
-            base.Insert(drw);
+            Insert(drw);
         }
 
         public void Reload(ISwObject pict, ISwDrawing drw)
@@ -93,7 +94,7 @@ namespace Xarial.CadPlus.Drawing.Features
             data.Picture = m_QrCodeManager.UpdateInPlace(pict, data.ToData().Source, drw);
         }
 
-        private QrCodeInfo FindInfo(ISwObject pict, ISwDrawing drw) 
+        private QrCodeInfo FindInfo(ISwObject pict, ISwDrawing drw)
         {
             var handler = m_App.Documents.GetHandler<QrCodeDrawingHandler>(drw);
             var qrCode = handler.QrCodes.FirstOrDefault(d => d.Picture.Equals(pict));
@@ -116,7 +117,7 @@ namespace Xarial.CadPlus.Drawing.Features
                 double trans = -1;
                 int matchColor = -1;
                 double matchTol = -1;
-                
+
                 skPict.GetTransparency(ref style, ref trans, ref matchColor, ref matchTol);
                 m_CurPictTrans = new Tuple<int, double, int, double>(style, trans, matchColor, matchTol);
 
@@ -126,7 +127,7 @@ namespace Xarial.CadPlus.Drawing.Features
                 skPict.SetTransparency((int)swSketchPictureTransparencyStyle_e.swSketchPictureTransparencyFullImage,
                     TRANSPARENT, COLOR_IGNORE, COLOR_EXACT_MATCH);
             }
-            else 
+            else
             {
                 skPict.SetTransparency(m_CurPictTrans.Item1, m_CurPictTrans.Item2, m_CurPictTrans.Item3, m_CurPictTrans.Item4);
             }

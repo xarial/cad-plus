@@ -11,8 +11,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Xarial.CadPlus.Drawing.Data;
-using Xarial.CadPlus.Drawing.Properties;
+using Xarial.CadPlus.Drawing.QrCode.Properties;
 using Xarial.CadPlus.Plus.Attributes;
 using Xarial.XCad;
 using Xarial.XCad.Base.Attributes;
@@ -20,7 +19,7 @@ using Xarial.XCad.UI.PropertyPage.Attributes;
 using Xarial.XCad.UI.PropertyPage.Base;
 using Xarial.XCad.UI.PropertyPage.Services;
 
-namespace Xarial.CadPlus.Drawing.Data
+namespace Xarial.CadPlus.Drawing.QrCode.Data
 {
     [IconEx(typeof(Resources), nameof(Resources.qrcode_vector), nameof(Resources.qrcode_icon))]
     [Title("Insert QR Code")]
@@ -31,7 +30,7 @@ namespace Xarial.CadPlus.Drawing.Data
 
         public LocationData Location { get; set; }
 
-        public QrCodeData() 
+        public QrCodeData()
         {
             Source = new SourceData();
             Location = new LocationData();

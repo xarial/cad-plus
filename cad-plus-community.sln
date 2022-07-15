@@ -53,11 +53,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Batch.Base", "src\Batch.Bas
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Batch.Extensions", "src\Batch.Extensions\Batch.Extensions.csproj", "{0E69A315-6BB3-40F9-8FE3-4A9861349270}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Drawing", "src\Drawing\Drawing.csproj", "{D3CF2344-FF9E-499A-9519-1E00C33F8457}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Drawing.QrCode", "src\Drawing.QrCode\Drawing.QrCode.csproj", "{D3CF2344-FF9E-499A-9519-1E00C33F8457}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Toolbar", "Toolbar", "{DF3412EF-E9EC-4F8D-BE37-FDF9408FECEE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SwAddInCommunity", "src\SwAddInCommunity\SwAddInCommunity.csproj", "{AABF6080-D0AA-4302-9111-C9B93D1418D6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SwAddInCommunity", "src\SwAddInCommunity\SwAddInCommunity.csproj", "{AABF6080-D0AA-4302-9111-C9B93D1418D6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

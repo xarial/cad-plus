@@ -7,7 +7,7 @@
 
 using System.ComponentModel;
 using System.Linq;
-using Xarial.CadPlus.Drawing.Properties;
+using Xarial.CadPlus.Drawing.QrCode.Properties;
 using Xarial.CadPlus.Plus.Attributes;
 using Xarial.XCad;
 using Xarial.XCad.Base.Attributes;
@@ -16,7 +16,7 @@ using Xarial.XCad.UI.PropertyPage.Base;
 using Xarial.XCad.UI.PropertyPage.Enums;
 using Xarial.XCad.UI.PropertyPage.Services;
 
-namespace Xarial.CadPlus.Drawing.Data
+namespace Xarial.CadPlus.Drawing.QrCode.Data
 {
     public class CustomPropertyNameDependencyHandler : IDependencyHandler
     {
@@ -50,7 +50,7 @@ namespace Xarial.CadPlus.Drawing.Data
         }
     }
 
-    public class SourceData 
+    public class SourceData
     {
         [IconEx(typeof(Resources), nameof(Resources.source_vector), nameof(Resources.source_icon))]
         [ControlTag(nameof(Source))]

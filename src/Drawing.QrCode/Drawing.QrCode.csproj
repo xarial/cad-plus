@@ -1,9 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <ModuleName>Drawing</ModuleName>
-    <RootNamespace>Xarial.CadPlus.Drawing</RootNamespace>
-    <AssemblyName>Xarial.CadPlus.Drawing.Module</AssemblyName>
-    <AssemblyTitle>Drawing</AssemblyTitle>
+    <RootNamespace>Xarial.CadPlus.Drawing.QrCode</RootNamespace>
+    <AssemblyName>Xarial.CadPlus.Drawing.QrCode.Module</AssemblyName>
+    <AssemblyTitle>Drawing.QrCode</AssemblyTitle>
   </PropertyGroup>
   <Import Project="$(SolutionDir)common\common.module.props" />
   <ItemGroup>

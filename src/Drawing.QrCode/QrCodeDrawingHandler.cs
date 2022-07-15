@@ -13,7 +13,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Xarial.CadPlus.Drawing.Data;
+using Xarial.CadPlus.Drawing.QrCode.Data;
 using Xarial.XCad;
 using Xarial.XCad.Base;
 using Xarial.XCad.Base.Enums;
@@ -24,7 +24,7 @@ using Xarial.XCad.SolidWorks;
 using Xarial.XCad.SolidWorks.Documents;
 using Xarial.XToolkit.Services.UserSettings;
 
-namespace Xarial.CadPlus.Drawing
+namespace Xarial.CadPlus.Drawing.QrCode
 {
     /// <summary>
     /// Sketch picture object does not provide persist references.
@@ -37,7 +37,7 @@ namespace Xarial.CadPlus.Drawing
         private readonly IXLogger m_Logger;
         private readonly IXDrawing m_Draw;
 
-        public PictureValueSerializer(IXLogger logger, IXDrawing drw) 
+        public PictureValueSerializer(IXLogger logger, IXDrawing drw)
         {
             m_Logger = logger;
             m_Draw = drw;
@@ -55,12 +55,12 @@ namespace Xarial.CadPlus.Drawing
                         var skPict = (ISketchPicture)feat.GetSpecificFeature2();
                         return ((ISwDrawing)m_Draw).CreateObjectFromDispatch<ISwObject>(skPict);
                     }
-                    else 
+                    else
                     {
                         throw new Exception("Failed to find the picture");
                     }
                 }
-                else 
+                else
                 {
                     throw new Exception("Value is empty");
                 }
@@ -81,7 +81,7 @@ namespace Xarial.CadPlus.Drawing
                 var skPict = ((ISwObject)obj).Dispatch as ISketchPicture;
                 return skPict.GetFeature().Name;
             }
-            catch 
+            catch
             {
                 return "";
             }
@@ -102,7 +102,7 @@ namespace Xarial.CadPlus.Drawing
         private readonly IXLogger m_Logger;
         private readonly UserSettingsService m_Serializer;
 
-        public QrCodeDrawingHandler(IXLogger logger) 
+        public QrCodeDrawingHandler(IXLogger logger)
         {
             m_Serializer = new UserSettingsService();
             m_Logger = logger;
@@ -112,7 +112,7 @@ namespace Xarial.CadPlus.Drawing
         {
             m_HasChanges = false;
 
-            if (model is IXDrawing) 
+            if (model is IXDrawing)
             {
                 m_Drawing = (IXDrawing)model;
                 m_Drawing.StreamWriteAvailable += OnStreamWriteAvailable;
@@ -149,7 +149,7 @@ namespace Xarial.CadPlus.Drawing
             {
                 var usedPictures = new List<IXObject>();
 
-                for (int i = data.Count - 1; i >= 0; i--) 
+                for (int i = data.Count - 1; i >= 0; i--)
                 {
                     if (data[i].Picture == null)
                     {
@@ -162,19 +162,19 @@ namespace Xarial.CadPlus.Drawing
                         data.RemoveAt(i);
                         m_Logger.Log($"Removed duplicate QR code data at index {i}", LoggerMessageSeverity_e.Debug);
                     }
-                    else 
+                    else
                     {
                         usedPictures.Add(data[i].Picture);
                     }
                 }
             }
-            else 
+            else
             {
                 data = new ObservableCollection<QrCodeInfo>();
             }
 
             data.CollectionChanged += OnDataCollectionChanged;
-            
+
             Init(data);
 
             return data;
@@ -197,7 +197,7 @@ namespace Xarial.CadPlus.Drawing
 
         private void OnStreamWriteAvailable(IXDocument doc)
         {
-            if (m_HasChanges) 
+            if (m_HasChanges)
             {
                 m_Logger.Log("Storing QR code data", LoggerMessageSeverity_e.Debug);
 

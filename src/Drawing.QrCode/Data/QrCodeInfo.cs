@@ -15,7 +15,7 @@ using Xarial.XCad.Features;
 using Xarial.XToolkit.Services.UserSettings;
 using Xarial.XToolkit.Services.UserSettings.Attributes;
 
-namespace Xarial.CadPlus.Drawing.Data
+namespace Xarial.CadPlus.Drawing.QrCode.Data
 {
     public class QrCodeInfoVersionTransformer : BaseUserSettingsVersionsTransformer
     {
@@ -38,13 +38,13 @@ namespace Xarial.CadPlus.Drawing.Data
         private double m_OffsetX;
         private double m_OffsetY;
 
-        public IXObject Picture 
+        public IXObject Picture
         {
             get => m_Picture;
-            set 
+            set
             {
                 m_Picture = value;
-                this.Changed?.Invoke(this);
+                Changed?.Invoke(this);
             }
         }
 
@@ -54,17 +54,17 @@ namespace Xarial.CadPlus.Drawing.Data
             set
             {
                 m_Source = value;
-                this.Changed?.Invoke(this);
+                Changed?.Invoke(this);
             }
         }
 
-        public bool RefDocumentSource 
+        public bool RefDocumentSource
         {
             get => m_RefDocumentSource;
-            set 
+            set
             {
                 m_RefDocumentSource = value;
-                this.Changed?.Invoke(this);
+                Changed?.Invoke(this);
             }
         }
 
@@ -74,7 +74,7 @@ namespace Xarial.CadPlus.Drawing.Data
             set
             {
                 m_Argument = value;
-                this.Changed?.Invoke(this);
+                Changed?.Invoke(this);
             }
         }
 
@@ -84,7 +84,7 @@ namespace Xarial.CadPlus.Drawing.Data
             set
             {
                 m_Size = value;
-                this.Changed?.Invoke(this);
+                Changed?.Invoke(this);
             }
         }
 
@@ -94,7 +94,7 @@ namespace Xarial.CadPlus.Drawing.Data
             set
             {
                 m_Dock = value;
-                this.Changed?.Invoke(this);
+                Changed?.Invoke(this);
             }
         }
 
@@ -104,7 +104,7 @@ namespace Xarial.CadPlus.Drawing.Data
             set
             {
                 m_OffsetX = value;
-                this.Changed?.Invoke(this);
+                Changed?.Invoke(this);
             }
         }
 
@@ -114,14 +114,14 @@ namespace Xarial.CadPlus.Drawing.Data
             set
             {
                 m_OffsetY = value;
-                this.Changed?.Invoke(this);
+                Changed?.Invoke(this);
             }
         }
 
         public QrCodeData ToData()
             => new QrCodeData()
             {
-                Source = new SourceData() 
+                Source = new SourceData()
                 {
                     Source = Source,
                     ReferencedDocument = RefDocumentSource,
@@ -129,7 +129,7 @@ namespace Xarial.CadPlus.Drawing.Data
                     PdmWeb2Server = Source == Source_e.PdmWeb2Url ? Argument : "",
                     CustomValue = Source == Source_e.Custom ? Argument : ""
                 },
-                Location= new LocationData() 
+                Location = new LocationData()
                 {
                     Dock = Dock,
                     Size = Size,

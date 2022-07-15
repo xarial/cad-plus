@@ -10,7 +10,7 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using Xarial.CadPlus.Drawing.Data;
+using Xarial.CadPlus.Drawing.QrCode.Data;
 using Xarial.CadPlus.Plus.Exceptions;
 using Xarial.CadPlus.Plus.Services;
 using Xarial.XCad;
@@ -19,11 +19,11 @@ using Xarial.XCad.Data;
 using Xarial.XCad.Documents;
 using Xarial.XCad.Documents.Enums;
 
-namespace Xarial.CadPlus.Drawing.Services
+namespace Xarial.CadPlus.Drawing.QrCode.Services
 {
     public class QrDataProvider
     {
-        private class ScopedDocument : IDisposable 
+        private class ScopedDocument : IDisposable
         {
             internal IXDocument Document { get; }
             internal IXConfiguration Configuration { get; }
@@ -37,7 +37,7 @@ namespace Xarial.CadPlus.Drawing.Services
             private readonly bool m_CloseDrawing;
             private readonly bool m_CloseDocument;
 
-            internal ScopedDocument(IDocumentAdapter docAdapter, IXDrawing drw, IXLogger logger, bool useRefDoc) 
+            internal ScopedDocument(IDocumentAdapter docAdapter, IXDrawing drw, IXLogger logger, bool useRefDoc)
             {
                 m_DocAdapter = docAdapter;
 
@@ -48,7 +48,7 @@ namespace Xarial.CadPlus.Drawing.Services
 
                 m_Drawing = (IXDrawing)m_DocAdapter.GetDocumentReplacement(drw, true);
 
-                if (drw != m_Drawing) 
+                if (drw != m_Drawing)
                 {
                     m_CloseDrawing = !m_Drawing.IsCommitted;
                 }
@@ -90,15 +90,15 @@ namespace Xarial.CadPlus.Drawing.Services
                         refDoc.Commit();
                     }
 
-                    if (!conf.IsCommitted) 
+                    if (!conf.IsCommitted)
                     {
                         conf = refDoc.Configurations[conf.Name];
                     }
-                    
+
                     Document = refDoc;
                     Configuration = conf;
                 }
-                else 
+                else
                 {
                     Document = m_Drawing;
                 }
@@ -106,27 +106,27 @@ namespace Xarial.CadPlus.Drawing.Services
 
             public void Dispose()
             {
-                if (m_CloseDrawing) 
+                if (m_CloseDrawing)
                 {
                     if (CanClose(m_Drawing))
                     {
                         m_Logger.Log("Closing temp drawing document for QR code");
                         m_Drawing.Close();
                     }
-                    else 
+                    else
                     {
                         Debug.Assert(false, "Drawing cannot be closed");
                     }
                 }
 
-                if (m_CloseDocument) 
+                if (m_CloseDocument)
                 {
                     if (CanClose(Document))
                     {
                         m_Logger.Log("Closing temp referenced document for QR code");
                         Document.Close();
                     }
-                    else 
+                    else
                     {
                         Debug.Assert(false, "Document cannot be closed");
                     }
@@ -157,18 +157,18 @@ namespace Xarial.CadPlus.Drawing.Services
 
         private readonly IXLogger m_Logger;
 
-        public QrDataProvider(IXApplication app, IXLogger logger, IDocumentAdapter docAdapter) 
+        public QrDataProvider(IXApplication app, IXLogger logger, IDocumentAdapter docAdapter)
         {
             m_App = app;
             m_DocAdapter = docAdapter;
             m_Logger = logger;
         }
 
-        public string GetData(IXDrawing drw, SourceData srcData) 
+        public string GetData(IXDrawing drw, SourceData srcData)
         {
             var src = srcData.Source;
 
-            using (var scopedDoc = new ScopedDocument(m_DocAdapter, drw, m_Logger, srcData.ReferencedDocument)) 
+            using (var scopedDoc = new ScopedDocument(m_DocAdapter, drw, m_Logger, srcData.ReferencedDocument))
             {
                 IEdmVault5 vault;
 
@@ -233,13 +233,13 @@ namespace Xarial.CadPlus.Drawing.Services
             }
         }
 
-        private string FindRelativeVaultPath(string filePath, out IEdmVault5 vault) 
+        private string FindRelativeVaultPath(string filePath, out IEdmVault5 vault)
         {
             vault = new EdmVault5Class();
-            
+
             var vaultName = vault.GetVaultNameFromPath(filePath);
 
-            if (string.IsNullOrEmpty(vaultName)) 
+            if (string.IsNullOrEmpty(vaultName))
             {
                 throw new UserException("This file is not a part of any vault");
             }
@@ -252,7 +252,7 @@ namespace Xarial.CadPlus.Drawing.Services
 
                 return filePath.Substring(rootFolderPath.Length + 1, filePath.Length - rootFolderPath.Length - 1);
             }
-            else 
+            else
             {
                 throw new UserException($"Failed to login to '{vaultName}' vault");
             }
