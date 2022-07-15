@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 using Xarial.CadPlus.Common.Services;
 using Xarial.CadPlus.Plus;
 using Xarial.CadPlus.Plus.Attributes;
+using Xarial.CadPlus.Plus.Shared.Services;
 using Xarial.XCad;
 using Xarial.XCad.Base;
 using Xarial.XCad.Documents;

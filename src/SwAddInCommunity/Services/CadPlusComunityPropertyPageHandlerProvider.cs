@@ -5,10 +5,10 @@
 //License: https://cadplus.xarial.com/license/
 //*********************************************************************
 
-using SolidWorks.Interop.sldworks;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using Xarial.XCad.SolidWorks;
@@ -17,9 +17,14 @@ using Xarial.XCad.SolidWorks.UI.PropertyPage;
 
 namespace Xarial.CadPlus.AddIn.Sw.Services
 {
-    internal class CadPlusPropertyPageHandlerProvider : IPropertyPageHandlerProvider
+    [ComVisible(true)]
+    public class SwGeneralPropertyManagerPageCommunityHandler : SwPropertyManagerPageHandler
+    {
+    }
+
+    internal class CadPlusComunityPropertyPageHandlerProvider : IPropertyPageHandlerProvider
     {
         public SwPropertyManagerPageHandler CreateHandler(ISwApplication app, Type handlerType)
-            => new SwGeneralPropertyManagerPageHandler();
+            => new SwGeneralPropertyManagerPageCommunityHandler();
     }
 }

@@ -17,6 +17,7 @@ using Xarial.CadPlus.Plus.Services;
 using Xarial.CadPlus.Batch.Base.Core;
 using Xarial.XToolkit.Wpf.Utils;
 using Xarial.CadPlus.Batch.Base.ViewModels;
+using Xarial.CadPlus.Plus.Shared.Services;
 
 namespace Xarial.CadPlus.Batch.InApp.ViewModels
 {

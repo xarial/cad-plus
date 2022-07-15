@@ -10,15 +10,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Xarial.CadPlus.AddIn.Base;
 using Xarial.CadPlus.Plus.Applications;
+using Xarial.CadPlus.Plus.Shared;
 using Xarial.XCad.Extensions;
 
 namespace Xarial.CadPlus.AddIn.Sw
 {
-    public class SwAddInApplication : CadExtensionApplication, ISwAddInApplication
+    public class SwAddinCommunityApplication : CadExtensionApplication, ISwAddInApplication
     {
-        public SwAddInApplication(IXExtension ext) : base(ext)
+        public SwAddinCommunityApplication(IXExtension ext) : base(ext)
         {
         }
     }

@@ -14,6 +14,8 @@ using Xarial.CadPlus.MacroRunner;
 using Xarial.CadPlus.Plus;
 using Xarial.CadPlus.Plus.Exceptions;
 using Xarial.CadPlus.Plus.Services;
+using Xarial.CadPlus.Plus.Shared.Exceptions;
+using Xarial.CadPlus.Plus.Shared.Services;
 using Xarial.XCad;
 using Xarial.XCad.Base;
 using Xarial.XCad.Documents;

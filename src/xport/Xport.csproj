@@ -8,6 +8,7 @@
     <AssemblyTitle>eXport+</AssemblyTitle>
     <Description>eXport+ is a part of CAD+ toolset and enables exporting of SOLIDWORKS files to foreign formats via eDrawings</Description>
     <UseWPF>true</UseWPF>
+    <UseWindowsForms>true</UseWindowsForms>
   </PropertyGroup>
   <PropertyGroup>
     <StartupObject />
@@ -18,7 +19,7 @@
   <Import Project="$(SolutionDir)common\common.props" />
   <ItemGroup>
     <PackageReference Include="BetterFolderBrowser" Version="1.2.0" />
-    <PackageReference Include="Xarial.CadPlusPlus.Shared" Version="0.4.0-20220714.2" />
+    <PackageReference Include="Xarial.CadPlusPlus.Shared" Version="0.4.0-20220715.1" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="xport.ico" />
