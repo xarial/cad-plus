@@ -32,14 +32,14 @@ stages:
     - task: NuGetCommand@2
       displayName: 'NuGet restore'
       inputs:
-        restoreSolution: 'cad-plus.sln'
+        restoreSolution: 'cad-plus-community.sln'
         feedsToUse: config
         nugetConfigPath: 'nuget.config'
 
     - task: VSBuild@1
       displayName: 'Build source code and unit tests'
       inputs:
-        solution: 'cad-plus.sln'
+        solution: 'cad-plus-community.sln'
         platform: 'Any CPU'
         configuration: 'Release'
   
