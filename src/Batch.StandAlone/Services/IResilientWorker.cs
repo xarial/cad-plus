@@ -15,6 +15,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Xarial.CadPlus.Batch.Base.Core;
 using Xarial.CadPlus.Batch.StandAlone.Services;
+using Xarial.CadPlus.Plus.Exceptions;
 
 namespace Xarial.CadPlus.Batch.Base.Services
 {
@@ -35,8 +36,12 @@ namespace Xarial.CadPlus.Batch.Base.Services
 
         private const string CONTEXT_PARAM_NAME = "_Context_";
 
+        private readonly int m_Retries;
+
         public PollyResilientWorker(int retries, TimeSpan? timeout) 
         {
+            m_Retries = retries;
+
             m_Policy = Policy
                     .Handle<Exception>()
                     .Retry(retries, OnRetry);
@@ -54,10 +59,22 @@ namespace Xarial.CadPlus.Batch.Base.Services
         {
             try
             {
-                m_Policy.Execute((Context ctx, CancellationToken token) =>
+                var res = m_Policy.ExecuteAndCapture((Context ctx, CancellationToken token) =>
                 {
                     action.Invoke(GetContext(ctx), token);
                 }, new Dictionary<string, object>() { { CONTEXT_PARAM_NAME, context } }, cancellationToken);
+
+                if (res.Outcome == OutcomeType.Failure)
+                {
+                    if (res.FinalException != null)
+                    {
+                        throw new UserException($"Failed to process the operation within {m_Retries} retries", res.FinalException);
+                    }
+                    else 
+                    {
+                        throw new Exception("Unknown error");
+                    }
+                }
             }
             catch (TimeoutRejectedException ex) 
             {

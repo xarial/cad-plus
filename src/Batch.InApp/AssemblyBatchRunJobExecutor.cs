@@ -46,8 +46,6 @@ namespace Xarial.CadPlus.Batch.InApp
         private readonly bool m_AutoSaveDocs;
         private readonly IXLogger m_Logger;
 
-        private CancellationTokenSource m_CurrentCancellationToken;
-
         internal AssemblyBatchRunJobExecutor(IXApplication app, IMacroExecutor macroRunnerSvc,
             IXDocument[] documents, IXLogger logger, IEnumerable<MacroData> macros,
             bool activateDocs, bool allowReadOnly, bool allowRapid, bool autoSaveDocs) 
@@ -65,18 +63,12 @@ namespace Xarial.CadPlus.Batch.InApp
             m_AutoSaveDocs = autoSaveDocs;
         }
 
-        public void Cancel()
-            => m_CurrentCancellationToken.Cancel();
-
-        public bool Execute()
+        public bool Execute(CancellationToken cancellationToken)
         {
             var startTime = DateTime.Now;
 
             try
             {
-                m_CurrentCancellationToken = new CancellationTokenSource();
-                var cancellationToken = m_CurrentCancellationToken.Token;
-
                 using (var prg = m_App.CreateProgress())
                 {
                     LogMessage("Preparing job");
@@ -117,7 +109,7 @@ namespace Xarial.CadPlus.Batch.InApp
             }
         }
 
-        public Task<bool> ExecuteAsync() => Task.FromResult(Execute());
+        public Task<bool> ExecuteAsync(CancellationToken cancellationToken) => Task.FromResult(Execute(cancellationToken));
 
         private JobItemDocument[] PrepareJob() 
         {

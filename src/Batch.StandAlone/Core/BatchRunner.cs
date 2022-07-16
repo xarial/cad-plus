@@ -83,6 +83,8 @@ namespace Xarial.CadPlus.Batch.Base.Core
 
         private bool m_IsRun;
 
+        private readonly object m_Lock;
+
         public BatchRunner(BatchJob job, TextWriter journalWriter, IProgressHandler progressHandler, ICadApplicationInstanceProvider appProvider,
             IBatchApplicationProxy batchAppProxy,
             IJobManager jobMgr, IXLogger logger,
@@ -91,6 +93,8 @@ namespace Xarial.CadPlus.Batch.Base.Core
             m_Job = job;
             m_AppProvider = appProvider;
             m_MacroRunnerSvc = m_AppProvider.MacroRunnerService;
+
+            m_Lock = new object();
 
             m_JournalWriter = journalWriter;
             m_ProgressHandler = progressHandler;
@@ -188,7 +192,7 @@ namespace Xarial.CadPlus.Batch.Base.Core
                             if (m_Job.BatchSize > 0 && curBatchSize >= m_Job.BatchSize)
                             {
                                 m_JournalWriter.WriteLine("Closing application as batch size reached the limit");
-                                TryShutDownApplication(m_CurrentContext.CurrentApplicationProcess);
+                                TryShutDownApplication(m_CurrentContext);
                                 curBatchSize = 0;
                             }
                         }
@@ -201,7 +205,7 @@ namespace Xarial.CadPlus.Batch.Base.Core
                 }
                 finally
                 {
-                    TryShutDownApplication(m_CurrentContext.CurrentApplicationProcess);
+                    TryShutDownApplication(m_CurrentContext);
                 }
 
                 var duration = DateTime.Now.Subtract(batchStartTime);
@@ -218,8 +222,7 @@ namespace Xarial.CadPlus.Batch.Base.Core
             }
         }
 
-        public void TryCancel() 
-            => TryShutDownApplication(m_CurrentContext?.CurrentApplicationProcess);
+        public void TryCancel() => TryShutDownApplication(m_CurrentContext);
 
         private void OnPopupNotClosed(Process prc, IntPtr hWnd)
         {
@@ -280,7 +283,7 @@ namespace Xarial.CadPlus.Batch.Base.Core
         private void OnTimeout(BatchJobContext context)
         {
             m_JournalWriter.WriteLine("Operation timed out");
-            TryShutDownApplication(context.CurrentApplicationProcess);
+            TryShutDownApplication(context);
         }
         
         private JobItemDocument[] PrepareJobScope(IXApplication app,
@@ -387,26 +390,70 @@ namespace Xarial.CadPlus.Batch.Base.Core
             }
         }
 
-        private void TryShutDownApplication(Process appPrc)
+        private void TryShutDownApplication(BatchJobContext context)
         {
-            try
+            lock (m_Lock)
             {
-                if (appPrc != null)
+                if (context != null)
                 {
-                    if (!appPrc.HasExited)
+                    try
                     {
-                        m_JournalWriter.WriteLine("Closing host application");
-                        appPrc.Kill();
+                        var appPrc = context.CurrentApplicationProcess;
+
+                        if (appPrc != null)
+                        {
+                            if (!appPrc.HasExited)
+                            {
+                                m_Logger.Log($"Trying to shut down IXApplication process", LoggerMessageSeverity_e.Debug);
+
+                                m_JournalWriter.WriteLine("Closing host application");
+                                appPrc.Kill();
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        m_Logger.Log($"Failed to shut down IXApplication process", LoggerMessageSeverity_e.Debug);
+                        m_Logger.Log(ex);
+                    }
+                    finally
+                    {
+                        context.CurrentApplicationProcess = null;
+                    }
+
+                    try
+                    {
+                        var app = context.CurrentApplication;
+
+                        if (app is IDisposable)
+                        {
+                            m_Logger.Log($"Trying to dispose pointer to IXApplication", LoggerMessageSeverity_e.Debug);
+                            ((IDisposable)app).Dispose();
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        m_Logger.Log($"Failed to dispose pointer to IXApplication", LoggerMessageSeverity_e.Debug);
+                        m_Logger.Log(ex);
+                    }
+                    finally
+                    {
+                        context.CurrentApplication = null;
                     }
                 }
 
-                if (m_PopupKiller.IsStarted)
+                try
                 {
-                    m_PopupKiller.Stop();
+                    if (m_PopupKiller != null && m_PopupKiller.IsStarted)
+                    {
+                        m_Logger.Log($"Trying to kill the popup killer", LoggerMessageSeverity_e.Debug);
+
+                        m_PopupKiller.Stop();
+                    }
                 }
-            }
-            catch 
-            {
+                catch
+                {
+                }
             }
         }
 
@@ -482,7 +529,7 @@ namespace Xarial.CadPlus.Batch.Base.Core
             {
                 m_JournalWriter.WriteLine("Critical error - restarting application");
 
-                TryShutDownApplication(context.CurrentApplicationProcess);
+                TryShutDownApplication(context);
             }
         }
 
@@ -580,7 +627,7 @@ namespace Xarial.CadPlus.Batch.Base.Core
         {
             if (context.CurrentApplication == null || !context.CurrentApplication.IsAlive)
             {
-                TryShutDownApplication(context.CurrentApplicationProcess);
+                TryShutDownApplication(context);
 
                 var vers = m_AppProvider.ParseVersion(context.Job.VersionId);
 
@@ -718,8 +765,8 @@ namespace Xarial.CadPlus.Batch.Base.Core
 
         public void Dispose()
         {
+            TryShutDownApplication(m_CurrentContext);
             m_PopupKiller.Dispose();
-            m_AppProvider.Dispose();
         }
     }
 }

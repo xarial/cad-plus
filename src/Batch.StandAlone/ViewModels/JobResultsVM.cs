@@ -61,7 +61,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
 
         public void StartNewJob()
         {
-            var newRes = new JobResultVM($"Job #{Items.Count + 1}", m_ExecFact.Create(m_Job), m_CadDesc, m_Logger);
+            var newRes = new JobResultVM($"Job #{Items.Count + 1}", m_ExecFact.Create(m_Job), m_CadDesc, m_Logger, new System.Threading.CancellationTokenSource());
             Items.Add(newRes);
             Selected = newRes;
             newRes.TryRunBatchAsync();

@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Xarial.CadPlus.Common.Services;
 
@@ -21,8 +22,7 @@ namespace Xarial.CadPlus.Batch.Base.Models
         event Action<IJobItem, bool> ProgressChanged;
         event Action<string> Log;
 
-        bool Execute();
-        Task<bool> ExecuteAsync();
-        void Cancel();
+        bool Execute(CancellationToken cancellationToken);
+        Task<bool> ExecuteAsync(CancellationToken cancellationToken);
     }
 }

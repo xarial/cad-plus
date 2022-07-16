@@ -16,21 +16,15 @@ using Xarial.XCad.Base.Attributes;
 using Xarial.XCad.Extensions;
 using Xarial.XCad.UI.Commands.Attributes;
 using Xarial.XCad.UI.Commands.Enums;
-using Xarial.XCad.UI.Commands;
 using Xarial.CadPlus.Plus;
 using Xarial.XCad.UI.PropertyPage;
 using Xarial.XCad.UI.PropertyPage.Enums;
 using Xarial.XCad.Documents;
-using Xarial.CadPlus.Common.Services;
-using Xarial.XToolkit.Reporting;
 using Xarial.XCad.Base;
 using Xarial.CadPlus.Batch.InApp.UI;
 using Xarial.CadPlus.Batch.InApp.Properties;
 using System.IO;
 using Xarial.XCad.UI.PropertyPage.Structures;
-using Xarial.XCad.Documents.Enums;
-using Xarial.CadPlus.Common;
-using Xarial.CadPlus.Common.Attributes;
 using Xarial.CadPlus.Plus.Attributes;
 using Xarial.CadPlus.Batch.Base.ViewModels;
 using Xarial.CadPlus.Plus.Services;
@@ -40,11 +34,10 @@ using Xarial.CadPlus.Plus.Delegates;
 using Xarial.CadPlus.Plus.UI;
 using Xarial.XCad.UI.PropertyPage.Base;
 using Xarial.CadPlus.Batch.InApp.Controls;
-using Xarial.CadPlus.Plus.Data;
-using Xarial.XCad.Base.Enums;
-using Xarial.CadPlus.Batch.InApp.Services;
 using System.Windows.Threading;
 using Xarial.XToolkit.Services;
+using Xarial.CadPlus.Plus.Shared.Services;
+using System.Threading;
 
 namespace Xarial.CadPlus.Batch.InApp
 {
@@ -239,9 +232,12 @@ namespace Xarial.CadPlus.Batch.InApp
                         m_Data.Options.ActivateDocuments, m_Data.Options.AllowReadOnly,
                         m_Data.Options.AllowRapid, m_Data.Options.AutoSave);
 
-                    var vm = new JobResultVM(rootDoc.Title, exec, m_CadDesc, m_Logger);
+                    var cancellationTokenSource = new CancellationTokenSource();
 
-                    using (var cancelHandler = new EscapeBatchExecutorCancelHandler(exec, m_Host.Extension.Application, m_Dispatcher))
+                    var vm = new JobResultVM(rootDoc.Title, exec, m_CadDesc, m_Logger, cancellationTokenSource);
+
+                    using (var cancellationSvc = new BatchOperationInteractiveCancellationService(cancellationTokenSource, m_Host.Extension.Application.Process, m_Dispatcher,
+                        "Do you want to cancel the current batch process?", "Batch+"))
                     {
                         vm.TryRunBatch();
                     }

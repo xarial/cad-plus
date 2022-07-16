@@ -18,6 +18,7 @@ using Xarial.CadPlus.Batch.Base.Exceptions;
 using Xarial.XToolkit.Wpf;
 using Xarial.XToolkit.Wpf.Extensions;
 using Xarial.XCad.Base;
+using System.Threading;
 
 namespace Xarial.CadPlus.Batch.Base.ViewModels
 {
@@ -73,20 +74,23 @@ namespace Xarial.CadPlus.Batch.Base.ViewModels
 
         private readonly IXLogger m_Logger;
 
-        public JobResultVM(string name, IBatchRunJobExecutor executor, ICadDescriptor cadDesc, IXLogger logger)
+        private readonly CancellationTokenSource m_CancellationTokenSource;
+
+        public JobResultVM(string name, IBatchRunJobExecutor executor, ICadDescriptor cadDesc, IXLogger logger, CancellationTokenSource cancellationTokenSource)
         {
             m_Executor = executor;
             CadDescriptor = cadDesc;
 
             m_Logger = logger;
 
+            m_CancellationTokenSource = cancellationTokenSource;
+
             Name = name;
             Summary = new JobResultSummaryVM(m_Executor, CadDescriptor);
             Journal = new JobResultJournalVM(m_Executor);
         }
 
-        public void CancelJob()
-            => m_Executor.Cancel();
+        public void CancelJob() => m_CancellationTokenSource.Cancel();
 
         public async void TryRunBatchAsync()
         {
@@ -96,7 +100,7 @@ namespace Xarial.CadPlus.Batch.Base.ViewModels
 
                 IsBatchInProgress = true;
 
-                if (await m_Executor.ExecuteAsync().ConfigureAwait(false))
+                if (await m_Executor.ExecuteAsync(m_CancellationTokenSource.Token).ConfigureAwait(false))
                 {
                     UpdateJobStatus();
                 }
@@ -128,7 +132,7 @@ namespace Xarial.CadPlus.Batch.Base.ViewModels
 
                 IsBatchInProgress = true;
 
-                if (m_Executor.Execute())
+                if (m_Executor.Execute(m_CancellationTokenSource.Token))
                 {
                     UpdateJobStatus();
                 }
