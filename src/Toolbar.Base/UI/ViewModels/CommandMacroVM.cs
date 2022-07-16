@@ -1,6 +1,6 @@
 ﻿//*********************************************************************
 //CAD+ Toolset
-//Copyright(C) 2021 Xarial Pty Limited
+//Copyright(C) 2022 Xarial Pty Limited
 //Product URL: https://cadplus.xarial.com
 //License: https://cadplus.xarial.com/license/
 //*********************************************************************
@@ -16,6 +16,7 @@ using Xarial.CadPlus.CustomToolbar.Services;
 using Xarial.CadPlus.CustomToolbar.Structs;
 using Xarial.CadPlus.Plus.Modules;
 using Xarial.CadPlus.Plus.Services;
+using Xarial.CadPlus.Plus.Shared.Services;
 using Xarial.CadPlus.Toolbar.Properties;
 using Xarial.CadPlus.Toolbar.Services;
 using Xarial.XToolkit.Wpf;
@@ -24,6 +25,27 @@ using Xarial.XToolkit.Wpf.Utils;
 
 namespace Xarial.CadPlus.CustomToolbar.UI.ViewModels
 {
+    public interface ICommandMacroVMFactory 
+    {
+        CommandMacroVM Create(CommandMacroInfo macroInfo);
+    }
+
+    public class CommandMacroVMFactory : ICommandMacroVMFactory
+    {
+        private readonly IIconsProvider[] m_IconsProviders;
+        private readonly IFilePathResolver m_FilePathResolver;
+        private readonly IMacroEntryPointsExtractor m_MacroEntryPointExtractor;
+
+        public CommandMacroVMFactory(IIconsProvider[] iconsProviders, IFilePathResolver filePathResolver, IMacroEntryPointsExtractor macroEntryPointExtractor)
+        {
+            m_IconsProviders = iconsProviders;
+            m_FilePathResolver = filePathResolver;
+            m_MacroEntryPointExtractor = macroEntryPointExtractor;
+        }
+
+        public CommandMacroVM Create(CommandMacroInfo macroInfo) => new CommandMacroVM(macroInfo, m_IconsProviders, m_FilePathResolver, m_MacroEntryPointExtractor);
+    }
+
     public class CommandMacroVM : CommandVM<CommandMacroInfo>, INotifyPropertyChanged
     {
         private static readonly BitmapImage m_DefaultMacroIcon = Resources.macro_icon_default.ToBitmapImage();
@@ -158,32 +180,32 @@ namespace Xarial.CadPlus.CustomToolbar.UI.ViewModels
             }
         }
                 
-        public ToggleButtonStateCode_e ToggleButtonStateCodeType
+        public bool EnableToggleButtonStateExpression
         {
-            get => Command.ToggleButtonStateCodeType;
+            get => Command.EnableToggleButtonStateExpression;
             set 
             {
-                Command.ToggleButtonStateCodeType = value;
+                Command.EnableToggleButtonStateExpression = value;
                 this.NotifyChanged();
             }
         }
         
-        public string ToggleButtonStateCode 
+        public string ToggleButtonStateExpression
         {
-            get => Command.ToggleButtonStateCode;
+            get => Command.ToggleButtonStateExpression;
             set
             {
-                Command.ToggleButtonStateCode = value;
+                Command.ToggleButtonStateExpression = value;
                 this.NotifyChanged();
             }
         }
 
-        public bool ResolveButtonStateCodeOnce
+        public bool CacheToggleState
         {
-            get => Command.ResolveButtonStateCodeOnce;
+            get => Command.CacheToggleState;
             set
             {
-                Command.ResolveButtonStateCodeOnce = value;
+                Command.CacheToggleState = value;
                 this.NotifyChanged();
             }
         }
@@ -192,10 +214,6 @@ namespace Xarial.CadPlus.CustomToolbar.UI.ViewModels
 
         private readonly FileFilter[] m_MacroFileFilters;
         private readonly IMacroEntryPointsExtractor m_Extractor;
-
-        public CommandMacroVM() : this(new CommandMacroInfo(), ToolbarModule.Resolve<IIconsProvider[]>(), ToolbarModule.Resolve<IFilePathResolver>(), ToolbarModule.Resolve<IMacroEntryPointsExtractor>())
-        {
-        }
 
         public CommandMacroVM(CommandMacroInfo cmd, IIconsProvider[] providers, IFilePathResolver filePathResolver, IMacroEntryPointsExtractor extractor)
             : base(cmd, providers, filePathResolver)

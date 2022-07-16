@@ -1,6 +1,6 @@
 ﻿//*********************************************************************
 //CAD+ Toolset
-//Copyright(C) 2021 Xarial Pty Limited
+//Copyright(C) 2022 Xarial Pty Limited
 //Product URL: https://cadplus.xarial.com
 //License: https://cadplus.xarial.com/license/
 //*********************************************************************
@@ -19,6 +19,29 @@ using Xarial.XToolkit.Wpf.Extensions;
 
 namespace Xarial.CadPlus.CustomToolbar.UI.ViewModels
 {
+    public interface ICommandGroupVMFactory
+    {
+        CommandGroupVM Create(CommandGroupInfo cmdGrp);
+    }
+
+    public class CommandGroupVMFactory : ICommandGroupVMFactory
+    {
+        private readonly IIconsProvider[] m_IconsProviders;
+        private readonly IFilePathResolver m_FilePathResolver;
+
+        private readonly ICommandMacroVMFactory m_MacroVmFactory;
+
+        public CommandGroupVMFactory(IIconsProvider[] iconsProviders, IFilePathResolver filePathResolver, ICommandMacroVMFactory macroVmFactory) 
+        {
+            m_MacroVmFactory = macroVmFactory;
+
+            m_IconsProviders = iconsProviders;
+            m_FilePathResolver = filePathResolver;
+        }
+
+        public CommandGroupVM Create(CommandGroupInfo cmdGrp) => new CommandGroupVM(cmdGrp, m_IconsProviders, m_FilePathResolver, m_MacroVmFactory);
+    }
+
     public class CommandGroupVM : CommandVM<CommandGroupInfo>
     {
         private static readonly BitmapImage m_DefaultGroupIcon = Resources.group_icon_default.ToBitmapImage();
@@ -29,18 +52,17 @@ namespace Xarial.CadPlus.CustomToolbar.UI.ViewModels
 
         protected override BitmapSource DefaultIcon => m_DefaultGroupIcon;
 
-        public CommandGroupVM()
-            : this(new CommandGroupInfo(), ToolbarModule.Resolve<IIconsProvider[]>(), ToolbarModule.Resolve<IFilePathResolver>(), ToolbarModule.Resolve<Func<CommandMacroInfo, CommandMacroVM>>())
-        {
-        }
+        private readonly ICommandMacroVMFactory m_MacroVmFactory;
 
-        public CommandGroupVM(CommandGroupInfo cmdGrp, IIconsProvider[] providers, IFilePathResolver filePathResolver, Func<CommandMacroInfo, CommandMacroVM> cmdMacroFact) : base(cmdGrp, providers, filePathResolver)
+        public CommandGroupVM(CommandGroupInfo cmdGrp, IIconsProvider[] providers, IFilePathResolver filePathResolver, ICommandMacroVMFactory macroVmFactory) 
+            : base(cmdGrp, providers, filePathResolver)
         {
+            m_MacroVmFactory = macroVmFactory;
             m_CmdGrp = cmdGrp;
 
-            Commands = new CommandsCollection<CommandMacroVM>(
-                (cmdGrp.Commands ?? new CommandMacroInfo[0])
-                .Select(c => cmdMacroFact.Invoke(c)));
+            Commands = new CommandsCollection<CommandMacroVM>((cmdGrp.Commands ?? new CommandMacroInfo[0])
+                .Select(c => m_MacroVmFactory.Create(c)),
+                () => m_MacroVmFactory.Create(new CommandMacroInfo()));
 
             Commands.CommandsChanged += OnCommandsCollectionChanged;
         }

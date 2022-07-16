@@ -1,6 +1,6 @@
 ﻿//*********************************************************************
 //CAD+ Toolset
-//Copyright(C) 2021 Xarial Pty Limited
+//Copyright(C) 2022 Xarial Pty Limited
 //Product URL: https://cadplus.xarial.com
 //License: https://cadplus.xarial.com/license/
 //*********************************************************************
@@ -11,6 +11,7 @@ using System.Linq;
 using System.Reflection;
 using Xarial.CadPlus.Plus;
 using Xarial.CadPlus.Plus.Data;
+using Xarial.CadPlus.Plus.DI;
 using Xarial.CadPlus.Plus.Services;
 using Xarial.XCad.Base;
 using Xarial.XCad.Exceptions;
@@ -25,6 +26,11 @@ namespace Xarial.CadPlus.Init
         public bool IsRegistered => false;
         public EditionType_e Edition => EditionType_e.Community;
         public DateTime? TrialExpiryDate => null;
+    }
+
+    internal class LicenseInfoProvider : ILicenseInfoProvider
+    {
+        public ILicenseInfo ProvideLicense() => new LicenseInfo();
     }
 
     internal class ExcelWriter : IExcelWriter
@@ -62,10 +68,12 @@ namespace Xarial.CadPlus.Init
 
         private void OnConfigureServices(IContainerBuilder builder)
         {
-            builder.Register<AppLogger, IXLogger>();
-            builder.Register<ExcelWriter, IExcelWriter>();
-            builder.Register<ExcelReader, IExcelReader>();
-            builder.Register<ILicenseInfo>(c => new LicenseInfo());
+            builder.RegisterSingleton<IXLogger, AppLogger>();
+            builder.RegisterSingleton<IExcelWriter, ExcelWriter>();
+            builder.RegisterSingleton<IExcelReader, ExcelReader>();
+            builder.RegisterSingleton<ILicenseInfoProvider, LicenseInfoProvider>();
+            builder.RegisterSingleton<ICadSpecificServiceFactory<IMacroExecutor>, CadSpecificServiceFactory<IMacroExecutor>>();
+            builder.RegisterSingleton<ICadSpecificServiceFactory<ICadDescriptor>, CadSpecificServiceFactory<ICadDescriptor>>();
         }
 
         public void Dispose()

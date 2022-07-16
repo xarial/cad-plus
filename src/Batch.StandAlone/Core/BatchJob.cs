@@ -1,6 +1,6 @@
 ﻿//*********************************************************************
 //CAD+ Toolset
-//Copyright(C) 2021 Xarial Pty Limited
+//Copyright(C) 2022 Xarial Pty Limited
 //Product URL: https://cadplus.xarial.com
 //License: https://cadplus.xarial.com/license/
 //*********************************************************************
@@ -100,23 +100,6 @@ namespace Xarial.CadPlus.Batch.Base.Core
             StartupOptions = StartupOptions_e.Silent | StartupOptions_e.Safe;
             OpenFileOptions = OpenFileOptions_e.Silent | OpenFileOptions_e.ForbidUpgrade;
             Actions = Actions_e.None;
-        }
-    }
-
-    public static class BatchJobExtension 
-    {
-        public static ICadApplicationInstanceProvider FindApplicationProvider(this BatchJob job, ICadApplicationInstanceProvider[] appProviders)
-        {
-            var appProvider = appProviders.FirstOrDefault(
-                p => string.Equals(p.Descriptor.ApplicationId, job.ApplicationId,
-                StringComparison.CurrentCultureIgnoreCase));
-
-            if (appProvider == null)
-            {
-                throw new UserException("Failed to find the application provider for this job file");
-            }
-
-            return appProvider;
         }
     }
 }

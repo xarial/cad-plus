@@ -1,6 +1,6 @@
 ﻿//*********************************************************************
 //CAD+ Toolset
-//Copyright(C) 2021 Xarial Pty Limited
+//Copyright(C) 2022 Xarial Pty Limited
 //Product URL: https://cadplus.xarial.com
 //License: https://cadplus.xarial.com/license/
 //*********************************************************************
@@ -46,7 +46,7 @@ namespace Xarial.CadPlus.Batch.Sw
             MacroRunnerService = svc;
             Descriptor = entDesc;
             m_CustomServices = new ServiceCollection();
-            m_CustomServices.AddOrReplace<IXLogger>(() => m_Logger);
+            m_CustomServices.Add(() => m_Logger);
 
             m_ForceDisabledAddIns = new Dictionary<Process, List<string>>();
         }

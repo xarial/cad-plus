@@ -1,6 +1,6 @@
 ﻿//*********************************************************************
 //CAD+ Toolset
-//Copyright(C) 2021 Xarial Pty Limited
+//Copyright(C) 2022 Xarial Pty Limited
 //Product URL: https://cadplus.xarial.com
 //License: https://cadplus.xarial.com/license/
 //*********************************************************************
@@ -44,6 +44,7 @@ using Xarial.CadPlus.Plus.Data;
 using Xarial.XCad.Base.Enums;
 using Xarial.CadPlus.Batch.InApp.Services;
 using System.Windows.Threading;
+using Xarial.XToolkit.Services;
 
 namespace Xarial.CadPlus.Batch.InApp
 {
@@ -53,7 +54,7 @@ namespace Xarial.CadPlus.Batch.InApp
         {
             try
             {
-                return string.Equals(x.Path, y.Path, StringComparison.CurrentCultureIgnoreCase);
+                return string.Equals(x.ReferencedDocument.Path, y.ReferencedDocument.Path, StringComparison.CurrentCultureIgnoreCase);
             }
             catch 
             {
@@ -116,7 +117,7 @@ namespace Xarial.CadPlus.Batch.InApp
             m_Host.Initialized += OnHostInitialized;
         }
 
-        private void OnHostInitialized(IApplication app, IServiceContainer svcProvider, IModule[] modules)
+        private void OnHostInitialized(IApplication app, IServiceProvider svcProvider, IModule[] modules)
         {
             m_MacroRunnerSvc = svcProvider.GetService<IMacroExecutor>();
             m_Msg = svcProvider.GetService<IMessageService>();

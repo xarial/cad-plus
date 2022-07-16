@@ -1,6 +1,6 @@
 ﻿//*********************************************************************
 //CAD+ Toolset
-//Copyright(C) 2021 Xarial Pty Limited
+//Copyright(C) 2022 Xarial Pty Limited
 //Product URL: https://cadplus.xarial.com
 //License: https://cadplus.xarial.com/license/
 //*********************************************************************
@@ -19,8 +19,10 @@ using Xarial.CadPlus.CustomToolbar.UI.Base;
 using Xarial.CadPlus.Plus;
 using Xarial.CadPlus.Plus.Modules;
 using Xarial.CadPlus.Plus.Services;
+using Xarial.CadPlus.Plus.Shared.Services;
 using Xarial.CadPlus.Toolbar.Services;
 using Xarial.XCad.Base;
+using Xarial.XToolkit.Services;
 using Xarial.XToolkit.Wpf;
 using Xarial.XToolkit.Wpf.Extensions;
 using Xarial.XToolkit.Wpf.Utils;
@@ -50,11 +52,11 @@ namespace Xarial.CadPlus.CustomToolbar.UI.ViewModels
         private string m_ToolbarSpecificationPath;
         private bool m_IsEditable;
 
-        private readonly Func<CommandGroupInfo, CommandGroupVM> m_CmdGrpFact;
+        private readonly ICommandGroupVMFactory m_CmdGrpFact;
         private readonly string[] m_MacroExtensions;
 
         public CommandManagerVM(IToolbarConfigurationProvider confsProvider,
-            IMessageService msgService, IXLogger logger, ICadDescriptor cadEntDesc, Func<CommandGroupInfo, CommandGroupVM> cmdGrpFact)
+            IMessageService msgService, IXLogger logger, ICadDescriptor cadEntDesc, ICommandGroupVMFactory cmdGrpFact)
         {
             m_ConfsProvider = confsProvider;
             m_MsgService = msgService;
@@ -103,7 +105,8 @@ namespace Xarial.CadPlus.CustomToolbar.UI.ViewModels
 
             Groups = new CommandsCollection<CommandGroupVM>(
                 (toolbarInfo.Groups ?? new CommandGroupInfo[0])
-                .Select(g => m_CmdGrpFact.Invoke(g)));
+                .Select(g => m_CmdGrpFact.Create(g)),
+                () => m_CmdGrpFact.Create(new CommandGroupInfo()));
 
             HandleCommandGroupCommandCreation(Groups.Commands);
 
