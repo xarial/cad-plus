@@ -57,12 +57,12 @@ namespace Xarial.CadPlus.Batch.StandAlone.Services
     {
         private const double POPUP_KILLER_PING_SECS = 2;
 
-        public event Action<IJobItem, bool> ProgressChanged;
         public event Action<IJobItem[], DateTime> JobSet;
-        public event Action<TimeSpan> JobCompleted;
-
+        public event Action<IJobItem, double, bool> ProgressChanged;
+        public event Action<string> StatusChanged;
         public event Action<string> Log;
-
+        public event Action<TimeSpan> JobCompleted;
+        
         private bool m_IsExecuted;
         private bool m_IsDisposed;
 
@@ -182,6 +182,8 @@ namespace Xarial.CadPlus.Batch.StandAlone.Services
 
                         for (int i = 0; i < allFiles.Length; i++)
                         {
+                            StatusChanged?.Invoke($"Processing {allFiles[i].FilePath}");
+
                             var curAppPrc = m_CurrentContext.CurrentApplicationProcess?.Id;
 
                             m_CurrentContext.CurrentJobItem = allFiles[i];
@@ -191,7 +193,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.Services
 
                             m_CurrentContext.CurrentDocument = null;
 
-                            ProgressChanged?.Invoke(m_CurrentContext.CurrentJobItem, res);
+                            ProgressChanged?.Invoke(m_CurrentContext.CurrentJobItem, (double)(i + 1) / (double)allFiles.Length, res);
 
                             if (!res && !m_Job.ContinueOnError)
                             {

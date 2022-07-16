@@ -21,6 +21,7 @@ using Xarial.CadPlus.Plus.DI;
 using Xarial.CadPlus.Plus.Services;
 using Xarial.CadPlus.Plus.Shared;
 using Xarial.CadPlus.Plus.Shared.DI;
+using Xarial.CadPlus.Plus.Shared.Services;
 using Xarial.XCad;
 using Xarial.XCad.Base.Attributes;
 using Xarial.XCad.SolidWorks;
@@ -80,6 +81,7 @@ namespace Xarial.CadPlus.AddIn.Sw
         private void OnConfigureModuleServices(IContainerBuilder builder)
         {
             builder.RegisterSingleton<IPropertyPageHandlerProvider, CadPlusComunityPropertyPageHandlerProvider>();
+            builder.RegisterSingleton<IProgressHandlerFactoryService, CadProgressHandlerFactoryService>();
 
             builder.RegisterAdapter<IXApplication, ISwApplication>(LifetimeScope_e.Singleton);
 

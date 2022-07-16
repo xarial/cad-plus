@@ -132,7 +132,7 @@ namespace Xarial.CadPlus.Batch.Base.ViewModels
             Duration = duration;
         }
 
-        private void OnProgressChanged(IJobItem file, bool result)
+        private void OnProgressChanged(IJobItem file, double progress, bool result)
         {
             if (IsInitializing)
             {
@@ -148,7 +148,7 @@ namespace Xarial.CadPlus.Batch.Base.ViewModels
                 FailedFiles++;
             }
 
-            Progress = (ProcessedFiles + FailedFiles) / (double)JobItemFiles.Length;
+            Progress = progress;
 
             if (StartTime.HasValue)
             {

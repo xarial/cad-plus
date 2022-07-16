@@ -73,9 +73,10 @@ namespace Xarial.CadPlus.Xport.Core
         private readonly IJobManager m_JobMgr;
 
         public event Action<IJobItem[], DateTime> JobSet;
-        public event Action<TimeSpan> JobCompleted;
-        public event Action<IJobItem, bool> ProgressChanged;
+        public event Action<IJobItem, double, bool> ProgressChanged;
+        public event Action<string> StatusChanged;
         public event Action<string> Log;
+        public event Action<TimeSpan> JobCompleted;
 
         private readonly ExportOptions m_Opts;
 
@@ -145,6 +146,8 @@ namespace Xarial.CadPlus.Xport.Core
 
             JobSet?.Invoke(formats, startTime);
 
+            var jobItemIndex = 0;
+
             foreach (var job in jobs)
             {
                 var file = job.FilePath;
@@ -156,6 +159,8 @@ namespace Xarial.CadPlus.Xport.Core
                     try
                     {
                         var desFile = outFile.FilePath;
+
+                        StatusChanged?.Invoke($"Exporting '{file}' to '{desFile}'");
 
                         int index = 0;
 
@@ -212,7 +217,8 @@ namespace Xarial.CadPlus.Xport.Core
                         }
                     }
 
-                    ProgressChanged?.Invoke(outFile, true);
+                    jobItemIndex++;
+                    ProgressChanged?.Invoke(outFile, (double)jobItemIndex / (double)formats.Length, true);
                 }
 
                 if (outFiles.All(f => f.Status == JobItemStatus_e.Succeeded))

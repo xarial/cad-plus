@@ -91,6 +91,7 @@ namespace Xarial.CadPlus.Batch.InApp
         private IMacroExecutor m_MacroRunnerSvc;
         private IMessageService m_Msg;
         private IXLogger m_Logger;
+        private IProgressHandlerFactoryService m_PrgHandlerFactSvc;
 
         private ICadDescriptor m_CadDesc;
 
@@ -115,6 +116,7 @@ namespace Xarial.CadPlus.Batch.InApp
             m_MacroRunnerSvc = svcProvider.GetService<IMacroExecutor>();
             m_Msg = svcProvider.GetService<IMessageService>();
             m_Logger = svcProvider.GetService<IXLogger>();
+            m_PrgHandlerFactSvc = svcProvider.GetService<IProgressHandlerFactoryService>();
 
             m_CadDesc = svcProvider.GetService<ICadDescriptor>();
 
@@ -236,9 +238,18 @@ namespace Xarial.CadPlus.Batch.InApp
 
                     var vm = new JobResultVM(rootDoc.Title, exec, m_CadDesc, m_Logger, cancellationTokenSource);
 
-                    using (var cancellationSvc = new BatchOperationInteractiveCancellationService(cancellationTokenSource, m_Host.Extension.Application.Process, m_Dispatcher,
-                        "Do you want to cancel the current batch process?", "Batch+"))
+                    using (var prg = m_PrgHandlerFactSvc.Create(cancellationTokenSource))
                     {
+                        exec.ProgressChanged += (i, p, r) => 
+                        {
+                            prg.ReportProgress(p);
+                        };
+
+                        exec.StatusChanged += s =>
+                        {
+                            prg.SetStatus(s);
+                        };
+
                         vm.TryRunBatch();
                     }
 

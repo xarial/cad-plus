@@ -99,7 +99,7 @@ namespace Xarial.CadPlus.Xport
 
         private static void OnJobCompleted(TimeSpan duration) => m_ProgressWriter.ReportCompleted(duration);
         private static void OnJobSet(IJobItem[] scope, DateTime startTime) => m_ProgressWriter.SetJobScope(scope, startTime);
-        private static void OnProgressChanged(IJobItem file, bool result) => m_ProgressWriter.ReportProgress(file, result);
+        private static void OnProgressChanged(IJobItem file, double progress, bool result) => m_ProgressWriter.ReportProgress(file, progress, result);
         private static void OnLog(string msg) => m_ProgressWriter.Log(msg);
     }
 }

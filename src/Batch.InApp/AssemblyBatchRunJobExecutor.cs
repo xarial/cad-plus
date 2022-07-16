@@ -31,8 +31,9 @@ namespace Xarial.CadPlus.Batch.InApp
     {
         public event Action<IJobItem[], DateTime> JobSet;
         public event Action<TimeSpan> JobCompleted;
-        public event Action<IJobItem, bool> ProgressChanged;
+        public event Action<IJobItem, double, bool> ProgressChanged;
         public event Action<string> Log;
+        public event Action<string> StatusChanged;
 
         private readonly IXApplication m_App;
 
@@ -69,27 +70,23 @@ namespace Xarial.CadPlus.Batch.InApp
 
             try
             {
-                using (var prg = m_App.CreateProgress())
+                LogMessage("Preparing job");
+
+                var jobItems = PrepareJob();
+
+                JobSet?.Invoke(jobItems, startTime);
+
+                for (int i = 0; i < jobItems.Length; i++)
                 {
-                    LogMessage("Preparing job");
+                    cancellationToken.ThrowIfCancellationRequested();
 
-                    var jobItems = PrepareJob();
+                    var jobItem = jobItems[i];
 
-                    JobSet?.Invoke(jobItems, startTime);
+                    StatusChanged?.Invoke($"Processing {jobItem.FilePath}");
 
-                    for (int i = 0; i < jobItems.Length; i++)
-                    {
-                        cancellationToken.ThrowIfCancellationRequested();
+                    var res = TryProcessFile(jobItem, cancellationToken);
 
-                        var jobItem = jobItems[i];
-
-                        prg.SetStatus($"Processing {jobItem.FilePath}");
-
-                        var res = TryProcessFile(jobItem, cancellationToken);
-
-                        ProgressChanged?.Invoke(jobItem, res);
-                        prg.Report((double)(i + 1) / (double)jobItems.Length);
-                    }
+                    ProgressChanged?.Invoke(jobItem, (double)(i + 1) / (double)jobItems.Length, res);
                 }
 
                 return true;

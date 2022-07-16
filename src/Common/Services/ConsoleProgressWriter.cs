@@ -15,27 +15,21 @@ namespace Xarial.CadPlus.Common.Services
 {
     public class ConsoleProgressWriter
     {
-        private int m_TotalFiles;
-        private int m_ProcessedFiles;
         private IJobItem[] m_Scope;
 
         public void Log(string msg) => Console.WriteLine(msg);
 
-        public void ReportProgress(IJobItem file, bool result)
+        public void ReportProgress(IJobItem file, double progress, bool result)
         {
-            m_ProcessedFiles++;
-            var prg = m_ProcessedFiles / (double)m_TotalFiles;
-
             Console.WriteLine($"Result: {file.Status}");
             Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine($"Progress: {(prg * 100).ToString("F")}%");
+            Console.WriteLine($"Progress: {(progress * 100).ToString("F")}%");
             Console.ResetColor();
         }
 
         public void SetJobScope(IJobItem[] scope, DateTime startTime)
         {
             m_Scope = scope;
-            m_TotalFiles = scope.Length;
             Console.WriteLine($"Processing {scope.Length} file(s). {startTime}");
         }
         

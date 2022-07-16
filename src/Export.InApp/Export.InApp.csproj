@@ -23,6 +23,6 @@
     <None Include="Resources\export-icon.png" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Xarial.CadPlusPlus" Version="0.4.0-20220716.1" />
+    <PackageReference Include="Xarial.CadPlusPlus" Version="0.4.0-20220716.4" />
   </ItemGroup>
 </Project>

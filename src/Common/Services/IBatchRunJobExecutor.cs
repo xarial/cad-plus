@@ -23,7 +23,8 @@ namespace Xarial.CadPlus.Common.Services
     {
         event Action<IJobItem[], DateTime> JobSet;
         event Action<TimeSpan> JobCompleted;
-        event Action<IJobItem, bool> ProgressChanged;
+        event Action<string> StatusChanged;
+        event Action<IJobItem, double, bool> ProgressChanged;
         event Action<string> Log;
 
         bool Execute(CancellationToken cancellationToken);

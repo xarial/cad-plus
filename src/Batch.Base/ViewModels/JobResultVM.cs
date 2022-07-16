@@ -77,6 +77,8 @@ namespace Xarial.CadPlus.Batch.Base.ViewModels
 
         private readonly CancellationTokenSource m_CancellationTokenSource;
 
+        private bool m_IsRun;
+
         public JobResultVM(string name, IBatchRunJobExecutor executor, ICadDescriptor cadDesc,
             IXLogger logger, CancellationTokenSource cancellationTokenSource)
         {
@@ -87,6 +89,8 @@ namespace Xarial.CadPlus.Batch.Base.ViewModels
 
             m_CancellationTokenSource = cancellationTokenSource;
 
+            m_IsRun = false;
+
             Name = name;
             Summary = new JobResultSummaryVM(m_Executor, CadDescriptor);
             Journal = new JobResultJournalVM(m_Executor);
@@ -96,65 +100,83 @@ namespace Xarial.CadPlus.Batch.Base.ViewModels
 
         public async void TryRunBatchAsync()
         {
-            try
+            if (!m_IsRun)
             {
-                Status = JobState_e.InProgress;
+                m_IsRun = true;
 
-                IsBatchInProgress = true;
-
-                if (await m_Executor.ExecuteAsync(m_CancellationTokenSource.Token).ConfigureAwait(false))
+                try
                 {
-                    UpdateJobStatus();
+                    Status = JobState_e.InProgress;
+
+                    IsBatchInProgress = true;
+
+                    if (await m_Executor.ExecuteAsync(m_CancellationTokenSource.Token).ConfigureAwait(false))
+                    {
+                        UpdateJobStatus();
+                    }
+                    else
+                    {
+                        Status = JobState_e.Failed;
+                    }
                 }
-                else
+                catch (JobCancelledException)
+                {
+                    Status = JobState_e.Cancelled;
+                }
+                catch (Exception ex)
                 {
                     Status = JobState_e.Failed;
+                    m_Logger.Log(ex);
+                }
+                finally
+                {
+                    IsBatchInProgress = false;
                 }
             }
-            catch (JobCancelledException)
+            else 
             {
-                Status = JobState_e.Cancelled;
-            }
-            catch (Exception ex)
-            {
-                Status = JobState_e.Failed;
-                m_Logger.Log(ex);
-            }
-            finally
-            {
-                IsBatchInProgress = false;
+                throw new NotSupportedException("Job result can only be executed once");
             }
         }
 
         public void TryRunBatch()
         {
-            try
+            if (!m_IsRun)
             {
-                Status = JobState_e.InProgress;
+                m_IsRun = true;
 
-                IsBatchInProgress = true;
-
-                if (m_Executor.Execute(m_CancellationTokenSource.Token))
+                try
                 {
-                    UpdateJobStatus();
+                    Status = JobState_e.InProgress;
+
+                    IsBatchInProgress = true;
+
+                    if (m_Executor.Execute(m_CancellationTokenSource.Token))
+                    {
+                        UpdateJobStatus();
+                    }
+                    else
+                    {
+                        Status = JobState_e.Failed;
+                    }
                 }
-                else
+                catch (JobCancelledException)
+                {
+                    Status = JobState_e.Cancelled;
+                }
+                catch (Exception ex)
                 {
                     Status = JobState_e.Failed;
+                    m_Logger.Log(ex);
+                }
+                finally
+                {
+                    IsBatchInProgress = false;
                 }
             }
-            catch (JobCancelledException)
+            else
             {
-                Status = JobState_e.Cancelled;
-            }
-            catch (Exception ex)
-            {
-                Status = JobState_e.Failed;
-                m_Logger.Log(ex);
-            }
-            finally
-            {
-                IsBatchInProgress = false;
+                throw new NotSupportedException("Job result can only be executed once");
             }
         }
 
