@@ -77,7 +77,8 @@ namespace Xarial.CadPlus.Batch.Base.ViewModels
 
         private readonly CancellationTokenSource m_CancellationTokenSource;
 
-        public JobResultVM(string name, IBatchRunJobExecutor executor, ICadDescriptor cadDesc, IXLogger logger, CancellationTokenSource cancellationTokenSource)
+        public JobResultVM(string name, IBatchRunJobExecutor executor, ICadDescriptor cadDesc,
+            IXLogger logger, CancellationTokenSource cancellationTokenSource)
         {
             m_Executor = executor;
             CadDescriptor = cadDesc;
@@ -159,11 +160,11 @@ namespace Xarial.CadPlus.Batch.Base.ViewModels
 
         private void UpdateJobStatus()
         {
-            if (Summary.JobItemFiles.All(f => f.Status == Common.Services.JobItemStatus_e.Succeeded))
+            if (Summary.JobItemFiles.All(f => f.Status == JobItemStatus_e.Succeeded))
             {
                 Status = JobState_e.Succeeded;
             }
-            else if (Summary.JobItemFiles.Any(f => f.Status == Common.Services.JobItemStatus_e.Succeeded))
+            else if (Summary.JobItemFiles.Any(f => f.Status == JobItemStatus_e.Succeeded))
             {
                 Status = JobState_e.CompletedWithWarning;
             }

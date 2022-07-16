@@ -57,28 +57,28 @@ namespace Xarial.CadPlus.Batch.Base.Services
 
         public void DoWork(Action<TContext, CancellationToken> action, TContext context, CancellationToken cancellationToken)
         {
-            try
+            var res = m_Policy.ExecuteAndCapture((Context ctx, CancellationToken token) =>
             {
-                var res = m_Policy.ExecuteAndCapture((Context ctx, CancellationToken token) =>
-                {
-                    action.Invoke(GetContext(ctx), token);
-                }, new Dictionary<string, object>() { { CONTEXT_PARAM_NAME, context } }, cancellationToken);
+                action.Invoke(GetContext(ctx), token);
+            }, new Dictionary<string, object>() { { CONTEXT_PARAM_NAME, context } }, cancellationToken);
 
-                if (res.Outcome == OutcomeType.Failure)
-                {
-                    if (res.FinalException != null)
-                    {
-                        throw new UserException($"Failed to process the operation within {m_Retries} retries", res.FinalException);
-                    }
-                    else 
-                    {
-                        throw new Exception("Unknown error");
-                    }
-                }
-            }
-            catch (TimeoutRejectedException ex) 
+            if (res.Outcome == OutcomeType.Failure)
             {
-                throw new TimeoutException("Timeout", ex);
+                switch (res.FinalException) 
+                {
+                    case OperationCanceledException cancelledEx:
+                        throw cancelledEx;
+
+                    case TimeoutRejectedException timeoutEx:
+                        throw new TimeoutException("Timeout", timeoutEx);
+
+                    case Exception ex:
+                        throw new UserException($"Failed to process the operation within {m_Retries} retries", res.FinalException);
+
+                    default:
+                        throw new NotSupportedException("Final exception is not set");
+
+                }
             }
         }
 
