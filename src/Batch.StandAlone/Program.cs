@@ -48,9 +48,13 @@ namespace Xarial.CadPlus.Batch.StandAlone
 
         private static Window m_Window;
 
+        private static ConsoleProgressWriter m_ProgressWriter;
+
         [STAThread]
         static void Main(string[] args)
         {
+            m_ProgressWriter = new ConsoleProgressWriter();
+
             m_AppLauncher = new ApplicationLauncher<BatchApplication, BatchArguments, MainWindow>(new Initiator());
             m_AppLauncher.ConfigureServices += OnConfigureServices;
             m_AppLauncher.ParseArguments += OnParseArguments;
@@ -60,18 +64,22 @@ namespace Xarial.CadPlus.Batch.StandAlone
             m_AppLauncher.Start(args);
         }
 
-        private static Task OnRunConsoleAsync(BatchArguments args)
-            => RunConsoleBatch(args);
+        private static Task OnRunConsoleAsync(BatchArguments args) => RunConsoleBatch(args);
 
         private static async Task RunConsoleBatch(BatchArguments args)
         {
             try
             {
-                var batchRunFact = m_AppLauncher.Container.GetService<IBatchRunnerFactory>();
+                var batchRunFact = m_AppLauncher.Container.GetService<IBatchRunJobExecutorFactory>();
 
-                using (var batchRunner = batchRunFact.Create(args.Job, Console.Out, new ConsoleProgressWriter()))
+                using (var batchRunner = batchRunFact.Create(args.Job))
                 {
-                    await batchRunner.BatchRunAsync().ConfigureAwait(false);
+                    batchRunner.Log += OnLog;
+                    batchRunner.ProgressChanged += OnProgressChanged;
+                    batchRunner.JobSet += OnJobSet;
+                    batchRunner.JobCompleted += OnJobCompleted;
+
+                    await batchRunner.ExecuteAsync(default).ConfigureAwait(false);
                 }
             }
             catch (Exception ex)
@@ -83,10 +91,14 @@ namespace Xarial.CadPlus.Batch.StandAlone
             }
         }
 
+        private static void OnJobCompleted(TimeSpan duration) => m_ProgressWriter.ReportCompleted(duration);
+        private static void OnJobSet(IJobItem[] scope, DateTime startTime) => m_ProgressWriter.SetJobScope(scope, startTime);
+        private static void OnProgressChanged(IJobItem file, bool result) => m_ProgressWriter.ReportProgress(file, result);
+        private static void OnLog(string msg) => m_ProgressWriter.Log(msg);
+
         private static void OnConfigureServices(IContainerBuilder builder, BatchArguments args)
         {
             builder.RegisterSingleton<IRecentFilesManager, RecentFilesManager>();
-            builder.RegisterSingleton<IBatchRunnerFactory, BatchRunnerFactory>();
             builder.RegisterSingleton<IBatchRunnerModel, BatchRunnerModel>();
             builder.RegisterSingleton<IBatchRunJobExecutorFactory, BatchRunJobExecutorFactory>();
             builder.RegisterSelfSingleton<BatchManagerVM>();

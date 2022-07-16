@@ -6,7 +6,6 @@ using System.Text;
 using System.Threading.Tasks;
 using Xarial.CadPlus.Batch.Base;
 using Xarial.CadPlus.Batch.Base.Core;
-using Xarial.CadPlus.Batch.Base.Models;
 using Xarial.CadPlus.Batch.Base.Services;
 using Xarial.CadPlus.Batch.StandAlone.ViewModels;
 using Xarial.CadPlus.Plus.Applications;

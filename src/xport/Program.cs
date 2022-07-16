@@ -35,10 +35,12 @@ namespace Xarial.CadPlus.Xport
     {
         private static Window m_Window;
         private static ApplicationLauncher<ExportApplication, Arguments, MainWindow> m_AppLauncher;
+        private static ConsoleProgressWriter m_ProgressWriter;
 
         [STAThread]
         static void Main(string[] args)
         {
+            m_ProgressWriter = new ConsoleProgressWriter();
             m_AppLauncher = new ApplicationLauncher<ExportApplication, Arguments, MainWindow>(new Initiator());
             m_AppLauncher.RunConsoleAsync += OnRunConsoleAsync;
             m_AppLauncher.WindowCreated += OnWindowCreated;
@@ -84,10 +86,20 @@ namespace Xarial.CadPlus.Xport
 
             var jobMgr = m_AppLauncher.Container.GetService<IJobManager>();
 
-            using (var exporter = new Exporter(Console.Out, jobMgr, new ConsoleProgressWriter()))
+            using (var exporter = new Exporter(jobMgr, opts))
             {
-                await exporter.Export(opts).ConfigureAwait(false);
+                exporter.Log += OnLog;
+                exporter.ProgressChanged += OnProgressChanged;
+                exporter.JobSet += OnJobSet;
+                exporter.JobCompleted += OnJobCompleted;
+
+                await exporter.ExecuteAsync(default).ConfigureAwait(false);
             }
         }
+
+        private static void OnJobCompleted(TimeSpan duration) => m_ProgressWriter.ReportCompleted(duration);
+        private static void OnJobSet(IJobItem[] scope, DateTime startTime) => m_ProgressWriter.SetJobScope(scope, startTime);
+        private static void OnProgressChanged(IJobItem file, bool result) => m_ProgressWriter.ReportProgress(file, result);
+        private static void OnLog(string msg) => m_ProgressWriter.Log(msg);
     }
 }

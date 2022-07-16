@@ -28,6 +28,7 @@ using Xarial.XCad.SolidWorks.Enums;
 using Xarial.XToolkit.Wpf.Utils;
 using Xarial.CadPlus.Batch.Base.Services;
 using Xarial.XToolkit.Services;
+using Xarial.CadPlus.Batch.StandAlone.Services;
 
 namespace Xbatch.Tests
 {

@@ -46,24 +46,12 @@ namespace Xarial.CadPlus.Xport.Models
         {
             m_CurrentCancellationToken = new CancellationTokenSource();
 
-            var logWriter = new JournalWriter(true);
-            var prgHander = new ProgressHandler();
-
-            logWriter.Log += OnLog;
-            prgHander.JobScopeSet += OnJobScopeSet;
-            prgHander.ProgressChanged += OnProgressChanged;
-
-            try
+            using (var exporter = new Exporter(m_JobMgr, opts))
             {
-                using (var exporter = new Exporter(logWriter, m_JobMgr, prgHander))
-                {
-                    await exporter.Export(opts, m_CurrentCancellationToken.Token).ConfigureAwait(false);
-                }
-            }
-            finally
-            {
-                logWriter.Log -= OnLog;
-                prgHander.ProgressChanged -= OnProgressChanged;
+                exporter.ProgressChanged += OnProgressChanged;
+                exporter.JobSet += OnJobScopeSet;
+                exporter.Log += OnLog;
+                await exporter.ExecuteAsync(m_CurrentCancellationToken.Token).ConfigureAwait(false);
             }
         }
 

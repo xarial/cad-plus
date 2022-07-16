@@ -13,7 +13,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Data;
-using Xarial.CadPlus.Batch.Base.Models;
+using Xarial.CadPlus.Batch.Base.Services;
+using Xarial.CadPlus.Common.Services;
 using Xarial.XToolkit.Wpf.Extensions;
 
 namespace Xarial.CadPlus.Batch.Base.ViewModels

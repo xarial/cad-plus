@@ -11,7 +11,6 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Xarial.CadPlus.Batch.Base.Models;
 using Xarial.CadPlus.Common.Services;
 using Xarial.CadPlus.Plus.Services;
 using Xarial.CadPlus.Batch.Base.Core;
@@ -24,6 +23,7 @@ using Xarial.XToolkit.Reporting;
 using Xarial.CadPlus.Plus.Extensions;
 using Xarial.XCad.Base.Enums;
 using Xarial.CadPlus.Batch.Base.Exceptions;
+using Xarial.CadPlus.Batch.Base.Services;
 
 namespace Xarial.CadPlus.Batch.InApp
 {
@@ -285,9 +285,10 @@ namespace Xarial.CadPlus.Batch.InApp
             }
         }
 
-        private void LogMessage(string msg) 
+        private void LogMessage(string msg) => Log?.Invoke(msg);
+
+        public void Dispose()
         {
-            Log?.Invoke(msg);
         }
     }
 }

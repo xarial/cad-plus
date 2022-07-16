@@ -12,13 +12,13 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Xarial.CadPlus.Batch.Base.Models;
 using Xarial.CadPlus.Plus.Applications;
 using Xarial.CadPlus.Plus.Services;
 using Xarial.CadPlus.Batch.Base.Core;
 using Xarial.CadPlus.Batch.Base.ViewModels;
 using Xarial.XToolkit.Wpf.Extensions;
 using Xarial.XCad.Base;
+using Xarial.CadPlus.Batch.StandAlone.Services;
 
 namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
 {

@@ -15,7 +15,6 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Input;
-using Xarial.CadPlus.Batch.Base.Models;
 using Xarial.CadPlus.Batch.StandAlone.Properties;
 using Xarial.CadPlus.Batch.StandAlone.ViewModels;
 using Xarial.CadPlus.Common.Exceptions;
@@ -39,6 +38,7 @@ using Xarial.XToolkit.Wpf.Utils;
 using Xarial.CadPlus.Batch.Base.Services;
 using Xarial.CadPlus.Batch.Base.ViewModels;
 using Xarial.XToolkit.Services;
+using Xarial.CadPlus.Batch.StandAlone.Services;
 
 namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
 {

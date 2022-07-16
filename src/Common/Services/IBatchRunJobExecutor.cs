@@ -13,9 +13,13 @@ using System.Threading;
 using System.Threading.Tasks;
 using Xarial.CadPlus.Common.Services;
 
-namespace Xarial.CadPlus.Batch.Base.Models
+namespace Xarial.CadPlus.Common.Services
 {
-    public interface IBatchRunJobExecutor
+    /// <summary>
+    /// Executes the batch running job and tracks the progress
+    /// </summary>
+    /// <remarks>This is a transient service and should be created and disposed once per the batch run</remarks>
+    public interface IBatchRunJobExecutor : IDisposable
     {
         event Action<IJobItem[], DateTime> JobSet;
         event Action<TimeSpan> JobCompleted;

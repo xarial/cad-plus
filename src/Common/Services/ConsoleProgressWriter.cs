@@ -13,11 +13,13 @@ using System.Threading.Tasks;
 
 namespace Xarial.CadPlus.Common.Services
 {
-    public class ConsoleProgressWriter : IProgressHandler
+    public class ConsoleProgressWriter
     {
         private int m_TotalFiles;
         private int m_ProcessedFiles;
         private IJobItem[] m_Scope;
+
+        public void Log(string msg) => Console.WriteLine(msg);
 
         public void ReportProgress(IJobItem file, bool result)
         {
@@ -43,6 +45,10 @@ namespace Xarial.CadPlus.Common.Services
             Console.WriteLine($"Processed: {m_Scope.Count(j => j.Status == JobItemStatus_e.Succeeded)}");
             Console.WriteLine($"Warning: {m_Scope.Count(j => j.Status == JobItemStatus_e.Warning)}");
             Console.WriteLine($"Failed: {m_Scope.Count(j => j.Status == JobItemStatus_e.Failed)}");
+        }
+
+        public void Dispose()
+        {
         }
     }
 }

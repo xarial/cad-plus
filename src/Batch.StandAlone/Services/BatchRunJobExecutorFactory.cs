@@ -1,25 +1,26 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Xarial.CadPlus.Batch.Base.Core;
+﻿//*********************************************************************
+//CAD+ Toolset
+//Copyright(C) 2022 Xarial Pty Limited
+//Product URL: https://cadplus.xarial.com
+//License: https://cadplus.xarial.com/license/
+//*********************************************************************
+
+using System;
 using Xarial.CadPlus.Common.Services;
-using Xarial.CadPlus.Plus.Applications;
+using Xarial.CadPlus.Batch.Base.Core;
 using Xarial.XCad.Base;
+using Xarial.CadPlus.Batch.Base.Services;
 
 namespace Xarial.CadPlus.Batch.StandAlone.Services
 {
-    public interface IBatchRunnerFactory
+    public interface IBatchRunJobExecutorFactory
     {
-        BatchRunner Create(BatchJob job, TextWriter journalWriter, IProgressHandler progressHandler);
+        IBatchRunJobExecutor Create(BatchJob job);
     }
 
-    public class BatchRunnerFactory : IBatchRunnerFactory
+    public class BatchRunJobExecutorFactory : IBatchRunJobExecutorFactory
     {
         private readonly IJobApplicationProvider m_JobAppProvider;
-
 
         private readonly IXLogger m_Logger;
         private readonly IJobManager m_JobMgr;
@@ -30,7 +31,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.Services
 
         private readonly IBatchApplicationProxy m_BatchAppProxy;
 
-        public BatchRunnerFactory(IJobApplicationProvider jobAppProvider,
+        public BatchRunJobExecutorFactory(IJobApplicationProvider jobAppProvider,
             IBatchApplicationProxy batchAppProxy,
             IJobManager jobMgr, IXLogger logger,
             IJobContectResilientWorkerFactory workerFact, IPopupKillerFactory popupKillerFactory)
@@ -41,17 +42,17 @@ namespace Xarial.CadPlus.Batch.StandAlone.Services
             m_BatchAppProxy = batchAppProxy;
 
             m_PopupKillerFact = popupKillerFactory;
-            
+
             m_Logger = logger;
 
             m_JobMgr = jobMgr;
         }
 
-        public BatchRunner Create(BatchJob job, TextWriter journalWriter, IProgressHandler progressHandler)
-            => new BatchRunner(job, journalWriter, progressHandler,
-                m_JobAppProvider.GetApplicationProvider(job),
-                m_BatchAppProxy, m_JobMgr, m_Logger,
+        public IBatchRunJobExecutor Create(BatchJob job)
+        {
+            return new BatchRunJobExecutor(job, m_JobAppProvider.GetApplicationProvider(job), m_BatchAppProxy, m_JobMgr, m_Logger,
                 m_WorkerFact.Create(job.Timeout > 0 ? TimeSpan.FromSeconds(job.Timeout) : default),
                 m_PopupKillerFact.Create());
+        }
     }
 }
