@@ -31,8 +31,8 @@ namespace Xarial.CadPlus.Plus.Shared.Services
             m_Progress = m_App.CreateProgress();
         }
 
-        public void ReportProgress(double prg) => m_Progress.Report(prg);
-        public void SetStatus(string status) => m_Progress.SetStatus(status);
-        public void Dispose() => m_Progress.Dispose();
+        public virtual void ReportProgress(double prg) => m_Progress.Report(prg);
+        public virtual void SetStatus(string status) => m_Progress.SetStatus(status);
+        public virtual void Dispose() => m_Progress.Dispose();
     }
 }
