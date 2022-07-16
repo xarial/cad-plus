@@ -1,10 +1,11 @@
 ﻿using System;
+using System.Threading;
 
 namespace Xarial.CadPlus.Plus.Services
 {
     public interface IProgressHandlerFactoryService 
     {
-        IProgressHandlerService Create();
+        IProgressHandlerService Create(CancellationTokenSource cancellationTokenSource);
     }
 
     public interface IProgressHandlerService : IDisposable
