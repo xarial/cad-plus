@@ -47,9 +47,15 @@ namespace Xarial.CadPlus.Batch.InApp
         private readonly bool m_AutoSaveDocs;
         private readonly IXLogger m_Logger;
 
+        private bool m_IsExecuted;
+
+        private JobItemMacro m_CurrentMacro;
+
+        private readonly IMacroRunnerPopupHandler m_PopupHandler;
+
         internal AssemblyBatchRunJobExecutor(IXApplication app, IMacroExecutor macroRunnerSvc,
             IXDocument[] documents, IXLogger logger, IEnumerable<MacroData> macros,
-            bool activateDocs, bool allowReadOnly, bool allowRapid, bool autoSaveDocs) 
+            bool activateDocs, bool allowReadOnly, bool allowRapid, bool autoSaveDocs, IMacroRunnerPopupHandler popupHandler) 
         {
             m_App = app;
             m_Logger = logger;
@@ -58,51 +64,74 @@ namespace Xarial.CadPlus.Batch.InApp
             m_Docs = documents;
             m_Macros = macros;
 
+            m_PopupHandler = popupHandler;
+            m_PopupHandler.MacroUserError += OnMacroUserError;
+
             m_ActivateDocs = activateDocs;
             m_AllowReadOnly = allowReadOnly;
             m_AllowRapid = allowRapid;
             m_AutoSaveDocs = autoSaveDocs;
         }
 
+        private void OnMacroUserError(IMacroRunnerPopupHandler sender, Exception error)
+        {
+            if (m_CurrentMacro != null) 
+            {
+                m_CurrentMacro.InternalMacroException = error;
+            }
+        }
+
         public bool Execute(CancellationToken cancellationToken)
         {
-            var startTime = DateTime.Now;
-
-            try
+            if (!m_IsExecuted)
             {
-                LogMessage("Preparing job");
+                m_IsExecuted = true;
 
-                var jobItems = PrepareJob();
+                var startTime = DateTime.Now;
 
-                JobSet?.Invoke(jobItems, startTime);
-
-                for (int i = 0; i < jobItems.Length; i++)
+                try
                 {
-                    cancellationToken.ThrowIfCancellationRequested();
+                    LogMessage("Preparing job");
 
-                    var jobItem = jobItems[i];
+                    m_PopupHandler.Start(m_App);
 
-                    StatusChanged?.Invoke($"Processing {jobItem.FilePath}");
+                    var jobItems = PrepareJob();
 
-                    var res = TryProcessFile(jobItem, cancellationToken);
+                    JobSet?.Invoke(jobItems, startTime);
 
-                    ProgressChanged?.Invoke(jobItem, (double)(i + 1) / (double)jobItems.Length, res);
+                    for (int i = 0; i < jobItems.Length; i++)
+                    {
+                        cancellationToken.ThrowIfCancellationRequested();
+
+                        var jobItem = jobItems[i];
+
+                        StatusChanged?.Invoke($"Processing {jobItem.FilePath}");
+
+                        var res = TryProcessFile(jobItem, cancellationToken);
+
+                        ProgressChanged?.Invoke(jobItem, (double)(i + 1) / (double)jobItems.Length, res);
+                    }
+
+                    return true;
                 }
-
-                return true;
+                catch (OperationCanceledException)
+                {
+                    throw new JobCancelledException();
+                }
+                catch (Exception ex)
+                {
+                    m_Logger.Log(ex);
+                    return false;
+                }
+                finally
+                {
+                    m_PopupHandler.Stop();
+                    JobCompleted?.Invoke(DateTime.Now - startTime);
+                }
             }
-            catch (OperationCanceledException)
+            else 
             {
-                throw new JobCancelledException();
-            }
-            catch (Exception ex)
-            {
-                m_Logger.Log(ex);
-                return false;
-            }
-            finally
-            {
-                JobCompleted?.Invoke(DateTime.Now - startTime);
+                throw new Exception("Job was already executed. This is a transient service and can onlyt be executed once");
             }
         }
 
@@ -253,12 +282,21 @@ namespace Xarial.CadPlus.Batch.InApp
         {
             try
             {
+                m_CurrentMacro = macro;
+
                 macro.ClearIssues();
 
                 macro.Status = JobItemStatus_e.InProgress;
                 
                 m_MacroRunner.RunMacro(m_App, macro.Macro.FilePath, null, 
                     XCad.Enums.MacroRunOptions_e.UnloadAfterRun, macro.Macro.Arguments, doc);
+
+                if (macro.InternalMacroException != null)
+                {
+                    var ex = macro.InternalMacroException;
+                    macro.InternalMacroException = null;
+                    throw ex;
+                }
 
                 macro.Status = JobItemStatus_e.Succeeded;
             }
@@ -286,6 +324,7 @@ namespace Xarial.CadPlus.Batch.InApp
 
         public void Dispose()
         {
+            m_PopupHandler.Dispose();
         }
     }
 }

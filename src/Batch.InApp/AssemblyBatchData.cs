@@ -172,6 +172,11 @@ namespace Xarial.CadPlus.Batch.InApp
             [ControlOptions(align: ControlLeftAlign_e.Indent)]
             public bool AutoSave { get; set; } = false;
 
+            [Description("Automatically close all popup windows")]
+            [Title("Silent")]
+            [ControlOptions(align: ControlLeftAlign_e.Indent)]
+            public bool Silent { get; set; }
+
             [DynamicControls(BatchModuleGroup_e.Options)]
             public List<IRibbonCommand> AdditionalCommands { get; }
 

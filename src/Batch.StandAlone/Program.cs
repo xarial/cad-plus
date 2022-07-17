@@ -104,7 +104,6 @@ namespace Xarial.CadPlus.Batch.StandAlone
             builder.RegisterSelfSingleton<BatchManagerVM>();
             builder.RegisterSingleton<IJobContectResilientWorkerFactory, PollyJobContectResilientWorkerFactory>().UsingParameters(Parameter<int>.Any(MAX_RETRIES));
 
-            builder.RegisterSingleton<IPopupKillerFactory, PopupKillerFactory>();
             builder.RegisterSingleton<IBatchDocumentVMFactory, BatchDocumentVMFactory>();
             builder.RegisterSingleton<IAboutService, AboutService>();
             builder.RegisterSingleton<IParentWindowProvider, ParentWindowProvider>().UsingFactory(() => new ParentWindowProvider(() => m_Window));
@@ -117,6 +116,8 @@ namespace Xarial.CadPlus.Batch.StandAlone
 
             builder.RegisterSingleton<IXCadMacroProvider, XCadMacroProvider>();
 
+            builder.RegisterSingleton<IMacroRunnerPopupHandlerFactory, MacroRunnerPopupHandlerFactory>();
+            
             builder.RegisterSingleton<IJournalExporter, JournalTextExporter>().AsCollectionItem();
             builder.RegisterSingleton<IResultsSummaryExcelExporter, ResultsSummaryExcelExporter>().AsCollectionItem();
         }

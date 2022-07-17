@@ -38,6 +38,8 @@ using System.Windows.Threading;
 using Xarial.XToolkit.Services;
 using Xarial.CadPlus.Plus.Shared.Services;
 using System.Threading;
+using Xarial.CadPlus.Plus.DI;
+using Xarial.CadPlus.Batch.Base.Services;
 
 namespace Xarial.CadPlus.Batch.InApp
 {
@@ -92,10 +94,9 @@ namespace Xarial.CadPlus.Batch.InApp
         private IMessageService m_Msg;
         private IXLogger m_Logger;
         private IProgressHandlerFactoryService m_PrgHandlerFactSvc;
+        private IMacroRunnerPopupHandlerFactory m_PopupHandlerFact;
 
         private ICadDescriptor m_CadDesc;
-
-        private Dispatcher m_Dispatcher;
 
         public void Init(IHost host)
         {
@@ -104,11 +105,15 @@ namespace Xarial.CadPlus.Batch.InApp
                 throw new InvalidCastException("Only extension host is supported for this module");
             }
 
-            m_Dispatcher = Dispatcher.CurrentDispatcher;
-
             m_Host = (IHostExtension)host;
+            m_Host.ConfigureServices += OnConfigureServices;
             m_Host.Connect += OnConnect;
             m_Host.Initialized += OnHostInitialized;
+        }
+
+        private void OnConfigureServices(IContainerBuilder builder)
+        {
+            builder.RegisterSingleton<IMacroRunnerPopupHandlerFactory, MacroRunnerPopupHandlerFactory>();
         }
 
         private void OnHostInitialized(IApplication app, IServiceProvider svcProvider, IModule[] modules)
@@ -117,7 +122,7 @@ namespace Xarial.CadPlus.Batch.InApp
             m_Msg = svcProvider.GetService<IMessageService>();
             m_Logger = svcProvider.GetService<IXLogger>();
             m_PrgHandlerFactSvc = svcProvider.GetService<IProgressHandlerFactoryService>();
-
+            m_PopupHandlerFact = svcProvider.GetService<IMacroRunnerPopupHandlerFactory>();
             m_CadDesc = svcProvider.GetService<ICadDescriptor>();
 
             m_Data = new AssemblyBatchData(m_CadDesc);
@@ -229,34 +234,35 @@ namespace Xarial.CadPlus.Batch.InApp
                     var input = docs.ToList();
                     ProcessInput?.Invoke(m_Host.Extension.Application, input);
 
-                    var exec = new AssemblyBatchRunJobExecutor(m_Host.Extension.Application, m_MacroRunnerSvc,
+                    using (var exec = new AssemblyBatchRunJobExecutor(m_Host.Extension.Application, m_MacroRunnerSvc,
                         input.ToArray(), m_Logger, m_Data.Macros.Macros.Macros.Select(x => x.Data).ToArray(),
                         m_Data.Options.ActivateDocuments, m_Data.Options.AllowReadOnly,
-                        m_Data.Options.AllowRapid, m_Data.Options.AutoSave);
-
-                    var cancellationTokenSource = new CancellationTokenSource();
-
-                    var vm = new JobResultVM(rootDoc.Title, exec, m_CadDesc, m_Logger, cancellationTokenSource);
-
-                    using (var prg = m_PrgHandlerFactSvc.Create(cancellationTokenSource))
+                        m_Data.Options.AllowRapid, m_Data.Options.AutoSave, m_PopupHandlerFact.Create(m_Data.Options.Silent)))
                     {
-                        exec.ProgressChanged += (i, p, r) => 
-                        {
-                            prg.ReportProgress(p);
-                        };
+                        var cancellationTokenSource = new CancellationTokenSource();
 
-                        exec.StatusChanged += s =>
-                        {
-                            prg.SetStatus(s);
-                        };
+                        var vm = new JobResultVM(rootDoc.Title, exec, m_CadDesc, m_Logger, cancellationTokenSource);
 
-                        vm.TryRunBatch();
+                        using (var prg = m_PrgHandlerFactSvc.Create(cancellationTokenSource))
+                        {
+                            exec.ProgressChanged += (i, p, r) =>
+                            {
+                                prg.ReportProgress(p);
+                            };
+
+                            exec.StatusChanged += s =>
+                            {
+                                prg.SetStatus(s);
+                            };
+
+                            vm.TryRunBatch();
+                        }
+
+                        var wnd = m_Host.Extension.CreatePopupWindow<ResultsWindow>();
+                        wnd.Control.Title = $"{rootDoc.Title} batch job result";
+                        wnd.Control.DataContext = vm;
+                        wnd.Show();
                     }
-
-                    var wnd = m_Host.Extension.CreatePopupWindow<ResultsWindow>();
-                    wnd.Control.Title = $"{rootDoc.Title} batch job result";
-                    wnd.Control.DataContext = vm;
-                    wnd.Show();
                 }
                 catch (OperationCanceledException) 
                 {

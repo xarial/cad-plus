@@ -12,7 +12,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Xarial.CadPlus.Plus.Exceptions;
 
-namespace Xarial.CadPlus.Batch.StandAlone.Exceptions
+namespace Xarial.CadPlus.Batch.Base.Exceptions
 {
     /// <summary>
     /// Represents the exception from VBA macro raised with Err.Raise

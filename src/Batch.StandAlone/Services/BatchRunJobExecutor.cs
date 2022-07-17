@@ -55,7 +55,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.Services
 
     public class BatchRunJobExecutor : IBatchRunJobExecutor
     {
-        private const double POPUP_KILLER_PING_SECS = 2;
+        //private const double POPUP_KILLER_PING_SECS = 2;
 
         public event Action<IJobItem[], DateTime> JobSet;
         public event Action<IJobItem, double, bool> ProgressChanged;
@@ -70,7 +70,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.Services
         private readonly IJobManager m_JobMgr;
         private readonly IXLogger m_Logger;
         private readonly IResilientWorker<BatchJobContext> m_Worker;
-        private readonly IPopupKiller m_PopupKiller;
+        private readonly IMacroRunnerPopupHandler m_PopupHandler;
         private readonly ICadApplicationInstanceProvider m_AppProvider;
         private readonly IMacroExecutor m_MacroRunnerSvc;
         private readonly BatchJob m_Job;
@@ -82,7 +82,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.Services
         public BatchRunJobExecutor(BatchJob job, ICadApplicationInstanceProvider appProvider,
             IBatchApplicationProxy batchAppProxy,
             IJobManager jobMgr, IXLogger logger,
-            IResilientWorker<BatchJobContext> worker, IPopupKiller popupKiller)
+            IResilientWorker<BatchJobContext> worker, IMacroRunnerPopupHandler popupHandler)
         {
             m_Job = job;
             m_AppProvider = appProvider;
@@ -97,9 +97,8 @@ namespace Xarial.CadPlus.Batch.StandAlone.Services
 
             m_BatchAppProxy = batchAppProxy;
 
-            m_PopupKiller = popupKiller;
-            m_PopupKiller.ShouldClosePopup += OnShouldClosePopup;
-            m_PopupKiller.PopupNotClosed += OnPopupNotClosed;
+            m_PopupHandler = popupHandler;
+            m_PopupHandler.MacroUserError += OnMacroUserError;
 
             m_Logger = logger;
 
@@ -242,50 +241,13 @@ namespace Xarial.CadPlus.Batch.StandAlone.Services
             }
         }
 
-        private void OnPopupNotClosed(Process prc, IntPtr hWnd)
+        private void OnMacroUserError(IMacroRunnerPopupHandler sender, Exception error)
         {
-            //VBA error popup cannot be closed automatically
-            TryHandleVbaExceptionPopup(hWnd);
-        }
+            var curMacro = m_CurrentContext.CurrentMacro;
 
-        private void OnShouldClosePopup(Process prc, IntPtr hWnd, ref bool close)
-        {
-            if (m_CurrentContext.Job.StartupOptions.HasFlag(StartupOptions_e.Silent))
+            if (curMacro != null)
             {
-                //attempt to close all popups in the silent mode
-                close = true;
-            }
-            else
-            {
-                close = false;
-                //only close VBA error popup
-                TryHandleVbaExceptionPopup(hWnd);
-            }
-        }
-
-        private void TryHandleVbaExceptionPopup(IntPtr hWnd)
-        {
-            using (var vbaErrPopup = new VbaErrorPopup(hWnd))
-            {
-                if (vbaErrPopup.IsVbaErrorPopup)
-                {
-                    var curMacro = m_CurrentContext.CurrentMacro;
-
-                    if (curMacro != null)
-                    {
-                        curMacro.InternalMacroException = new VbaMacroException(vbaErrPopup.ErrorText);
-                    }
-
-                    m_Logger.Log($"Closing VBA Error popup window: {hWnd}", LoggerMessageSeverity_e.Debug);
-
-                    vbaErrPopup.Close();
-                }
-                else
-                {
-                    m_Logger.Log($"Blocking popup window is not closed: {hWnd}", LoggerMessageSeverity_e.Debug);
-
-                    Log?.Invoke("Failed to close the blocking popup window");
-                }
+                curMacro.InternalMacroException = error;
             }
         }
 
@@ -461,18 +423,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.Services
                     }
                 }
 
-                try
-                {
-                    if (m_PopupKiller != null && m_PopupKiller.IsStarted)
-                    {
-                        m_Logger.Log($"Trying to kill the popup killer", LoggerMessageSeverity_e.Debug);
-
-                        m_PopupKiller.Stop();
-                    }
-                }
-                catch
-                {
-                }
+                m_PopupHandler.Stop();
             }
         }
 
@@ -671,7 +622,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.Services
                 app = m_AppProvider.StartApplication(versionInfo,
                     opts, p => TryAddProcessToJob(p), cancellationToken);
 
-                m_PopupKiller.Start(app.Process, TimeSpan.FromSeconds(POPUP_KILLER_PING_SECS));
+                m_PopupHandler.Start(app);
             }
             catch (Exception ex)
             {
@@ -789,7 +740,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.Services
                 m_IsDisposed = true;
 
                 TryShutDownApplication(m_CurrentContext);
-                m_PopupKiller.Dispose();
+                //m_PopupKiller.Dispose();
             }
         }
     }

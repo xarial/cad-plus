@@ -76,6 +76,7 @@ namespace Xarial.CadPlus.Init
             builder.RegisterSingleton<ICadSpecificServiceFactory<IMacroExecutor>, CadSpecificServiceFactory<IMacroExecutor>>();
             builder.RegisterSingleton<ICadSpecificServiceFactory<ICadDescriptor>, CadSpecificServiceFactory<ICadDescriptor>>();
             builder.RegisterSingleton<IJobManager, JobManager>().UsingInitializer(x => x.Init());
+            builder.RegisterSingleton<IPopupKillerFactory, PopupKillerFactory>();
         }
 
         public void Dispose()

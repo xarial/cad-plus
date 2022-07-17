@@ -11,6 +11,7 @@ using Xarial.CadPlus.Batch.Base.Core;
 using Xarial.XCad.Base;
 using Xarial.CadPlus.Batch.Base.Services;
 using Xarial.CadPlus.Plus.Services;
+using Xarial.CadPlus.Plus.Applications;
 
 namespace Xarial.CadPlus.Batch.StandAlone.Services
 {
@@ -28,21 +29,21 @@ namespace Xarial.CadPlus.Batch.StandAlone.Services
 
         private readonly IJobContectResilientWorkerFactory m_WorkerFact;
 
-        private readonly IPopupKillerFactory m_PopupKillerFact;
+        private readonly IMacroRunnerPopupHandlerFactory m_PopupHandlerFact;
 
         private readonly IBatchApplicationProxy m_BatchAppProxy;
 
         public BatchRunJobExecutorFactory(IJobApplicationProvider jobAppProvider,
             IBatchApplicationProxy batchAppProxy,
             IJobManager jobMgr, IXLogger logger,
-            IJobContectResilientWorkerFactory workerFact, IPopupKillerFactory popupKillerFactory)
+            IJobContectResilientWorkerFactory workerFact, IMacroRunnerPopupHandlerFactory popupHandlerFact)
         {
             m_JobAppProvider = jobAppProvider;
 
             m_WorkerFact = workerFact;
             m_BatchAppProxy = batchAppProxy;
 
-            m_PopupKillerFact = popupKillerFactory;
+            m_PopupHandlerFact = popupHandlerFact;
 
             m_Logger = logger;
 
@@ -53,7 +54,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.Services
         {
             return new BatchRunJobExecutor(job, m_JobAppProvider.GetApplicationProvider(job), m_BatchAppProxy, m_JobMgr, m_Logger,
                 m_WorkerFact.Create(job.Timeout > 0 ? TimeSpan.FromSeconds(job.Timeout) : default),
-                m_PopupKillerFact.Create());
+                m_PopupHandlerFact.Create(job.StartupOptions.HasFlag(StartupOptions_e.Silent)));
         }
     }
 }
