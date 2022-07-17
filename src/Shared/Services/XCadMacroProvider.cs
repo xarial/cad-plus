@@ -5,16 +5,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Xarial.CadPlus.Plus.Exceptions;
+using Xarial.CadPlus.Plus.Services;
 using Xarial.CadPlus.Plus.Shared.Exceptions;
 using Xarial.XToolkit.Wpf.Utils;
 
 namespace Xarial.CadPlus.Plus.Shared.Services
 {
-    public interface IXCadMacroProvider
-    {
-        IXCadMacro GetMacro(string path);
-    }
-
     public class XCadMacroProvider : IXCadMacroProvider
     {
         public static FileFilter Filter => new FileFilter("xCAD Macro File", "*.dll");

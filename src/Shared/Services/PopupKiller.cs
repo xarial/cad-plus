@@ -10,24 +10,12 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
+using Xarial.CadPlus.Plus.Services;
 using Xarial.XCad.Base;
 using Xarial.XCad.Base.Enums;
 
 namespace Xarial.CadPlus.Plus.Shared.Services
 {
-    public delegate void PopupNotClosedDelegate(Process prc, IntPtr hWnd);
-    public delegate void ShouldClosePopupDelegate(Process prc, IntPtr hWnd, ref bool close);
-
-    public interface IPopupKiller : IDisposable
-    {
-        event PopupNotClosedDelegate PopupNotClosed;
-        event ShouldClosePopupDelegate ShouldClosePopup;
-
-        bool IsStarted { get; }
-        void Start(Process prc, TimeSpan period, string popupClassName = "#32770");
-        void Stop();
-    }
-
     public class PopupKiller : IPopupKiller
     {
         #region Windows API
@@ -192,5 +180,17 @@ namespace Xarial.CadPlus.Plus.Shared.Services
             m_Timer?.Dispose();
             IsStarted = false;
         }
+    }
+
+    public class PopupKillerFactory : IPopupKillerFactory
+    {
+        private readonly IXLogger m_Logger;
+
+        public PopupKillerFactory(IXLogger logger)
+        {
+            m_Logger = logger;
+        }
+
+        public IPopupKiller Create() => new PopupKiller(m_Logger);
     }
 }
