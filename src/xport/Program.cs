@@ -54,7 +54,6 @@ namespace Xarial.CadPlus.Xport
             builder.RegisterSingleton<IExporterModel, ExporterModel>();
             builder.RegisterSingleton<IAboutService, AboutService>();
             builder.RegisterSingleton<IParentWindowProvider, ParentWindowProvider>().UsingFactory(() => new ParentWindowProvider(() => m_Window));
-            builder.RegisterSingleton<IJobManager, JobManager>().UsingInitializer(x => x.Init());
         }
 
         private static void OnWindowCreated(MainWindow window, Arguments args)

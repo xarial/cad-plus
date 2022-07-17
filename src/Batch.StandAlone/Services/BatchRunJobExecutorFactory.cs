@@ -10,6 +10,7 @@ using Xarial.CadPlus.Common.Services;
 using Xarial.CadPlus.Batch.Base.Core;
 using Xarial.XCad.Base;
 using Xarial.CadPlus.Batch.Base.Services;
+using Xarial.CadPlus.Plus.Services;
 
 namespace Xarial.CadPlus.Batch.StandAlone.Services
 {

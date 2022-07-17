@@ -117,8 +117,6 @@ namespace Xarial.CadPlus.Batch.StandAlone
 
             builder.RegisterSingleton<IXCadMacroProvider, XCadMacroProvider>();
 
-            builder.RegisterSingleton<IJobManager, JobManager>().UsingInitializer(x => x.Init());
-
             builder.RegisterSingleton<IJournalExporter, JournalTextExporter>().AsCollectionItem();
             builder.RegisterSingleton<IResultsSummaryExcelExporter, ResultsSummaryExcelExporter>().AsCollectionItem();
         }

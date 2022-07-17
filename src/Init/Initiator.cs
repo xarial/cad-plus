@@ -13,6 +13,7 @@ using Xarial.CadPlus.Plus;
 using Xarial.CadPlus.Plus.Data;
 using Xarial.CadPlus.Plus.DI;
 using Xarial.CadPlus.Plus.Services;
+using Xarial.CadPlus.Plus.Shared.Services;
 using Xarial.XCad.Base;
 using Xarial.XCad.Exceptions;
 using Xarial.XToolkit.Helpers;
@@ -74,6 +75,7 @@ namespace Xarial.CadPlus.Init
             builder.RegisterSingleton<ILicenseInfoProvider, LicenseInfoProvider>();
             builder.RegisterSingleton<ICadSpecificServiceFactory<IMacroExecutor>, CadSpecificServiceFactory<IMacroExecutor>>();
             builder.RegisterSingleton<ICadSpecificServiceFactory<ICadDescriptor>, CadSpecificServiceFactory<ICadDescriptor>>();
+            builder.RegisterSingleton<IJobManager, JobManager>().UsingInitializer(x => x.Init());
         }
 
         public void Dispose()
