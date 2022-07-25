@@ -18,8 +18,6 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
 using Xarial.CadPlus.Plus.Extensions;
-using Xarial.CadPlus.Plus.Hosts;
-using Xarial.CadPlus.Plus.Services;
 using Xarial.CadPlus.Plus.Shared.DI;
 using Xarial.CadPlus.Plus.Shared.Services;
 using Xarial.XCad.Base;
@@ -27,6 +25,7 @@ using Xarial.XCad.Base.Enums;
 using Xarial.XToolkit.Reporting;
 using Xarial.XToolkit.Services;
 using Xarial.CadPlus.Plus.DI;
+using Xarial.CadPlus.Plus.Shared.Hosts;
 
 namespace Xarial.CadPlus.Plus.Shared
 {

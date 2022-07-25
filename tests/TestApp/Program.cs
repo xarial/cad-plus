@@ -9,6 +9,7 @@ using Xarial.CadPlus.Plus;
 using Xarial.CadPlus.Plus.DI;
 using Xarial.CadPlus.Plus.Services;
 using Xarial.CadPlus.Plus.Shared;
+using Xarial.CadPlus.Plus.Shared.Services;
 using Xarial.XCad.Base;
 
 namespace TestApp

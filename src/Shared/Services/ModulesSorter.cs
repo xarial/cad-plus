@@ -15,7 +15,7 @@ using Xarial.CadPlus.Plus.Attributes;
 using Xarial.CadPlus.Plus.Exceptions;
 using Xarial.XCad.Reflection;
 
-namespace Xarial.CadPlus.Plus.Services
+namespace Xarial.CadPlus.Plus.Shared.Services
 {
     public class ModulesSorter
     {

@@ -7,24 +7,23 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.Composition;
+using System.ComponentModel.Composition.Hosting;
+using System.ComponentModel.Composition.Primitives;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
-using Xarial.XCad.Base;
-using Xarial.XCad.Base.Enums;
+using Xarial.CadPlus.Plus.Attributes;
+using Xarial.CadPlus.Plus.Exceptions;
+using Xarial.XToolkit.Reflection;
+using Xarial.XToolkit;
 
 namespace Xarial.CadPlus.Plus.Services
 {
-    public class AppLogger : IXLogger
+    public interface IModulesLoader
     {
-        protected readonly string m_Category;
-
-        public AppLogger()
-        {
-            m_Category = "CAD+ Toolset";
-        }
-
-        public virtual void Log(string msg, LoggerMessageSeverity_e severity = LoggerMessageSeverity_e.Information)
-            => this.Trace(msg, m_Category, severity, true);
+        IModule[] Load(IHost host, Type hostApplicationType);
     }
 }

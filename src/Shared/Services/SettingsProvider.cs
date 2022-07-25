@@ -1,11 +1,4 @@
-﻿//*********************************************************************
-//CAD+ Toolset
-//Copyright(C) 2021 Xarial Pty Limited
-//Product URL: https://cadplus.xarial.com
-//License: https://cadplus.xarial.com/license/
-//*********************************************************************
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -13,22 +6,12 @@ using System.Text;
 using System.Threading.Tasks;
 using Xarial.CadPlus.Plus.Attributes;
 using Xarial.CadPlus.Plus.Exceptions;
-using Xarial.CadPlus.Plus.Hosts;
-using Xarial.XCad.Reflection;
+using Xarial.CadPlus.Plus.Services;
 using Xarial.XToolkit.Reflection;
 using Xarial.XToolkit.Services.UserSettings;
 
-namespace Xarial.CadPlus.Plus.Services
+namespace Xarial.CadPlus.Plus.Shared.Services
 {
-    public interface ISettingsProvider
-    {
-        T ReadSettings<T>()
-            where T : new();
-
-        void WriteSettings<T>(T setts)
-            where T : new();
-    }
-
     public class SettingsProvider : ISettingsProvider
     {
         private readonly UserSettingsService m_UserSettsSrv;
@@ -41,7 +24,7 @@ namespace Xarial.CadPlus.Plus.Services
         public T ReadSettings<T>() where T : new()
         {
             var settsFilePath = GetSettingsFilePath<T>(out string[] altSettsFilePaths);
-            
+
             if (File.Exists(settsFilePath))
             {
                 try

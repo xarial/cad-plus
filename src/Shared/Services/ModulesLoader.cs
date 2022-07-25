@@ -1,33 +1,18 @@
-﻿//*********************************************************************
-//CAD+ Toolset
-//Copyright(C) 2021 Xarial Pty Limited
-//Product URL: https://cadplus.xarial.com
-//License: https://cadplus.xarial.com/license/
-//*********************************************************************
-
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.Composition;
 using System.ComponentModel.Composition.Hosting;
 using System.ComponentModel.Composition.Primitives;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Xarial.CadPlus.Plus.Attributes;
 using Xarial.CadPlus.Plus.Exceptions;
-using Xarial.XToolkit.Reflection;
+using Xarial.CadPlus.Plus.Services;
 using Xarial.XToolkit;
-using Xarial.CadPlus.Plus.Hosts;
 
-namespace Xarial.CadPlus.Plus.Services
+namespace Xarial.CadPlus.Plus.Shared.Services
 {
-    public interface IModulesLoader
-    {
-        IModule[] Load(IHost host, Type hostApplicationType);
-    }
-
     public class ModulesLoader : IModulesLoader
     {
         private const string LOCAL_MODULES_FOLDER_NAME = "Modules";
@@ -86,7 +71,7 @@ namespace Xarial.CadPlus.Plus.Services
 
             return modules;
         }
-        
+
         private void CheckDuplicates(IModule[] modules)
         {
             var dupModuleTypes = modules.GroupBy(m => m.GetType().FullName).Where(x => x.Count() > 1).Select(m => m.Key).ToArray();
@@ -106,13 +91,13 @@ namespace Xarial.CadPlus.Plus.Services
                 if (Directory.Exists(path))
                 {
                     catalog.Catalogs.Add(new DirectoryCatalog(path, searchPattern));
-                    
+
                     foreach (var subDir in Directory.GetDirectories(path, "*.*", SearchOption.AllDirectories))
                     {
                         catalog.Catalogs.Add(new DirectoryCatalog(subDir, searchPattern));
                     }
                 }
-                else 
+                else
                 {
                     throw new UserException($"Specified directory '{path}' with modules does not exist");
                 }

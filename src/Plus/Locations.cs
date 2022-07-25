@@ -13,7 +13,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Xarial.CadPlus.Plus.Properties;
 
-namespace Xarial.CadPlus.Plus.Hosts
+namespace Xarial.CadPlus.Plus
 {
     public static class Locations
     {

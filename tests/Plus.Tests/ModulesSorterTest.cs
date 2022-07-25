@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Xarial.CadPlus.Plus.Attributes;
 using Xarial.CadPlus.Plus.Exceptions;
 using Xarial.CadPlus.Plus.Services;
+using Xarial.CadPlus.Plus.Shared.Services;
 
 namespace Xarial.CadPlus.Plus.Tests
 {
