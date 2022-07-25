@@ -30,26 +30,34 @@ namespace Xarial.CadPlus.Plus.Shared.Hosts
         public event HostStartedDelegate Started;
         public event HostInitializedDelegate Initialized;
         
+        private readonly IContainerBuilder m_Builder;
         private readonly IModulesLoader m_ModulesLoader;
-
         private readonly IInitiator m_Initiator;
+        private readonly Type m_HostApplicationType;
 
-        private readonly IModule[] m_Modules;
-
-        private readonly IServiceProvider m_Services;
-
-        private readonly IXLogger m_Logger;
+        private IXLogger m_Logger;
+        private IModule[] m_Modules;
+        private IServiceProvider m_Services;
 
         public HostConsole(IContainerBuilder builder, IInitiator initiator, Type hostApplicationType)
         {
+            m_Builder = builder;
+
             m_Initiator = initiator;
+            
+            m_ModulesLoader = new ModulesLoader();
+
+            m_HostApplicationType = hostApplicationType;
+        }
+
+        public void Load() 
+        {
             m_Initiator.Init(this);
 
-            m_ModulesLoader = new ModulesLoader();
-            m_Modules = m_ModulesLoader.Load(this, hostApplicationType);
-            
-            ConfigureServices?.Invoke(builder);
-            m_Services = builder.Build();
+            m_Modules = m_ModulesLoader.Load(this, m_HostApplicationType);
+
+            ConfigureServices?.Invoke(m_Builder);
+            m_Services = m_Builder.Build();
 
             m_Logger = m_Services.GetService<IXLogger>();
 

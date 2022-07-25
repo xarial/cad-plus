@@ -33,31 +33,39 @@ namespace Xarial.CadPlus.Plus.Shared.Hosts
 
         public Application WpfApplication { get; }
 
-        private IModule[] m_Modules;
-
+        private readonly IContainerBuilder m_Builder;
+        private readonly IInitiator m_Initiator;
         private readonly IModulesLoader m_ModulesLoader;
+        private readonly Type m_HostApplicationType;
+        
+        private IServiceProvider m_Services;
+        private IModule[] m_Modules;
+        private IXLogger m_Logger;
 
         private bool m_IsLoaded;
-
-        private readonly IInitiator m_Initiator;
-        private readonly IXLogger m_Logger;
-
-        private readonly IServiceProvider m_Services;
 
         public HostWpf(Application wpfApp, 
             IContainerBuilder builder, IInitiator initiator, Type hostApplicationType)
         {
             m_Initiator = initiator;
-            m_Initiator.Init(this);
-            
+
+            m_Builder = builder;
             WpfApplication = wpfApp;
             
+            m_HostApplicationType = hostApplicationType;
+
             m_IsLoaded = false;
             
             m_ModulesLoader = new ModulesLoader();
-            m_Modules = m_ModulesLoader.Load(this, hostApplicationType);
-            ConfigureServices?.Invoke(builder);
-            m_Services = builder.Build();
+        }
+
+        public void Load() 
+        {
+            m_Initiator.Init(this);
+
+            m_Modules = m_ModulesLoader.Load(this, m_HostApplicationType);
+            ConfigureServices?.Invoke(m_Builder);
+            m_Services = m_Builder.Build();
 
             m_Logger = m_Services.GetService<IXLogger>();
 

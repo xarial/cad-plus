@@ -76,17 +76,13 @@ namespace Xarial.CadPlus.Plus.Shared.Hosts
 
         public IServiceProvider Services => m_SvcProvider;
 
-        private IServiceProvider m_SvcProvider;
-
         private readonly IModulesLoader m_ModulesLoader;
-
         private readonly IInitiator m_Initiator;
-
         private readonly ICadExtensionApplication m_App;
-
-        private readonly IModule[] m_Modules;
-
         private readonly List<Tuple<EnumCommandGroupSpec, Delegate>> m_RegisteredCommands;
+
+        private IModule[] m_Modules;
+        private IServiceProvider m_SvcProvider;
 
         public HostCadExtension(ICadExtensionApplication app, IInitiator initiator)
         {
@@ -94,14 +90,18 @@ namespace Xarial.CadPlus.Plus.Shared.Hosts
 
             m_Initiator = initiator;
 
+            Extension = m_App.Extension;
+            m_ModulesLoader = new ModulesLoader();
+
+            m_RegisteredCommands = new List<Tuple<EnumCommandGroupSpec, Delegate>>();
+            m_Handlers = new Dictionary<CommandSpec, Tuple<Delegate, Enum>>();
+        }
+
+        public void Load() 
+        {
             try
             {
-                Extension = m_App.Extension;
-
                 m_Initiator.Init(this);
-
-                m_RegisteredCommands = new List<Tuple<EnumCommandGroupSpec, Delegate>>();
-                m_Handlers = new Dictionary<CommandSpec, Tuple<Delegate, Enum>>();
 
                 Extension.StartupCompleted += OnStartupCompleted;
                 Extension.Connect += OnExtensionConnect;
@@ -111,8 +111,7 @@ namespace Xarial.CadPlus.Plus.Shared.Hosts
                     (Extension as IXServiceConsumer).ConfigureServices += OnConfigureExtensionServices;
                 }
 
-                m_ModulesLoader = new ModulesLoader();
-                m_Modules = m_ModulesLoader.Load(this, app.GetType());
+                m_Modules = m_ModulesLoader.Load(this, m_App.GetType());
             }
             catch (Exception ex)
             {

@@ -193,7 +193,11 @@ namespace Xarial.CadPlus.Plus.Shared
                     if (!hasError)
                     {
                         SynchronizationContext.SetSynchronizationContext(new SynchronizationContext());
-                        Host = new HostConsole(svc, m_Initiator, typeof(TApplication));
+
+                        var hostConsole = new HostConsole(svc, m_Initiator, typeof(TApplication));
+                        Host = hostConsole;
+
+                        hostConsole.Load();
 
                         try
                         {
@@ -233,7 +237,11 @@ namespace Xarial.CadPlus.Plus.Shared
                     m_WpfApp.ShutdownMode = ShutdownMode.OnMainWindowClose;
                     m_WpfApp.DispatcherUnhandledException += OnDispatcherUnhandledException;
 
-                    Host = new HostWpf(m_WpfApp, svc, m_Initiator, typeof(TApplication));
+                    var hostWpf = new HostWpf(m_WpfApp, svc, m_Initiator, typeof(TApplication));
+
+                    Host = hostWpf;
+
+                    hostWpf.Load();
 
                     var wnd = new TWindow();
                     WindowCreated?.Invoke(wnd, cliArgs);
