@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
@@ -21,6 +22,7 @@ using Xarial.CadPlus.Plus.DI;
 using Xarial.CadPlus.Plus.Services;
 using Xarial.CadPlus.Plus.Shared;
 using Xarial.CadPlus.Plus.Shared.DI;
+using Xarial.CadPlus.Plus.Shared.Hosts;
 using Xarial.CadPlus.Plus.Shared.Services;
 using Xarial.XCad;
 using Xarial.XCad.Base.Attributes;
@@ -42,21 +44,9 @@ namespace Xarial.CadPlus.AddIn.Sw
             {
             }
 
-            protected override Assembly[] GetRequestingAssemblies(Assembly requestingAssembly)
-            {
-                if (requestingAssembly != null)
-                {
-                    return new Assembly[] { requestingAssembly };
-                }
-                else
-                {
-                    return new Assembly[]
-                    {
-                        typeof(CadPlusSwAddInCommunity).Assembly,
-                        typeof(CadPlusCommands_e).Assembly
-                    };
-                }
-            }
+            protected override string[] GetAppConfigs(Assembly requestingAssembly)
+                => Directory.GetFiles(Path.GetDirectoryName(typeof(CadPlusSwAddInCommunity).Assembly.Location),
+                    "*.config", SearchOption.AllDirectories);
         }
 
         private static readonly AssemblyResolver m_AssmResolver;
@@ -67,12 +57,13 @@ namespace Xarial.CadPlus.AddIn.Sw
             m_AssmResolver.RegisterAssemblyReferenceResolver(new LocalAppConfigBindingRedirectReferenceResolver());
         }
 
-        private readonly AddInHost m_Host;
+        private readonly HostCadExtension m_Host;
 
         public CadPlusSwAddInCommunity()
         {
-            m_Host = new AddInHost(new SwAddinCommunityApplication(this), new Initiator());
+            m_Host = new HostCadExtension(new SwAddinCommunityApplication(this), new Initiator());
             m_Host.ConfigureServices += OnConfigureModuleServices;
+            m_Host.Load();
         }
 
         protected override IXServiceCollection CreateServiceCollection()

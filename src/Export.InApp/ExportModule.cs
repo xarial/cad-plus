@@ -29,7 +29,7 @@ using Xarial.XToolkit.Services;
 
 namespace Xarial.CadPlus.Export.InApp
 {
-    [Module(typeof(IHostExtension))]
+    [Module(typeof(IHostCadExtension))]
     public class ExportModule : IModule
     {
         [Title("eXport+")]
@@ -46,7 +46,7 @@ namespace Xarial.CadPlus.Export.InApp
             RunStandAlone,
         }
 
-        private IHostExtension m_Host;
+        private IHostCadExtension m_Host;
 
         private IMessageService m_Msg;
         private IXLogger m_Logger;
@@ -55,12 +55,12 @@ namespace Xarial.CadPlus.Export.InApp
 
         public void Init(IHost host)
         {
-            if (!(host is IHostExtension))
+            if (!(host is IHostCadExtension))
             {
                 throw new InvalidCastException("Only extension host is supported for this module");
             }
 
-            m_Host = (IHostExtension)host;
+            m_Host = (IHostCadExtension)host;
             m_Host.Initialized += OnHostInitialized;
             m_Host.Connect += OnConnect;
         }

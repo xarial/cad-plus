@@ -12,12 +12,22 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Xarial.CadPlus.Common.Services;
+using Xarial.CadPlus.Init;
+using Xarial.CadPlus.Plus;
+using Xarial.CadPlus.Plus.DI;
+using Xarial.CadPlus.Plus.Extensions;
 using Xarial.CadPlus.Plus.Services;
+using Xarial.CadPlus.Plus.Shared.DI;
+using Xarial.CadPlus.Plus.Shared.Hosts;
 using Xarial.CadPlus.Plus.Shared.Services;
 using Xarial.CadPlus.Xport.SwEDrawingsHost;
 
 namespace Xarial.CadPlus.Xport.EDrawingsHost
 {
+    public class EDrawingsPublisherApplication : IApplication 
+    {
+    }
+
     public class EDrawingsPublisher : IPublisher
     {
         private Form m_HostForm;
@@ -25,16 +35,30 @@ namespace Xarial.CadPlus.Xport.EDrawingsHost
         private TaskCompletionSource<bool> m_PrintTcs;
         private TaskCompletionSource<bool> m_SaveTcs;
 
-        private readonly IEDrawingsControl m_Control;
-
-        private readonly PopupKiller m_PopupKiller;
-
         private readonly EDrawingsVersion_e m_Version;
+        private readonly HostConsole m_HostConsole;
+
+        private IEDrawingsControl m_Control;
+        private IPopupKiller m_PopupKiller;
 
         public EDrawingsPublisher(EDrawingsVersion_e version)
         {
             m_Version = version;
-            m_PopupKiller = new PopupKiller(new AppLogger());
+
+            m_HostConsole = new HostConsole(new SimpleInjectorContainerBuilder(), new Initiator(), typeof(EDrawingsPublisherApplication));
+            m_HostConsole.Initialized += OnHostConsoleInitialized;
+            m_HostConsole.ConfigureServices += OnHostConsoleConfigureServices;
+            m_HostConsole.Load();
+        }
+
+        private void OnHostConsoleConfigureServices(IContainerBuilder builder)
+        {
+            builder.RegisterSingleton<IApplication, EDrawingsPublisherApplication>();
+        }
+
+        private void OnHostConsoleInitialized(IApplication app, IServiceProvider svcProvider, IModule[] modules)
+        {
+            m_PopupKiller = svcProvider.GetService<IPopupKillerFactory>().Create();
             m_PopupKiller.Start(Process.GetCurrentProcess(), TimeSpan.FromSeconds(1));
 
             m_Control = Load();

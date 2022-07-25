@@ -26,10 +26,10 @@ using Xarial.CadPlus.Plus.Extensions;
 
 namespace Xarial.CadPlus.Batch.Extensions
 {
-    [Module(typeof(IHostExtension))]
+    [Module(typeof(IHostCadExtension))]
     public class InputSorterModuleInApp : IInputSorterModule
     {
-        private IHostExtension m_Host;
+        private IHostCadExtension m_Host;
         private IBatchInAppModule m_BatchInAppModule;
         private bool m_EnableOrdering;
 
@@ -44,7 +44,7 @@ namespace Xarial.CadPlus.Batch.Extensions
 
         public void Init(IHost host)
         {
-            m_Host = (IHostExtension)host;
+            m_Host = (IHostCadExtension)host;
             m_Host.Initialized += OnInitialized;
             m_Host.Connect += OnConnect;
         }

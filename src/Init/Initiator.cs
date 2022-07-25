@@ -6,9 +6,12 @@
 //*********************************************************************
 
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
+using System.Threading.Tasks;
 using Xarial.CadPlus.Plus;
 using Xarial.CadPlus.Plus.Data;
 using Xarial.CadPlus.Plus.DI;
@@ -46,6 +49,56 @@ namespace Xarial.CadPlus.Init
             => throw new NotImplementedException();
     }
 
+    internal class JobManager : IJobManager
+    {
+        public void AddProcess(Process process)
+        {
+        }
+
+        public void Dispose()
+        {
+        }
+    }
+
+    internal class PopupKiller : IPopupKiller
+    {
+        public event PopupNotClosedDelegate PopupNotClosed;
+        public event ShouldClosePopupDelegate ShouldClosePopup;
+
+        public bool IsStarted => m_IsStarted;
+
+        private bool m_IsStarted;
+
+        public void Start(Process prc, TimeSpan period, string popupClassName = "#32770")
+        {
+            m_IsStarted = true;
+        }
+
+        public void Stop()
+        {
+            m_IsStarted = false;
+        }
+
+        public void Dispose()
+        {
+            m_IsStarted = false;
+        }
+    }
+
+    internal class PopupKillerFactory : IPopupKillerFactory
+    {
+        public IPopupKiller Create() => new PopupKiller();
+    }
+
+    internal class TaskRunner : ITaskRunner
+    {
+        public Task Run(Action action, CancellationToken cancellationToken)
+            => Task.Run(action, cancellationToken);
+
+        public Task<T> Run<T>(Func<T> func, CancellationToken cancellationToken)
+            => Task.Run(func, cancellationToken);
+    }
+
     public class Initiator : IInitiator
     {
         private IHost m_Host;
@@ -70,12 +123,13 @@ namespace Xarial.CadPlus.Init
         private void OnConfigureServices(IContainerBuilder builder)
         {
             builder.RegisterSingleton<IXLogger, AppLogger>();
+            builder.RegisterSingleton<ITaskRunner, TaskRunner>();
             builder.RegisterSingleton<IExcelWriter, ExcelWriter>();
             builder.RegisterSingleton<IExcelReader, ExcelReader>();
             builder.RegisterSingleton<ILicenseInfoProvider, LicenseInfoProvider>();
             builder.RegisterSingleton<ICadSpecificServiceFactory<IMacroExecutor>, CadSpecificServiceFactory<IMacroExecutor>>();
             builder.RegisterSingleton<ICadSpecificServiceFactory<ICadDescriptor>, CadSpecificServiceFactory<ICadDescriptor>>();
-            builder.RegisterSingleton<IJobManager, JobManager>().UsingInitializer(x => x.Init());
+            builder.RegisterSingleton<IJobManager, JobManager>();
             builder.RegisterSingleton<IPopupKillerFactory, PopupKillerFactory>();
         }
 

@@ -33,10 +33,12 @@ namespace Xarial.CadPlus.Batch.StandAlone.Services
 
         private readonly IBatchApplicationProxy m_BatchAppProxy;
 
+        private readonly ITaskRunner m_TaskRunner;
+
         public BatchRunJobExecutorFactory(IJobApplicationProvider jobAppProvider,
             IBatchApplicationProxy batchAppProxy,
             IJobManager jobMgr, IXLogger logger,
-            IJobContectResilientWorkerFactory workerFact, IMacroRunnerPopupHandlerFactory popupHandlerFact)
+            IJobContectResilientWorkerFactory workerFact, IMacroRunnerPopupHandlerFactory popupHandlerFact, ITaskRunner taskRunner)
         {
             m_JobAppProvider = jobAppProvider;
 
@@ -48,13 +50,15 @@ namespace Xarial.CadPlus.Batch.StandAlone.Services
             m_Logger = logger;
 
             m_JobMgr = jobMgr;
+
+            m_TaskRunner = taskRunner;
         }
 
         public IBatchRunJobExecutor Create(BatchJob job)
         {
             return new BatchRunJobExecutor(job, m_JobAppProvider.GetApplicationProvider(job), m_BatchAppProxy, m_JobMgr, m_Logger,
                 m_WorkerFact.Create(job.Timeout > 0 ? TimeSpan.FromSeconds(job.Timeout) : default),
-                m_PopupHandlerFact.Create(job.StartupOptions.HasFlag(StartupOptions_e.Silent)));
+                m_PopupHandlerFact.Create(job.StartupOptions.HasFlag(StartupOptions_e.Silent)), m_TaskRunner);
         }
     }
 }

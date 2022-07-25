@@ -28,11 +28,11 @@ using Xarial.XToolkit.Services;
 
 namespace Xarial.CadPlus.Batch.Extensions
 {
-    [Module(typeof(IHostExtension))]
+    [Module(typeof(IHostCadExtension))]
     [ModuleOrder(typeof(IInputSorterModule), ModuleRelativeOrder_e.Before)]
     public class ReferenceExtractorModuleInApp : IModule
     {
-        private IHostExtension m_Host;
+        private IHostCadExtension m_Host;
         private IBatchInAppModule m_BatchInAppModule;
         private bool m_FindDrawings;
         private ICadDescriptor m_EntDesc;
@@ -41,7 +41,7 @@ namespace Xarial.CadPlus.Batch.Extensions
 
         public void Init(IHost host)
         {
-            m_Host = (IHostExtension)host;
+            m_Host = (IHostCadExtension)host;
             m_Host.Initialized += OnInitialized;
             m_Host.Connect += OnConnect;
         }

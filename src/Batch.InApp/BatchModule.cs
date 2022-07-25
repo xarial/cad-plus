@@ -80,12 +80,12 @@ namespace Xarial.CadPlus.Batch.InApp
         RunInApp
     }
 
-    [Module(typeof(IHostExtension))]
+    [Module(typeof(IHostCadExtension))]
     public class BatchModule : IBatchInAppModule
     {
         public event ProcessInAppBatchInputDelegate ProcessInput;
 
-        private IHostExtension m_Host;
+        private IHostCadExtension m_Host;
 
         private IXPropertyPage<AssemblyBatchData> m_Page;
         private AssemblyBatchData m_Data;
@@ -100,12 +100,12 @@ namespace Xarial.CadPlus.Batch.InApp
 
         public void Init(IHost host)
         {
-            if (!(host is IHostExtension))
+            if (!(host is IHostCadExtension))
             {
                 throw new InvalidCastException("Only extension host is supported for this module");
             }
 
-            m_Host = (IHostExtension)host;
+            m_Host = (IHostCadExtension)host;
             m_Host.ConfigureServices += OnConfigureServices;
             m_Host.Connect += OnConnect;
             m_Host.Initialized += OnHostInitialized;

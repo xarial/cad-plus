@@ -31,7 +31,6 @@ using Xarial.XCad.Documents.Enums;
 using System.Linq;
 using Xarial.XCad.Exceptions;
 using Xarial.CadPlus.Batch.StandAlone.Exceptions;
-using Xarial.CadPlus.Plus.Shared.Extensions;
 
 namespace Xarial.CadPlus.Batch.StandAlone.Services
 {
@@ -79,14 +78,18 @@ namespace Xarial.CadPlus.Batch.StandAlone.Services
 
         private readonly object m_Lock;
 
+        private readonly ITaskRunner m_TaskRunner;
+
         public BatchRunJobExecutor(BatchJob job, ICadApplicationInstanceProvider appProvider,
             IBatchApplicationProxy batchAppProxy,
             IJobManager jobMgr, IXLogger logger,
-            IResilientWorker<BatchJobContext> worker, IMacroRunnerPopupHandler popupHandler)
+            IResilientWorker<BatchJobContext> worker, IMacroRunnerPopupHandler popupHandler, ITaskRunner taskRunner)
         {
             m_Job = job;
             m_AppProvider = appProvider;
             m_MacroRunnerSvc = m_AppProvider.MacroRunnerService;
+
+            m_TaskRunner = taskRunner;
 
             m_Lock = new object();
 
@@ -160,7 +163,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.Services
 
                 try
                 {
-                    await TaskEx.Run(() =>
+                    await m_TaskRunner.Run(() =>
                     {
                         Log?.Invoke($"Collecting files for processing");
 
@@ -215,7 +218,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.Services
                                 curBatchSize = 0;
                             }
                         }
-                    }, new StaTaskScheduler(m_Logger)).ConfigureAwait(false);
+                    }, cancellationToken).ConfigureAwait(false);
                     jobResult = true;
                 }
                 catch (OperationCanceledException)
