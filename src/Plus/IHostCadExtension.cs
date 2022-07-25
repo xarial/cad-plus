@@ -21,7 +21,7 @@ namespace Xarial.CadPlus.Plus
     /// <summary>
     /// Represents specific host application which runs inside the CAD host process
     /// </summary>
-    public interface IHostExtension : IHost
+    public interface IHostCadExtension : IHost
     {
         /// <summary>
         /// Pointer to the extension add-in

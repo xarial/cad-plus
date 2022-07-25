@@ -33,8 +33,8 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Xarial.XCad" Version="0.8.0-20220718.1" />
-    <PackageReference Include="Xarial.XToolkit" Version="0.4.0-20220719.1" />
+    <PackageReference Include="Xarial.XCad" Version="0.8.0-20220725.1" />
+    <PackageReference Include="Xarial.XToolkit" Version="0.4.0-20220722.2" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System.ComponentModel.Composition" />

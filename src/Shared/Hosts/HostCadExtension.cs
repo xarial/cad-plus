@@ -28,7 +28,7 @@ using Xarial.XCad.UI.PropertyPage;
 using Xarial.XToolkit.Reflection;
 using Xarial.XToolkit.Services;
 
-namespace Xarial.CadPlus.Plus.Shared
+namespace Xarial.CadPlus.Plus.Shared.Hosts
 {
     public delegate IXPropertyPage<TData> CreatePageDelegate<TData>();
 
@@ -48,7 +48,7 @@ namespace Xarial.CadPlus.Plus.Shared
         About
     }
 
-    public class AddInHost : IHostExtension
+    public class HostCadExtension : IHostCadExtension
     {
         private class DefaultDocumentAdapter : IDocumentAdapter
         {
@@ -88,7 +88,7 @@ namespace Xarial.CadPlus.Plus.Shared
 
         private readonly List<Tuple<EnumCommandGroupSpec, Delegate>> m_RegisteredCommands;
 
-        public AddInHost(ICadExtensionApplication app, IInitiator initiator)
+        public HostCadExtension(ICadExtensionApplication app, IInitiator initiator)
         {
             m_App = app;
 
