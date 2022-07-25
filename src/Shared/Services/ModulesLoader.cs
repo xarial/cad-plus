@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Xarial.CadPlus.Plus.Attributes;
 using Xarial.CadPlus.Plus.Exceptions;
 using Xarial.CadPlus.Plus.Services;
+using Xarial.XCad.Base;
 using Xarial.XToolkit;
 
 namespace Xarial.CadPlus.Plus.Shared.Services
@@ -20,10 +21,12 @@ namespace Xarial.CadPlus.Plus.Shared.Services
         private const string MODULES_FILTER = "*.Module.dll";
 
         private readonly ISettingsProvider m_SettsProvider;
+        private readonly IXLogger m_Logger;
 
         public ModulesLoader()
         {
             m_SettsProvider = new SettingsProvider();
+            m_Logger = new AppLogger();
         }
 
         public IModule[] Load(IHost host, Type hostApplicationType)
@@ -66,6 +69,8 @@ namespace Xarial.CadPlus.Plus.Shared.Services
 
             foreach (var module in modules)
             {
+                m_Logger.Log($"Initiating '{module.GetType().FullName}' module");
+
                 module.Init(host);
             }
 
@@ -90,6 +95,8 @@ namespace Xarial.CadPlus.Plus.Shared.Services
             {
                 if (Directory.Exists(path))
                 {
+                    m_Logger.Log($"Adding modules directory: '{path}' to catalog");
+
                     catalog.Catalogs.Add(new DirectoryCatalog(path, searchPattern));
 
                     foreach (var subDir in Directory.GetDirectories(path, "*.*", SearchOption.AllDirectories))
