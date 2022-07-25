@@ -36,7 +36,7 @@ namespace Xarial.CadPlus.Plus.Shared
                 },
                 new LicenseInfo()
                 {
-                    Title = "Autofac",
+                    Title = "SimpleInjector",
                     Url = "https://licenses.nuget.org/MIT"
                 },
                 new LicenseInfo()
@@ -47,7 +47,7 @@ namespace Xarial.CadPlus.Plus.Shared
                 new LicenseInfo()
                 {
                     Title = "CommandLineParser",
-                    Url = "https://www.nuget.org/packages/CommandLineParser/2.8.0/License"
+                    Url = "https://www.nuget.org/packages/CommandLineParser/2.9.1/License"
                 },
                 new LicenseInfo()
                 {
@@ -66,13 +66,8 @@ namespace Xarial.CadPlus.Plus.Shared
                 },
                 new LicenseInfo()
                 {
-                    Title = "Microsoft.CodeAnalysis.CSharp",
-                    Url = "https://licenses.nuget.org/MIT"
-                },
-                new LicenseInfo()
-                {
-                    Title = "Microsoft.CodeAnalysis.VisualBasic",
-                    Url = "https://licenses.nuget.org/MIT"
+                    Title = "System.Linq.Dynamic.Core",
+                    Url = "https://licenses.nuget.org/Apache-2.0"
                 },
                 new LicenseInfo()
                 {
@@ -98,11 +93,6 @@ namespace Xarial.CadPlus.Plus.Shared
                 {
                     Title = "ClosedXML",
                     Url = "https://licenses.nuget.org/MIT"
-                },
-                new LicenseInfo()
-                {
-                    Title = "CsvHelper",
-                    Url = "https://licenses.nuget.org/Apache-2.0"
                 }
             };
         }

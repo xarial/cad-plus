@@ -83,7 +83,7 @@ namespace Xarial.CadPlus.Plus.Shared.Hosts
             }
         }
 
-        public void ShowPopup<TWindow>(TWindow wnd) where TWindow : Window
+        public bool? ShowPopup<TWindow>(TWindow wnd) where TWindow : Window
             => wnd.ShowDialog();
     }
 }

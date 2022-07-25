@@ -50,7 +50,8 @@ namespace Xarial.CadPlus.Plus
         /// Displays the popup dialog in the current host
         /// </summary>
         /// <typeparam name="TWindow">Window to show in popup</typeparam>
-        void ShowPopup<TWindow>(TWindow wnd)
+        /// <returns>Dialog result</returns>
+        bool? ShowPopup<TWindow>(TWindow wnd)
             where TWindow : Window;
     }
 }

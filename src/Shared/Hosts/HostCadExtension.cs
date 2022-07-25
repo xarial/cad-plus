@@ -237,10 +237,7 @@ namespace Xarial.CadPlus.Plus.Shared.Hosts
             builder.RegisterInstance(Extension.Application);
             builder.RegisterSingleton<IMessageService, CadAppMessageService>().UsingParameters(Parameter<Type[]>.Any(UserException.AdditionalUserExceptions));
             builder.RegisterSingleton<IParentWindowProvider, CadParentWindowProvider>();
-            builder.RegisterSingleton<IAboutService, AboutService>();
-
             builder.RegisterSingleton<IDocumentAdapter, DefaultDocumentAdapter>();
-            builder.RegisterSingleton<ISettingsProvider, SettingsProvider>();
             builder.RegisterSingleton<IXCadMacroProvider, XCadMacroProvider>();
         }
 
@@ -315,11 +312,7 @@ namespace Xarial.CadPlus.Plus.Shared.Hosts
             }
         }
 
-        public void ShowPopup<TWindow>(TWindow wnd) where TWindow : Window
-        {
-            var interopHelper = new WindowInteropHelper(wnd);
-            interopHelper.Owner = m_App.Extension.Application.WindowHandle;
-            wnd.ShowDialog();
-        }
+        public bool? ShowPopup<TWindow>(TWindow wnd) where TWindow : Window
+            => m_App.Extension.CreatePopupWindow(wnd).ShowDialog();
     }
 }

@@ -119,11 +119,11 @@ namespace Xarial.CadPlus.Plus.Shared.Hosts
             }
         }
 
-        public void ShowPopup<TWindow>(TWindow wnd) 
+        public bool? ShowPopup<TWindow>(TWindow wnd) 
             where TWindow : Window
         {
             wnd.Owner = WpfApplication.MainWindow;
-            wnd.ShowDialog();
+            return wnd.ShowDialog();
         }
     }
 }
