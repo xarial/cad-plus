@@ -289,7 +289,7 @@ namespace Xarial.CadPlus.Plus.Shared.Hosts
                 case CadPlusCommands_e.About:
                     try
                     {
-                        m_SvcProvider.GetService<IAboutService>().ShowAbout(this.GetType().Assembly,
+                        m_SvcProvider.GetService<IAboutService>().ShowAbout(m_App.GetType().Assembly,
                             Resources.logo);
                     }
                     catch
