@@ -9,14 +9,11 @@ namespace Xarial.CadPlus.Plus.Services
 {
     public interface IPersistentMessageBoxFactory 
     {
-        IPersistentMessageBox Create(IParentWindowProvider windowProvider);
+        IPersistentMessageBox Create(IParentWindowProvider windowProvider, string caption, string msg, Image icon);
     }
 
     public interface IPersistentMessageBox : IDisposable
     {
-        Image Icon { get; }
-        string Caption { get; }
-        string Message { get; }
         void ShowAppendBody(string msg);
     }
 }
