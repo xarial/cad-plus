@@ -23,6 +23,7 @@ using Xarial.CadPlus.Plus.UI;
 using Xarial.XCad;
 using Xarial.XCad.Documents;
 using Xarial.CadPlus.Plus.Extensions;
+using Xarial.XCad.Extensions;
 
 namespace Xarial.CadPlus.Batch.Extensions
 {

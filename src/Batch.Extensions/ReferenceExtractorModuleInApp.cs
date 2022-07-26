@@ -25,6 +25,7 @@ using Xarial.XCad.Documents;
 using Xarial.CadPlus.Plus.Extensions;
 using Xarial.XCad.Base;
 using Xarial.XToolkit.Services;
+using Xarial.XCad.Extensions;
 
 namespace Xarial.CadPlus.Batch.Extensions
 {

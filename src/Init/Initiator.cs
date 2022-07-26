@@ -7,6 +7,7 @@
 
 using System;
 using System.Diagnostics;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -22,6 +23,7 @@ using Xarial.XCad.Exceptions;
 using Xarial.XToolkit.Helpers;
 using Xarial.XToolkit.Reflection;
 using Xarial.XToolkit.Reporting;
+using Xarial.XToolkit.Wpf.Dialogs;
 
 namespace Xarial.CadPlus.Init
 {
@@ -35,18 +37,6 @@ namespace Xarial.CadPlus.Init
     internal class LicenseInfoProvider : ILicenseInfoProvider
     {
         public ILicenseInfo ProvideLicense() => new LicenseInfo();
-    }
-
-    internal class ExcelWriter : IExcelWriter
-    {
-        public void CreateWorkbook(string filePath, ExcelRow[] rows, ExcelWriterOptions options)
-            => throw new NotImplementedException();
-    }
-
-    internal class ExcelReader : IExcelReader
-    {
-        public ExcelRow[] ReadWorkbook(string filePath, ExcelReaderOptions options, out ExcelCustomProperty[] customProperties)
-            => throw new NotImplementedException();
     }
 
     internal class JobManager : IJobManager
@@ -97,6 +87,21 @@ namespace Xarial.CadPlus.Init
 
         public Task<T> Run<T>(Func<T> func, CancellationToken cancellationToken)
             => Task.Run(func, cancellationToken);
+
+        public void Dispose()
+        {
+        }
+    }
+
+    internal class TaskRunnerFactory : ITaskRunnerFactory
+    {
+        public ITaskRunner Create() => new TaskRunner();
+    }
+
+    public class AboutService : IAboutService
+    {
+        public void ShowAbout(Assembly assm, Image icon)
+            => About.Show(assm, icon, IntPtr.Zero);
     }
 
     public class Initiator : IInitiator
@@ -123,9 +128,9 @@ namespace Xarial.CadPlus.Init
         private void OnConfigureServices(IContainerBuilder builder)
         {
             builder.RegisterSingleton<IXLogger, AppLogger>();
-            builder.RegisterSingleton<ITaskRunner, TaskRunner>();
-            builder.RegisterSingleton<IExcelWriter, ExcelWriter>();
-            builder.RegisterSingleton<IExcelReader, ExcelReader>();
+            builder.RegisterSingleton<IAboutService, AboutService>();
+            builder.RegisterSingleton<ITaskRunnerFactory, TaskRunnerFactory>();
+            builder.RegisterSingleton<ISettingsProvider, SettingsProvider>();
             builder.RegisterSingleton<ILicenseInfoProvider, LicenseInfoProvider>();
             builder.RegisterSingleton<ICadSpecificServiceFactory<IMacroExecutor>, CadSpecificServiceFactory<IMacroExecutor>>();
             builder.RegisterSingleton<ICadSpecificServiceFactory<ICadDescriptor>, CadSpecificServiceFactory<ICadDescriptor>>();
