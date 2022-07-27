@@ -61,7 +61,7 @@ stages:
             configurationToPack: $(BuildConfiguration)
             outputDir: $(Build.ArtifactStagingDirectory)/packages/preview
             nobuild: true
-            buildProperties: '--version-suffix=$(Build.BuildId)-preview'
+            buildProperties: 'VersionSuffix=preview.$(Build.BuildId)'
 
       - ${{ if and(eq(variables['Build.SourceBranch'], 'refs/heads/!api-master'), ne(variables['Build.Reason'], 'PullRequest')) }}:
         - task: VSBuild@1
