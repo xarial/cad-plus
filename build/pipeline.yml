@@ -45,13 +45,12 @@ stages:
         inputs:
           secureFile: xarial.snk
 
-      - ${{ if and(eq(variables['Build.SourceBranch'], 'refs/heads/!api-dev'), ne(variables['Build.Reason'], 'PullRequest')) }}:
-        - task: VSBuild@1
-          displayName: 'Build preview versions'
-          inputs:
-            solution: 'src/**/*.csproj'
-            configuration: '$(BuildConfiguration)'
-            msbuildArgs: '/p:SignAssembly=true;AssemblyOriginatorKeyFile=$(Certificate.secureFilePath);DelaySign=false;BuildNumber=.$(Build.BuildId)'
+      - task: VSBuild@1
+        displayName: 'Build preview versions'
+        inputs:
+          solution: 'src/**/*.csproj'
+          configuration: '$(BuildConfiguration)'
+          msbuildArgs: '/p:SignAssembly=true;AssemblyOriginatorKeyFile=$(Certificate.secureFilePath);DelaySign=false;BuildNumber=.$(Build.BuildId)'
 
       - ${{ if and(eq(variables['Build.SourceBranch'], 'refs/heads/!api-dev'), ne(variables['Build.Reason'], 'PullRequest')) }}:
         - task: DotNetCoreCLI@2
@@ -62,24 +61,17 @@ stages:
             configurationToPack: $(BuildConfiguration)
             outputDir: $(Build.ArtifactStagingDirectory)/packages/preview
             nobuild: true
-            #buildProperties: 'VersionSuffix=preview.$(Build.BuildId)'
-
-      - ${{ if and(eq(variables['Build.SourceBranch'], 'refs/heads/!api-master'), ne(variables['Build.Reason'], 'PullRequest')) }}:
-        - task: VSBuild@1
-          displayName: 'Build production version'
-          inputs:
-            solution: 'src/**/*.csproj'
-            configuration: '$(BuildConfiguration)'
-            msbuildArgs: '/p:SignAssembly=true;AssemblyOriginatorKeyFile=$(Certificate.secureFilePath);DelaySign=false;BuildNumber=$(Build.BuildId)'
-            clean: true
+            buildProperties: 'VersionSuffix=preview.$(Build.BuildId)'
 
       - ${{ if and(eq(variables['Build.SourceBranch'], 'refs/heads/!api-master'), ne(variables['Build.Reason'], 'PullRequest')) }}:
         - task: DotNetCoreCLI@2
-          displayName: 'Pack production version'
+          displayName: 'Pack production versions'
           inputs:
-            command: custom
-            custom: pack
-            arguments: src/**/*.csproj --output $(Build.ArtifactStagingDirectory)/packages/release --no-build /p:Configuration=$(BuildConfiguration)
+            command: pack
+            packagesToPack: 'src/**/*.csproj'
+            configurationToPack: $(BuildConfiguration)
+            outputDir: $(Build.ArtifactStagingDirectory)/packages/release
+            nobuild: true
       
       - ${{ if ne(variables['Build.Reason'], 'PullRequest') }}:
         - publish: '$(Build.ArtifactStagingDirectory)/packages'
@@ -88,7 +80,7 @@ stages:
 - stage: 'PublishPreviewNuGetPackage'
   displayName: 'Publish Preview NuGet Package to xarial nuget feed'
   dependsOn: 'Build'
-  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/!api-dev1'), ne(variables['Build.Reason'], 'PullRequest'))
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/!api-dev'), ne(variables['Build.Reason'], 'PullRequest'))
   jobs:
   - deployment:
     pool:
