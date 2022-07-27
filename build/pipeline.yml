@@ -27,6 +27,7 @@ stages:
 
     steps:
       - task: UseDotNet@2
+        displayName: 'Install .NET SDK'
         inputs:
           packageType: 'sdk'
         
@@ -57,7 +58,7 @@ stages:
           displayName: 'Pack preview versions'
           inputs:
             command: pack
-            projects: 'src/**/*.csproj'
+            packagesToPack: 'src/**/*.csproj'
             configurationToPack: $(BuildConfiguration)
             outputDir: $(Build.ArtifactStagingDirectory)/packages/preview
             nobuild: true
