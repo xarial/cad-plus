@@ -104,12 +104,37 @@ stages:
                 nuGetFeedType: 'internal'
                 publishVstsFeed: 'cad-plus-community/cadplus-preview'
 
+- stage: 'PublishPreReleaseNuGetPackage'
+  displayName: 'Publish PreRelease NuGet packages to xarial nuget feed'
+  dependsOn: 'Build'
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/!api-master'), ne(variables['Build.Reason'], 'PullRequest'))
+  jobs:
+  - job:
+    pool:
+      vmImage: 'windows-latest'
+
+    steps:
+    - checkout: none
+
+    - download: current
+      artifact: 'packages'
+
+    - task: NuGetCommand@2
+      displayName: 'Push NuGet Packages'
+      inputs:
+        command: 'push'
+        packagesToPush: '$(Pipeline.Workspace)/packages/release/*.nupkg'
+        allowPackageConflicts: true
+        nuGetFeedType: 'internal'
+        publishVstsFeed: 'cad-plus-community/cadplus-preview'
+
 - stage: 'PublishProductionNuGetPackage'
   variables:
   - group: build-vars
   - name: packagePath
     value:
   displayName: 'Publish Production NuGet Package to nuget.org'
+  dependsOn: 'PublishPreReleaseNuGetPackage'
   dependsOn: 'Build'
   condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/!api-master'), ne(variables['Build.Reason'], 'PullRequest'))
   jobs:
