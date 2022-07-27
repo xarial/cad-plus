@@ -135,7 +135,6 @@ stages:
     value:
   displayName: 'Publish Production NuGet Package to nuget.org'
   dependsOn: 'PublishPreReleaseNuGetPackage'
-  dependsOn: 'Build'
   condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/!api-master'), ne(variables['Build.Reason'], 'PullRequest'))
   jobs:
   - deployment:
