@@ -1,9 +1,8 @@
 <Project>
   <PropertyGroup>
     <OutputPath>..\..\_build\</OutputPath>
-    <BuildNumber>0</BuildNumber>
-    <VersionPrefix>0.4.0.$(BuildNumber)</VersionPrefix>
-	<PackageVersion>0.4.0</PackageVersion>
+    <BuildNumber></BuildNumber>
+    <VersionPrefix>0.4.0$(BuildNumber)</VersionPrefix>
     <TargetFramework>net472</TargetFramework>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <Authors>Xarial</Authors>

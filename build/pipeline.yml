@@ -46,15 +46,15 @@ stages:
 
       - ${{ if and(eq(variables['Build.SourceBranch'], 'refs/heads/!api-dev'), ne(variables['Build.Reason'], 'PullRequest')) }}:
         - task: VSBuild@1
-          displayName: 'Build preview version'
+          displayName: 'Build preview versions'
           inputs:
             solution: 'src/**/*.csproj'
             configuration: '$(BuildConfiguration)'
-            msbuildArgs: '/p:SignAssembly=true;AssemblyOriginatorKeyFile=$(Certificate.secureFilePath);DelaySign=false;BuildNumber=$(Build.BuildId)'
+            msbuildArgs: '/p:SignAssembly=true;AssemblyOriginatorKeyFile=$(Certificate.secureFilePath);DelaySign=false;BuildNumber=.$(Build.BuildId)'
 
       - ${{ if and(eq(variables['Build.SourceBranch'], 'refs/heads/!api-dev'), ne(variables['Build.Reason'], 'PullRequest')) }}:
         - task: DotNetCoreCLI@2
-          displayName: 'Pack preview version'
+          displayName: 'Pack preview versions'
           inputs:
             command: pack
             projects: 'src/**/*.csproj'
