@@ -35,7 +35,7 @@ stages:
         displayName: 'Restore NuGet'
         inputs:
           command: restore
-          projects: 'cad-plus-api.sln'
+          projects: 'src/**/*.csproj'
           feedsToUse: config
           nugetConfigPath: 'nuget.config'
 
@@ -48,7 +48,7 @@ stages:
       - task: VSBuild@1
         displayName: 'Build solution'
         inputs:
-          solution: 'cad-plus-api.sln'
+          solution: 'src/**/*.csproj'
           configuration: '$(BuildConfiguration)'
           msbuildArgs: '/p:SignAssembly=true;AssemblyOriginatorKeyFile=$(Certificate.secureFilePath);DelaySign=false;BuildNumber=.$(Build.BuildId)'
 
