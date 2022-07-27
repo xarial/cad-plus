@@ -3,6 +3,7 @@
     <OutputPath>..\..\_build\</OutputPath>
     <BuildNumber>0</BuildNumber>
     <VersionPrefix>0.4.0.$(BuildNumber)</VersionPrefix>
+	<PackageVersion>0.4.0</PackageVersion>
     <TargetFramework>net472</TargetFramework>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <Authors>Xarial</Authors>

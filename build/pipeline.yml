@@ -48,23 +48,26 @@ stages:
         - task: VSBuild@1
           displayName: 'Build preview version'
           inputs:
-            solution: 'cad-plus-api.sln'
+            solution: 'src/**/*.csproj'
             configuration: '$(BuildConfiguration)'
-            msbuildArgs: '/p:SignAssembly=true;AssemblyOriginatorKeyFile=$(Certificate.secureFilePath);DelaySign=false;VersionSuffix=preview;BuildNumber=$(Build.BuildId)'
+            msbuildArgs: '/p:SignAssembly=true;AssemblyOriginatorKeyFile=$(Certificate.secureFilePath);DelaySign=false;BuildNumber=$(Build.BuildId)'
 
       - ${{ if and(eq(variables['Build.SourceBranch'], 'refs/heads/!api-dev'), ne(variables['Build.Reason'], 'PullRequest')) }}:
         - task: DotNetCoreCLI@2
           displayName: 'Pack preview version'
           inputs:
-            command: custom
-            custom: pack
-            arguments: 'cad-plus-api.sln --version-suffix preview --output $(Build.ArtifactStagingDirectory)/packages/preview --no-build /p:Configuration=$(BuildConfiguration);BuildNumber=$(Build.BuildId)'
+            command: pack
+            projects: 'src/**/*.csproj'
+            configurationToPack: $(BuildConfiguration)
+            outputDir: $(Build.ArtifactStagingDirectory)/packages/preview
+            nobuild: true
+            buildProperties: '--version-suffix=$(Build.BuildId)-preview'
 
       - ${{ if and(eq(variables['Build.SourceBranch'], 'refs/heads/!api-master'), ne(variables['Build.Reason'], 'PullRequest')) }}:
         - task: VSBuild@1
           displayName: 'Build production version'
           inputs:
-            solution: 'cad-plus-api.sln'
+            solution: 'src/**/*.csproj'
             configuration: '$(BuildConfiguration)'
             msbuildArgs: '/p:SignAssembly=true;AssemblyOriginatorKeyFile=$(Certificate.secureFilePath);DelaySign=false;BuildNumber=$(Build.BuildId)'
             clean: true
@@ -75,7 +78,7 @@ stages:
           inputs:
             command: custom
             custom: pack
-            arguments: ${{ parameters.projectPath }} --output $(Build.ArtifactStagingDirectory)/packages/release --no-build /p:Configuration=$(BuildConfiguration)
+            arguments: src/**/*.csproj --output $(Build.ArtifactStagingDirectory)/packages/release --no-build /p:Configuration=$(BuildConfiguration)
       
       - ${{ if ne(variables['Build.Reason'], 'PullRequest') }}:
         - publish: '$(Build.ArtifactStagingDirectory)/packages'
