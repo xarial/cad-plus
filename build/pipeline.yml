@@ -46,9 +46,9 @@ stages:
           secureFile: xarial.snk
 
       - task: VSBuild@1
-        displayName: 'Build preview versions'
+        displayName: 'Build solution'
         inputs:
-          solution: 'src/**/*.csproj'
+          solution: 'cad-plus-api.sln'
           configuration: '$(BuildConfiguration)'
           msbuildArgs: '/p:SignAssembly=true;AssemblyOriginatorKeyFile=$(Certificate.secureFilePath);DelaySign=false;BuildNumber=.$(Build.BuildId)'
 
@@ -75,6 +75,7 @@ stages:
       
       - ${{ if ne(variables['Build.Reason'], 'PullRequest') }}:
         - publish: '$(Build.ArtifactStagingDirectory)/packages'
+          displayName: 'Publish packages artifact'
           artifact: 'packages'
 
 - stage: 'PublishPreviewNuGetPackage'
