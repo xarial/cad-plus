@@ -1,5 +1,13 @@
-parameters:
-  projectPath : ''
+trigger:
+  branches:
+    include:
+    - '!api-master'
+    - '!api-dev'
+  paths:
+    include:
+    - src/*
+
+name: '$(Date:yyyyMMdd).$(Rev:r)[$(BuildID)]'
 
 stages:
 
@@ -23,10 +31,10 @@ stages:
           packageType: 'sdk'
         
       - task: DotNetCoreCLI@2
-        displayName: 'NuGet restore'
+        displayName: 'Restore NuGet'
         inputs:
           command: restore
-          projects: '${{ parameters.projectPath }}'
+          projects: 'cad-plus-api.sln'
           feedsToUse: config
           nugetConfigPath: 'nuget.config'
 
@@ -36,30 +44,34 @@ stages:
         inputs:
           secureFile: xarial.snk
 
-      - task: VSBuild@1
-        displayName: 'Build preview version'
-        inputs:
-          solution: '${{ parameters.projectPath }}'
-          configuration: '$(BuildConfiguration)'
-          msbuildArgs: '/p:SignAssembly=true;AssemblyOriginatorKeyFile=$(Certificate.secureFilePath);DelaySign=false;VersionSuffix=$(Build.BuildNumber)'
+      - ${{ if and(eq(variables['Build.SourceBranch'], 'refs/heads/!api-dev'), ne(variables['Build.Reason'], 'PullRequest')) }}:
+        - task: VSBuild@1
+          displayName: 'Build preview version'
+          inputs:
+            solution: 'cad-plus-api.sln'
+            configuration: '$(BuildConfiguration)'
+            msbuildArgs: '/p:SignAssembly=true;AssemblyOriginatorKeyFile=$(Certificate.secureFilePath);DelaySign=false;VersionSuffix=preview;BuildNumber=$(Build.BuildId)'
 
-      - task: DotNetCoreCLI@2
-        inputs:
-          command: custom
-          custom: pack
-          arguments: ${{ parameters.projectPath }} --version-suffix $(Build.BuildNumber) --output $(Build.ArtifactStagingDirectory)/packages/preview --no-build /p:Configuration=$(BuildConfiguration)
+      - ${{ if and(eq(variables['Build.SourceBranch'], 'refs/heads/!api-dev'), ne(variables['Build.Reason'], 'PullRequest')) }}:
+        - task: DotNetCoreCLI@2
+          displayName: 'Pack preview version'
+          inputs:
+            command: custom
+            custom: pack
+            arguments: 'cad-plus-api.sln --version-suffix preview --output $(Build.ArtifactStagingDirectory)/packages/preview --no-build /p:Configuration=$(BuildConfiguration);BuildNumber=$(Build.BuildId)'
 
       - ${{ if and(eq(variables['Build.SourceBranch'], 'refs/heads/!api-master'), ne(variables['Build.Reason'], 'PullRequest')) }}:
         - task: VSBuild@1
           displayName: 'Build production version'
           inputs:
-            solution: '${{ parameters.projectPath }}'
+            solution: 'cad-plus-api.sln'
             configuration: '$(BuildConfiguration)'
-            msbuildArgs: '/p:SignAssembly=true;AssemblyOriginatorKeyFile=$(Certificate.secureFilePath);DelaySign=false'
+            msbuildArgs: '/p:SignAssembly=true;AssemblyOriginatorKeyFile=$(Certificate.secureFilePath);DelaySign=false;BuildNumber=$(Build.BuildId)'
             clean: true
 
       - ${{ if and(eq(variables['Build.SourceBranch'], 'refs/heads/!api-master'), ne(variables['Build.Reason'], 'PullRequest')) }}:
         - task: DotNetCoreCLI@2
+          displayName: 'Pack production version'
           inputs:
             command: custom
             custom: pack
@@ -88,7 +100,7 @@ stages:
               artifact: packages
 
             - task: NuGetCommand@2
-              displayName: 'Push NuGet Package'
+              displayName: 'Push NuGet Preview Nuget packages'
               inputs:
                 command: 'push'
                 packagesToPush: '$(Pipeline.Workspace)/packages/preview/*.nupkg'
@@ -138,7 +150,7 @@ stages:
                 arguments: sign "$(PackagePath)" -CertificatePath "$(Certificate.secureFilePath)" -CertificatePassword "$(CODE_SIGN_CERT_PWD)" -Timestamper http://timestamp.comodoca.com
                 
             - task: NuGetCommand@2
-              displayName: 'Push NuGet Package'
+              displayName: 'Push Production NuGet Packages'
               inputs:
                 command: 'push'
                 packagesToPush: '$(Pipeline.Workspace)/packages/release/*.nupkg'

@@ -1,30 +1,17 @@
 <Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
-  <PropertyGroup>
-    <UseWpf>true</UseWpf>
-    <TargetFramework>net472</TargetFramework>
+  <PropertyGroup>    
     <RootNamespace>Xarial.CadPlus.Plus.Shared</RootNamespace>
     <AssemblyName>Xarial.CadPlusPlus.Shared</AssemblyName>
-    <SignAssembly>false</SignAssembly>
-    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <PackageId>Xarial.CadPlusPlus.Shared</PackageId>
-    <VersionPrefix>0.4.0</VersionPrefix>
-    <Authors>Xarial</Authors>
-    <Product>CAD+</Product>
-    <Copyright>© 2022 Xarial Pty Limited</Copyright>
-    <PackageProjectUrl>https://cadplus.xarial.com</PackageProjectUrl>
-    <AssemblyOriginatorKeyFile></AssemblyOriginatorKeyFile>
-    <Company>Xarial Pty Limited</Company>
-    <RepositoryUrl>https://github.com/xarial/cad-plus</RepositoryUrl>
-    <PackageTags>cad,solidworks,tools</PackageTags>
+    <PackageTags>cad,solidworks,tools,cadplus,sdk</PackageTags>
     <Description>CAD+ Toolset API Shared</Description>
-    <RepositoryType>git</RepositoryType>
     <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
-    <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <PackageIcon>icon.png</PackageIcon>
     <PackageIconUrl>https://cadplus.xarial.com/icon-api.png</PackageIconUrl>
     <UseWPF>true</UseWPF>
     <UseWindowsForms>true</UseWindowsForms>
   </PropertyGroup>
+  <Import Project="..\..\common\common.props" />
   <ItemGroup>
     <None Include="..\..\LICENSE.md">
       <Pack>True</Pack>
