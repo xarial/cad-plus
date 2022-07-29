@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
   <PropertyGroup>    
     <RootNamespace>Xarial.CadPlus.Plus.Shared</RootNamespace>
     <AssemblyName>Xarial.CadPlusPlus.Shared</AssemblyName>
@@ -27,7 +27,7 @@
     <PackageReference Include="Fluent.Ribbon" Version="9.0.4" />
     <PackageReference Include="MahApps.Metro" Version="2.4.9" />
     <PackageReference Include="SimpleInjector" Version="5.3.3" />
-    <PackageReference Include="Xarial.XToolkit.Wpf" Version="0.4.0-20220725.1" />
+    <PackageReference Include="Xarial.XToolkit.Wpf" Version="0.4.0-preview.4268" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Plus\Plus.csproj" />
