@@ -12,22 +12,57 @@
              xmlns:xctrl="clr-namespace:Xarial.XToolkit.Wpf.Controls;assembly=Xarial.XToolkit.Wpf"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <xctrl:ProgressPanel IsWorkInProgress="{Binding Path=IsWorkInProgress}" Progress="{Binding Path=Progress}"
+    <TabControl>
+        <TabItem Header="ProgressPanel">
+            <Grid DataContext="{Binding Path=ProgressPanel}">
+                <xctrl:ProgressPanel IsWorkInProgress="{Binding Path=IsWorkInProgress}" Progress="{Binding Path=Progress}"
                          Message="{Binding Path=ProgressMessage}">
-        <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
-            <sharedui:RibbonControl Grid.Row="0"
-                                    CommandManager="{Binding Path=CommandManager}"/>
-            <StackPanel Orientation="Vertical" Grid.Row="1">
-                <TextBlock Text="Hello World" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                <sharedctrls:CadObjectLabelControl HorizontalAlignment="Stretch" Object="{Binding Path=ObjectLabel.Document}" Descriptor="{Binding Path=ObjectLabel.Descriptor}"/>
-                <sharedctrls:CadObjectLabelControl HorizontalAlignment="Stretch" Object="{Binding Path=ObjectLabel.Document}" DocumentTitleDisplayType="FilePath" Descriptor="{Binding Path=ObjectLabel.Descriptor}"/>
-                <sharedctrls:CadObjectLabelControl HorizontalAlignment="Stretch" Object="{Binding Path=ObjectLabel.Configuration}" Descriptor="{Binding Path=ObjectLabel.Descriptor}"/>
-                <sharedctrls:CadObjectLabelControl HorizontalAlignment="Stretch" Object="{Binding Path=ObjectLabel.CutList}" Descriptor="{Binding Path=ObjectLabel.Descriptor}"/>
-            </StackPanel>
-        </Grid>
-    </xctrl:ProgressPanel>
+                </xctrl:ProgressPanel>
+            </Grid>
+        </TabItem>
+        <TabItem Header="Ribbon">
+            <Grid DataContext="{Binding Path=Ribbon}">
+                <sharedui:RibbonControl Grid.Row="0" CommandManager="{Binding Path=CommandManager}"/>
+            </Grid>
+        </TabItem>
+        <TabItem Header="ObjectLabel">
+            <Grid DataContext="{Binding Path=ObjectLabel}">
+                <StackPanel Orientation="Vertical" Grid.Row="1">
+                    <TextBlock Text="Hello World" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                    <sharedctrls:CadObjectLabelControl HorizontalAlignment="Stretch" Object="{Binding Path=Object1.Document}" Descriptor="{Binding Path=Object1.Descriptor}"/>
+                    <sharedctrls:CadObjectLabelControl HorizontalAlignment="Stretch" Object="{Binding Path=Object1.Document}" DocumentTitleDisplayType="FilePath" Descriptor="{Binding Path=Object1.Descriptor}"/>
+                    <sharedctrls:CadObjectLabelControl HorizontalAlignment="Stretch" Object="{Binding Path=Object1.Configuration}" Descriptor="{Binding Path=Object1.Descriptor}"/>
+                    <sharedctrls:CadObjectLabelControl HorizontalAlignment="Stretch" Object="{Binding Path=Object1.CutList}" Descriptor="{Binding Path=Object1.Descriptor}"/>
+                </StackPanel>
+            </Grid>
+        </TabItem>
+        <TabItem Header="JobResult">
+            <Grid DataContext="{Binding Path=JobResult}">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Border BorderThickness="1" BorderBrush="Black" Grid.Row="0" Grid.Column="0" Margin="5">
+                    <sharedui:JobSummaryControl  DataContext="{Binding Path=Result}"/>
+                </Border>
+                <Border BorderThickness="1" BorderBrush="Black" Grid.Row="0" Grid.Column="1" Margin="5">
+                    <sharedui:JobJournalControl  DataContext="{Binding Path=Result}"/>
+                </Border>
+                <Border BorderThickness="1" BorderBrush="Black" Grid.Row="1" Grid.ColumnSpan="2" Margin="5">
+                    <sharedui:JobReportControl  DataContext="{Binding Path=Result}"/>
+                </Border>
+                <Button Grid.Row="2" Margin="5" Grid.Column="0" HorizontalAlignment="Right" Command="{Binding Path=RunJobCommand}">
+                    <TextBlock Text="Run Job" Margin="5"/>
+                </Button>
+                <Button Grid.Row="2" Margin="5" Grid.Column="1" HorizontalAlignment="Left" Command="{Binding Path=CancelJobCommand}">
+                    <TextBlock Text="Cancel Job" Margin="5"/>
+                </Button>
+            </Grid>
+        </TabItem>
+    </TabControl>
 </metro:MetroWindow>

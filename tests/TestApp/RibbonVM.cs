@@ -1,67 +1,20 @@
-﻿using Moq;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Diagnostics;
-using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using TestApp.Properties;
-using Xarial.CadPlus.Plus.Extensions;
-using Xarial.CadPlus.Plus.Services;
 using Xarial.CadPlus.Plus.UI;
-using Xarial.XCad.Documents;
-using Xarial.XCad.Features;
-using Xarial.XCad.UI;
-using Xarial.XToolkit.Wpf.Extensions;
 
 namespace TestApp
 {
-    public class TestVM : INotifyPropertyChanged
+    public class RibbonVM
     {
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        private bool m_IsWorkInProgress;
-        private double? m_Progress;
-        private string m_ProgressMessage;
-
-        public ObjectLabelVM ObjectLabel { get; }
-
-        public bool IsWorkInProgress 
-        {
-            get => m_IsWorkInProgress;
-            set
-            {
-                m_IsWorkInProgress = value;
-                this.NotifyChanged();
-            }
-        }
-
-        public string ProgressMessage
-        {
-            get => m_ProgressMessage;
-            set
-            {
-                m_ProgressMessage = value;
-                this.NotifyChanged();
-            }
-        }
-
-        public double? Progress
-        {
-            get => m_Progress;
-            set
-            {
-                m_Progress = value;
-                this.NotifyChanged();
-            }
-        }
-
         public IRibbonCommandManager CommandManager { get; }
 
-        public class DropDownItem 
+        public class DropDownItem
         {
             public string Title { get; set; }
 
@@ -90,10 +43,8 @@ namespace TestApp
         private bool m_Toggle3;
         private double m_NumericValue1;
 
-        public TestVM() 
+        public RibbonVM()
         {
-            ObjectLabel = new ObjectLabelVM();
-
             m_Toggle2 = true;
 
             m_SelectedDropDown1Item = m_DropDown1Items.First();
@@ -123,53 +74,6 @@ namespace TestApp
                         new RibbonButtonCommand("Very Wide Button2", Resources.icon1, "Button 2 Tooltip", () => { }, null),
                         new RibbonNumericSwitchCommand("NumericSwitch1", Resources.icon3, "Some numeric toggle switch", "Numeric Toggle On", "Numeric Toggle Off", () => m_NumericSwitch1, x => m_NumericSwitch1 = x, () => m_NumericValue1, x => m_NumericValue1 = x, new RibbonNumericSwitchCommandOptions(10, 100, true, "0")),
                         new RibbonSwitchCommand("Switch1", Resources.icon3, "Some toggle switch", "Toggle On", "Toggle Off", () => m_Switch1, x => m_Switch1 = x))));
-        }
-    }
-
-    public class MockImage : IXImage
-    {
-        public byte[] Buffer { get; }
-
-        public MockImage(Image img) 
-        {
-            Buffer = img.GetBytes();
-        }
-    }
-
-    public class ObjectLabelVM 
-    {
-        public IXConfiguration Configuration { get; }
-        public IXPart Document { get; }
-        public IXCutListItem CutList { get; }
-
-        public ICadDescriptor Descriptor { get; }
-
-        public ObjectLabelVM() 
-        {
-            var descMock = new Mock<ICadDescriptor>();
-            descMock.Setup(x => x.PartIcon).Returns(Resources.document_icon);
-            descMock.Setup(x => x.ConfigurationIcon).Returns(Resources.config_icon);
-            descMock.Setup(x => x.CutListIcon).Returns(Resources.cutlist_icon);
-            descMock.Setup(x => x.ApplicationId).Returns("MockApp");
-            Descriptor = descMock.Object;
-
-            var confMock = new Mock<IXPartConfiguration>();
-            confMock.Setup(x => x.Name).Returns("Default");
-            confMock.Setup(x => x.Preview).Returns(() => new MockImage(Resources.preview));
-            Configuration = confMock.Object;
-
-            var cutListMock = new Mock<IXCutListItem>();
-            cutListMock.Setup(x => x.Name).Returns("CutList-1");
-            CutList = cutListMock.Object;
-
-            var confsMock = new Mock<IXPartConfigurationRepository>();
-            confsMock.Setup(x => x.Active).Returns(confMock.Object);
-
-            var partMock = new Mock<IXPart>();
-            partMock.Setup(x => x.Configurations).Returns(confsMock.Object);
-            partMock.Setup(x => x.Path).Returns(@"D:\SubFolder\SubFolder\SubFolder\SubFolder\SubFolder\SubFolder\MockPart.sldprt");
-
-            Document = partMock.Object;
         }
     }
 }
