@@ -12,17 +12,14 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using Xarial.CadPlus.Plus.Shared.Styles;
 
-namespace TestApp
+namespace Xarial.CadPlus.Plus.Shared.UI
 {
-    public partial class MyWindow
+    public partial class JobLoadingControl : UserControl
     {
-        public MyWindow()
+        public JobLoadingControl()
         {
-            Application.Current.UsingMetroStyles();
             InitializeComponent();
-            this.DataContext = new MainVM();
         }
     }
 }
