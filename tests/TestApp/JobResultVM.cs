@@ -32,10 +32,13 @@ namespace TestApp
         {
             async Task ProcessJobItemOperation(MyJobItemOperation oper, JobItemState_e res, object userRes, string[] issues) 
             {
+                cancellationToken.ThrowIfCancellationRequested();
                 oper.Update(JobItemState_e.Initializing, null, null);
                 await Task.Delay(TimeSpan.FromSeconds(1));
+                cancellationToken.ThrowIfCancellationRequested();
                 oper.Update(JobItemState_e.InProgress, null, null);
                 await Task.Delay(TimeSpan.FromSeconds(2));
+                cancellationToken.ThrowIfCancellationRequested();
                 oper.Update(res, issues?.Select(i => new MyJobItemIssue(res == JobItemState_e.Failed ? IssueType_e.Error : IssueType_e.Information, i)).ToArray(), userRes);
             }
 
@@ -56,6 +59,9 @@ namespace TestApp
             var item3 = new MyJobItem(Resources.icon3, null, "Item3", "Third Item", null, new IJobItemOperation[] { item3oper1, item3oper2 }, null);
 
             var startTime = DateTime.Now;
+
+            //Initializing
+            await Task.Delay(TimeSpan.FromSeconds(2));
 
             JobSet?.Invoke(this, new IJobItem[] { item1, item2, item3 }, new IJobItemOperationDefinition[] { oper1, oper2 }, startTime);
 
@@ -193,6 +199,7 @@ namespace TestApp
         }
 
         public ICommand RunJobCommand { get; }
+        public ICommand CancelJobCommand { get; }
 
         private JobResultBaseVM m_Result;
 
@@ -200,7 +207,8 @@ namespace TestApp
 
         public JobResultVM() 
         {
-            RunJobCommand = new RelayCommand(RunJob);
+            RunJobCommand = new RelayCommand(RunJob, () => m_CancellationTokenSource == null);
+            CancelJobCommand = new RelayCommand(CancelJob, () => m_CancellationTokenSource != null);
         }
 
         private async void RunJob()
@@ -212,6 +220,12 @@ namespace TestApp
             Result = res;
 
             await res.TryRunBatchAsync();
+        }
+
+        private void CancelJob()
+        {
+            m_CancellationTokenSource.Cancel();
+            m_CancellationTokenSource = null;
         }
     }
 }

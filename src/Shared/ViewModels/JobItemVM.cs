@@ -66,15 +66,11 @@ namespace Xarial.CadPlus.Plus.Shared.ViewModels
 
         private void ResolveState() 
         {
-            var states = Operations.Select(o => State).ToArray();
+            var states = Operations.Select(o => o.State).ToArray();
 
-            if (states.Contains(JobItemState_e.Initializing))
+            if (states.All(s => s == JobItemState_e.Initializing))
             {
                 State = JobItemState_e.Initializing;
-            }
-            else if (states.Contains(JobItemState_e.InProgress))
-            {
-                State = JobItemState_e.InProgress;
             }
             else if (states.All(s => s == JobItemState_e.Succeeded))
             {
@@ -84,9 +80,13 @@ namespace Xarial.CadPlus.Plus.Shared.ViewModels
             {
                 State = JobItemState_e.Failed;
             }
-            else 
+            else if (states.All(s => s == JobItemState_e.Failed || s == JobItemState_e.Succeeded))
             {
                 State = JobItemState_e.Warning;
+            }
+            else
+            {
+                State = JobItemState_e.InProgress;
             }
         }
     }

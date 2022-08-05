@@ -207,6 +207,7 @@ namespace Xarial.CadPlus.Plus.Shared.ViewModels
             JobItems = items.Select(f => new JobItemVM(f)).ToArray();
             OperationDefinitions = operations.Select(o => new JobItemOperationDefinitionVM(o)).ToArray();
             StartTime = startTime;
+            IsInitializing = false;
         }
 
         private void OnJobCompleted(IBatchJobBase sender, TimeSpan duration)
@@ -216,11 +217,6 @@ namespace Xarial.CadPlus.Plus.Shared.ViewModels
 
         private void OnProgressChanged(IBatchJobBase sender, IJobItem file, double progress, bool result)
         {
-            if (IsInitializing)
-            {
-                IsInitializing = false;
-            }
-
             if (result)
             {
                 ProcessedItemsCount++;

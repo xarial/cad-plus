@@ -56,8 +56,11 @@
                 <Border BorderThickness="1" BorderBrush="Black" Grid.Row="1" Grid.ColumnSpan="2" Margin="5">
                     <sharedui:JobReportControl  DataContext="{Binding Path=Result}"/>
                 </Border>
-                <Button Grid.Row="2" Margin="5" Grid.ColumnSpan="2" HorizontalAlignment="Center" Command="{Binding Path=RunJobCommand}">
+                <Button Grid.Row="2" Margin="5" Grid.Column="0" HorizontalAlignment="Right" Command="{Binding Path=RunJobCommand}">
                     <TextBlock Text="Run Job" Margin="5"/>
+                </Button>
+                <Button Grid.Row="2" Margin="5" Grid.Column="1" HorizontalAlignment="Left" Command="{Binding Path=CancelJobCommand}">
+                    <TextBlock Text="Cancel Job" Margin="5"/>
                 </Button>
             </Grid>
         </TabItem>

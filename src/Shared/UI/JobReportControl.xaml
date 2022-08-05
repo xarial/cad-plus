@@ -11,16 +11,12 @@
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
         <xconv:ObjectIsNotNullVisibilityConverter x:Key="objIsNotNullToVisConv"/>
-        <xconv:ObjectIsNotNullVisibilityConverter x:Key="objIsNullToVisConv" Reverse="True"/>
         <conv:JobItemStateToImageConverter x:Key="stateToImgConv"/>
-        <conv:HasIssuesToVisibilityConverter x:Key="hasIssuesToVisConv"/>
+        <xconv:EnumerableIsNotEmptyVisibilityConverter x:Key="hasIssuesToVisConv"/>
         <conv:IssuesToTextConverter x:Key="issuesToTextConv"/>
     </UserControl.Resources>
-    <Grid>
-        <Grid Visibility="{Binding Path=JobItems, Converter={StaticResource objIsNullToVisConv}}">
-            <local:JobLoadingControl/>
-        </Grid>
-        <Grid Visibility="{Binding Path=JobItems, Converter={StaticResource objIsNotNullToVisConv}}">
+    <xctrls:ProgressPanel Progress="{x:Null}" Message="Loading job..." IsWorkInProgress="{Binding Path=IsInitializing}">
+        <Grid>
             <xctrls:XDataGrid IsReadOnly="True"
                       AutoGenerateColumns="False"
                       ItemsSource="{Binding Path=JobItems}"
@@ -82,15 +78,14 @@
                     </DataTemplate>
                 </xctrls:XDataGrid.ColumnHeaderTemplate>
                 <xctrls:XDataGrid.StaticColumns>
-                    <DataGridTemplateColumn Header="State" CanUserSort="False">
+                    <DataGridTemplateColumn Header="State" SortMemberPath="State">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <Image Width="16" Height="16" Grid.Column="0"
-                                   Source="{Binding Path=State, Converter={StaticResource stateToImgConv}}"/>
+                                <Image Width="16" Height="16" Grid.Column="0" Source="{Binding Path=State, Converter={StaticResource stateToImgConv}}"/>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
-                    <DataGridTemplateColumn IsReadOnly="True" Header="Item" CanUserSort="False">
+                    <DataGridTemplateColumn IsReadOnly="True" Header="Item" SortMemberPath="Title">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <Grid>
@@ -114,7 +109,16 @@
                                     </Grid.ToolTip>
                                     <Image Grid.Column="0" Margin="4" Width="16" Height="16" Stretch="Uniform"
                                            VerticalAlignment="Center" RenderOptions.BitmapScalingMode="Fant" Source="{Binding Path=Icon}"/>
-                                    <TextBlock Grid.Column="1" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" Text="{Binding Path=Title}"/>
+                                    <TextBlock Grid.Column="1" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" Text="{Binding Path=Title}">
+                                        <Hyperlink Command="{Binding Path=LinkCommand}">
+                                            <TextBlock Text="{Binding Path=Title}"/>
+                                        </Hyperlink>
+                                    </TextBlock>
+                                    <TextBlock Grid.Column="1" VerticalAlignment="Center" Visibility="{Binding Path=LinkCommand, Converter={StaticResource objIsNotNullToVisConv}}">
+                                        <Hyperlink Command="{Binding Path=LinkCommand}">
+                                            <TextBlock Text="{Binding Path=Title}" TextTrimming="CharacterEllipsis"/>
+                                        </Hyperlink>
+                                    </TextBlock>
                                 </Grid>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
@@ -122,5 +126,5 @@
                 </xctrls:XDataGrid.StaticColumns>
             </xctrls:XDataGrid>
         </Grid>
-    </Grid>
+    </xctrls:ProgressPanel>
 </UserControl>

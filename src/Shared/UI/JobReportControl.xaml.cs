@@ -48,9 +48,9 @@ namespace Xarial.CadPlus.Plus.Shared.UI
 
 		private void OnColumnsPreCreated(List<DataGridColumn> columns)
 		{
-			foreach (var macroCol in columns.Where(c => c.Header is JobItemOperationDefinitionVM))
+			foreach (var operationCol in columns.Where(c => c.Header is JobItemOperationDefinitionVM))
 			{
-				macroCol.SortMemberPath = nameof(JobItemOperationVM.State);
+				operationCol.SortMemberPath = nameof(JobItemOperationVM.State);
 			}
 		}
 	}
