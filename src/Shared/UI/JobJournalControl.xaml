@@ -6,7 +6,7 @@
              xmlns:xctrls="clr-namespace:Xarial.XToolkit.Wpf.Controls;assembly=Xarial.XToolkit.Wpf"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <xctrls:ProgressPanel Progress="{x:Null}" Message="Loading job..." IsWorkInProgress="{Binding Path=IsInitializing}">
+    <xctrls:ProgressPanel Progress="{x:Null}" Message="Loading Job..." IsWorkInProgress="{Binding Path=IsInitializing}">
         <Grid>
             <ListBox VirtualizingStackPanel.IsVirtualizing="True"
                  Margin="2" ItemsSource="{Binding Path=Output}" />

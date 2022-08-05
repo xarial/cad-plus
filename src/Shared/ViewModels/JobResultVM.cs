@@ -202,7 +202,7 @@ namespace Xarial.CadPlus.Plus.Shared.ViewModels
             Output.Add(line);
         }
 
-        private void OnJobSet(IBatchJobBase sender, IJobItem[] items, IJobItemOperationDefinition[] operations, DateTime startTime)
+        private void OnJobSet(IBatchJobBase sender, IReadOnlyList<IJobItem> items, IReadOnlyList<IJobItemOperationDefinition> operations, DateTime startTime)
         {
             JobItems = items.Select(f => new JobItemVM(f)).ToArray();
             OperationDefinitions = operations.Select(o => new JobItemOperationDefinitionVM(o)).ToArray();

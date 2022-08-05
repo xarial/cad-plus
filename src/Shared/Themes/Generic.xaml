@@ -3,6 +3,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:conv="clr-namespace:Xarial.CadPlus.Plus.Shared.Converters"
     xmlns:xconv="clr-namespace:Xarial.XToolkit.Wpf.Converters;assembly=Xarial.XToolkit.Wpf"
+    xmlns:xctrls="clr-namespace:Xarial.XToolkit.Wpf.Controls;assembly=Xarial.XToolkit.Wpf"
     xmlns:local="clr-namespace:Xarial.CadPlus.Plus.Shared.Controls">
 
     <conv:CadObjectIconConverter x:Key="objIconConv"/>
@@ -77,5 +78,5 @@
             </Setter.Value>
         </Setter>
     </Style>
-    
+
 </ResourceDictionary>

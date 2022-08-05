@@ -41,10 +41,10 @@ namespace Xarial.CadPlus.Plus.Services
     }
 
     public delegate void JobItemOperationStateChangedDelegate(IJobItemOperation sender, JobItemState_e state);
-    public delegate void JobItemOperationIssuesChangedDelegate(IJobItemOperation sender, IJobItemIssue[] issues);
+    public delegate void JobItemOperationIssuesChangedDelegate(IJobItemOperation sender, IReadOnlyList<IJobItemIssue> issues);
     public delegate void JobItemOperationUserResultChangedDelegate(IJobItemOperation sender, object userResult);
 
-    public delegate void JobSetDelegate(IBatchJobBase sender, IJobItem[] jobItems, IJobItemOperationDefinition[] operations, DateTime startTime);
+    public delegate void JobSetDelegate(IBatchJobBase sender, IReadOnlyList<IJobItem> jobItems, IReadOnlyList<IJobItemOperationDefinition> operations, DateTime startTime);
     public delegate void JobCompletedDelegate(IBatchJobBase sender, TimeSpan duration);
     public delegate void JobItemProcessedDelegate(IBatchJobBase sender, IJobItem item, double progress, bool result);
     public delegate void JobLogDelegateDelegate(IBatchJobBase sender, string message);
@@ -57,8 +57,8 @@ namespace Xarial.CadPlus.Plus.Services
         string Description { get; }
         Action Link { get; }
         
-        IJobItemOperation[] Operations { get; }
-        IJobItem[] Nested { get; }
+        IReadOnlyList<IJobItemOperation> Operations { get; }
+        IReadOnlyList<IJobItem> Nested { get; }
     }
 
     public interface IJobItemOperationDefinition 
@@ -76,7 +76,7 @@ namespace Xarial.CadPlus.Plus.Services
         IJobItemOperationDefinition Definition { get; }
 
         JobItemState_e State { get; }
-        IJobItemIssue[] Issues { get; }
+        IReadOnlyList<IJobItemIssue> Issues { get; }
         object UserResult { get; }
     }
 

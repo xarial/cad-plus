@@ -7,6 +7,7 @@
              xmlns:xctrls="clr-namespace:Xarial.XToolkit.Wpf.Controls;assembly=Xarial.XToolkit.Wpf"
              xmlns:xconv="clr-namespace:Xarial.XToolkit.Wpf.Converters;assembly=Xarial.XToolkit.Wpf"
              xmlns:conv="clr-namespace:Xarial.CadPlus.Plus.Shared.Converters"
+             xmlns:svc="clr-namespace:Xarial.CadPlus.Plus.Services;assembly=Xarial.CadPlusPlus"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
@@ -15,7 +16,7 @@
         <xconv:EnumerableIsNotEmptyVisibilityConverter x:Key="hasIssuesToVisConv"/>
         <conv:IssuesToTextConverter x:Key="issuesToTextConv"/>
     </UserControl.Resources>
-    <xctrls:ProgressPanel Progress="{x:Null}" Message="Loading job..." IsWorkInProgress="{Binding Path=IsInitializing}">
+    <xctrls:ProgressPanel Progress="{x:Null}" Message="Loading Job..." IsWorkInProgress="{Binding Path=IsInitializing}">
         <Grid>
             <xctrls:XDataGrid IsReadOnly="True"
                       AutoGenerateColumns="False"
@@ -33,6 +34,7 @@
                     <DataTemplate>
                         <Grid HorizontalAlignment="Center">
                             <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
                                 <ColumnDefinition Width="Auto"/>
                                 <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
@@ -61,6 +63,17 @@
                                                Grid.Column="1"/>
                                 </Grid>
                             </Popup>
+                            <TextBlock Text="{Binding Path=UserResult}" TextTrimming="CharacterEllipsis" Margin="2" VerticalAlignment="Center" Grid.Column="2">
+                                <TextBlock.Style>
+                                    <Style TargetType="{x:Type TextBlock}">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding Path=State}" Value="{x:Static svc:JobItemState_e.Failed}">
+                                                <Setter Property="Foreground" Value="Red"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
                         </Grid>
                     </DataTemplate>
                 </xctrls:XDataGrid.CellTemplate>

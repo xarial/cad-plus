@@ -76,7 +76,7 @@ namespace TestApp
                 ItemProcessed?.Invoke(this, item1, 1d / 3d, true);
 
                 Log?.Invoke(this, "Processing item2oper1");
-                await ProcessJobItemOperation(item2oper1, JobItemState_e.Failed, null, new string[] { "Some Error 1", "Some Error 2" });
+                await ProcessJobItemOperation(item2oper1, JobItemState_e.Failed, "Failed Result", new string[] { "Some Error 1", "Some Error 2" });
 
                 Log?.Invoke(this, "Processing item2oper2");
                 await ProcessJobItemOperation(item2oper2, JobItemState_e.Succeeded, "Test Result", new string[] { "Some Info 1" });
@@ -139,8 +139,8 @@ namespace TestApp
         public string Title { get; }
         public string Description { get; }
         public Action Link { get; }
-        public IJobItemOperation[] Operations { get; }
-        public IJobItem[] Nested { get; }
+        public IReadOnlyList<IJobItemOperation> Operations { get; }
+        public IReadOnlyList<IJobItem> Nested { get; }
 
         public MyJobItem(Image icon, Image preview, string title, string description,
             Action link, IJobItemOperation[] operations, IJobItem[] nested)
@@ -164,7 +164,7 @@ namespace TestApp
         public IJobItemOperationDefinition Definition { get; }
         
         public JobItemState_e State { get; private set; }
-        public IJobItemIssue[] Issues { get; private set; }
+        public IReadOnlyList<IJobItemIssue> Issues { get; private set; }
         public object UserResult { get; private set; }
 
         public MyJobItemOperation(IJobItemOperationDefinition def) 

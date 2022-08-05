@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Xarial.CadPlus.Plus.Services
 {
-    public interface IJobManager : IDisposable
+    public interface IJobProcessManager : IDisposable
     {
         void AddProcess(Process process);
     }

@@ -40,7 +40,7 @@ namespace Xarial.CadPlus.Plus.Shared.ViewModels
         private void OnUserResultChanged(IJobItemOperation sender, object userResult)
             => this.NotifyChanged(nameof(UserResult));
 
-        private void OnIssuesChanged(IJobItemOperation sender, IJobItemIssue[] issues)
+        private void OnIssuesChanged(IJobItemOperation sender, IReadOnlyList<IJobItemIssue> issues)
             => this.NotifyChanged(nameof(Issues));
 
         private void OnStateChanged(IJobItemOperation sender, JobItemState_e state)
