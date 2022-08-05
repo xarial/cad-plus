@@ -30,16 +30,16 @@ namespace TestApp
 
         public async Task<bool> ExecuteAsync(CancellationToken cancellationToken)
         {
-            async Task ProcessJobItemOperation(MyJobItemOperation oper, JobItemState_e res, object userRes, string[] issues) 
+            async Task ProcessJobItemOperation(MyJobItemOperation oper, JobItemStateStatus_e res, object userRes, string[] issues) 
             {
                 cancellationToken.ThrowIfCancellationRequested();
-                oper.Update(JobItemState_e.Initializing, null, null);
+                oper.Update(JobItemStateStatus_e.Initializing, null, null);
                 await Task.Delay(TimeSpan.FromSeconds(1));
                 cancellationToken.ThrowIfCancellationRequested();
-                oper.Update(JobItemState_e.InProgress, null, null);
+                oper.Update(JobItemStateStatus_e.InProgress, null, null);
                 await Task.Delay(TimeSpan.FromSeconds(2));
                 cancellationToken.ThrowIfCancellationRequested();
-                oper.Update(res, issues?.Select(i => new MyJobItemIssue(res == JobItemState_e.Failed ? IssueType_e.Error : IssueType_e.Information, i)).ToArray(), userRes);
+                oper.Update(res, issues?.Select(i => new MyJobItemIssue(res == JobItemStateStatus_e.Failed ? IssueType_e.Error : IssueType_e.Information, i)).ToArray(), userRes);
             }
 
             var oper1 = new MyJobItemOperationDefinition("Operation #1", Resources.icon1);
@@ -67,29 +67,44 @@ namespace TestApp
 
             try
             {
+                //item1
+                item1.Update(JobItemStateStatus_e.InProgress, null, null);
+
                 Log?.Invoke(this, "Processing item1oper1");
-                await ProcessJobItemOperation(item1oper1, JobItemState_e.Succeeded, null, null);
+                await ProcessJobItemOperation(item1oper1, JobItemStateStatus_e.Succeeded, null, null);
 
                 Log?.Invoke(this, "Processing item1oper2");
-                await ProcessJobItemOperation(item1oper2, JobItemState_e.Succeeded, null, null);
+                await ProcessJobItemOperation(item1oper2, JobItemStateStatus_e.Succeeded, null, null);
+
+                item1.Update(item1.ComposeStatus(), null, null);
 
                 ItemProcessed?.Invoke(this, item1, 1d / 3d, true);
 
+                //item2
+                item2.Update(JobItemStateStatus_e.InProgress, null, null);
+
                 Log?.Invoke(this, "Processing item2oper1");
-                await ProcessJobItemOperation(item2oper1, JobItemState_e.Failed, "Failed Result", new string[] { "Some Error 1", "Some Error 2" });
+                await ProcessJobItemOperation(item2oper1, JobItemStateStatus_e.Failed, "Failed Result", new string[] { "Some Error 1", "Some Error 2" });
 
                 Log?.Invoke(this, "Processing item2oper2");
-                await ProcessJobItemOperation(item2oper2, JobItemState_e.Succeeded, "Test Result", new string[] { "Some Info 1" });
+                await ProcessJobItemOperation(item2oper2, JobItemStateStatus_e.Succeeded, "Test Result", new string[] { "Some Info 1" });
+
+                item2.Update(item2.ComposeStatus(), new IJobItemIssue[] { new MyJobItemIssue(IssueType_e.Warning, "Some Warning") }, null);
 
                 ItemProcessed?.Invoke(this, item2, 2d / 3d, true);
 
+                //item3
+                item3.Update(JobItemStateStatus_e.InProgress, null, null);
+
                 Log?.Invoke(this, "Processing item3oper1");
-                await ProcessJobItemOperation(item3oper1, JobItemState_e.Failed, null, null);
+                await ProcessJobItemOperation(item3oper1, JobItemStateStatus_e.Failed, null, null);
 
                 Log?.Invoke(this, "Processing item3oper2");
-                await ProcessJobItemOperation(item3oper2, JobItemState_e.Failed, null, null);
+                await ProcessJobItemOperation(item3oper2, JobItemStateStatus_e.Failed, null, null);
 
-                ItemProcessed?.Invoke(this, item1, 3d / 3d, true);
+                item3.Update(item3.ComposeStatus(), null, null);
+
+                ItemProcessed?.Invoke(this, item3, 3d / 3d, true);
 
                 return true;
             }
@@ -132,6 +147,24 @@ namespace TestApp
         }
     }
 
+    public class MyJobItemState : IJobItemState
+    {
+        public event JobStateStatusChangedDelegate StatusChanged;
+        public event JobStateIssuesChangedDelegate IssuesChanged;
+
+        public JobItemStateStatus_e Status { get; private set; }
+        public IReadOnlyList<IJobItemIssue> Issues { get; private set; }
+
+        public void Update(JobItemStateStatus_e status, IJobItemIssue[] issues)
+        {
+            Status = status;
+            Issues = issues;
+
+            StatusChanged?.Invoke(this, Status);
+            IssuesChanged?.Invoke(this, Issues);
+        }
+    }
+
     public class MyJobItem : IJobItem
     {
         public ImageSource Icon { get; }
@@ -141,6 +174,10 @@ namespace TestApp
         public Action Link { get; }
         public IReadOnlyList<IJobItemOperation> Operations { get; }
         public IReadOnlyList<IJobItem> Nested { get; }
+
+        public IJobItemState State => m_State;
+
+        private readonly MyJobItemState m_State;
 
         public MyJobItem(Image icon, Image preview, string title, string description,
             Action link, IJobItemOperation[] operations, IJobItem[] nested)
@@ -152,34 +189,40 @@ namespace TestApp
             Link = link;
             Operations = operations;
             Nested = nested;
+
+            m_State = new MyJobItemState();
+        }
+
+        public void Update(JobItemStateStatus_e status, IJobItemIssue[] issues, object userRes)
+        {
+            m_State.Update(status, issues);
         }
     }
 
     public class MyJobItemOperation : IJobItemOperation
     {
-        public event JobItemOperationStateChangedDelegate StateChanged;
-        public event JobItemOperationIssuesChangedDelegate IssuesChanged;
+        
         public event JobItemOperationUserResultChangedDelegate UserResultChanged;
 
         public IJobItemOperationDefinition Definition { get; }
         
-        public JobItemState_e State { get; private set; }
-        public IReadOnlyList<IJobItemIssue> Issues { get; private set; }
         public object UserResult { get; private set; }
+
+        public IJobItemState State => m_State;
+
+        private MyJobItemState m_State;
 
         public MyJobItemOperation(IJobItemOperationDefinition def) 
         {
             Definition = def;
+            m_State = new MyJobItemState();
         }
 
-        public void Update(JobItemState_e state, IJobItemIssue[] issues, object userRes) 
+        public void Update(JobItemStateStatus_e status, IJobItemIssue[] issues, object userRes) 
         {
-            State = state;
-            Issues = issues;
-            UserResult = userRes;
+            m_State.Update(status, issues);
 
-            StateChanged?.Invoke(this, State);
-            IssuesChanged?.Invoke(this, Issues);
+            UserResult = userRes;
             UserResultChanged?.Invoke(this, UserResult);
         }
     }
@@ -215,7 +258,7 @@ namespace TestApp
         {
             m_CancellationTokenSource = new CancellationTokenSource();
 
-            var res = new AsyncJobResultVM("Test Async Job", new MyAsyncBatchJob(), Mock.Of<IXLogger>(), m_CancellationTokenSource);
+            var res = new AsyncJobResultVM(new MyAsyncBatchJob(), Mock.Of<IXLogger>(), m_CancellationTokenSource);
 
             Result = res;
 

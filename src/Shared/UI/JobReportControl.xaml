@@ -12,9 +12,42 @@
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
         <xconv:ObjectIsNotNullVisibilityConverter x:Key="objIsNotNullToVisConv"/>
-        <conv:JobItemStateToImageConverter x:Key="stateToImgConv"/>
+        <conv:JobItemStateStatusToImageConverter x:Key="statusToImgConv"/>
         <xconv:EnumerableIsNotEmptyVisibilityConverter x:Key="hasIssuesToVisConv"/>
         <conv:IssuesToTextConverter x:Key="issuesToTextConv"/>
+        <DataTemplate x:Key="JobItemStateTemplate">
+            <Grid HorizontalAlignment="Center">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <Image Width="16" Height="16" Grid.Column="0"
+                                   Source="{Binding Path=Status, Converter={StaticResource statusToImgConv}}"/>
+                <TextBlock x:Name="txtIssues" Visibility="{Binding Path=Issues, Converter={StaticResource hasIssuesToVisConv}}"
+                                       Grid.Column="1" Margin="2" ToolTip="What's Wrong" FontSize="14" VerticalAlignment="Center">
+                                <Hyperlink Command="{Binding Path=ShowErrorCommand}" CommandParameter="{Binding ElementName=popupError}">?</Hyperlink>
+                </TextBlock>
+                <Popup x:Name="popupError" Placement="Bottom" MaxWidth="500"
+                                   StaysOpen="False" AllowsTransparency="True" PopupAnimation="Scroll"
+                                   PlacementTarget="{Binding ElementName=txtIssues}">
+                    <Grid Margin="5" Background="White">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.Effect>
+                            <DropShadowEffect BlurRadius="2" Opacity="0.5" />
+                        </Grid.Effect>
+                        <Image Source="/Xarial.CadPlusPlus.Shared;component/Resources/info.png" Width="16" Height="16" Margin="4"
+                                           Grid.Column="0" VerticalAlignment="Center" />
+                        <TextBlock VerticalAlignment="Center" Text="{Binding Path=Issues, Converter={StaticResource issuesToTextConv}}"
+                                               Foreground="Black"
+                                               Margin="5" TextWrapping="Wrap"
+                                               Grid.Column="1"/>
+                    </Grid>
+                </Popup>
+            </Grid>
+        </DataTemplate>
     </UserControl.Resources>
     <xctrls:ProgressPanel Progress="{x:Null}" Message="Loading Job..." IsWorkInProgress="{Binding Path=IsInitializing}">
         <Grid>
@@ -32,42 +65,17 @@
                 </xctrls:XDataGrid.CellContentSelector>
                 <xctrls:XDataGrid.CellTemplate>
                     <DataTemplate>
-                        <Grid HorizontalAlignment="Center">
+                        <Grid HorizontalAlignment="Center" Margin="2">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto"/>
                                 <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
-                            <Image Width="16" Height="16" Grid.Column="0"
-                                   Source="{Binding Path=State, Converter={StaticResource stateToImgConv}}"/>
-                            <TextBlock x:Name="txtIssues" Visibility="{Binding Path=Issues, Converter={StaticResource hasIssuesToVisConv}}"
-                                       Grid.Column="1" Margin="2" ToolTip="What's Wrong" FontSize="14" VerticalAlignment="Center">
-                                <Hyperlink Command="{Binding Path=ShowErrorCommand}" CommandParameter="{Binding ElementName=popupError}">?</Hyperlink>
-                            </TextBlock>
-                            <Popup x:Name="popupError" Placement="Bottom" MaxWidth="500"
-                                   StaysOpen="False" AllowsTransparency="True" PopupAnimation="Scroll"
-                                   PlacementTarget="{Binding ElementName=txtIssues}">
-                                <Grid Margin="5" Background="White">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="Auto"/>
-                                        <ColumnDefinition Width="*"/>
-                                    </Grid.ColumnDefinitions>
-                                    <Grid.Effect>
-                                        <DropShadowEffect BlurRadius="2" Opacity="0.5" />
-                                    </Grid.Effect>
-                                    <Image Source="/Xarial.CadPlusPlus.Shared;component/Resources/info.png" Width="16" Height="16" Margin="4"
-                                           Grid.Column="0" VerticalAlignment="Center" />
-                                    <TextBlock VerticalAlignment="Center" Text="{Binding Path=Issues, Converter={StaticResource issuesToTextConv}}"
-                                               Foreground="Black"
-                                               Margin="5" TextWrapping="Wrap"
-                                               Grid.Column="1"/>
-                                </Grid>
-                            </Popup>
+                            <ContentPresenter ContentTemplate="{StaticResource JobItemStateTemplate}" Content="{Binding Path=State}"/>
                             <TextBlock Text="{Binding Path=UserResult}" TextTrimming="CharacterEllipsis" Margin="2" VerticalAlignment="Center" Grid.Column="2">
                                 <TextBlock.Style>
                                     <Style TargetType="{x:Type TextBlock}">
                                         <Style.Triggers>
-                                            <DataTrigger Binding="{Binding Path=State}" Value="{x:Static svc:JobItemState_e.Failed}">
+                                            <DataTrigger Binding="{Binding Path=State.Status}" Value="{x:Static svc:JobItemStateStatus_e.Failed}">
                                                 <Setter Property="Foreground" Value="Red"/>
                                             </DataTrigger>
                                         </Style.Triggers>
@@ -79,7 +87,7 @@
                 </xctrls:XDataGrid.CellTemplate>
                 <xctrls:XDataGrid.ColumnHeaderTemplate>
                     <DataTemplate>
-                        <Grid>
+                        <Grid Margin="2">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto"/>
                                 <ColumnDefinition Width="*"/>
@@ -94,14 +102,14 @@
                     <DataGridTemplateColumn Header="State" SortMemberPath="State">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <Image Width="16" Height="16" Grid.Column="0" Source="{Binding Path=State, Converter={StaticResource stateToImgConv}}"/>
+                                <ContentPresenter ContentTemplate="{StaticResource JobItemStateTemplate}" Content="{Binding Path=State}" Margin="2"/>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
                     <DataGridTemplateColumn IsReadOnly="True" Header="Item" SortMemberPath="Title">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <Grid>
+                                <Grid Margin="2">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="Auto"/>
                                         <ColumnDefinition Width="*"/>

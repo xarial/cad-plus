@@ -19,7 +19,7 @@ using Xarial.XToolkit.Wpf.Extensions;
 
 namespace Xarial.CadPlus.Plus.Shared.Converters
 {
-    public class JobItemStateToImageConverter : IValueConverter
+    public class JobItemStateStatusToImageConverter : IValueConverter
     {
         private static readonly BitmapImage m_InitializingImage;
         private static readonly BitmapImage m_FailedImage;
@@ -27,7 +27,7 @@ namespace Xarial.CadPlus.Plus.Shared.Converters
         private static readonly BitmapImage m_SucceededImage;
         private static readonly BitmapImage m_WarningImage;
 
-        static JobItemStateToImageConverter() 
+        static JobItemStateStatusToImageConverter() 
         {
             m_InitializingImage = Resources.status_awaiting.ToBitmapImage();
             m_FailedImage = Resources.status_failed.ToBitmapImage();
@@ -38,19 +38,19 @@ namespace Xarial.CadPlus.Plus.Shared.Converters
 
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value is JobItemState_e)
+            if (value is JobItemStateStatus_e)
             {
-                switch ((JobItemState_e)value) 
+                switch ((JobItemStateStatus_e)value) 
                 {
-                    case JobItemState_e.Initializing:
+                    case JobItemStateStatus_e.Initializing:
                         return m_InitializingImage;
-                    case JobItemState_e.Failed:
+                    case JobItemStateStatus_e.Failed:
                         return m_FailedImage;
-                    case JobItemState_e.InProgress:
+                    case JobItemStateStatus_e.InProgress:
                         return m_InProgressImage;
-                    case JobItemState_e.Succeeded:
+                    case JobItemStateStatus_e.Succeeded:
                         return m_SucceededImage;
-                    case JobItemState_e.Warning:
+                    case JobItemStateStatus_e.Warning:
                         return m_WarningImage;
                     default:
                         return null;

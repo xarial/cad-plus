@@ -9,7 +9,7 @@ using System.Windows.Media;
 
 namespace Xarial.CadPlus.Plus.Services
 {
-    public enum JobItemState_e
+    public enum JobItemStateStatus_e
     {
         Initializing,
         InProgress,
@@ -18,7 +18,7 @@ namespace Xarial.CadPlus.Plus.Services
         Warning
     }
 
-    public enum JobState_e
+    public enum JobStatus_e
     {
         InProgress,
         Failed,
@@ -40,8 +40,9 @@ namespace Xarial.CadPlus.Plus.Services
         string Content { get; }
     }
 
-    public delegate void JobItemOperationStateChangedDelegate(IJobItemOperation sender, JobItemState_e state);
-    public delegate void JobItemOperationIssuesChangedDelegate(IJobItemOperation sender, IReadOnlyList<IJobItemIssue> issues);
+    public delegate void JobStateStatusChangedDelegate(IJobItemState sender, JobItemStateStatus_e status);
+    public delegate void JobStateIssuesChangedDelegate(IJobItemState sender, IReadOnlyList<IJobItemIssue> issues);
+
     public delegate void JobItemOperationUserResultChangedDelegate(IJobItemOperation sender, object userResult);
 
     public delegate void JobSetDelegate(IBatchJobBase sender, IReadOnlyList<IJobItem> jobItems, IReadOnlyList<IJobItemOperationDefinition> operations, DateTime startTime);
@@ -57,35 +58,37 @@ namespace Xarial.CadPlus.Plus.Services
         string Description { get; }
         Action Link { get; }
         
+        IJobItemState State { get; }
+
         IReadOnlyList<IJobItemOperation> Operations { get; }
         IReadOnlyList<IJobItem> Nested { get; }
     }
 
     public static class JobItemExtension 
     {
-        public static JobItemState_e ResolveState(this IJobItem jobItem) 
+        public static JobItemStateStatus_e ComposeStatus(this IJobItem jobItem) 
         {
-            var states = jobItem.Operations.Select(o => o.State).ToArray();
+            var statuses = jobItem.Operations.Select(o => o.State.Status).ToArray();
 
-            if (states.All(s => s == JobItemState_e.Initializing))
+            if (statuses.All(s => s == JobItemStateStatus_e.Initializing))
             {
-                return JobItemState_e.Initializing;
+                return JobItemStateStatus_e.Initializing;
             }
-            else if (states.All(s => s == JobItemState_e.Succeeded))
+            else if (statuses.All(s => s == JobItemStateStatus_e.Succeeded))
             {
-                return JobItemState_e.Succeeded;
+                return JobItemStateStatus_e.Succeeded;
             }
-            else if (states.All(s => s == JobItemState_e.Failed))
+            else if (statuses.All(s => s == JobItemStateStatus_e.Failed))
             {
-                return JobItemState_e.Failed;
+                return JobItemStateStatus_e.Failed;
             }
-            else if (states.All(s => s == JobItemState_e.Failed || s == JobItemState_e.Succeeded))
+            else if (statuses.All(s => s == JobItemStateStatus_e.Failed || s == JobItemStateStatus_e.Succeeded))
             {
-                return JobItemState_e.Warning;
+                return JobItemStateStatus_e.Warning;
             }
             else
             {
-                return JobItemState_e.InProgress;
+                return JobItemStateStatus_e.InProgress;
             }
         }
     }
@@ -98,15 +101,20 @@ namespace Xarial.CadPlus.Plus.Services
 
     public interface IJobItemOperation 
     {
-        event JobItemOperationStateChangedDelegate StateChanged;
-        event JobItemOperationIssuesChangedDelegate IssuesChanged;
         event JobItemOperationUserResultChangedDelegate UserResultChanged;
-
         IJobItemOperationDefinition Definition { get; }
 
-        JobItemState_e State { get; }
-        IReadOnlyList<IJobItemIssue> Issues { get; }
+        IJobItemState State { get; }
         object UserResult { get; }
+    }
+
+    public interface IJobItemState
+    {
+        event JobStateStatusChangedDelegate StatusChanged;
+        event JobStateIssuesChangedDelegate IssuesChanged;
+
+        JobItemStateStatus_e Status { get; }
+        IReadOnlyList<IJobItemIssue> Issues { get; }
     }
 
     public interface IBatchJobBase : IDisposable

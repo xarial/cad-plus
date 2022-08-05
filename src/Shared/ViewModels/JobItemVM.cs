@@ -16,16 +16,6 @@ namespace Xarial.CadPlus.Plus.Shared.ViewModels
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public JobItemState_e State 
-        {
-            get => m_State;
-            private set 
-            {
-                m_State = value;
-                this.NotifyChanged();
-            }
-        }
-
         public ImageSource Icon => JobItem.Icon;
         public ImageSource Preview => JobItem.Preview;
         public string Title => JobItem.Title;
@@ -36,7 +26,7 @@ namespace Xarial.CadPlus.Plus.Shared.ViewModels
 
         public JobItemOperationVM[] Operations { get; }
 
-        private JobItemState_e m_State;
+        public JobItemStateVM State { get; }
 
         public JobItemVM(IJobItem jobItem) 
         {
@@ -49,22 +39,7 @@ namespace Xarial.CadPlus.Plus.Shared.ViewModels
 
             Operations = (JobItem.Operations ?? new IJobItemOperation[0]).Select(o => new JobItemOperationVM(o)).ToArray();
 
-            ResolveState();
-
-            //TODO: also consider all nested job items
-
-            foreach (var oper in Operations) 
-            {
-                oper.JobItemOperation.StateChanged += OnOperationStateChanged;
-            }
+            State = new JobItemStateVM(JobItem.State);
         }
-
-        private void OnOperationStateChanged(IJobItemOperation sender, JobItemState_e state)
-        {
-            ResolveState();
-        }
-
-        private void ResolveState()
-            => State = JobItem.ResolveState();
     }
 }

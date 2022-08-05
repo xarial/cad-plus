@@ -25,7 +25,7 @@ namespace Xarial.CadPlus.Plus.Shared.ViewModels
 
         private readonly IBatchJobBase m_BatchJob;
 
-        private JobState_e m_Status;
+        private JobStatus_e m_Status;
 
         private JobItemVM[] m_JobItems;
         private int m_ProcessedItemsCount;
@@ -46,8 +46,6 @@ namespace Xarial.CadPlus.Plus.Shared.ViewModels
 
         private object m_Lock;
 
-        public string Name { get; }
-
         public bool IsBatchJobInProgress
         {
             get => m_IsBatchJobInProgress;
@@ -60,7 +58,7 @@ namespace Xarial.CadPlus.Plus.Shared.ViewModels
 
         public ICommand CancelJobCommand { get; }
 
-        public JobState_e Status
+        public JobStatus_e Status
         {
             get => m_Status;
             set
@@ -155,7 +153,7 @@ namespace Xarial.CadPlus.Plus.Shared.ViewModels
 
         public ObservableCollection<string> Output { get; }
 
-        public JobResultBaseVM(string name, IBatchJobBase batchJob,
+        public JobResultBaseVM(IBatchJobBase batchJob,
             IXLogger logger, CancellationTokenSource cancellationTokenSource)
         {
             if (batchJob == null) 
@@ -193,8 +191,6 @@ namespace Xarial.CadPlus.Plus.Shared.ViewModels
             m_IsRun = false;
 
             IsInitializing = true;
-
-            Name = name;
         }
 
         private void OnLog(IBatchJobBase sender, string line)
@@ -244,17 +240,17 @@ namespace Xarial.CadPlus.Plus.Shared.ViewModels
         {
             var allOperations = (m_BatchJob.JobItems ?? new IJobItem[0]).SelectMany(i => i.Operations ?? new IJobItemOperation[0]);
 
-            if (allOperations.All(f => f.State == JobItemState_e.Succeeded))
+            if (allOperations.All(f => f.State.Status == JobItemStateStatus_e.Succeeded))
             {
-                Status = JobState_e.Succeeded;
+                Status = JobStatus_e.Succeeded;
             }
-            else if (allOperations.Any(f => f.State == JobItemState_e.Succeeded))
+            else if (allOperations.Any(f => f.State.Status == JobItemStateStatus_e.Succeeded))
             {
-                Status = JobState_e.CompletedWithWarning;
+                Status = JobStatus_e.CompletedWithWarning;
             }
             else
             {
-                Status = JobState_e.Failed;
+                Status = JobStatus_e.Failed;
             }
         }
 
@@ -264,7 +260,7 @@ namespace Xarial.CadPlus.Plus.Shared.ViewModels
             {
                 m_IsRun = true;
 
-                Status = JobState_e.InProgress;
+                Status = JobStatus_e.InProgress;
 
                 IsBatchJobInProgress = true;
 
@@ -286,7 +282,7 @@ namespace Xarial.CadPlus.Plus.Shared.ViewModels
                 }
                 else
                 {
-                    Status = JobState_e.Failed;
+                    Status = JobStatus_e.Failed;
                 }
             }
             else 
@@ -294,11 +290,11 @@ namespace Xarial.CadPlus.Plus.Shared.ViewModels
                 switch (err) 
                 {
                     case JobCancelledException _:
-                        Status = JobState_e.Cancelled;
+                        Status = JobStatus_e.Cancelled;
                         break;
 
                     case Exception ex:
-                        Status = JobState_e.Failed;
+                        Status = JobStatus_e.Failed;
                         m_Logger.Log(ex);
                         break;
                 }
@@ -312,8 +308,8 @@ namespace Xarial.CadPlus.Plus.Shared.ViewModels
     {
         private readonly IBatchJob m_BatchJob;
 
-        public JobResultVM(string name, IBatchJob batchJob, IXLogger logger,
-            CancellationTokenSource cancellationTokenSource) : base(name, batchJob, logger, cancellationTokenSource)
+        public JobResultVM(IBatchJob batchJob, IXLogger logger,
+            CancellationTokenSource cancellationTokenSource) : base(batchJob, logger, cancellationTokenSource)
         {
             m_BatchJob = batchJob;
         }
@@ -338,8 +334,8 @@ namespace Xarial.CadPlus.Plus.Shared.ViewModels
     {
         private readonly IAsyncBatchJob m_BatchJob;
 
-        public AsyncJobResultVM(string name, IAsyncBatchJob batchJob, IXLogger logger,
-            CancellationTokenSource cancellationTokenSource) : base(name, batchJob, logger, cancellationTokenSource)
+        public AsyncJobResultVM(IAsyncBatchJob batchJob, IXLogger logger,
+            CancellationTokenSource cancellationTokenSource) : base(batchJob, logger, cancellationTokenSource)
         {
             m_BatchJob = batchJob;
         }
