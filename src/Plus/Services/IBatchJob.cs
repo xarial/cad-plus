@@ -61,6 +61,35 @@ namespace Xarial.CadPlus.Plus.Services
         IReadOnlyList<IJobItem> Nested { get; }
     }
 
+    public static class JobItemExtension 
+    {
+        public static JobItemState_e ResolveState(this IJobItem jobItem) 
+        {
+            var states = jobItem.Operations.Select(o => o.State).ToArray();
+
+            if (states.All(s => s == JobItemState_e.Initializing))
+            {
+                return JobItemState_e.Initializing;
+            }
+            else if (states.All(s => s == JobItemState_e.Succeeded))
+            {
+                return JobItemState_e.Succeeded;
+            }
+            else if (states.All(s => s == JobItemState_e.Failed))
+            {
+                return JobItemState_e.Failed;
+            }
+            else if (states.All(s => s == JobItemState_e.Failed || s == JobItemState_e.Succeeded))
+            {
+                return JobItemState_e.Warning;
+            }
+            else
+            {
+                return JobItemState_e.InProgress;
+            }
+        }
+    }
+
     public interface IJobItemOperationDefinition 
     {
         string Name { get; }
