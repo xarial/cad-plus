@@ -23,7 +23,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Xarial.XCad" Version="0.8.0-dev.4306" />
-    <PackageReference Include="Xarial.XToolkit" Version="0.4.0-dev.4307" />
+    <PackageReference Include="Xarial.XToolkit" Version="0.4.0-dev.4310" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System.ComponentModel.Composition" />
