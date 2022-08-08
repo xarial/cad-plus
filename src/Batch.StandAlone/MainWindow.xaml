@@ -207,16 +207,16 @@
                                                 <TextBlock.Text>
                                                     <MultiBinding Converter="{StaticResource jobTitleConv}">
                                                         <Binding Path="Name"/>
-                                                        <Binding Path="ProcessedItems"/>
-                                                        <Binding Path="FailedItems"/>
-                                                        <Binding Path="JobItems.Length"/>
+                                                        <Binding Path="ProcessedItemsCount"/>
+                                                        <Binding Path="FailedItemsCount"/>
+                                                        <Binding Path="JobItems.Count"/>
                                                     </MultiBinding>
                                                 </TextBlock.Text>
                                             </TextBlock>
                                             <metro:MetroProgressBar Grid.Row="1" Grid.ColumnSpan="2" 
                                                                 Visibility="{Binding Path=Status, Converter={StaticResource statusToVisConv}}"
                                                                 IsIndeterminate="{Binding Path=IsInitializing}"
-                                                                Value="{Binding Path=Progress}" Minimum="0" Maximum="1"/>
+                                                                Value="{Binding Path=Progress, Mode=OneWay}" Minimum="0" Maximum="1"/>
                                             <Button Grid.Column="2" 
                                                 Visibility="{Binding Path=Status, Converter={StaticResource statusToVisConv}}"
                                                 Grid.RowSpan="2" Command="{Binding Path=CancelJobCommand}" Margin="2">
@@ -239,11 +239,21 @@
                                 <RowDefinition Height="*"/>
                                 <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
-                            <ctrlsbase:ResultsControl JobItemsDataGridStyle="{StaticResource MahApps.Styles.DataGrid}"  Grid.Row="0"/>
+                            <TabControl Grid.Row="0" Style="{x:Null}">
+                                <TabItem Header="Summary">
+                                    <sharedui:JobSummaryControl/>
+                                </TabItem>
+                                <TabItem Header="Status">
+                                    <sharedui:JobReportControl DataGridStyle="{StaticResource MahApps.Styles.DataGrid}"/>
+                                </TabItem>
+                                <TabItem Header="Journal">
+                                    <sharedui:JobJournalControl/>
+                                </TabItem>
+                            </TabControl>
                             <metro:MetroProgressBar Grid.Row="1" IsIndeterminate="{Binding Path=IsInitializing}"
                                                 Margin="0,5"
                                                 Visibility="{Binding Path=IsBatchJobInProgress, Converter={StaticResource boolToVisConv}}"
-                                                Value="{Binding Path=Progress}" Minimum="0" Maximum="1"/>
+                                                Value="{Binding Path=Progress, Mode=OneWay}" Minimum="0" Maximum="1"/>
                         </Grid>
                     </Grid>
                 </Grid>

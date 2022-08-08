@@ -70,12 +70,12 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
             Items = new ObservableCollection<JobResultBaseVM>();
         }
 
-        public void StartNewJob()
+        public async void StartNewJob()
         {
             var newRes = new AsyncBatchStandAloneJobResultVM($"Job #{Items.Count + 1}", m_JobFact.Create(m_Job), m_Logger, new CancellationTokenSource());
             Items.Add(newRes);
             Selected = newRes;
-            newRes.TryRunBatchAsync();
+            await newRes.TryRunBatchAsync();
         }
     }
 }

@@ -21,9 +21,10 @@ using Xarial.CadPlus.Common.Services;
 using Xarial.CadPlus.Plus.Services;
 using Xarial.CadPlus.Plus.Shared;
 using Xarial.CadPlus.Plus.Shared.Services;
+using Xarial.CadPlus.Plus.Shared.ViewModels;
 using Xarial.CadPlus.Xport.Core;
-using Xarial.CadPlus.Xport.Models;
 using Xarial.CadPlus.Xport.Properties;
+using Xarial.CadPlus.Xport.Services;
 using Xarial.XCad.Base;
 using Xarial.XToolkit.Reflection;
 using Xarial.XToolkit.Services;
@@ -38,10 +39,8 @@ namespace Xarial.CadPlus.Xport.ViewModels
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
-        private bool m_IsExportInProgress;
         private int m_ActiveTabIndex;
         private string m_OutputDirectory;
-        private double m_Progress;
         private bool m_IsSameDirectoryOutput;
         private bool m_IsTimeoutEnabled;
 
@@ -51,24 +50,12 @@ namespace Xarial.CadPlus.Xport.ViewModels
         
         public Format_e Format { get; set; }
 
-        public ObservableCollection<string> Log { get; }
-        
         public string OutputDirectory
         {
             get => m_OutputDirectory;
             set
             {
                 m_OutputDirectory = value;
-                this.NotifyChanged();
-            }
-        }
-
-        public bool IsExportInProgress
-        {
-            get => m_IsExportInProgress;
-            set
-            {
-                m_IsExportInProgress = value;
                 this.NotifyChanged();
             }
         }
@@ -83,12 +70,14 @@ namespace Xarial.CadPlus.Xport.ViewModels
             }
         }
 
-        public double Progress
+        private AsyncJobResultVM m_JobResult;
+
+        public AsyncJobResultVM JobResult 
         {
-            get => m_Progress;
-            set
+            get => m_JobResult;
+            private set 
             {
-                m_Progress = value;
+                m_JobResult = value;
                 this.NotifyChanged();
             }
         }
@@ -113,8 +102,8 @@ namespace Xarial.CadPlus.Xport.ViewModels
             }
         }
 
-        public ICommand ExportCommand => m_ExportCommand ?? (m_ExportCommand = new RelayCommand(Export, () => !IsExportInProgress && Input.Any() && Format != 0));
-        public ICommand CancelExportCommand => m_CancelExportCommand ?? (m_CancelExportCommand = new RelayCommand(CancelExport, () => IsExportInProgress));
+        public ICommand ExportCommand => m_ExportCommand ?? (m_ExportCommand = new RelayCommand(Export, () => JobResult?.IsBatchJobInProgress != true && Input.Any() && Format != 0));
+        public ICommand CancelExportCommand => m_CancelExportCommand ?? (m_CancelExportCommand = new RelayCommand(CancelExport, () => JobResult?.IsBatchJobInProgress == true));
         public ICommand BrowseOutputDirectoryCommand => m_BrowseOutputDirectoryCommand ?? (m_BrowseOutputDirectoryCommand = new RelayCommand(BrowseOutputDirectory));
 
         public ICommand AboutCommand { get; }
@@ -132,28 +121,22 @@ namespace Xarial.CadPlus.Xport.ViewModels
 
         internal MainWindow ParentWindow { get; set; }
 
-        private readonly IExporterModel m_Model;
+        private readonly IJobProcessManager m_JobPrcMgr;
+
         private readonly IMessageService m_MsgSvc;
         private readonly IXLogger m_Logger;
 
-        private readonly object m_Lock;
-
         private readonly IAboutService m_AboutSvc;
 
-        public ExporterVM(IExporterModel model, IMessageService msgSvc, IXLogger logger, IAboutService aboutSvc)
+        public ExporterVM(IMessageService msgSvc, IJobProcessManager jobPrcMgr, IXLogger logger, IAboutService aboutSvc)
         {
-            m_Model = model;
             m_MsgSvc = msgSvc;
             m_Logger = logger;
 
+            m_JobPrcMgr = jobPrcMgr;
+
             m_AboutSvc = aboutSvc;
 
-            m_Lock = new object();
-            Log = new ObservableCollection<string>();
-            BindingOperations.EnableCollectionSynchronization(Log, m_Lock);
-
-            m_Model.ProgressChanged += OnProgressChanged;
-            m_Model.Log += OnLog;
             Input = new ObservableCollection<string>();
             Format = Format_e.Html;
             Filter = "*.*";
@@ -164,24 +147,11 @@ namespace Xarial.CadPlus.Xport.ViewModels
             HelpCommand = new RelayCommand(OpenHelp);
         }
 
-        private void OnProgressChanged(double prg)
-        {
-            Progress = prg;
-        }
-
-        private void OnLog(string line)
-        {
-            Log.Add(line);
-        }
-
         private async void Export()
         {
             try
             {
                 ActiveTabIndex = 1;
-                IsExportInProgress = true;
-                Progress = 0;
-                Log.Clear();
 
                 var opts = new ExportOptions()
                 {
@@ -194,7 +164,11 @@ namespace Xarial.CadPlus.Xport.ViewModels
                     Version = (int)Version
                 };
 
-                await m_Model.Export(opts).ConfigureAwait(false);
+                using (var exporter = new Exporter(m_JobPrcMgr, opts)) 
+                {
+                    JobResult = new AsyncJobResultVM(exporter, m_Logger, new CancellationTokenSource());
+                    await JobResult.TryRunBatchAsync().ConfigureAwait(false);
+                }
 
                 m_MsgSvc.ShowInformation("Operation completed");
             }
@@ -202,10 +176,6 @@ namespace Xarial.CadPlus.Xport.ViewModels
             {
                 m_Logger.Log(ex);
                 m_MsgSvc.ShowError("Processing error");
-            }
-            finally
-            {
-                IsExportInProgress = false;
             }
         }
 
@@ -227,10 +197,7 @@ namespace Xarial.CadPlus.Xport.ViewModels
             return res.ToArray();
         }
 
-        private void CancelExport()
-        {
-            m_Model.Cancel();
-        }
+        private void CancelExport() => JobResult?.CancelJob();
 
         private void ShowAbout()
             => m_AboutSvc.ShowAbout(this.GetType().Assembly, Resources.export_plus_icon);

@@ -22,7 +22,7 @@ using Xarial.CadPlus.Plus.Services;
 using Xarial.CadPlus.Plus.Shared;
 using Xarial.CadPlus.Plus.Shared.Services;
 using Xarial.CadPlus.Xport.Core;
-using Xarial.CadPlus.Xport.Models;
+using Xarial.CadPlus.Xport.Services;
 using Xarial.CadPlus.Xport.ViewModels;
 
 namespace Xarial.CadPlus.Xport
@@ -49,7 +49,6 @@ namespace Xarial.CadPlus.Xport
         private static void OnConfigureServices(IContainerBuilder builder, Arguments args)
         {
             builder.RegisterSelfSingleton<ExporterVM>();
-            builder.RegisterSingleton<IExporterModel, ExporterModel>();
             builder.RegisterSingleton<IAboutService, AboutService>();
             builder.RegisterSingleton<IParentWindowProvider, ParentWindowProvider>().UsingFactory(() => new ParentWindowProvider(() => m_Window));
         }

@@ -24,7 +24,7 @@ namespace Xarial.CadPlus.Batch.Base.Core
 
         static JobItemOperationMacroDefinition() 
         {
-            m_Icon = Resources.macro_icon_default.ToBitmapImage();
+            m_Icon = Resources.macro_icon_default.ToBitmapImage(true);
         }
 
         public string Name { get; }

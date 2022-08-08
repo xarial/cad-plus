@@ -17,10 +17,11 @@ using Xarial.CadPlus.Batch.Base.Core;
 using Xarial.CadPlus.Common.Services;
 using Xarial.CadPlus.Plus.Extensions;
 using Xarial.CadPlus.Plus.Services;
+using Xarial.CadPlus.Xport.Core;
 using Xarial.XToolkit;
 using Xarial.XToolkit.Wpf.Utils;
 
-namespace Xarial.CadPlus.Xport.Core
+namespace Xarial.CadPlus.Xport.Services
 {
     public class JobItemFile : IJobItem
     {
@@ -32,14 +33,13 @@ namespace Xarial.CadPlus.Xport.Core
         internal JobItemFile(string filePath, JobItemExportFormat[] formats)
         {
             FilePath = filePath;
-            Formats = formats;
+            Operations = formats;
             Title = Path.GetFileName(filePath);
             Description = filePath;
             Link = TryOpenInFileExplorer;
             State = new JobItemState();
         }
 
-        public JobItemExportFormat[] Formats { get; }
         public ImageSource Icon { get; }
         public ImageSource Preview { get; }
         public string Title { get; }
@@ -59,7 +59,7 @@ namespace Xarial.CadPlus.Xport.Core
             {
                 FileSystemUtils.BrowseFileInExplorer(FilePath);
             }
-            catch 
+            catch
             {
             }
         }
@@ -72,7 +72,7 @@ namespace Xarial.CadPlus.Xport.Core
 
         public string Extension { get; }
 
-        public JobItemExportFormatDefinition(string ext) 
+        public JobItemExportFormatDefinition(string ext)
         {
             Extension = ext;
 
@@ -183,7 +183,7 @@ namespace Xarial.CadPlus.Xport.Core
             {
                 var file = jobFiles[i];
 
-                var outFiles = file.Formats;
+                var outFiles = file.Operations;
 
                 foreach (var outFile in outFiles)
                 {
@@ -247,15 +247,15 @@ namespace Xarial.CadPlus.Xport.Core
                     }
                 }
 
-                ItemProcessed?.Invoke(this, file, (double)(i + 1) / (double)jobFiles.Length, true);
+                ItemProcessed?.Invoke(this, file, (i + 1) / (double)jobFiles.Length, true);
 
                 file.State.Status = file.ComposeStatus();
             }
 
             var duration = DateTime.Now.Subtract(startTime);
-            
+
             Log?.Invoke(this, $"Exporting completed in {duration.ToString(@"hh\:mm\:ss")}");
-            
+
             JobCompleted?.Invoke(this, duration);
 
             return true;

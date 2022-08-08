@@ -66,14 +66,14 @@ namespace Xarial.CadPlus.Batch.Base.Services
             }
         }
 
-        private ExcelRow CreateHeader(JobItemOperationDefinitionVM[] definition)
+        private ExcelRow CreateHeader(IReadOnlyList<JobItemOperationDefinitionVM> definition)
         {
-            var cells = new ExcelCell[definition.Length + 3];
+            var cells = new ExcelCell[definition.Count + 3];
 
             cells[0] = new ExcelCell("Status");
             cells[1] = new ExcelCell("File");
 
-            for (int i = 0; i < definition.Length; i++)
+            for (int i = 0; i < definition.Count; i++)
             {
                 cells[i + 2] = new ExcelCell(definition[i].Name);
             }
@@ -83,9 +83,9 @@ namespace Xarial.CadPlus.Batch.Base.Services
             return new ExcelRow(cells);
         }
 
-        private ExcelRow CreateRowForItem(JobItemVM item, JobItemOperationDefinitionVM[] definition)
+        private ExcelRow CreateRowForItem(JobItemVM item, IReadOnlyList<JobItemOperationDefinitionVM> definition)
         {
-            var cells = new ExcelCell[definition.Length + 3];
+            var cells = new ExcelCell[definition.Count + 3];
 
             var errors = new List<string>();
 

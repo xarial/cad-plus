@@ -3,10 +3,19 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:Xarial.CadPlus.Batch.InApp.UI"
-             xmlns:ctrls="clr-namespace:Xarial.CadPlus.Batch.Base.Controls;assembly=Batch.Base"
+             xmlns:sharedui="clr-namespace:Xarial.CadPlus.Plus.Shared.UI;assembly=Xarial.CadPlusPlus.Shared"
              WindowStartupLocation="CenterOwner" WindowStyle="ToolWindow"
              mc:Ignorable="d" 
              Height="450" Width="600">
-    <ctrls:ResultsControl/>
+    <TabControl Grid.Row="0">
+        <TabItem Header="Summary">
+            <sharedui:JobSummaryControl/>
+        </TabItem>
+        <TabItem Header="Status">
+            <sharedui:JobReportControl/>
+        </TabItem>
+        <TabItem Header="Journal">
+            <sharedui:JobJournalControl/>
+        </TabItem>
+    </TabControl>
 </Window>

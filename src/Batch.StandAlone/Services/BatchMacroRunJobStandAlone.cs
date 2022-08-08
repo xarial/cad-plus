@@ -119,8 +119,6 @@ namespace Xarial.CadPlus.Batch.StandAlone.Services
             m_IsExecuted = false;
         }
 
-        //public bool Execute(CancellationToken cancellationToken) => ExecuteAsync(cancellationToken).Result;
-
         public async Task<bool> ExecuteAsync(CancellationToken cancellationToken)
         {
             cancellationToken.Register(() =>

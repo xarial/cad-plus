@@ -3,4 +3,7 @@
   <PropertyGroup>
      <OutputPath>$(SolutionDir)_build\Modules\$(ModuleName)</OutputPath>
   </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System.ComponentModel.Composition" />
+  </ItemGroup>
 </Project>

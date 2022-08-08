@@ -56,18 +56,18 @@ namespace Xarial.CadPlus.Batch.Base.Core
 
                 if (TextUtils.MatchesAnyFilter(Document.Path, m_CadDesc.PartFileFilter.Extensions))
                 {
-                    return icons.Part ?? (icons.Part = m_CadDesc.PartIcon.ToBitmapImage());
+                    return icons.Part ?? (icons.Part = m_CadDesc.PartIcon.ToBitmapImage(true));
                 }
                 else if (TextUtils.MatchesAnyFilter(Document.Path, m_CadDesc.AssemblyFileFilter.Extensions))
                 {
-                    return icons.Assembly ?? (icons.Assembly = m_CadDesc.AssemblyIcon.ToBitmapImage());
+                    return icons.Assembly ?? (icons.Assembly = m_CadDesc.AssemblyIcon.ToBitmapImage(true));
                 }
                 else if (TextUtils.MatchesAnyFilter(Document.Path, m_CadDesc.DrawingFileFilter.Extensions))
                 {
-                    return icons.Drawing ?? (icons.Drawing = m_CadDesc.DrawingIcon.ToBitmapImage());
+                    return icons.Drawing ?? (icons.Drawing = m_CadDesc.DrawingIcon.ToBitmapImage(true));
                 }
 
-                return m_DefaultIcon ?? (m_DefaultIcon = Resources.file_icon.ToBitmapImage());
+                return m_DefaultIcon ?? (m_DefaultIcon = Resources.file_icon.ToBitmapImage(true));
             }
         }
 
@@ -151,7 +151,7 @@ namespace Xarial.CadPlus.Batch.Base.Core
                     using (var memStr = new MemoryStream(img.Buffer))
                     {
                         memStr.Seek(0, SeekOrigin.Begin);
-                        return Image.FromStream(memStr).ToBitmapImage();
+                        return Image.FromStream(memStr).ToBitmapImage(true);
                     }
                 }
                 else
