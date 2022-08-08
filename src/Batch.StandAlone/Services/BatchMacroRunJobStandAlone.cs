@@ -456,9 +456,9 @@ namespace Xarial.CadPlus.Batch.StandAlone.Services
             Log?.Invoke(this, $"Started processing file {context.CurrentJobItem.Document.Path}");
 
             context.ForbidSaving = null;
-            context.CurrentJobItem.State = JobItemState_e.InProgress;
+            context.CurrentJobItem.State.Status = JobItemStateStatus_e.InProgress;
 
-            foreach (var macro in context.CurrentJobItem.Macros)
+            foreach (var macro in context.CurrentJobItem.Operations)
             {
                 context.CurrentMacro = macro;
 
@@ -476,11 +476,11 @@ namespace Xarial.CadPlus.Batch.StandAlone.Services
 
                     if (context.CurrentDocument == null)//document was not opened thus reporting error on document item
                     {
-                        context.CurrentJobItem.ReportError(ex);
+                        context.CurrentJobItem.State.ReportError(ex);
                     }
                     else
                     {
-                        context.CurrentMacro.ReportError(ex);
+                        context.CurrentMacro.State.ReportError(ex);
                     }
 
                     Log?.Invoke(this, ex.ParseUserError(out _));
@@ -488,25 +488,18 @@ namespace Xarial.CadPlus.Batch.StandAlone.Services
                 }
             }
 
-            if (context.CurrentJobItem.Macros.All(m => m.Status == JobItemStatus_e.Succeeded))
-            {
-                context.CurrentJobItem.Status = JobItemStatus_e.Succeeded;
-            }
-            else
-            {
-                context.CurrentJobItem.Status = context.CurrentJobItem.Macros.Any(m => m.Status == JobItemStatus_e.Succeeded) ? JobItemStatus_e.Warning : JobItemStatus_e.Failed;
-            }
+            context.CurrentJobItem.State.Status = context.CurrentJobItem.ComposeStatus();
 
             Log?.Invoke(this, $"Processing file '{context.CurrentJobItem.Document.Path}' completed. Execution time {DateTime.Now.Subtract(fileProcessStartTime).ToString(@"hh\:mm\:ss")}");
 
-            return context.CurrentJobItem.Status != JobItemState_e.Failed;
+            return context.CurrentJobItem.State.Status != JobItemStateStatus_e.Failed;
         }
 
         private void ProcessError(Exception err, BatchJobContext context)
         {
             if (err is ICriticalException)
             {
-                Log?.Invoke("Critical error - restarting application");
+                Log?.Invoke(this, "Critical error - restarting application");
 
                 TryShutDownApplication(context);
             }
@@ -531,23 +524,23 @@ namespace Xarial.CadPlus.Batch.StandAlone.Services
                 context.CurrentApplication.Documents.Active = context.CurrentDocument;
             }
 
-            Log?.Invoke($"Running '{context.CurrentMacro.FilePath}' macro");
+            Log?.Invoke(this, $"Running '{context.CurrentMacro.Definition.MacroData.FilePath}' macro");
 
             try
             {
-                context.CurrentMacro.State = JobItemState_e.InProgress;
+                context.CurrentMacro.State.Status = JobItemStateStatus_e.InProgress;
 
                 IXDocument macroDoc = null;
 
-                if (!string.IsNullOrEmpty(context.CurrentMacro.Macro.Arguments)
+                if (!string.IsNullOrEmpty(context.CurrentMacro.Definition.MacroData.Arguments)
                     || context.Job.OpenFileOptions.HasFlag(OpenFileOptions_e.Invisible))
                 {
                     macroDoc = context.CurrentDocument;
                 }
 
-                m_MacroRunnerSvc.RunMacro(context.CurrentApplication, context.CurrentMacro.FilePath, null,
+                m_MacroRunnerSvc.RunMacro(context.CurrentApplication, context.CurrentMacro.Definition.MacroData.FilePath, null,
                     XCad.Enums.MacroRunOptions_e.UnloadAfterRun,
-                    context.CurrentMacro.Macro.Arguments, macroDoc);
+                    context.CurrentMacro.Definition.MacroData.Arguments, macroDoc);
 
                 if (context.CurrentMacro.InternalMacroException != null)
                 {
@@ -577,11 +570,11 @@ namespace Xarial.CadPlus.Batch.StandAlone.Services
                     }
                 }
 
-                context.CurrentMacro.State = JobItemState_e.Succeeded;
+                context.CurrentMacro.State.Status = JobItemStateStatus_e.Succeeded;
             }
             catch (Exception ex)
             {
-                context.CurrentMacro.State = JobItemState_e.Failed;
+                context.CurrentMacro.State.Status = JobItemStateStatus_e.Failed;
 
                 if (ex is ICriticalException)
                 {
@@ -593,7 +586,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.Services
                 }
                 else if (ex is INoRetryMacroRunException)
                 {
-                    context.CurrentMacro.ReportError(ex);
+                    context.CurrentMacro.State.ReportError(ex);
                 }
                 else
                 {
@@ -692,14 +685,14 @@ namespace Xarial.CadPlus.Batch.StandAlone.Services
                 {
                     if (!state.HasFlag(DocumentState_e.ReadOnly))
                     {
-                        Log?.Invoke($"Setting the readonly flag to {doc.Path} to prevent upgrade of the file");
+                        Log?.Invoke(this, $"Setting the readonly flag to {doc.Path} to prevent upgrade of the file");
                         state |= DocumentState_e.ReadOnly;
                     }
                 }
-
+                
                 doc.State = state;
 
-                Log?.Invoke($"Opening '{doc.Path}'");
+                Log?.Invoke(this, $"Opening '{doc.Path}'");
 
                 doc.Commit(cancellationToken);
             }

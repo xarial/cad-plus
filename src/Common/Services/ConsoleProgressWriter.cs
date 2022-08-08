@@ -22,7 +22,7 @@ namespace Xarial.CadPlus.Common.Services
 
         public void ReportProgress(IJobItem file, double progress, bool result)
         {
-            Console.WriteLine($"Result: {file.ResolveState()}");
+            Console.WriteLine($"Result: {file.State.Status}");
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine($"Progress: {(progress * 100).ToString("F")}%");
             Console.ResetColor();
@@ -37,9 +37,9 @@ namespace Xarial.CadPlus.Common.Services
         public void ReportCompleted(TimeSpan duration)
         {
             Console.WriteLine($"Operation completed: {duration}");
-            Console.WriteLine($"Processed: {m_Scope.Count(j => j.ResolveState() == JobItemState_e.Succeeded)}");
-            Console.WriteLine($"Warning: {m_Scope.Count(j => j.ResolveState() == JobItemState_e.Warning)}");
-            Console.WriteLine($"Failed: {m_Scope.Count(j => j.ResolveState() == JobItemState_e.Failed)}");
+            Console.WriteLine($"Processed: {m_Scope.Count(j => j.State.Status == JobItemStateStatus_e.Succeeded)}");
+            Console.WriteLine($"Warning: {m_Scope.Count(j => j.State.Status == JobItemStateStatus_e.Warning)}");
+            Console.WriteLine($"Failed: {m_Scope.Count(j => j.State.Status == JobItemStateStatus_e.Failed)}");
         }
 
         public void Dispose()

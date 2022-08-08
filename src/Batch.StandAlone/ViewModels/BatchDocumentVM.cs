@@ -292,7 +292,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
                         {
                             if (Results?.Selected != null)
                             {
-                                return Results.Selected.IsBatchInProgress;
+                                return Results.Selected.IsBatchJobInProgress;
                             }
                             else
                             {
@@ -366,7 +366,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
 
                     if (exp != null)
                     {
-                        exp.Export(Results.Selected.Name, Results.Selected.Summary, filePath);
+                        exp.Export(Results.Selected.Name, Results.Selected, filePath);
                     }
                     else
                     {
@@ -394,7 +394,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
 
                     if (exp != null)
                     {
-                        exp.Export(Results.Selected.Journal, filePath);
+                        exp.Export(Results.Selected, filePath);
                     }
                     else
                     {

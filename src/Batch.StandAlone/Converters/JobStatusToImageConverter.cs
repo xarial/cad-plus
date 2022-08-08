@@ -41,19 +41,19 @@ namespace Xarial.CadPlus.Batch.StandAlone.Converters
 
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value is JobState_e)
+            if (value is JobStatus_e)
             {
-                switch ((JobState_e)value) 
+                switch ((JobStatus_e)value) 
                 {
-                    case JobState_e.Cancelled:
+                    case JobStatus_e.Cancelled:
                         return m_CancelledImage;
-                    case JobState_e.Failed:
+                    case JobStatus_e.Failed:
                         return m_FailedImage;
-                    case JobState_e.InProgress:
+                    case JobStatus_e.InProgress:
                         return m_InProgressImage;
-                    case JobState_e.Succeeded:
+                    case JobStatus_e.Succeeded:
                         return m_SucceededImage;
-                    case JobState_e.CompletedWithWarning:
+                    case JobStatus_e.CompletedWithWarning:
                         return m_WarningImage;
                     default:
                         return null;

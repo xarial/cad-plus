@@ -8,6 +8,7 @@
         xmlns:ctrlsbase="clr-namespace:Xarial.CadPlus.Batch.Base.Controls;assembly=Batch.Base"
         xmlns:conv="clr-namespace:Xarial.CadPlus.Batch.StandAlone.Converters"
         xmlns:xconv="clr-namespace:Xarial.XToolkit.Wpf.Converters;assembly=Xarial.XToolkit.Wpf"
+        xmlns:cppsvc="clr-namespace:Xarial.CadPlus.Plus.Services;assembly=Xarial.CadPlusPlus"
         xmlns:fluent="clr-namespace:Fluent;assembly=Fluent"
         xmlns:win="clr-namespace:System.Windows;assembly=PresentationCore"
         xmlns:vm="clr-namespace:Xarial.CadPlus.Batch.StandAlone.ViewModels"
@@ -28,7 +29,7 @@
         <conv:FileFolderIconConverter x:Key="fileFolderIconConv"/>
 
         <xconv:MatchValueUniversalConverter x:Key="statusToVisConv" 
-                                            TargetValue="{x:Static vmbase:JobState_e.InProgress}"
+                                            TargetValue="{x:Static cppsvc:JobStatus_e.InProgress}"
                                             TrueValue="{x:Static win:Visibility.Visible}"
                                             FalseValue="{x:Static win:Visibility.Collapsed}"/>
 

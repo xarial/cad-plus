@@ -31,6 +31,9 @@ namespace Xarial.CadPlus.Batch.Base.Core
             internal ImageSource Drawing { get; set; }
         }
 
+        IJobItemState IJobItem.State => State;
+        IReadOnlyList<IJobItemOperation> IJobItem.Operations => Operations;
+
         private static readonly Dictionary<string, CadObjectIcons> m_Icons;
         private static ImageSource m_DefaultIcon;
 
@@ -100,10 +103,13 @@ namespace Xarial.CadPlus.Batch.Base.Core
 
         public Action Link { get; }
 
-        public IReadOnlyList<IJobItemOperation> Operations { get; }
+        public IReadOnlyList<JobItemMacro> Operations { get; }
 
         //TODO: implement support for configurations and sheets
         public IReadOnlyList<IJobItem> Nested { get; }
+
+        public JobItemState State { get; }
+
 
         private readonly ICadDescriptor m_CadDesc;
 
@@ -115,6 +121,8 @@ namespace Xarial.CadPlus.Batch.Base.Core
             }
 
             m_CadDesc = cadDesc;
+
+            State = new JobItemState();
 
             Document = doc;
             Title = Path.GetFileName(doc.Path);

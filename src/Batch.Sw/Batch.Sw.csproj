@@ -8,8 +8,8 @@
   </PropertyGroup>
   <Import Project="$(SolutionDir)common\common.module.props" />
   <ItemGroup>
-    <PackageReference Include="Xarial.CadPlusPlus" Version="0.4.0-preview.4280" />
-    <PackageReference Include="Xarial.XCad.SolidWorks" Version="0.8.0-preview.4276" />
+    <PackageReference Include="Xarial.CadPlusPlus" Version="0.4.0-dev.4308" />
+    <PackageReference Include="Xarial.XCad.SolidWorks" Version="0.8.0-dev.4306" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Common\Common.csproj" />

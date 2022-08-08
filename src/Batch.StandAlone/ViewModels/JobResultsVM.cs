@@ -20,16 +20,28 @@ using Xarial.XToolkit.Wpf.Extensions;
 using Xarial.XCad.Base;
 using Xarial.CadPlus.Batch.StandAlone.Services;
 using Xarial.CadPlus.Plus.Shared.ViewModels;
+using System.Threading;
 
 namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
 {
+    public class AsyncBatchStandAloneJobResultVM : AsyncJobResultVM
+    {
+        public string Name { get; }
+
+        public AsyncBatchStandAloneJobResultVM(string name, IAsyncBatchJob batchJob, IXLogger logger, CancellationTokenSource cancellationTokenSource) 
+            : base(batchJob, logger, cancellationTokenSource)
+        {
+            Name = name;
+        }
+    }
+
     public class JobResultsVM : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
-        private JobResultBaseVM m_Selected;
+        private AsyncBatchStandAloneJobResultVM m_Selected;
 
-        public JobResultBaseVM Selected 
+        public AsyncBatchStandAloneJobResultVM Selected 
         {
             get => m_Selected;
             set 
@@ -60,7 +72,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
 
         public void StartNewJob()
         {
-            var newRes = new AsyncJobResultVM($"Job #{Items.Count + 1}", m_JobFact.Create(m_Job), m_Logger, new System.Threading.CancellationTokenSource());
+            var newRes = new AsyncBatchStandAloneJobResultVM($"Job #{Items.Count + 1}", m_JobFact.Create(m_Job), m_Logger, new CancellationTokenSource());
             Items.Add(newRes);
             Selected = newRes;
             newRes.TryRunBatchAsync();

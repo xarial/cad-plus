@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <RootNamespace>Xarial.CadPlus.AddIn.Sw</RootNamespace>
     <AssemblyName>CadPlusSwAddInCommunity</AssemblyName>
@@ -8,8 +8,8 @@
   </PropertyGroup>
   <Import Project="$(SolutionDir)common\common.props" />
   <ItemGroup>
-    <PackageReference Include="Xarial.CadPlusPlus.Shared" Version="0.4.0-preview.4280" />
-    <PackageReference Include="Xarial.XCad.SolidWorks" Version="0.8.0-preview.4276" />
+    <PackageReference Include="Xarial.CadPlusPlus.Shared" Version="0.4.0-dev.4308" />
+    <PackageReference Include="Xarial.XCad.SolidWorks" Version="0.8.0-dev.4306" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Init\Init.csproj" />

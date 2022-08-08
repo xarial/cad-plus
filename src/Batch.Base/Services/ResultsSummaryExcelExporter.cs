@@ -91,25 +91,25 @@ namespace Xarial.CadPlus.Batch.Base.Services
 
             var cellColor = default(KnownColor?);
 
-            switch (item.State)
+            switch (item.State.Status)
             {
-                case JobItemState_e.Failed:
+                case JobItemStateStatus_e.Failed:
                     cellColor = KnownColor.Red;
                     break;
 
-                case JobItemState_e.InProgress:
+                case JobItemStateStatus_e.InProgress:
                     cellColor = KnownColor.LightBlue;
                     break;
 
-                case JobItemState_e.Succeeded:
+                case JobItemStateStatus_e.Succeeded:
                     cellColor = KnownColor.LightGreen;
                     break;
 
-                case JobItemState_e.Warning:
+                case JobItemStateStatus_e.Warning:
                     cellColor = KnownColor.LightYellow;
                     break;
 
-                case JobItemState_e.Initializing:
+                case JobItemStateStatus_e.Initializing:
                     cellColor = KnownColor.LightGray;
                     break;
             }
@@ -121,9 +121,9 @@ namespace Xarial.CadPlus.Batch.Base.Services
             {
                 var macro = item.Operations[i];
                 
-                if (macro.Issues.Any())
+                if (macro.State.Issues.Any())
                 {
-                    errors.Add($"[{macro.JobItemOperation.Definition.Name}] - {string.Join("; ", macro.Issues)}");
+                    errors.Add($"[{macro.JobItemOperation.Definition.Name}] - {string.Join("; ", macro.State.Issues)}");
                 }
 
                 cells[i + 2] = new ExcelCell(macro.State, null, cellColor);

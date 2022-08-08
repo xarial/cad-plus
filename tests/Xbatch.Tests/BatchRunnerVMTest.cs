@@ -134,7 +134,7 @@ namespace Xbatch.Tests
             var msgSvcMock = new Mock<IMessageService>().Object;
 
             var jobExecFactMock = new Mock<IBatchMacroRunJobStandAloneFactory>();
-            jobExecFactMock.Setup(m => m.Create(It.IsAny<BatchJob>())).Returns(new Mock<IBatchRunJobExecutor>().Object);
+            jobExecFactMock.Setup(m => m.Create(It.IsAny<BatchJob>())).Returns(new Mock<IBatchMacroRunJobStandAlone>().Object);
 
             var docVm = new BatchDocumentMockVM("", job,
                 appProviderMock.Object,
