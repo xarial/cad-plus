@@ -12,74 +12,108 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Media;
+using Xarial.CadPlus.Batch.Base.Core;
 using Xarial.CadPlus.Common.Services;
+using Xarial.CadPlus.Plus.Extensions;
 using Xarial.CadPlus.Plus.Services;
+using Xarial.XToolkit;
+using Xarial.XToolkit.Wpf.Utils;
 
 namespace Xarial.CadPlus.Xport.Core
 {
-    internal class JobItem : IJobItem
+    public class JobItemFile : IJobItem
     {
-        public event JobItemStatusChangedDelegate StatusChanged;
-        public event JobItemIssuesChanged IssuesChanged;
+        IReadOnlyList<IJobItemOperation> IJobItem.Operations => Operations;
+        IJobItemState IJobItem.State => State;
 
-        public string DisplayName { get; protected set; }
+        public string FilePath { get; }
 
-        internal string FilePath { get; }
-
-        public JobItemStatus_e Status
-        {
-            get => m_Status;
-            set
-            {
-                m_Status = value;
-                StatusChanged?.Invoke(this, value);
-            }
-        }
-
-        public IReadOnlyList<IJobItemIssue> Issues => m_Issues;
-
-        private JobItemStatus_e m_Status;
-
-        private List<IJobItemIssue> m_Issues;
-
-        internal JobItem(string filePath)
+        internal JobItemFile(string filePath, JobItemExportFormat[] formats)
         {
             FilePath = filePath;
-            m_Status = JobItemStatus_e.AwaitingProcessing;
-            m_Issues = new List<IJobItemIssue>();
-        }
-    }
-
-    internal class JobItemFile : JobItem//, IJobItemDocument
-    {
-        internal JobItemFile(string filePath, JobItemFormat[] formats) : base(filePath)
-        {
             Formats = formats;
+            Title = Path.GetFileName(filePath);
+            Description = filePath;
+            Link = TryOpenInFileExplorer;
+            State = new JobItemState();
         }
 
-        public JobItemFormat[] Formats { get; }
-    }
+        public JobItemExportFormat[] Formats { get; }
+        public ImageSource Icon { get; }
+        public ImageSource Preview { get; }
+        public string Title { get; }
+        public string Description { get; }
 
-    internal class JobItemFormat : JobItem//, IJobItemOperation
-    {
-        internal JobItemFormat(string filePath) : base(filePath)
+        public Action Link { get; }
+
+        public JobItemState State { get; }
+
+        public IReadOnlyList<JobItemExportFormat> Operations { get; }
+
+        public IReadOnlyList<IJobItem> Nested { get; }
+
+        private void TryOpenInFileExplorer()
         {
+            try
+            {
+                FileSystemUtils.BrowseFileInExplorer(FilePath);
+            }
+            catch 
+            {
+            }
         }
     }
 
-    public class Exporter : IBatchJobExecutor
+    public class JobItemExportFormatDefinition : IJobItemOperationDefinition
     {
-        private readonly IJobManager m_JobMgr;
+        public string Name { get; }
+        public ImageSource Icon { get; }
+
+        public string Extension { get; }
+
+        public JobItemExportFormatDefinition(string ext) 
+        {
+            Extension = ext;
+
+            Name = ext;
+        }
+    }
+
+    public class JobItemExportFormat : IJobItemOperation
+    {
+        public event JobItemOperationUserResultChangedDelegate UserResultChanged;
+
+        IJobItemState IJobItemOperation.State => State;
+
+        public string OutputFilePath { get; }
+        public IJobItemOperationDefinition Definition { get; }
+
+        public JobItemState State { get; }
+        public object UserResult { get; }
+
+        public JobItemExportFormat(string outFilePath, JobItemExportFormatDefinition def)
+        {
+            OutputFilePath = outFilePath;
+            Definition = def;
+            State = new JobItemState();
+        }
+    }
+
+    public class Exporter : IAsyncBatchJob
+    {
+        private readonly IJobProcessManager m_JobMgr;
 
         public event JobSetDelegate JobSet;
         public event JobItemProcessedDelegate ItemProcessed;
-        public event JobStatusChangedDelegate StatusChanged;
         public event JobLogDelegateDelegate Log;
         public event JobCompletedDelegate JobCompleted;
 
         private readonly ExportOptions m_Opts;
 
-        public Exporter(IJobManager jobMgr, ExportOptions opts)
+        public IJobItem[] JobItems => throw new NotImplementedException();
+
+        public Exporter(IJobProcessManager jobMgr, ExportOptions opts)
         {
             m_JobMgr = jobMgr;
             m_Opts = opts;
@@ -139,35 +173,29 @@ namespace Xarial.CadPlus.Xport.Core
 
             var startTime = DateTime.Now;
 
-            var jobs = ParseOptions(m_Opts);
+            var jobFiles = ParseOptions(m_Opts, out var formats);
 
-            var formats = jobs.SelectMany(j => j.Formats).ToArray();
+            JobSet?.Invoke(this, jobFiles, formats, startTime);
 
-            JobSet?.Invoke(this, formats, startTime);
-
-            var jobItemIndex = 0;
-
-            foreach (var job in jobs)
+            for (int i = 0; i < jobFiles.Length; i++)
             {
-                var file = job.FilePath;
+                var file = jobFiles[i];
 
-                var outFiles = job.Formats;
+                var outFiles = file.Formats;
 
                 foreach (var outFile in outFiles)
                 {
                     try
                     {
-                        var desFile = outFile.FilePath;
-
-                        StatusChanged?.Invoke(this, $"Exporting '{file}' to '{desFile}'");
+                        var desFile = outFile.OutputFilePath;
 
                         int index = 0;
 
                         while (File.Exists(desFile))
                         {
-                            var outDir = Path.GetDirectoryName(outFile.FilePath);
-                            var fileName = Path.GetFileNameWithoutExtension(outFile.FilePath);
-                            var ext = Path.GetExtension(outFile.FilePath);
+                            var outDir = Path.GetDirectoryName(outFile.OutputFilePath);
+                            var fileName = Path.GetFileNameWithoutExtension(outFile.OutputFilePath);
+                            var ext = Path.GetExtension(outFile.OutputFilePath);
 
                             fileName = $"{fileName} ({++index})";
 
@@ -185,7 +213,7 @@ namespace Xarial.CadPlus.Xport.Core
                             CreateNoWindow = true,
                             UseShellExecute = false,
                             FileName = typeof(StandAloneExporter.Program).Assembly.Location,
-                            Arguments = $"\"{file}\" \"{desFile}\" {m_Opts.Version}"
+                            Arguments = $"\"{file.FilePath}\" \"{desFile}\" {m_Opts.Version}"
                         };
 
                         var tcs = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
@@ -198,7 +226,7 @@ namespace Xarial.CadPlus.Xport.Core
 
                         if (res)
                         {
-                            outFile.Status = JobItemStatus_e.Succeeded;
+                            outFile.State.Status = JobItemStateStatus_e.Succeeded;
                         }
                         else
                         {
@@ -207,31 +235,19 @@ namespace Xarial.CadPlus.Xport.Core
                     }
                     catch (Exception ex)
                     {
-                        outFile.Status = JobItemStatus_e.Failed;
+                        outFile.State.Status = JobItemStateStatus_e.Failed;
 
-                        Log?.Invoke(this, $"Error while processing '{file}': {ex.Message}");
+                        Log?.Invoke(this, $"Error while processing '{file.FilePath}': {ex.Message}");
                         if (!m_Opts.ContinueOnError)
                         {
                             throw ex;
                         }
                     }
-
-                    jobItemIndex++;
-                    ItemProcessed?.Invoke(this, outFile, (double)jobItemIndex / (double)formats.Length, true);
                 }
 
-                if (outFiles.All(f => f.Status == JobItemStatus_e.Succeeded))
-                {
-                    job.Status = JobItemStatus_e.Succeeded;
-                }
-                else if (outFiles.All(f => f.Status == JobItemStatus_e.Failed))
-                {
-                    job.Status = JobItemStatus_e.Failed;
-                }
-                else
-                {
-                    job.Status = JobItemStatus_e.Warning;
-                }
+                ItemProcessed?.Invoke(this, file, (double)(i + 1) / (double)jobFiles.Length, true);
+
+                file.State.Status = file.ComposeStatus();
             }
 
             var duration = DateTime.Now.Subtract(startTime);
@@ -243,9 +259,7 @@ namespace Xarial.CadPlus.Xport.Core
             return true;
         }
 
-        public bool Execute(CancellationToken cancellationToken) => ExecuteAsync(cancellationToken).Result;
-
-        private JobItemFile[] ParseOptions(ExportOptions opts)
+        private JobItemFile[] ParseOptions(ExportOptions opts, out JobItemExportFormatDefinition[] formatDefs)
         {
             const string EDRW_FORMAT = ".e";
 
@@ -264,6 +278,20 @@ namespace Xarial.CadPlus.Xport.Core
             if (string.IsNullOrEmpty(filter))
             {
                 filter = "*.*";
+            }
+
+            formatDefs = new JobItemExportFormatDefinition[opts.Format.Length];
+
+            for (int i = 0; i < opts.Format.Length; i++)
+            {
+                var ext = opts.Format[i];
+
+                if (!ext.StartsWith("."))
+                {
+                    ext = "." + ext;
+                }
+
+                formatDefs[i] = new JobItemExportFormatDefinition(ext);
             }
 
             var files = new List<string>();
@@ -288,17 +316,14 @@ namespace Xarial.CadPlus.Xport.Core
 
             foreach (var file in files)
             {
-                var outFiles = new JobItemFormat[opts.Format.Length];
+                var outFiles = new JobItemExportFormat[opts.Format.Length];
                 jobs.Add(new JobItemFile(file, outFiles));
 
-                for (int i = 0; i < opts.Format.Length; i++)
+                for (int i = 0; i < formatDefs.Length; i++)
                 {
-                    var ext = opts.Format[i];
+                    var formatDef = formatDefs[i];
 
-                    if (!ext.StartsWith("."))
-                    {
-                        ext = "." + ext;
-                    }
+                    var ext = formatDef.Extension;
 
                     if (ext.Equals(EDRW_FORMAT, StringComparison.CurrentCultureIgnoreCase))
                     {
@@ -321,8 +346,8 @@ namespace Xarial.CadPlus.Xport.Core
                         }
                     }
 
-                    outFiles[i] = new JobItemFormat(Path.Combine(!string.IsNullOrEmpty(outDir) ? outDir : Path.GetDirectoryName(file),
-                        Path.GetFileNameWithoutExtension(file) + ext));
+                    outFiles[i] = new JobItemExportFormat(Path.Combine(!string.IsNullOrEmpty(outDir) ? outDir : Path.GetDirectoryName(file),
+                        Path.GetFileNameWithoutExtension(file) + ext), formatDef);
                 }
             }
 

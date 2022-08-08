@@ -33,9 +33,9 @@ namespace Xarial.CadPlus.Xport.Models
 
         private CancellationTokenSource m_CurrentCancellationToken;
 
-        private readonly IJobManager m_JobMgr;
+        private readonly IJobProcessManager m_JobMgr;
 
-        public ExporterModel(IJobManager jobMgr) 
+        public ExporterModel(IJobProcessManager jobMgr) 
         {
             m_JobMgr = jobMgr;
         }
@@ -46,10 +46,15 @@ namespace Xarial.CadPlus.Xport.Models
 
             using (var exporter = new Exporter(m_JobMgr, opts))
             {
-                exporter.ProgressChanged += OnProgressChanged;
+                exporter.ItemProcessed += OnItemProcessed;
                 exporter.Log += OnLog;
                 await exporter.ExecuteAsync(m_CurrentCancellationToken.Token).ConfigureAwait(false);
             }
+        }
+
+        private void OnItemProcessed(IBatchJobBase sender, IJobItem item, double progress, bool result)
+        {
+            ProgressChanged?.Invoke(progress);
         }
 
         public void Cancel()
@@ -57,14 +62,9 @@ namespace Xarial.CadPlus.Xport.Models
             m_CurrentCancellationToken.Cancel();
         }
 
-        private void OnLog(string line)
+        private void OnLog(IBatchJobBase sender, string line)
         {
             Log?.Invoke(line);
-        }
-
-        private void OnProgressChanged(IJobItem file, double progress, bool res)
-        {
-            ProgressChanged?.Invoke(progress);
         }
     }
 }

@@ -10,12 +10,6 @@
     <Compile Remove="Converters\IssuesToTextConverter.cs" />
     <Compile Remove="Converters\JobItemStatusToImageConverter.cs" />
     <Compile Remove="Exceptions\JobCancelledException.cs" />
-    <Compile Remove="ViewModels\JobItemDocumentVM.cs" />
-    <Compile Remove="ViewModels\JobItemMacroVM.cs" />
-    <Compile Remove="ViewModels\JobItemVM.cs" />
-    <Compile Remove="ViewModels\JobResultJournalVM.cs" />
-    <Compile Remove="ViewModels\JobResultSummaryVM.cs" />
-    <Compile Remove="ViewModels\JobResultVM.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Update="Properties\Resources.Designer.cs">
@@ -48,12 +42,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\status-warning.png" />
-    <None Include="ViewModels\JobItemDocumentVM.cs" />
-    <None Include="ViewModels\JobItemMacroVM.cs" />
-    <None Include="ViewModels\JobItemVM.cs" />
-    <None Include="ViewModels\JobResultJournalVM.cs" />
-    <None Include="ViewModels\JobResultSummaryVM.cs" />
-    <None Include="ViewModels\JobResultVM.cs" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\arguments-icon.png" />

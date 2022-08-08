@@ -1,18 +1,11 @@
-﻿//*********************************************************************
-//CAD+ Toolset
-//Copyright(C) 2022 Xarial Pty Limited
-//Product URL: https://cadplus.xarial.com
-//License: https://cadplus.xarial.com/license/
-//*********************************************************************
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Xarial.CadPlus.Common.Services;
-using Xarial.CadPlus.Plus.Extensions;
+using System.Text;
+using System.Threading.Tasks;
 using Xarial.CadPlus.Plus.Services;
 
-namespace Xarial.CadPlus.Batch.Base.Core
+namespace Xarial.CadPlus.Common.Services
 {
     public class JobItemIssue : IJobItemIssue, IEquatable<IJobItemIssue>
     {
@@ -27,15 +20,15 @@ namespace Xarial.CadPlus.Batch.Base.Core
 
         public bool Equals(IJobItemIssue other)
         {
-            if (other == null) 
+            if (other == null)
             {
                 throw new ArgumentNullException(nameof(other));
             }
 
-            if (this.GetType() == other.GetType()) 
+            if (this.GetType() == other.GetType())
             {
-                if (Type == other.Type 
-                    && string.Equals(Content, other.Content, StringComparison.CurrentCultureIgnoreCase)) 
+                if (Type == other.Type
+                    && string.Equals(Content, other.Content, StringComparison.CurrentCultureIgnoreCase))
                 {
                     return true;
                 }

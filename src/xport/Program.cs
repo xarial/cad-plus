@@ -35,12 +35,10 @@ namespace Xarial.CadPlus.Xport
     {
         private static Window m_Window;
         private static ApplicationLauncher<ExportApplication, Arguments, MainWindow> m_AppLauncher;
-        private static ConsoleProgressWriter m_ProgressWriter;
 
         [STAThread]
         static void Main(string[] args)
         {
-            m_ProgressWriter = new ConsoleProgressWriter();
             m_AppLauncher = new ApplicationLauncher<ExportApplication, Arguments, MainWindow>(new Initiator());
             m_AppLauncher.RunConsoleAsync += OnRunConsoleAsync;
             m_AppLauncher.WindowCreated += OnWindowCreated;
@@ -83,22 +81,15 @@ namespace Xarial.CadPlus.Xport
                 Version = args.Version
             };
 
-            var jobMgr = m_AppLauncher.Container.GetService<IJobManager>();
+            var jobMgr = m_AppLauncher.Container.GetService<IJobProcessManager>();
 
             using (var exporter = new Exporter(jobMgr, opts))
             {
-                exporter.Log += OnLog;
-                exporter.ProgressChanged += OnProgressChanged;
-                exporter.JobSet += OnJobSet;
-                exporter.JobCompleted += OnJobCompleted;
-
-                await exporter.ExecuteAsync(default).ConfigureAwait(false);
+                using (var prgWriter = new ConsoleProgressWriter(exporter))
+                {
+                    await exporter.ExecuteAsync(default).ConfigureAwait(false);
+                }
             }
         }
-
-        private static void OnJobCompleted(IBatchJobExecutorBase sender, TimeSpan duration) => m_ProgressWriter.ReportCompleted(duration);
-        private static void OnJobSet(IBatchJobExecutorBase sender, IJobItem[] scope, DateTime startTime) => m_ProgressWriter.SetJobScope(scope, startTime);
-        private static void OnProgressChanged(IBatchJobExecutorBase sender, IJobItem file, double progress, bool result) => m_ProgressWriter.ReportProgress(file, progress, result);
-        private static void OnLog(IBatchJobExecutorBase sender, string msg) => m_ProgressWriter.Log(msg);
     }
 }

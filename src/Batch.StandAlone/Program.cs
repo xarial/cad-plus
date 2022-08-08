@@ -48,13 +48,9 @@ namespace Xarial.CadPlus.Batch.StandAlone
 
         private static Window m_Window;
 
-        private static ConsoleProgressWriter m_ProgressWriter;
-
         [STAThread]
         static void Main(string[] args)
         {
-            m_ProgressWriter = new ConsoleProgressWriter();
-
             m_AppLauncher = new ApplicationLauncher<BatchApplication, BatchArguments, MainWindow>(new Initiator());
             m_AppLauncher.ConfigureServices += OnConfigureServices;
             m_AppLauncher.ParseArguments += OnParseArguments;
@@ -71,15 +67,13 @@ namespace Xarial.CadPlus.Batch.StandAlone
             try
             {
                 var batchRunFact = m_AppLauncher.Container.GetService<IBatchMacroRunJobStandAloneFactory>();
-
+                
                 using (var batchRunner = batchRunFact.Create(args.Job))
                 {
-                    batchRunner.Log += OnLog;
-                    batchRunner.ItemProcessed += OnProgressChanged;
-                    batchRunner.JobSet += OnJobSet;
-                    batchRunner.JobCompleted += OnJobCompleted;
-
-                    await batchRunner.ExecuteAsync(default).ConfigureAwait(false);
+                    using (var prgWriter = new ConsoleProgressWriter(batchRunner))
+                    {
+                        await batchRunner.ExecuteAsync(default).ConfigureAwait(false);
+                    }
                 }
             }
             catch (Exception ex)
@@ -90,11 +84,6 @@ namespace Xarial.CadPlus.Batch.StandAlone
                 Environment.Exit(1);
             }
         }
-
-        private static void OnJobCompleted(IBatchJobBase sender, TimeSpan duration) => m_ProgressWriter.ReportCompleted(duration);
-        private static void OnJobSet(IBatchJobBase sender, IReadOnlyList<IJobItem> jobItems, IReadOnlyList<IJobItemOperationDefinition> operations, DateTime startTime) => m_ProgressWriter.SetJobScope(jobItems, startTime);
-        private static void OnProgressChanged(IBatchJobBase sender, IJobItem file, double progress, bool result) => m_ProgressWriter.ReportProgress(file, progress, result);
-        private static void OnLog(IBatchJobBase sender, string msg) => m_ProgressWriter.Log(msg);
 
         private static void OnConfigureServices(IContainerBuilder builder, BatchArguments args)
         {

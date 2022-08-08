@@ -14,13 +14,29 @@ using Xarial.CadPlus.Plus.Services;
 
 namespace Xarial.CadPlus.Common.Services
 {
-    public class ConsoleProgressWriter
+    public class ConsoleProgressWriter : IDisposable
     {
         private IReadOnlyList<IJobItem> m_Scope;
 
-        public void Log(string msg) => Console.WriteLine(msg);
+        private readonly IBatchJobBase m_Job;
 
-        public void ReportProgress(IJobItem file, double progress, bool result)
+        public ConsoleProgressWriter(IBatchJobBase job) 
+        {
+            m_Job = job;
+            m_Job.JobCompleted += OnJobCompleted;
+            m_Job.JobSet += OnJobSet;
+            m_Job.ItemProcessed += OnProgressChanged;
+            m_Job.Log += OnLog;
+        }
+
+        private void OnJobCompleted(IBatchJobBase sender, TimeSpan duration) => ReportCompleted(duration);
+        private void OnJobSet(IBatchJobBase sender, IReadOnlyList<IJobItem> jobItems, IReadOnlyList<IJobItemOperationDefinition> operations, DateTime startTime) => SetJobScope(jobItems, startTime);
+        private void OnProgressChanged(IBatchJobBase sender, IJobItem file, double progress, bool result) => ReportProgress(file, progress, result);
+        private void OnLog(IBatchJobBase sender, string msg) => Log(msg);
+
+        private void Log(string msg) => Console.WriteLine(msg);
+
+        private void ReportProgress(IJobItem file, double progress, bool result)
         {
             Console.WriteLine($"Result: {file.State.Status}");
             Console.ForegroundColor = ConsoleColor.Green;
@@ -28,13 +44,13 @@ namespace Xarial.CadPlus.Common.Services
             Console.ResetColor();
         }
 
-        public void SetJobScope(IReadOnlyList<IJobItem> scope, DateTime startTime)
+        private void SetJobScope(IReadOnlyList<IJobItem> scope, DateTime startTime)
         {
             m_Scope = scope;
             Console.WriteLine($"Processing {scope.Count} file(s). {startTime}");
         }
-        
-        public void ReportCompleted(TimeSpan duration)
+
+        private void ReportCompleted(TimeSpan duration)
         {
             Console.WriteLine($"Operation completed: {duration}");
             Console.WriteLine($"Processed: {m_Scope.Count(j => j.State.Status == JobItemStateStatus_e.Succeeded)}");
@@ -44,6 +60,10 @@ namespace Xarial.CadPlus.Common.Services
 
         public void Dispose()
         {
+            m_Job.JobCompleted -= OnJobCompleted;
+            m_Job.JobSet -= OnJobSet;
+            m_Job.ItemProcessed -= OnProgressChanged;
+            m_Job.Log -= OnLog;
         }
     }
 }
