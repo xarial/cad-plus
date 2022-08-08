@@ -54,14 +54,14 @@ stages:
 
       - ${{ if and(eq(variables['Build.SourceBranch'], 'refs/heads/!api-dev'), ne(variables['Build.Reason'], 'PullRequest')) }}:
         - task: DotNetCoreCLI@2
-          displayName: 'Pack preview versions'
+          displayName: 'Pack dev versions'
           inputs:
             command: pack
             packagesToPack: 'src/**/*.csproj'
             configurationToPack: $(BuildConfiguration)
-            outputDir: $(Build.ArtifactStagingDirectory)/packages/preview
+            outputDir: $(Build.ArtifactStagingDirectory)/packages/dev
             nobuild: true
-            buildProperties: 'VersionSuffix=preview.$(Build.BuildId)'
+            buildProperties: 'VersionSuffix=dev.$(Build.BuildId)'
 
       - ${{ if and(eq(variables['Build.SourceBranch'], 'refs/heads/!api-master'), ne(variables['Build.Reason'], 'PullRequest')) }}:
         - task: DotNetCoreCLI@2
@@ -78,15 +78,15 @@ stages:
           displayName: 'Publish packages artifact'
           artifact: 'packages'
 
-- stage: 'PublishPreviewNuGetPackage'
-  displayName: 'Publish Preview NuGet Package to xarial nuget feed'
+- stage: 'PublishDevNuGetPackage'
+  displayName: 'Publish Dev NuGet Package to xarial nuget feed'
   dependsOn: 'Build'
   condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/!api-dev'), ne(variables['Build.Reason'], 'PullRequest'))
   jobs:
   - deployment:
     pool:
       vmImage: 'ubuntu-latest'
-    environment: preview
+    environment: dev
     strategy: 
         runOnce:
           deploy:
@@ -97,12 +97,12 @@ stages:
               artifact: packages
 
             - task: NuGetCommand@2
-              displayName: 'Push NuGet Preview Nuget packages'
+              displayName: 'Push NuGet Dev Nuget packages'
               inputs:
                 command: 'push'
-                packagesToPush: '$(Pipeline.Workspace)/packages/preview/*.nupkg'
+                packagesToPush: '$(Pipeline.Workspace)/packages/dev/*.nupkg'
                 nuGetFeedType: 'internal'
-                publishVstsFeed: 'cad-plus-community/cadplus-preview'
+                publishVstsFeed: 'cad-plus-community/cadplus-dev'
 
 - stage: 'PublishPreReleaseNuGetPackage'
   displayName: 'Publish PreRelease NuGet packages to xarial nuget feed'
@@ -126,7 +126,7 @@ stages:
         packagesToPush: '$(Pipeline.Workspace)/packages/release/*.nupkg'
         allowPackageConflicts: true
         nuGetFeedType: 'internal'
-        publishVstsFeed: 'cad-plus-community/cadplus-preview'
+        publishVstsFeed: 'cad-plus-community/cadplus-dev'
 
 - stage: 'PublishProductionNuGetPackage'
   variables:
