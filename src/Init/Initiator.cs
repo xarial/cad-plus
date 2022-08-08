@@ -39,7 +39,7 @@ namespace Xarial.CadPlus.Init
         public ILicenseInfo ProvideLicense() => new LicenseInfo();
     }
 
-    internal class JobManager : IJobManager
+    internal class JobProcessManager : IJobProcessManager
     {
         public void AddProcess(Process process)
         {
@@ -134,7 +134,7 @@ namespace Xarial.CadPlus.Init
             builder.RegisterSingleton<ILicenseInfoProvider, LicenseInfoProvider>();
             builder.RegisterSingleton<ICadSpecificServiceFactory<IMacroExecutor>, CadSpecificServiceFactory<IMacroExecutor>>();
             builder.RegisterSingleton<ICadSpecificServiceFactory<ICadDescriptor>, CadSpecificServiceFactory<ICadDescriptor>>();
-            builder.RegisterSingleton<IJobManager, JobManager>();
+            builder.RegisterSingleton<IJobProcessManager, JobProcessManager>();
             builder.RegisterSingleton<IPopupKillerFactory, PopupKillerFactory>();
         }
 

@@ -25,7 +25,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.Services
     {
         private readonly IMessageService m_MsgSvc;
 
-        private readonly IBatchRunJobExecutorFactory m_ExecFact;
+        private readonly IBatchMacroRunJobStandAloneFactory m_ExecFact;
         private readonly IJobApplicationProvider m_JobAppProvider;
 
         private readonly IBatchApplicationProxy m_BatchAppProxy;
@@ -37,7 +37,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.Services
 
         public BatchDocumentVMFactory(IJobApplicationProvider jobAppProvider,
             IEnumerable<IJournalExporter> journalExporters, IEnumerable<IResultsSummaryExcelExporter> resultsExporters,
-            IMessageService msgSvc, IXLogger logger, IBatchRunJobExecutorFactory execFact,
+            IMessageService msgSvc, IXLogger logger, IBatchMacroRunJobStandAloneFactory execFact,
             IBatchApplicationProxy batchAppProxy)
         {
             m_ExecFact = execFact;

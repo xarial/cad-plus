@@ -19,6 +19,7 @@ using Xarial.CadPlus.Batch.Base.ViewModels;
 using Xarial.XToolkit.Wpf.Extensions;
 using Xarial.XCad.Base;
 using Xarial.CadPlus.Batch.StandAlone.Services;
+using Xarial.CadPlus.Plus.Shared.ViewModels;
 
 namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
 {
@@ -26,9 +27,9 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
-        private JobResultVM m_Selected;
+        private JobResultBaseVM m_Selected;
 
-        public JobResultVM Selected 
+        public JobResultBaseVM Selected 
         {
             get => m_Selected;
             set 
@@ -38,30 +39,28 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
             }
         }
 
-        public ObservableCollection<JobResultVM> Items { get; }
+        public ObservableCollection<JobResultBaseVM> Items { get; }
 
         private readonly BatchJob m_Job;
 
-        private readonly IBatchRunJobExecutorFactory m_ExecFact;
+        private readonly IBatchMacroRunJobStandAloneFactory m_JobFact;
 
-        private readonly ICadDescriptor m_CadDesc;
         private readonly IXLogger m_Logger;
 
         public JobResultsVM(BatchJob job,
-            IBatchRunJobExecutorFactory execFact, ICadDescriptor cadDesc, IXLogger logger) 
+            IBatchMacroRunJobStandAloneFactory jobFact, IXLogger logger) 
         {
             m_Job = job;
 
-            m_CadDesc = cadDesc;
             m_Logger = logger;
 
-            m_ExecFact = execFact;
-            Items = new ObservableCollection<JobResultVM>();
+            m_JobFact = jobFact;
+            Items = new ObservableCollection<JobResultBaseVM>();
         }
 
         public void StartNewJob()
         {
-            var newRes = new JobResultVM($"Job #{Items.Count + 1}", m_ExecFact.Create(m_Job), m_CadDesc, m_Logger, new System.Threading.CancellationTokenSource());
+            var newRes = new AsyncJobResultVM($"Job #{Items.Count + 1}", m_JobFact.Create(m_Job), m_Logger, new System.Threading.CancellationTokenSource());
             Items.Add(newRes);
             Selected = newRes;
             newRes.TryRunBatchAsync();

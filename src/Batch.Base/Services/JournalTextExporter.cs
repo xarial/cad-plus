@@ -7,6 +7,7 @@
 
 using System.IO;
 using Xarial.CadPlus.Batch.Base.ViewModels;
+using Xarial.CadPlus.Plus.Shared.ViewModels;
 using Xarial.XToolkit.Wpf.Utils;
 
 namespace Xarial.CadPlus.Batch.Base.Services
@@ -14,7 +15,7 @@ namespace Xarial.CadPlus.Batch.Base.Services
     public interface IJournalExporter 
     {
         FileFilter Filter { get; }
-        void Export(JobResultJournalVM journal, string filePath);
+        void Export(JobResultBaseVM jobResult, string filePath);
     }
 
     public class JournalTextExporter : IJournalExporter
@@ -26,11 +27,11 @@ namespace Xarial.CadPlus.Batch.Base.Services
             Filter = new FileFilter("Text File", "*.txt");
         }
 
-        public void Export(JobResultJournalVM journal, string filePath)
+        public void Export(JobResultBaseVM jobResult, string filePath)
         {
             using (var file = File.CreateText(filePath)) 
             {
-                foreach (var line in journal.Output) 
+                foreach (var line in jobResult.Output) 
                 {
                     file.WriteLine(line);
                 }

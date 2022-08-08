@@ -23,14 +23,7 @@ using Xarial.CadPlus.Common.Services;
 
 namespace Xarial.CadPlus.Batch.Base.ViewModels
 {
-    public enum JobState_e 
-    {
-        InProgress,
-        Failed,
-        Succeeded,
-        CompletedWithWarning,
-        Cancelled
-    }
+
 
     public class JobResultVM : INotifyPropertyChanged
     {
@@ -57,7 +50,7 @@ namespace Xarial.CadPlus.Batch.Base.ViewModels
 
         private bool m_IsBatchInProgress;
         
-        private readonly IBatchRunJobExecutor m_Executor;
+        private readonly IBatchRunJobExecutorBase m_Executor;
 
         private JobState_e m_Status;
 
@@ -79,7 +72,7 @@ namespace Xarial.CadPlus.Batch.Base.ViewModels
 
         private bool m_IsRun;
 
-        public JobResultVM(string name, IBatchRunJobExecutor executor, ICadDescriptor cadDesc,
+        public JobResultVM(string name, IBatchRunJobExecutorBase executor, ICadDescriptor cadDesc,
             IXLogger logger, CancellationTokenSource cancellationTokenSource)
         {
             m_Executor = executor;

@@ -103,13 +103,13 @@ namespace Xarial.CadPlus.Batch.Base.ViewModels
             }
         }
 
-        private readonly IBatchRunJobExecutor m_Executor;
+        private readonly IBatchRunJobExecutorBase m_Executor;
         private double m_Progress;
         private bool m_IsInitializing;
 
         private readonly ICadDescriptor m_CadDesc;
 
-        public JobResultSummaryVM(IBatchRunJobExecutor executor, ICadDescriptor cadDesc)
+        public JobResultSummaryVM(IBatchRunJobExecutorBase executor, ICadDescriptor cadDesc)
         {
             IsInitializing = true;
 
@@ -117,22 +117,22 @@ namespace Xarial.CadPlus.Batch.Base.ViewModels
             m_CadDesc = cadDesc;
 
             m_Executor.JobSet += OnJobSet;
-            m_Executor.ProgressChanged += OnProgressChanged;
+            m_Executor.ItemProcessed += OnProgressChanged;
             m_Executor.JobCompleted += OnJobCompleted;
         }
 
-        private void OnJobSet(IJobItem[] files, DateTime startTime)
+        private void OnJobSet(IBatchJobExecutorBase sender, IJobItem[] files, DateTime startTime)
         {
             JobItemFiles = files.Select(f => new JobItemDocumentVM((JobItemDocument)f, m_CadDesc)).ToArray();
             StartTime = startTime;
         }
 
-        private void OnJobCompleted(TimeSpan duration)
+        private void OnJobCompleted(IBatchJobExecutorBase sender, TimeSpan duration)
         {
             Duration = duration;
         }
 
-        private void OnProgressChanged(IJobItem file, double progress, bool result)
+        private void OnProgressChanged(IBatchJobExecutorBase sender, IJobItem file, double progress, bool result)
         {
             if (IsInitializing)
             {

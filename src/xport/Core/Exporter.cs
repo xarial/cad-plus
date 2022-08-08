@@ -19,8 +19,8 @@ namespace Xarial.CadPlus.Xport.Core
 {
     internal class JobItem : IJobItem
     {
-        public event Action<IJobItem, JobItemStatus_e> StatusChanged;
-        public event Action<IJobItem> IssuesChanged;
+        public event JobItemStatusChangedDelegate StatusChanged;
+        public event JobItemIssuesChanged IssuesChanged;
 
         public string DisplayName { get; protected set; }
 
@@ -36,24 +36,22 @@ namespace Xarial.CadPlus.Xport.Core
             }
         }
 
-        public IReadOnlyList<string> Issues => m_Issues;
+        public IReadOnlyList<IJobItemIssue> Issues => m_Issues;
 
         private JobItemStatus_e m_Status;
 
-        private List<string> m_Issues;
+        private List<IJobItemIssue> m_Issues;
 
         internal JobItem(string filePath)
         {
             FilePath = filePath;
             m_Status = JobItemStatus_e.AwaitingProcessing;
-            m_Issues = new List<string>();
+            m_Issues = new List<IJobItemIssue>();
         }
     }
 
-    internal class JobItemFile : JobItem, IJobItemDocument
+    internal class JobItemFile : JobItem//, IJobItemDocument
     {
-        public IEnumerable<IJobItemOperation> Operations => throw new NotImplementedException();
-
         internal JobItemFile(string filePath, JobItemFormat[] formats) : base(filePath)
         {
             Formats = formats;
@@ -62,22 +60,22 @@ namespace Xarial.CadPlus.Xport.Core
         public JobItemFormat[] Formats { get; }
     }
 
-    internal class JobItemFormat : JobItem, IJobItemOperation
+    internal class JobItemFormat : JobItem//, IJobItemOperation
     {
         internal JobItemFormat(string filePath) : base(filePath)
         {
         }
     }
 
-    public class Exporter : IBatchRunJobExecutor
+    public class Exporter : IBatchJobExecutor
     {
         private readonly IJobManager m_JobMgr;
 
-        public event Action<IJobItem[], DateTime> JobSet;
-        public event Action<IJobItem, double, bool> ProgressChanged;
-        public event Action<string> StatusChanged;
-        public event Action<string> Log;
-        public event Action<TimeSpan> JobCompleted;
+        public event JobSetDelegate JobSet;
+        public event JobItemProcessedDelegate ItemProcessed;
+        public event JobStatusChangedDelegate StatusChanged;
+        public event JobLogDelegateDelegate Log;
+        public event JobCompletedDelegate JobCompleted;
 
         private readonly ExportOptions m_Opts;
 
@@ -104,7 +102,7 @@ namespace Xarial.CadPlus.Xport.Core
                 var tag = StandAloneExporter.Program.LOG_MESSAGE_TAG;
                 if (e.Data?.StartsWith(tag) == true)
                 {
-                    Log?.Invoke(e.Data.Substring(tag.Length));
+                    Log?.Invoke(this, e.Data.Substring(tag.Length));
                 }
             };
 
@@ -137,7 +135,7 @@ namespace Xarial.CadPlus.Xport.Core
 
         public async Task<bool> ExecuteAsync(CancellationToken cancellationToken)
         {
-            Log?.Invoke($"Exporting Started");
+            Log?.Invoke(this, $"Exporting Started");
 
             var startTime = DateTime.Now;
 
@@ -145,7 +143,7 @@ namespace Xarial.CadPlus.Xport.Core
 
             var formats = jobs.SelectMany(j => j.Formats).ToArray();
 
-            JobSet?.Invoke(formats, startTime);
+            JobSet?.Invoke(this, formats, startTime);
 
             var jobItemIndex = 0;
 
@@ -161,7 +159,7 @@ namespace Xarial.CadPlus.Xport.Core
                     {
                         var desFile = outFile.FilePath;
 
-                        StatusChanged?.Invoke($"Exporting '{file}' to '{desFile}'");
+                        StatusChanged?.Invoke(this, $"Exporting '{file}' to '{desFile}'");
 
                         int index = 0;
 
@@ -178,7 +176,7 @@ namespace Xarial.CadPlus.Xport.Core
 
                         if (cancellationToken.IsCancellationRequested)
                         {
-                            Log?.Invoke($"Cancelled by the user");
+                            Log?.Invoke(this, $"Cancelled by the user");
                             return false;
                         }
 
@@ -211,7 +209,7 @@ namespace Xarial.CadPlus.Xport.Core
                     {
                         outFile.Status = JobItemStatus_e.Failed;
 
-                        Log?.Invoke($"Error while processing '{file}': {ex.Message}");
+                        Log?.Invoke(this, $"Error while processing '{file}': {ex.Message}");
                         if (!m_Opts.ContinueOnError)
                         {
                             throw ex;
@@ -219,7 +217,7 @@ namespace Xarial.CadPlus.Xport.Core
                     }
 
                     jobItemIndex++;
-                    ProgressChanged?.Invoke(outFile, (double)jobItemIndex / (double)formats.Length, true);
+                    ItemProcessed?.Invoke(this, outFile, (double)jobItemIndex / (double)formats.Length, true);
                 }
 
                 if (outFiles.All(f => f.Status == JobItemStatus_e.Succeeded))
@@ -238,9 +236,9 @@ namespace Xarial.CadPlus.Xport.Core
 
             var duration = DateTime.Now.Subtract(startTime);
             
-            Log?.Invoke($"Exporting completed in {duration.ToString(@"hh\:mm\:ss")}");
+            Log?.Invoke(this, $"Exporting completed in {duration.ToString(@"hh\:mm\:ss")}");
             
-            JobCompleted?.Invoke(duration);
+            JobCompleted?.Invoke(this, duration);
 
             return true;
         }

@@ -103,7 +103,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
 
         public string FilePath => m_FilePath;
 
-        private readonly IBatchRunJobExecutorFactory m_ExecFact;
+        private readonly IBatchMacroRunJobStandAloneFactory m_ExecFact;
         private readonly ICadApplicationInstanceProvider m_AppProvider;
 
         public event Action<BatchDocumentVM, BatchJob, string> Save;
@@ -120,7 +120,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
         public BatchDocumentVM(FileInfo file, BatchJob job, ICadApplicationInstanceProvider appProvider,
             IJournalExporter[] journalExporters, IResultsSummaryExcelExporter[] resultsExporters,
             IMessageService msgSvc, IXLogger logger,
-            IBatchRunJobExecutorFactory execFact,
+            IBatchMacroRunJobStandAloneFactory execFact,
             IBatchApplicationProxy batchAppProxy, MainWindow parentWnd, IRibbonButtonCommand[] backstageCmds)
             : this(Path.GetFileNameWithoutExtension(file.FullName), job, appProvider, journalExporters, resultsExporters,
                   msgSvc, logger, execFact, batchAppProxy, parentWnd, backstageCmds)
@@ -132,7 +132,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
         public BatchDocumentVM(string name, BatchJob job,
             ICadApplicationInstanceProvider appProvider,
             IJournalExporter[] journalExporters, IResultsSummaryExcelExporter[] resultsExporters,
-            IMessageService msgSvc, IXLogger logger, IBatchRunJobExecutorFactory execFact,
+            IMessageService msgSvc, IXLogger logger, IBatchMacroRunJobStandAloneFactory execFact,
             IBatchApplicationProxy batchAppProxy, MainWindow parentWnd, IRibbonButtonCommand[] backstageCmds)
         {
             m_ExecFact = execFact;
@@ -164,7 +164,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
             Name = name;
             Settings = new BatchDocumentSettingsVM(m_Job, m_AppProvider, m_Logger);
             Settings.Modified += OnSettingsModified;
-            Results = new JobResultsVM(m_Job, m_ExecFact, m_AppProvider.Descriptor, m_Logger);
+            Results = new JobResultsVM(m_Job, m_ExecFact, m_Logger);
 
             Filters = new ObservableCollection<FilterVM>((m_Job.Filters ?? Enumerable.Empty<string>()).Select(f => new FilterVM(f)));
             Filters.CollectionChanged += OnFiltersCollectionChanged;

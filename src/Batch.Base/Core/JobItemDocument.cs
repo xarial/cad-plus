@@ -5,26 +5,156 @@
 //License: https://cadplus.xarial.com/license/
 //*********************************************************************
 
+using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using Xarial.CadPlus.Batch.Base.Properties;
+using Xarial.CadPlus.Batch.Base.Services;
 using Xarial.CadPlus.Common.Services;
+using Xarial.CadPlus.Plus.Services;
 using Xarial.XCad.Documents;
+using Xarial.XCad.UI;
+using Xarial.XToolkit;
+using Xarial.XToolkit.Wpf.Extensions;
 
 namespace Xarial.CadPlus.Batch.Base.Core
 {
-    public class JobItemDocument : JobItem, IJobItemDocument
+    public class JobItemDocument : IJobItemDocument
     {
-        public IXDocument Document { get; }
-
-        public JobItemDocument(IXDocument doc, JobItemMacro[] macros) : base(doc.Path)
+        private class CadObjectIcons
         {
-            Document = doc;
-            DisplayName = Path.GetFileName(doc.Path);
-            Macros = macros;
+            internal ImageSource Part { get; set; }
+            internal ImageSource Assembly { get; set; }
+            internal ImageSource Drawing { get; set; }
         }
 
-        public IEnumerable<IJobItemOperation> Operations => Macros;
+        private static readonly Dictionary<string, CadObjectIcons> m_Icons;
+        private static ImageSource m_DefaultIcon;
 
-        public JobItemMacro[] Macros { get; }
+        static JobItemDocument()
+        {
+            m_Icons = new Dictionary<string, CadObjectIcons>();
+        }
+
+        public IXDocument Document { get; }
+
+        public ImageSource Icon
+        {
+            get
+            {
+                if (!m_Icons.TryGetValue(m_CadDesc.ApplicationId, out CadObjectIcons icons))
+                {
+                    icons = new CadObjectIcons();
+                    m_Icons.Add(m_CadDesc.ApplicationId, icons);
+                }
+
+                if (TextUtils.MatchesAnyFilter(Document.Path, m_CadDesc.PartFileFilter.Extensions))
+                {
+                    return icons.Part ?? (icons.Part = m_CadDesc.PartIcon.ToBitmapImage());
+                }
+                else if (TextUtils.MatchesAnyFilter(Document.Path, m_CadDesc.AssemblyFileFilter.Extensions))
+                {
+                    return icons.Assembly ?? (icons.Assembly = m_CadDesc.AssemblyIcon.ToBitmapImage());
+                }
+                else if (TextUtils.MatchesAnyFilter(Document.Path, m_CadDesc.DrawingFileFilter.Extensions))
+                {
+                    return icons.Drawing ?? (icons.Drawing = m_CadDesc.DrawingIcon.ToBitmapImage());
+                }
+
+                return m_DefaultIcon ?? (m_DefaultIcon = Resources.file_icon.ToBitmapImage());
+            }
+        }
+
+        public ImageSource Preview
+        {
+            get
+            {
+                try
+                {
+                    if (!Document.IsCommitted || Document.IsAlive)
+                    {
+                        switch (Document)
+                        {
+                            case IXDocument3D doc3D:
+                                return ConvertImage(doc3D.Configurations.Active.Preview);
+
+                            case IXDrawing drw:
+                                return ConvertImage(drw.Sheets.Active.Preview);
+                        }
+                    }
+                }
+                catch
+                {
+                }
+
+                return null;
+            }
+        }
+
+        public string Title { get; }
+
+        public string Description { get; }
+
+        public Action Link { get; }
+
+        public IReadOnlyList<IJobItemOperation> Operations { get; }
+
+        //TODO: implement support for configurations and sheets
+        public IReadOnlyList<IJobItem> Nested { get; }
+
+        private readonly ICadDescriptor m_CadDesc;
+
+        public JobItemDocument(IXDocument doc, IReadOnlyList<JobItemMacro> macros, ICadDescriptor cadDesc)
+        {
+            if (doc == null)
+            {
+                throw new ArgumentNullException(nameof(doc));
+            }
+
+            m_CadDesc = cadDesc;
+
+            Document = doc;
+            Title = Path.GetFileName(doc.Path);
+            Description = doc.Path;
+            Operations = macros;
+            Link = TryOpenInExplorer;
+        }
+
+        private void TryOpenInExplorer()
+        {
+            try
+            {
+                FileSystemUtils.BrowseFileInExplorer(Document.Path);
+            }
+            catch 
+            {
+            }
+        }
+
+        private BitmapImage ConvertImage(IXImage img)
+        {
+            try
+            {
+                if (img != null && img.Buffer != null)
+                {
+                    using (var memStr = new MemoryStream(img.Buffer))
+                    {
+                        memStr.Seek(0, SeekOrigin.Begin);
+                        return Image.FromStream(memStr).ToBitmapImage();
+                    }
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            catch
+            {
+                return null;
+            }
+        }
     }
 }

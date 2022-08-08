@@ -37,7 +37,7 @@ namespace Xbatch.Tests
     {
         public BatchDocumentMockVM(string name, BatchJob job, ICadApplicationInstanceProvider appProvider,
             IJournalExporter[] journalExporters, IResultsSummaryExcelExporter[] resultsExporters,
-            IMessageService msgSvc, IXLogger logger, IBatchRunJobExecutorFactory execFact,
+            IMessageService msgSvc, IXLogger logger, IBatchMacroRunJobStandAloneFactory execFact,
             IBatchApplicationProxy batchAppProxy, MainWindow parentWnd, IRibbonButtonCommand[] backstageCmds) 
             : base(name, job, appProvider, journalExporters, resultsExporters,
                   msgSvc, logger, execFact, batchAppProxy, parentWnd, backstageCmds)
@@ -133,7 +133,7 @@ namespace Xbatch.Tests
             var modelMock = mock.Object;
             var msgSvcMock = new Mock<IMessageService>().Object;
 
-            var jobExecFactMock = new Mock<IBatchRunJobExecutorFactory>();
+            var jobExecFactMock = new Mock<IBatchMacroRunJobStandAloneFactory>();
             jobExecFactMock.Setup(m => m.Create(It.IsAny<BatchJob>())).Returns(new Mock<IBatchRunJobExecutor>().Object);
 
             var docVm = new BatchDocumentMockVM("", job,

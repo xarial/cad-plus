@@ -4,89 +4,20 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Xarial.CadPlus.Batch.Base.Controls"
+             xmlns:sharedui="clr-namespace:Xarial.CadPlus.Plus.Shared.UI;assembly=Xarial.CadPlusPlus.Shared"
              xmlns:xconv="clr-namespace:Xarial.XToolkit.Wpf.Converters;assembly=Xarial.XToolkit.Wpf"
              xmlns:win="clr-namespace:System.Windows;assembly=PresentationCore"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <UserControl.Resources>
-        <xconv:ObjectIsNotNullVisibilityConverter x:Key="objIsNotNullToVisConv"/>
-        <xconv:ObjectIsNotNullVisibilityConverter x:Key="objIsNullToVisConv" Reverse="True"/>
-
-        <DataTemplate x:Key="LoadingItemsWatermarkTemplate">
-            <TextBlock Text="Loading files..."
-                       VerticalAlignment="Center" HorizontalAlignment="Center" Margin="5" TextWrapping="Wrap"
-                       FontSize="16" TextTrimming="CharacterEllipsis" TextAlignment="Center" Foreground="Gray" IsHitTestVisible="False"/>
-        </DataTemplate>
-    </UserControl.Resources>
     <TabControl Style="{x:Null}">
         <TabItem Header="Summary">
-            <Grid>
-                <Grid Visibility="{Binding Path=Summary.JobItemFiles, Converter={StaticResource objIsNullToVisConv}}">
-                    <ContentPresenter ContentTemplate="{StaticResource LoadingItemsWatermarkTemplate}"/>
-                </Grid>
-                <Grid Visibility="{Binding Path=Summary.JobItemFiles, Converter={StaticResource objIsNotNullToVisConv}}">
-                    <Grid Margin="5" DataContext="{Binding Path=Summary}">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="*"/>
-                            <RowDefinition Height="Auto"/>
-                        </Grid.RowDefinitions>
-                        <Grid Grid.Row="0" Margin="5">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="10"/>
-                                <ColumnDefinition Width="*"/>
-                            </Grid.ColumnDefinitions>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                            </Grid.RowDefinitions>
-
-                            <TextBlock Text="Start Time:" Grid.Row="0" Grid.Column="0" Margin="2"/>
-                            <TextBlock Text="{Binding Path=StartTime}" Grid.Row="0" Grid.Column="2" Margin="2"/>
-
-                            <TextBlock Text="Duration:" Grid.Row="1" Grid.Column="0" Margin="2"/>
-                            <TextBlock Text="{Binding Path=Duration, StringFormat=hh\\:mm\\:ss}" Grid.Row="1" Grid.Column="2" Margin="2"/>
-
-                            <TextBlock Text="Total Files:" Grid.Row="2" Grid.Column="0" Margin="2"/>
-                            <TextBlock Text="{Binding Path=JobItemFiles.Length}" Grid.Row="2" Grid.Column="2" Margin="2"/>
-
-                            <TextBlock Text="Processed Files:" Grid.Row="3" Grid.Column="0" Margin="2"/>
-                            <TextBlock Text="{Binding Path=ProcessedFiles}" Grid.Row="3" Grid.Column="2" Margin="2"/>
-
-                            <TextBlock Text="Failed Files:" Grid.Row="4" Grid.Column="0" Margin="2"/>
-                            <TextBlock Text="{Binding Path=FailedFiles}" Grid.Row="4" Grid.Column="2" Margin="2"/>
-
-                        </Grid>
-                    </Grid>
-                </Grid>
-            </Grid>
+            <sharedui:JobSummaryControl/>
         </TabItem>
         <TabItem Header="Status">
-            <Grid>
-                <Grid Visibility="{Binding Path=Summary.JobItemFiles, Converter={StaticResource objIsNullToVisConv}}">
-                    <ContentPresenter ContentTemplate="{StaticResource LoadingItemsWatermarkTemplate}"/>
-                </Grid>
-                <Grid Visibility="{Binding Path=Summary.JobItemFiles, Converter={StaticResource objIsNotNullToVisConv}}">
-                    <Grid DataContext="{Binding Path=Summary}">
-                        <local:JobItemsDataGrid DataGridStyle="{Binding Path=JobItemsDataGridStyle, RelativeSource={RelativeSource AncestorType={x:Type local:ResultsControl}}}"
-                                            ItemsSource="{Binding Path=JobItemFiles}"
-                                            CadDescriptor="{Binding Path=DataContext.CadDescriptor, RelativeSource={RelativeSource AncestorType={x:Type local:ResultsControl}}}"
-                                            Grid.Row="1" Margin="5"/>
-                    </Grid>
-                </Grid>
-            </Grid>
+            <sharedui:JobReportControl DataGridStyle="{Binding Path=JobItemsDataGridStyle, RelativeSource={RelativeSource AncestorType={x:Type local:ResultsControl}}}"/>
         </TabItem>
         <TabItem Header="Journal">
-            <Grid Visibility="{Binding Converter={StaticResource objIsNotNullToVisConv}}"
-                                  DataContext="{Binding Path=Journal}">
-                <ListBox VirtualizingStackPanel.IsVirtualizing="True"
-                                         Margin="2" Grid.ColumnSpan="2" ItemsSource="{Binding Path=Output}" />
-            </Grid>
+            <sharedui:JobJournalControl/>
         </TabItem>
     </TabControl>
 </UserControl>

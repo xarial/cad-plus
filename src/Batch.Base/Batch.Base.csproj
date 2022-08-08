@@ -6,6 +6,18 @@
   </PropertyGroup>
   <Import Project="$(SolutionDir)common\common.props" />
   <ItemGroup>
+    <Compile Remove="Converters\HasIssuesToVisibilityConverter.cs" />
+    <Compile Remove="Converters\IssuesToTextConverter.cs" />
+    <Compile Remove="Converters\JobItemStatusToImageConverter.cs" />
+    <Compile Remove="Exceptions\JobCancelledException.cs" />
+    <Compile Remove="ViewModels\JobItemDocumentVM.cs" />
+    <Compile Remove="ViewModels\JobItemMacroVM.cs" />
+    <Compile Remove="ViewModels\JobItemVM.cs" />
+    <Compile Remove="ViewModels\JobResultJournalVM.cs" />
+    <Compile Remove="ViewModels\JobResultSummaryVM.cs" />
+    <Compile Remove="ViewModels\JobResultVM.cs" />
+  </ItemGroup>
+  <ItemGroup>
     <Compile Update="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -16,6 +28,10 @@
     <ProjectReference Include="..\Common\Common.csproj" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Converters\HasIssuesToVisibilityConverter.cs" />
+    <None Include="Converters\IssuesToTextConverter.cs" />
+    <None Include="Converters\JobItemStatusToImageConverter.cs" />
+    <None Include="Exceptions\JobCancelledException.cs" />
     <None Include="Resources\status-awaiting.png" />
   </ItemGroup>
   <ItemGroup>
@@ -32,6 +48,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\status-warning.png" />
+    <None Include="ViewModels\JobItemDocumentVM.cs" />
+    <None Include="ViewModels\JobItemMacroVM.cs" />
+    <None Include="ViewModels\JobItemVM.cs" />
+    <None Include="ViewModels\JobResultJournalVM.cs" />
+    <None Include="ViewModels\JobResultSummaryVM.cs" />
+    <None Include="ViewModels\JobResultVM.cs" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\arguments-icon.png" />
@@ -52,6 +74,6 @@
     <Resource Include="Resources\info.png" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Xarial.CadPlusPlus.Shared" Version="0.4.0-preview.4269" />
+    <PackageReference Include="Xarial.CadPlusPlus.Shared" Version="0.4.0-preview.4280" />
   </ItemGroup>
 </Project>

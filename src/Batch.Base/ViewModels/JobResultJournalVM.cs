@@ -15,6 +15,7 @@ using System.Threading.Tasks;
 using System.Windows.Data;
 using Xarial.CadPlus.Batch.Base.Services;
 using Xarial.CadPlus.Common.Services;
+using Xarial.CadPlus.Plus.Services;
 using Xarial.XToolkit.Wpf.Extensions;
 
 namespace Xarial.CadPlus.Batch.Base.ViewModels
@@ -25,11 +26,11 @@ namespace Xarial.CadPlus.Batch.Base.ViewModels
 
         public ObservableCollection<string> Output { get; }
 
-        private readonly IBatchRunJobExecutor m_Executor;
+        private readonly IBatchRunJobExecutorBase m_Executor;
 
         private object m_Lock;
 
-        public JobResultJournalVM(IBatchRunJobExecutor executor) 
+        public JobResultJournalVM(IBatchRunJobExecutorBase executor) 
         {
             m_Lock = new object();
 
@@ -41,7 +42,7 @@ namespace Xarial.CadPlus.Batch.Base.ViewModels
             m_Executor.Log += OnLog;
         }
 
-        private void OnLog(string line)
+        private void OnLog(IBatchJobExecutorBase sender, string line)
         {
             Output.Add(line);
         }

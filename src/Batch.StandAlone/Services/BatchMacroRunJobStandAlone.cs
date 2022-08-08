@@ -31,6 +31,7 @@ using Xarial.XCad.Documents.Enums;
 using System.Linq;
 using Xarial.XCad.Exceptions;
 using Xarial.CadPlus.Batch.StandAlone.Exceptions;
+using Xarial.CadPlus.Plus.Shared.Exceptions;
 
 namespace Xarial.CadPlus.Batch.StandAlone.Services
 {
@@ -52,21 +53,22 @@ namespace Xarial.CadPlus.Batch.StandAlone.Services
         }
     }
 
-    public class BatchRunJobExecutor : IBatchRunJobExecutor
+    public interface IBatchMacroRunJobStandAlone : IAsyncBatchJob 
     {
-        //private const double POPUP_KILLER_PING_SECS = 2;
+    }
 
-        public event Action<IJobItem[], DateTime> JobSet;
-        public event Action<IJobItem, double, bool> ProgressChanged;
-        public event Action<string> StatusChanged;
-        public event Action<string> Log;
-        public event Action<TimeSpan> JobCompleted;
-        
+    public class BatchMacroRunJobStandAlone : IBatchMacroRunJobStandAlone
+    {
+        public event JobSetDelegate JobSet;
+        public event JobCompletedDelegate JobCompleted;
+        public event JobItemProcessedDelegate ItemProcessed;
+        public event JobLogDelegateDelegate Log;
+
         private bool m_IsExecuted;
         private bool m_IsDisposed;
 
         private readonly IBatchApplicationProxy m_BatchAppProxy;
-        private readonly IJobManager m_JobMgr;
+        private readonly IJobProcessManager m_JobMgr;
         private readonly IXLogger m_Logger;
         private readonly IResilientWorker<BatchJobContext> m_Worker;
         private readonly IMacroRunnerPopupHandler m_PopupHandler;
@@ -80,9 +82,11 @@ namespace Xarial.CadPlus.Batch.StandAlone.Services
 
         private readonly ITaskRunner m_TaskRunner;
 
-        public BatchRunJobExecutor(BatchJob job, ICadApplicationInstanceProvider appProvider,
+        public IJobItem[] JobItems => throw new NotImplementedException();
+
+        public BatchMacroRunJobStandAlone(BatchJob job, ICadApplicationInstanceProvider appProvider,
             IBatchApplicationProxy batchAppProxy,
-            IJobManager jobMgr, IXLogger logger,
+            IJobProcessManager jobMgr, IXLogger logger,
             IResilientWorker<BatchJobContext> worker, IMacroRunnerPopupHandler popupHandler, ITaskRunner taskRunner)
         {
             m_Job = job;
@@ -115,7 +119,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.Services
             m_IsExecuted = false;
         }
 
-        public bool Execute(CancellationToken cancellationToken) => ExecuteAsync(cancellationToken).Result;
+        //public bool Execute(CancellationToken cancellationToken) => ExecuteAsync(cancellationToken).Result;
 
         public async Task<bool> ExecuteAsync(CancellationToken cancellationToken)
         {
@@ -133,7 +137,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.Services
             }
             catch (Exception ex)
             {
-                Log?.Invoke(ex.ParseUserError());
+                Log?.Invoke(this, ex.ParseUserError());
                 throw;
             }
             finally
@@ -148,7 +152,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.Services
             {
                 m_IsExecuted = true;
 
-                Log?.Invoke($"Batch macro running started");
+                Log?.Invoke(this, $"Batch macro running started");
 
                 var batchStartTime = DateTime.Now;
 
@@ -165,15 +169,15 @@ namespace Xarial.CadPlus.Batch.StandAlone.Services
                 {
                     await m_TaskRunner.Run(() =>
                     {
-                        Log?.Invoke($"Collecting files for processing");
+                        Log?.Invoke(this, $"Collecting files for processing");
 
                         var app = EnsureApplication(m_CurrentContext, cancellationToken);
 
-                        var allFiles = PrepareJobScope(app, m_Job.Input, m_Job.Filters, m_Job.TopLevelFilesOnly, m_Job.Macros);
+                        var allFiles = PrepareJobScope(app, m_Job.Input, m_Job.Filters, m_Job.TopLevelFilesOnly, m_Job.Macros, out var macroDefs);
 
-                        Log?.Invoke($"Running batch processing for {allFiles.Length} file(s)");
+                        Log?.Invoke(this, $"Running batch processing for {allFiles.Length} file(s)");
 
-                        JobSet?.Invoke(allFiles, batchStartTime);
+                        JobSet?.Invoke(this, allFiles, macroDefs, batchStartTime);
 
                         if (!allFiles.Any())
                         {
@@ -184,8 +188,6 @@ namespace Xarial.CadPlus.Batch.StandAlone.Services
 
                         for (int i = 0; i < allFiles.Length; i++)
                         {
-                            StatusChanged?.Invoke($"Processing {allFiles[i].FilePath}");
-
                             var curAppPrc = m_CurrentContext.CurrentApplicationProcess?.Id;
 
                             m_CurrentContext.CurrentJobItem = allFiles[i];
@@ -195,7 +197,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.Services
 
                             m_CurrentContext.CurrentDocument = null;
 
-                            ProgressChanged?.Invoke(m_CurrentContext.CurrentJobItem, (double)(i + 1) / (double)allFiles.Length, res);
+                            ItemProcessed?.Invoke(this, m_CurrentContext.CurrentJobItem, (double)(i + 1) / (double)allFiles.Length, res);
 
                             if (!res && !m_Job.ContinueOnError)
                             {
@@ -213,7 +215,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.Services
 
                             if (m_Job.BatchSize > 0 && curBatchSize >= m_Job.BatchSize)
                             {
-                                Log?.Invoke("Closing application as batch size reached the limit");
+                                Log?.Invoke(this, "Closing application as batch size reached the limit");
                                 TryShutDownApplication(m_CurrentContext);
                                 curBatchSize = 0;
                             }
@@ -232,9 +234,9 @@ namespace Xarial.CadPlus.Batch.StandAlone.Services
 
                 var duration = DateTime.Now.Subtract(batchStartTime);
 
-                JobCompleted?.Invoke(duration);
+                JobCompleted?.Invoke(this, duration);
 
-                Log?.Invoke($"Batch running completed in {duration.ToString(@"hh\:mm\:ss")}");
+                Log?.Invoke(this, $"Batch running completed in {duration.ToString(@"hh\:mm\:ss")}");
 
                 return jobResult;
             }
@@ -256,7 +258,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.Services
 
         private void OnRetry(Exception err, int retry, BatchJobContext context)
         {
-            Log?.Invoke($"Failed to run macro: {err.ParseUserError()}. Retrying (retry #{retry})...");
+            Log?.Invoke(this, $"Failed to run macro: {err.ParseUserError()}. Retrying (retry #{retry})...");
 
             ProcessError(err, context);
 
@@ -265,13 +267,17 @@ namespace Xarial.CadPlus.Batch.StandAlone.Services
 
         private void OnTimeout(BatchJobContext context)
         {
-            Log?.Invoke("Operation timed out");
+            Log?.Invoke(this, "Operation timed out");
             TryShutDownApplication(context);
         }
 
         private JobItemDocument[] PrepareJobScope(IXApplication app,
-            IEnumerable<string> inputs, string[] filters, bool topLevelOnly, IEnumerable<MacroData> macros)
+            IEnumerable<string> inputs, string[] filters, bool topLevelOnly, IEnumerable<MacroData> macros, out JobItemOperationMacroDefinition[] macroDefs)
         {
+            macroDefs = macros.Select(m => new JobItemOperationMacroDefinition(m)).ToArray();
+
+            var macroDefsLocal = macroDefs;
+
             var inputFiles = new List<string>();
 
             foreach (var input in inputs)
@@ -293,7 +299,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.Services
                             }
                             else
                             {
-                                Log?.Invoke($"Skipping file '{file}'");
+                                Log?.Invoke(this, $"Skipping file '{file}'");
                             }
                         }
                     }
@@ -340,7 +346,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.Services
             m_BatchAppProxy.ProcessInput(app, m_AppProvider, inputDocs);
 
             return inputDocs
-                .Select(d => new JobItemDocument(d, macros.Select(m => new JobItemMacro(m)).ToArray()))
+                .Select(d => new JobItemDocument(d, macroDefsLocal.Select(m => new JobItemMacro(m)).ToArray(), m_AppProvider.Descriptor))
                 .ToArray();
         }
 
@@ -363,7 +369,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.Services
             {
                 try
                 {
-                    Log?.Invoke($"Closing '{doc.Path}'");
+                    Log?.Invoke(this, $"Closing '{doc.Path}'");
 
                     doc.Close();
                 }
@@ -390,7 +396,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.Services
                             {
                                 m_Logger.Log($"Trying to shut down IXApplication process", LoggerMessageSeverity_e.Debug);
 
-                                Log?.Invoke("Closing host application");
+                                Log?.Invoke(this, "Closing host application");
                                 appPrc.Kill();
                             }
                         }
@@ -447,10 +453,10 @@ namespace Xarial.CadPlus.Batch.StandAlone.Services
             CancellationToken cancellationToken)
         {
             var fileProcessStartTime = DateTime.Now;
-            Log?.Invoke($"Started processing file {context.CurrentJobItem.FilePath}");
+            Log?.Invoke(this, $"Started processing file {context.CurrentJobItem.Document.Path}");
 
             context.ForbidSaving = null;
-            context.CurrentJobItem.Status = JobItemStatus_e.InProgress;
+            context.CurrentJobItem.State = JobItemState_e.InProgress;
 
             foreach (var macro in context.CurrentJobItem.Macros)
             {
@@ -468,7 +474,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.Services
                 {
                     ProcessError(ex, context);
 
-                    if (context.CurrentDocument == null)
+                    if (context.CurrentDocument == null)//document was not opened thus reporting error on document item
                     {
                         context.CurrentJobItem.ReportError(ex);
                     }
@@ -477,7 +483,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.Services
                         context.CurrentMacro.ReportError(ex);
                     }
 
-                    Log?.Invoke(ex.ParseUserError(out _));
+                    Log?.Invoke(this, ex.ParseUserError(out _));
                     m_Logger.Log(ex);
                 }
             }
@@ -491,9 +497,9 @@ namespace Xarial.CadPlus.Batch.StandAlone.Services
                 context.CurrentJobItem.Status = context.CurrentJobItem.Macros.Any(m => m.Status == JobItemStatus_e.Succeeded) ? JobItemStatus_e.Warning : JobItemStatus_e.Failed;
             }
 
-            Log?.Invoke($"Processing file '{context.CurrentJobItem.FilePath}' completed. Execution time {DateTime.Now.Subtract(fileProcessStartTime).ToString(@"hh\:mm\:ss")}");
+            Log?.Invoke(this, $"Processing file '{context.CurrentJobItem.Document.Path}' completed. Execution time {DateTime.Now.Subtract(fileProcessStartTime).ToString(@"hh\:mm\:ss")}");
 
-            return context.CurrentJobItem.Status != JobItemStatus_e.Failed;
+            return context.CurrentJobItem.Status != JobItemState_e.Failed;
         }
 
         private void ProcessError(Exception err, BatchJobContext context)
@@ -529,7 +535,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.Services
 
             try
             {
-                context.CurrentMacro.Status = JobItemStatus_e.InProgress;
+                context.CurrentMacro.State = JobItemState_e.InProgress;
 
                 IXDocument macroDoc = null;
 
@@ -554,7 +560,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.Services
                 {
                     if (!context.ForbidSaving.Value)
                     {
-                        Log?.Invoke("Saving the document");
+                        Log?.Invoke(this, "Saving the document");
 
                         if (context.CurrentDocument.IsAlive)
                         {
@@ -571,11 +577,11 @@ namespace Xarial.CadPlus.Batch.StandAlone.Services
                     }
                 }
 
-                context.CurrentMacro.Status = JobItemStatus_e.Succeeded;
+                context.CurrentMacro.State = JobItemState_e.Succeeded;
             }
             catch (Exception ex)
             {
-                context.CurrentMacro.Status = JobItemStatus_e.Failed;
+                context.CurrentMacro.State = JobItemState_e.Failed;
 
                 if (ex is ICriticalException)
                 {
@@ -583,7 +589,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.Services
                 }
                 else if (ex is MacroRunFailedException)
                 {
-                    throw new UserException($"Failed to run macro '{context.CurrentMacro.DisplayName}': {ex.Message}", ex);
+                    throw new UserException($"Failed to run macro '{context.CurrentMacro.Definition.Name}': {ex.Message}", ex);
                 }
                 else if (ex is INoRetryMacroRunException)
                 {
@@ -616,7 +622,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.Services
         private IXApplication StartApplication(IXVersion versionInfo,
             StartupOptions_e opts, CancellationToken cancellationToken)
         {
-            Log?.Invoke($"Starting host application: {versionInfo.DisplayName}");
+            Log?.Invoke(this, $"Starting host application: {versionInfo.DisplayName}");
 
             IXApplication app;
 

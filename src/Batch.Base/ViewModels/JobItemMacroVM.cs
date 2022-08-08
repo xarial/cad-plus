@@ -11,6 +11,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Xarial.CadPlus.Batch.Base.Services;
 using Xarial.CadPlus.Batch.Base.ViewModels;
 using Xarial.CadPlus.Common.Services;
 using Xarial.XToolkit.Wpf.Extensions;
@@ -19,7 +20,7 @@ namespace Xarial.CadPlus.Batch.Base.ViewModels
 {
     public class JobItemMacroVM : JobItemVM
     {
-        public JobItemMacroVM(IJobItemOperation jobItemMacro) : base(jobItemMacro)
+        public JobItemMacroVM(IJobItemMacro jobItemMacro) : base(jobItemMacro)
         {
         }
     }

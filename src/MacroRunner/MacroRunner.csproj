@@ -13,7 +13,7 @@
     <Exec Command="%windir%\Microsoft.NET\Framework64\v4.0.30319\RegAsm.exe &quot;$(TargetPath)&quot; /codebase /tlb" Condition="Exists('$(TargetPath)')" />
   </Target>
   <ItemGroup>
-    <PackageReference Include="Xarial.XCad" Version="0.8.0-preview.4265" />
-    <PackageReference Include="Xarial.XCad.Toolkit" Version="0.8.0-preview.4265" />
+    <PackageReference Include="Xarial.XCad" Version="0.8.0-preview.4276" />
+    <PackageReference Include="Xarial.XCad.Toolkit" Version="0.8.0-preview.4276" />
   </ItemGroup>
 </Project>

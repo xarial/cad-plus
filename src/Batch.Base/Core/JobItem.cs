@@ -7,77 +7,41 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Xarial.CadPlus.Common.Services;
 using Xarial.CadPlus.Plus.Extensions;
+using Xarial.CadPlus.Plus.Services;
 
 namespace Xarial.CadPlus.Batch.Base.Core
 {
-    public class JobItem : IJobItem
+    public class JobItemIssue : IJobItemIssue, IEquatable<IJobItemIssue>
     {
-        public event Action<IJobItem, JobItemStatus_e> StatusChanged;
-        public event Action<IJobItem> IssuesChanged;
+        public IssueType_e Type { get; }
+        public string Content { get; }
 
-        public string DisplayName { get; protected set; }
-        
-        public string FilePath { get; }
-
-        public JobItemStatus_e Status 
+        public JobItemIssue(IssueType_e type, string content)
         {
-            get => m_Status;
-            set 
-            {
-                m_Status = value;
-                StatusChanged?.Invoke(this, value);
-            }
+            Type = type;
+            Content = content;
         }
 
-        private List<string> m_Issues;
-
-        public IReadOnlyList<string> Issues => m_Issues;
-
-        private JobItemStatus_e m_Status;
-
-        internal JobItem(string filePath) 
+        public bool Equals(IJobItemIssue other)
         {
-            FilePath = filePath;
-            DisplayName = filePath;
-            m_Status = JobItemStatus_e.AwaitingProcessing;
-            m_Issues = new List<string>();
-        }
-
-        public void ReportError(Exception ex, string genericError = "Unknown error") 
-        {
-            var err = "";
-
-            if (ex is OperationCanceledException)
+            if (other == null) 
             {
-                err = "Operation cancelled";
-            }
-            else if (ex is TimeoutException)
-            {
-                err = "Timeout";
-            }
-            else if (ex != null)
-            {
-                err = ex.ParseUserError(genericError);
+                throw new ArgumentNullException(nameof(other));
             }
 
-            ReportIssue(err);
-        }
-
-        public void ReportIssue(string issue)
-        {
-            if (!m_Issues.Contains(issue))
+            if (this.GetType() == other.GetType()) 
             {
-                m_Issues.Add(issue);
-                IssuesChanged?.Invoke(this);
+                if (Type == other.Type 
+                    && string.Equals(Content, other.Content, StringComparison.CurrentCultureIgnoreCase)) 
+                {
+                    return true;
+                }
             }
-        }
 
-        public void ClearIssues()
-        {
-            m_Issues.Clear();
-            IssuesChanged?.Invoke(this);
+            return false;
         }
     }
 }

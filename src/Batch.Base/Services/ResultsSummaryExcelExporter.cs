@@ -16,6 +16,7 @@ using Xarial.CadPlus.Batch.Base.ViewModels;
 using Xarial.CadPlus.Plus.Data;
 using Xarial.CadPlus.Plus.Exceptions;
 using Xarial.CadPlus.Plus.Services;
+using Xarial.CadPlus.Plus.Shared.ViewModels;
 using Xarial.XToolkit.Reporting;
 using Xarial.XToolkit.Wpf.Utils;
 
@@ -24,7 +25,7 @@ namespace Xarial.CadPlus.Batch.Base.Services
     public interface IResultsSummaryExcelExporter 
     {
         FileFilter Filter { get; }
-        void Export(string name, JobResultSummaryVM summary, string filePath);
+        void Export(string name, JobResultBaseVM jobResult, string filePath);
     }
 
     public class ResultsSummaryExcelExporter : IResultsSummaryExcelExporter
@@ -39,17 +40,17 @@ namespace Xarial.CadPlus.Batch.Base.Services
             Filter = new FileFilter("Excel file", "*.xlsx");
         }
 
-        public void Export(string name, JobResultSummaryVM summary, string filePath)
+        public void Export(string name, JobResultBaseVM jobResult, string filePath)
         {
-            if (summary.JobItemFiles.Any())
+            if (jobResult.JobItems.Any())
             {
                 var rows = new List<ExcelRow>();
 
-                rows.Add(CreateHeader(summary.JobItemFiles.FirstOrDefault()));
+                rows.Add(CreateHeader(jobResult.OperationDefinitions));
 
-                foreach (var item in summary.JobItemFiles)
+                foreach (var item in jobResult.JobItems)
                 {
-                    rows.Add(CreateRowForItem(item));
+                    rows.Add(CreateRowForItem(item, jobResult.OperationDefinitions));
                 }
 
                 m_ExcelWriter.CreateWorkbook(filePath, rows.ToArray(), new ExcelWriterOptions()
@@ -65,16 +66,16 @@ namespace Xarial.CadPlus.Batch.Base.Services
             }
         }
 
-        private ExcelRow CreateHeader(JobItemDocumentVM template)
+        private ExcelRow CreateHeader(JobItemOperationDefinitionVM[] definition)
         {
-            var cells = new ExcelCell[template.Macros.Length + 3];
+            var cells = new ExcelCell[definition.Length + 3];
 
             cells[0] = new ExcelCell("Status");
             cells[1] = new ExcelCell("File");
 
-            for (int i = 0; i < template.Macros.Length; i++)
+            for (int i = 0; i < definition.Length; i++)
             {
-                cells[i + 2] = new ExcelCell(template.Macros[i].Name);
+                cells[i + 2] = new ExcelCell(definition[i].Name);
             }
 
             cells[cells.Length - 1] = new ExcelCell("Error");
@@ -82,55 +83,50 @@ namespace Xarial.CadPlus.Batch.Base.Services
             return new ExcelRow(cells);
         }
 
-        private ExcelRow CreateRowForItem(JobItemDocumentVM item)
+        private ExcelRow CreateRowForItem(JobItemVM item, JobItemOperationDefinitionVM[] definition)
         {
-            var cells = new ExcelCell[item.Macros.Length + 3];
+            var cells = new ExcelCell[definition.Length + 3];
 
             var errors = new List<string>();
 
-            if (item.Issues.Any())
-            {
-                errors.Add($"[File] - {string.Join(", ", item.Issues)}");
-            }
-
             var cellColor = default(KnownColor?);
 
-            switch (item.Status)
+            switch (item.State)
             {
-                case Common.Services.JobItemStatus_e.Failed:
+                case JobItemState_e.Failed:
                     cellColor = KnownColor.Red;
                     break;
 
-                case Common.Services.JobItemStatus_e.InProgress:
+                case JobItemState_e.InProgress:
                     cellColor = KnownColor.LightBlue;
                     break;
 
-                case Common.Services.JobItemStatus_e.Succeeded:
+                case JobItemState_e.Succeeded:
                     cellColor = KnownColor.LightGreen;
                     break;
 
-                case Common.Services.JobItemStatus_e.Warning:
+                case JobItemState_e.Warning:
                     cellColor = KnownColor.LightYellow;
                     break;
 
-                case Common.Services.JobItemStatus_e.AwaitingProcessing:
+                case JobItemState_e.Initializing:
                     cellColor = KnownColor.LightGray;
                     break;
             }
 
-            cells[0] = new ExcelCell(item.Status, null, cellColor);
-            cells[1] = new ExcelCell(item.DisplayObject.Path, null, cellColor);
+            cells[0] = new ExcelCell(item.State, null, cellColor);
+            cells[1] = new ExcelCell(item.Title, null, cellColor);
 
-            for (int i = 0; i < item.Macros.Length; i++)
+            for (int i = 0; i < item.Operations.Length; i++)
             {
-                var macro = item.Macros[i];
+                var macro = item.Operations[i];
                 
                 if (macro.Issues.Any())
                 {
-                    errors.Add($"[{macro.Name}] - {string.Join("; ", macro.Issues)}");
+                    errors.Add($"[{macro.JobItemOperation.Definition.Name}] - {string.Join("; ", macro.Issues)}");
                 }
 
-                cells[i + 2] = new ExcelCell(macro.Status, null, cellColor);
+                cells[i + 2] = new ExcelCell(macro.State, null, cellColor);
             }
 
             cells[cells.Length - 1] = new ExcelCell(string.Join(Environment.NewLine, errors), null, cellColor);

@@ -18,6 +18,7 @@ using Xarial.CadPlus.Batch.StandAlone.Properties;
 using Xarial.CadPlus.Batch.StandAlone.ViewModels;
 using Xarial.XToolkit.Wpf.Extensions;
 using Xarial.CadPlus.Batch.Base.ViewModels;
+using Xarial.CadPlus.Plus.Services;
 
 namespace Xarial.CadPlus.Batch.StandAlone.Converters
 {

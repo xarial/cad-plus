@@ -151,7 +151,7 @@ namespace Xarial.CadPlus.Batch.Base.ViewModels
         public JobItemDocumentVM(JobItemDocument jobItemFile, ICadDescriptor cadDesc) : base(jobItemFile)
         {
             m_JobItemFile = jobItemFile;
-            Macros = m_JobItemFile.Operations.Select(o => new JobItemMacroVM(o)).ToArray();
+            Macros = m_JobItemFile.Macros.Select(o => new JobItemMacroVM(o)).ToArray();
             DisplayObject = new JobItemCadObject(jobItemFile.Document, jobItemFile.FilePath, cadDesc);
         }
     }

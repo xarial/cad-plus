@@ -12,6 +12,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Xarial.CadPlus.Common.Services;
+using Xarial.CadPlus.Plus.Services;
 using Xarial.XToolkit.Wpf.Extensions;
 
 namespace Xarial.CadPlus.Batch.Base.ViewModels
@@ -22,7 +23,7 @@ namespace Xarial.CadPlus.Batch.Base.ViewModels
         
         public string Name => m_JobItem.DisplayName;
         public JobItemStatus_e Status => m_JobItem.Status;
-        public IReadOnlyList<string> Issues => m_JobItem.Issues;
+        public IReadOnlyList<string> Issues => m_JobItem.Issues?.Select(i => i.Content).ToList();
 
         private readonly IJobItem m_JobItem;
 
@@ -33,10 +34,10 @@ namespace Xarial.CadPlus.Batch.Base.ViewModels
             m_JobItem.IssuesChanged += OnIssuesChanged;
         }
 
-        private void OnIssuesChanged(IJobItem item)
+        private void OnIssuesChanged(IJobItem sender, IReadOnlyList<IJobItemIssue> issues)
             => this.NotifyChanged(nameof(Issues));
 
-        private void OnJobItemFileStatusChanged(IJobItem item, JobItemStatus_e newStatus)
+        private void OnJobItemFileStatusChanged(IJobItem sender, JobItemStatus_e newStatus)
             => this.NotifyChanged(nameof(Status));
     }
 }

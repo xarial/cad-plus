@@ -70,12 +70,12 @@ namespace Xarial.CadPlus.Batch.StandAlone
         {
             try
             {
-                var batchRunFact = m_AppLauncher.Container.GetService<IBatchRunJobExecutorFactory>();
+                var batchRunFact = m_AppLauncher.Container.GetService<IBatchMacroRunJobStandAloneFactory>();
 
                 using (var batchRunner = batchRunFact.Create(args.Job))
                 {
                     batchRunner.Log += OnLog;
-                    batchRunner.ProgressChanged += OnProgressChanged;
+                    batchRunner.ItemProcessed += OnProgressChanged;
                     batchRunner.JobSet += OnJobSet;
                     batchRunner.JobCompleted += OnJobCompleted;
 
@@ -91,16 +91,16 @@ namespace Xarial.CadPlus.Batch.StandAlone
             }
         }
 
-        private static void OnJobCompleted(TimeSpan duration) => m_ProgressWriter.ReportCompleted(duration);
-        private static void OnJobSet(IJobItem[] scope, DateTime startTime) => m_ProgressWriter.SetJobScope(scope, startTime);
-        private static void OnProgressChanged(IJobItem file, double progress, bool result) => m_ProgressWriter.ReportProgress(file, progress, result);
-        private static void OnLog(string msg) => m_ProgressWriter.Log(msg);
+        private static void OnJobCompleted(IBatchJobBase sender, TimeSpan duration) => m_ProgressWriter.ReportCompleted(duration);
+        private static void OnJobSet(IBatchJobBase sender, IReadOnlyList<IJobItem> jobItems, IReadOnlyList<IJobItemOperationDefinition> operations, DateTime startTime) => m_ProgressWriter.SetJobScope(jobItems, startTime);
+        private static void OnProgressChanged(IBatchJobBase sender, IJobItem file, double progress, bool result) => m_ProgressWriter.ReportProgress(file, progress, result);
+        private static void OnLog(IBatchJobBase sender, string msg) => m_ProgressWriter.Log(msg);
 
         private static void OnConfigureServices(IContainerBuilder builder, BatchArguments args)
         {
             builder.RegisterSingleton<IRecentFilesManager, RecentFilesManager>();
             builder.RegisterSingleton<IBatchRunnerModel, BatchRunnerModel>();
-            builder.RegisterSingleton<IBatchRunJobExecutorFactory, BatchRunJobExecutorFactory>();
+            builder.RegisterSingleton<IBatchMacroRunJobStandAloneFactory, BatchMacroRunJobStandAloneFactory>();
             builder.RegisterSelfSingleton<BatchManagerVM>();
             builder.RegisterSingleton<IJobContectResilientWorkerFactory, PollyJobContectResilientWorkerFactory>().UsingParameters(Parameter<int>.Any(MAX_RETRIES));
 
