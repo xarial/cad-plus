@@ -53,7 +53,7 @@ namespace Xarial.CadPlus.Batch.InApp
 
         private readonly IMacroRunnerPopupHandler m_PopupHandler;
 
-        public IJobItem[] JobItems => throw new NotImplementedException();
+        public IJobItem[] JobItems { get; private set; }
 
         private readonly ICadDescriptor m_CadDesc;
 
@@ -101,6 +101,8 @@ namespace Xarial.CadPlus.Batch.InApp
                     m_PopupHandler.Start(m_App);
 
                     var jobItems = PrepareJob(out var macroDefs);
+
+                    JobItems = jobItems;
 
                     JobSet?.Invoke(this, jobItems, macroDefs, startTime);
 

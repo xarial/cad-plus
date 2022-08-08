@@ -111,7 +111,7 @@ namespace Xarial.CadPlus.Xport.Core
 
         private readonly ExportOptions m_Opts;
 
-        public IJobItem[] JobItems => throw new NotImplementedException();
+        public IJobItem[] JobItems { get; private set; }
 
         public Exporter(IJobProcessManager jobMgr, ExportOptions opts)
         {
@@ -174,6 +174,8 @@ namespace Xarial.CadPlus.Xport.Core
             var startTime = DateTime.Now;
 
             var jobFiles = ParseOptions(m_Opts, out var formats);
+
+            JobItems = jobFiles;
 
             JobSet?.Invoke(this, jobFiles, formats, startTime);
 

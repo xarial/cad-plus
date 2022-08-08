@@ -33,12 +33,12 @@ namespace Xarial.CadPlus.Batch.StandAlone.Services
 
         private readonly IBatchApplicationProxy m_BatchAppProxy;
 
-        private readonly ITaskRunner m_TaskRunner;
+        private readonly ITaskRunnerFactory m_TaskRunnerFact;
 
         public BatchMacroRunJobStandAloneFactory(IJobApplicationProvider jobAppProvider,
             IBatchApplicationProxy batchAppProxy,
             IJobProcessManager jobPrcMgr, IXLogger logger,
-            IJobContectResilientWorkerFactory workerFact, IMacroRunnerPopupHandlerFactory popupHandlerFact, ITaskRunner taskRunner)
+            IJobContectResilientWorkerFactory workerFact, IMacroRunnerPopupHandlerFactory popupHandlerFact, ITaskRunnerFactory taskRunnerFact)
         {
             m_JobAppProvider = jobAppProvider;
 
@@ -51,14 +51,14 @@ namespace Xarial.CadPlus.Batch.StandAlone.Services
 
             m_JobPrcMgr = jobPrcMgr;
 
-            m_TaskRunner = taskRunner;
+            m_TaskRunnerFact = taskRunnerFact;
         }
 
         public IBatchMacroRunJobStandAlone Create(BatchJob job)
         {
-            return new BatchMacroRunJobStandAlone(job, m_JobAppProvider.GetApplicationProvider(job), (IBatchApplicationProxy)this.m_BatchAppProxy, m_JobPrcMgr, (IXLogger)this.m_Logger,
+            return new BatchMacroRunJobStandAlone(job, m_JobAppProvider.GetApplicationProvider(job), this.m_BatchAppProxy, m_JobPrcMgr, this.m_Logger,
                 m_WorkerFact.Create(job.Timeout > 0 ? TimeSpan.FromSeconds(job.Timeout) : default),
-                m_PopupHandlerFact.Create(job.StartupOptions.HasFlag(StartupOptions_e.Silent)), (ITaskRunner)this.m_TaskRunner);
+                m_PopupHandlerFact.Create(job.StartupOptions.HasFlag(StartupOptions_e.Silent)), m_TaskRunnerFact.Create());
         }
     }
 }

@@ -35,6 +35,7 @@ namespace Xarial.CadPlus.Batch.Base.Core
 
         public JobItemOperationMacroDefinition(MacroData macroData)
         {
+            MacroData = macroData;
             Name = Path.GetFileNameWithoutExtension(macroData.FilePath);
         }
     }

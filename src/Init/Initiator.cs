@@ -98,6 +98,18 @@ namespace Xarial.CadPlus.Init
         public ITaskRunner Create() => new TaskRunner();
     }
 
+    internal class ExcelWriter : IExcelWriter
+    {
+        public void CreateWorkbook(string filePath, ExcelRow[] rows, ExcelWriterOptions options)
+            => throw new NotSupportedException();
+    }
+
+    internal class ExcelReader : IExcelReader
+    {
+        public ExcelRow[] ReadWorkbook(string filePath, ExcelReaderOptions options, out ExcelCustomProperty[] customProperties)
+            => throw new NotSupportedException();
+    }
+
     public class AboutService : IAboutService
     {
         public void ShowAbout(Assembly assm, Image icon)
@@ -136,6 +148,8 @@ namespace Xarial.CadPlus.Init
             builder.RegisterSingleton<ICadSpecificServiceFactory<ICadDescriptor>, CadSpecificServiceFactory<ICadDescriptor>>();
             builder.RegisterSingleton<IJobProcessManager, JobProcessManager>();
             builder.RegisterSingleton<IPopupKillerFactory, PopupKillerFactory>();
+            builder.RegisterSingleton<IExcelReader, ExcelReader>();
+            builder.RegisterSingleton<IExcelWriter, ExcelWriter>();
         }
 
         public void Dispose()
