@@ -51,15 +51,14 @@
     </UserControl.Resources>
     <xctrls:ProgressPanel Progress="{x:Null}" Message="Loading Job..." IsWorkInProgress="{Binding Path=IsInitializing}">
         <Grid>
-            <xctrls:XDataGrid IsReadOnly="True"
+            <xctrls:XDataGrid x:Name="grdResults" IsReadOnly="True"
                       AutoGenerateColumns="False"
                       ItemsSource="{Binding Path=JobItems}"
                       ColumnsSource="{Binding Path=OperationDefinitions}"
                       EnableColumnVirtualization="True" EnableRowVirtualization="True"
                       VirtualizingPanel.VirtualizationMode="Standard"
                       VirtualizingPanel.IsVirtualizing="True"
-                      ScrollViewer.CanContentScroll="True" ColumnsPreCreated="OnColumnsPreCreated"
-                      Style="{Binding Path=DataGridStyle, RelativeSource={RelativeSource AncestorType={x:Type local:JobReportControl}}}">
+                      ScrollViewer.CanContentScroll="True" ColumnsPreCreated="OnColumnsPreCreated">
                 <xctrls:XDataGrid.CellContentSelector>
                     <local:OperationCellContentSelector/>
                 </xctrls:XDataGrid.CellContentSelector>

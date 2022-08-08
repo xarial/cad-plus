@@ -38,7 +38,17 @@ namespace Xarial.CadPlus.Plus.Shared.UI
         public static readonly DependencyProperty DataGridStyleProperty =
             DependencyProperty.Register(
                 nameof(DataGridStyle), typeof(Style),
-                typeof(JobReportControl));
+                typeof(JobReportControl), new PropertyMetadata(OnStyleChanged));
+
+        private static void OnStyleChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            ((JobReportControl)d).SetStyle((Style)e.NewValue);
+        }
+
+        private void SetStyle(Style style) 
+        {
+            grdResults.Style = style;
+        }
 
         public Style DataGridStyle
         {
