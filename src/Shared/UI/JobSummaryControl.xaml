@@ -35,7 +35,7 @@
                 <TextBlock Text="{Binding Path=Duration, StringFormat=hh\\:mm\\:ss}" Grid.Row="1" Grid.Column="2" Margin="2"/>
 
                 <TextBlock Text="Total:" Grid.Row="2" Grid.Column="0" Margin="2"/>
-                <TextBlock Text="{Binding Path=JobItems.Length}" Grid.Row="2" Grid.Column="2" Margin="2"/>
+                <TextBlock Text="{Binding Path=JobItems.Count}" Grid.Row="2" Grid.Column="2" Margin="2"/>
 
                 <TextBlock Text="Processed:" Grid.Row="3" Grid.Column="0" Margin="2"/>
                 <TextBlock Text="{Binding Path=ProcessedItemsCount}" Grid.Row="3" Grid.Column="2" Margin="2"/>

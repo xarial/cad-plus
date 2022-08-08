@@ -27,13 +27,13 @@ namespace Xarial.CadPlus.Plus.Shared.ViewModels
 
         private JobStatus_e m_Status;
 
-        private JobItemVM[] m_JobItems;
         private int m_ProcessedItemsCount;
         private int m_FailedItemsCount;
         private DateTime? m_StartTime;
         private TimeSpan? m_Duration;
 
-        private JobItemOperationDefinitionVM[] m_OperationDefinitions;
+        private readonly List<JobItemVM> m_JobItems;
+        private readonly List<JobItemOperationDefinitionVM> m_OperationDefinitions;
 
         private readonly IXLogger m_Logger;
 
@@ -49,7 +49,7 @@ namespace Xarial.CadPlus.Plus.Shared.ViewModels
         public bool IsBatchJobInProgress
         {
             get => m_IsBatchJobInProgress;
-            set
+            private set
             {
                 m_IsBatchJobInProgress = value;
                 this.NotifyChanged();
@@ -61,7 +61,7 @@ namespace Xarial.CadPlus.Plus.Shared.ViewModels
         public JobStatus_e Status
         {
             get => m_Status;
-            set
+            private set
             {
                 m_Status = value;
                 this.NotifyChanged();
@@ -71,7 +71,7 @@ namespace Xarial.CadPlus.Plus.Shared.ViewModels
         public double Progress
         {
             get => m_Progress;
-            set
+            private set
             {
                 m_Progress = value;
                 this.NotifyChanged();
@@ -81,7 +81,7 @@ namespace Xarial.CadPlus.Plus.Shared.ViewModels
         public bool IsInitializing
         {
             get => m_IsInitializing;
-            set
+            private set
             {
                 if (value != m_IsInitializing)
                 {
@@ -91,30 +91,13 @@ namespace Xarial.CadPlus.Plus.Shared.ViewModels
             }
         }
 
-        public JobItemVM[] JobItems
-        {
-            get => m_JobItems;
-            set
-            {
-                m_JobItems = value;
-                this.NotifyChanged();
-            }
-        }
-
-        public JobItemOperationDefinitionVM[] OperationDefinitions
-        {
-            get => m_OperationDefinitions;
-            set
-            {
-                m_OperationDefinitions = value;
-                this.NotifyChanged();
-            }
-        }
+        public IReadOnlyList<JobItemVM> JobItems => IsInitializing ? null : m_JobItems;
+        public IReadOnlyList<JobItemOperationDefinitionVM> OperationDefinitions => IsInitializing ? null : m_OperationDefinitions;
 
         public int ProcessedItemsCount
         {
             get => m_ProcessedItemsCount;
-            set
+            private set
             {
                 m_ProcessedItemsCount = value;
                 this.NotifyChanged();
@@ -124,7 +107,7 @@ namespace Xarial.CadPlus.Plus.Shared.ViewModels
         public int FailedItemsCount
         {
             get => m_FailedItemsCount;
-            set
+            private set
             {
                 m_FailedItemsCount = value;
                 this.NotifyChanged();
@@ -134,7 +117,7 @@ namespace Xarial.CadPlus.Plus.Shared.ViewModels
         public DateTime? StartTime
         {
             get => m_StartTime;
-            set
+            private set
             {
                 m_StartTime = value;
                 this.NotifyChanged();
@@ -144,7 +127,7 @@ namespace Xarial.CadPlus.Plus.Shared.ViewModels
         public TimeSpan? Duration
         {
             get => m_Duration;
-            set
+            private set
             {
                 m_Duration = value;
                 this.NotifyChanged();
@@ -176,6 +159,12 @@ namespace Xarial.CadPlus.Plus.Shared.ViewModels
             Output = new ObservableCollection<string>();
             BindingOperations.EnableCollectionSynchronization(Output, m_Lock);
 
+            m_JobItems = new List<JobItemVM>();
+            BindingOperations.EnableCollectionSynchronization(m_JobItems, m_Lock);
+
+            m_OperationDefinitions = new List<JobItemOperationDefinitionVM>();
+            BindingOperations.EnableCollectionSynchronization(m_OperationDefinitions, m_Lock);
+
             CancelJobCommand = new RelayCommand(CancelJob, () => IsBatchJobInProgress);
 
             m_BatchJob = batchJob;
@@ -200,10 +189,13 @@ namespace Xarial.CadPlus.Plus.Shared.ViewModels
 
         private void OnJobSet(IBatchJobBase sender, IReadOnlyList<IJobItem> items, IReadOnlyList<IJobItemOperationDefinition> operations, DateTime startTime)
         {
-            JobItems = items.Select(f => new JobItemVM(f)).ToArray();
-            OperationDefinitions = operations.Select(o => new JobItemOperationDefinitionVM(o)).ToArray();
+            m_JobItems.AddRange(items.Select(f => new JobItemVM(f)));
+            m_OperationDefinitions.AddRange(operations.Select(o => new JobItemOperationDefinitionVM(o)));
             StartTime = startTime;
             IsInitializing = false;
+
+            this.NotifyChanged(nameof(JobItems));
+            this.NotifyChanged(nameof(OperationDefinitions));
         }
 
         private void OnJobCompleted(IBatchJobBase sender, TimeSpan duration)
