@@ -40,6 +40,7 @@ using Xarial.CadPlus.Plus.Shared.Services;
 using System.Threading;
 using Xarial.CadPlus.Plus.DI;
 using Xarial.CadPlus.Batch.Base.Services;
+using Xarial.CadPlus.Plus.Shared.ViewModels;
 
 namespace Xarial.CadPlus.Batch.InApp
 {
@@ -234,25 +235,20 @@ namespace Xarial.CadPlus.Batch.InApp
                     var input = docs.ToList();
                     ProcessInput?.Invoke(m_Host.Extension.Application, input);
 
-                    using (var exec = new AssemblyBatchRunJobExecutor(m_Host.Extension.Application, m_MacroRunnerSvc,
+                    using (var exec = new AssemblyBatchRunJobExecutor(m_Host.Extension.Application, m_MacroRunnerSvc, m_CadDesc,
                         input.ToArray(), m_Logger, m_Data.Macros.Macros.Macros.Select(x => x.Data).ToArray(),
                         m_Data.Options.ActivateDocuments, m_Data.Options.AllowReadOnly,
                         m_Data.Options.AllowRapid, m_Data.Options.AutoSave, m_PopupHandlerFact.Create(m_Data.Options.Silent)))
                     {
                         var cancellationTokenSource = new CancellationTokenSource();
 
-                        var vm = new JobResultVM(rootDoc.Title, exec, m_CadDesc, m_Logger, cancellationTokenSource);
+                        var vm = new JobResultVM(exec, m_Logger, cancellationTokenSource);
 
                         using (var prg = m_PrgHandlerFactSvc.Create(cancellationTokenSource))
                         {
-                            exec.ProgressChanged += (i, p, r) =>
+                            exec.ItemProcessed += (s, i, p, r) =>
                             {
                                 prg.ReportProgress(p);
-                            };
-
-                            exec.StatusChanged += s =>
-                            {
-                                prg.SetStatus(s);
                             };
 
                             vm.TryRunBatch();
