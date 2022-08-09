@@ -26,7 +26,20 @@ namespace TestApp
         public event JobItemProcessedDelegate ItemProcessed;
         public event JobLogDelegateDelegate Log;
 
-        public IJobItem[] JobItems { get; private set; }
+        public IReadOnlyList<IJobItem> JobItems => m_JobItems;
+        public IReadOnlyList<string> LogEntries => m_LogEntries;
+        public IReadOnlyList<IJobItemOperationDefinition> OperationDefinitions => m_OperationDefinitions;
+
+        private List<IJobItem> m_JobItems;
+        private List<string> m_LogEntries;
+        private List<IJobItemOperationDefinition> m_OperationDefinitions;
+
+        public MyAsyncBatchJob() 
+        {
+            m_JobItems = new List<IJobItem>();
+            m_LogEntries = new List<string>();
+            m_OperationDefinitions = new List<IJobItemOperationDefinition>();
+        }
 
         public async Task<bool> ExecuteAsync(CancellationToken cancellationToken)
         {
@@ -63,7 +76,11 @@ namespace TestApp
             //Initializing
             await Task.Delay(TimeSpan.FromSeconds(2));
 
-            JobSet?.Invoke(this, new IJobItem[] { item1, item2, item3 }, new IJobItemOperationDefinition[] { oper1, oper2 }, startTime);
+            m_JobItems.AddRange(new IJobItem[] { item1, item2, item3 });
+
+            m_OperationDefinitions.AddRange(new IJobItemOperationDefinition[] { oper1, oper2 });
+
+            JobSet?.Invoke(this, m_JobItems, m_OperationDefinitions, startTime);
 
             try
             {

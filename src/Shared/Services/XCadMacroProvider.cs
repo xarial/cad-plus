@@ -7,13 +7,14 @@ using System.Threading.Tasks;
 using Xarial.CadPlus.Plus.Exceptions;
 using Xarial.CadPlus.Plus.Services;
 using Xarial.CadPlus.Plus.Shared.Exceptions;
+using Xarial.XToolkit;
 using Xarial.XToolkit.Wpf.Utils;
 
 namespace Xarial.CadPlus.Plus.Shared.Services
 {
     public class XCadMacroProvider : IXCadMacroProvider
     {
-        public static FileFilter Filter => new FileFilter("xCAD Macro File", "*.dll");
+        public static FileFilter Filter => FileFilter.Create("xCAD Macro File", "*.dll");
 
         public IXCadMacro GetMacro(string path)
         {

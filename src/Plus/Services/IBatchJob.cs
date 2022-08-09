@@ -124,7 +124,9 @@ namespace Xarial.CadPlus.Plus.Services
         event JobItemProcessedDelegate ItemProcessed;
         event JobLogDelegateDelegate Log;
 
-        IJobItem[] JobItems { get; }
+        IReadOnlyList<IJobItemOperationDefinition> OperationDefinitions { get; }
+        IReadOnlyList<string> LogEntries { get; }
+        IReadOnlyList<IJobItem> JobItems { get; }
     }
 
     public interface IBatchJob : IBatchJobBase
