@@ -17,6 +17,7 @@ namespace Xarial.CadPlus.Plus.Data
         public KnownColor? TextColor { get; }
         public KnownColor? BackgroundColor { get; }
         public FontStyle? FontStyle { get; }
+        public string Comment { get; }
 
         public ExcelCell(object value) 
         {
@@ -33,6 +34,12 @@ namespace Xarial.CadPlus.Plus.Data
             : this(value, textColor, backgroundColor)
         {
             FontStyle = fontStyle;
+        }
+
+        public ExcelCell(object value, KnownColor? textColor, KnownColor? backgroundColor, FontStyle? fontStyle, string comment)
+            : this(value, textColor, backgroundColor, fontStyle)
+        {
+            Comment = comment;
         }
     }
 }
