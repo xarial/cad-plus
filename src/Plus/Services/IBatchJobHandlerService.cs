@@ -5,7 +5,7 @@ namespace Xarial.CadPlus.Plus.Services
 {
     public interface IBatchJobHandlerServiceFactory
     {
-        IBatchJobHandlerService Create(IBatchJob job, CancellationTokenSource cancellationTokenSource);
+        IBatchJobHandlerService Create(IBatchJob job, string title, CancellationTokenSource cancellationTokenSource);
     }
 
     public interface IBatchJobHandlerService : IDisposable
