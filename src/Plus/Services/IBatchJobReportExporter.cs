@@ -7,9 +7,9 @@ using Xarial.XToolkit;
 
 namespace Xarial.CadPlus.Plus.Services
 {
-    internal interface IBatchJobReportWriter
+    public interface IBatchJobReportExporter
     {
         FileFilter Filter { get; }
-        void Write(IBatchJobBase job, string filePath, string title);
+        void Export(IBatchJobBase job, string filePath);
     }
 }

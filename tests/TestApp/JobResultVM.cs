@@ -14,6 +14,7 @@ using TestApp.Properties;
 using Xarial.CadPlus.Plus.Services;
 using Xarial.CadPlus.Plus.Shared.ViewModels;
 using Xarial.XCad.Base;
+using Xarial.XToolkit.Services;
 using Xarial.XToolkit.Wpf;
 using Xarial.XToolkit.Wpf.Extensions;
 
@@ -275,7 +276,7 @@ namespace TestApp
         {
             m_CancellationTokenSource = new CancellationTokenSource();
 
-            var res = new AsyncJobResultVM(new MyAsyncBatchJob(), Mock.Of<IXLogger>(), m_CancellationTokenSource);
+            var res = new AsyncJobResultVM(new MyAsyncBatchJob(), Mock.Of<IMessageService>(), Mock.Of<IXLogger>(), m_CancellationTokenSource, null, null);
 
             Result = res;
 

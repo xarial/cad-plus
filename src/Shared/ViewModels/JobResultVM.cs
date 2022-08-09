@@ -9,11 +9,15 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Data;
 using System.Windows.Input;
+using Xarial.CadPlus.Plus.Exceptions;
 using Xarial.CadPlus.Plus.Services;
 using Xarial.CadPlus.Plus.Shared.Exceptions;
 using Xarial.XCad.Base;
+using Xarial.XToolkit;
+using Xarial.XToolkit.Services;
 using Xarial.XToolkit.Wpf;
 using Xarial.XToolkit.Wpf.Extensions;
+using Xarial.XToolkit.Wpf.Utils;
 
 namespace Xarial.CadPlus.Plus.Shared.ViewModels
 {
@@ -35,6 +39,7 @@ namespace Xarial.CadPlus.Plus.Shared.ViewModels
         private readonly List<JobItemVM> m_JobItems;
         private readonly List<JobItemOperationDefinitionVM> m_OperationDefinitions;
 
+        private readonly IMessageService m_MsgSvc;
         private readonly IXLogger m_Logger;
 
         private readonly CancellationTokenSource m_CancellationTokenSource;
@@ -134,10 +139,17 @@ namespace Xarial.CadPlus.Plus.Shared.ViewModels
             }
         }
 
-        public ObservableCollection<string> Output { get; }
+        public ObservableCollection<string> LogEntries { get; }
+
+        private IBatchJobReportExporter[] m_ReportExporters;
+        private IBatchJobLogExporter[] m_LogExporters;
+
+        public ICommand ExportReportCommand { get; }
+        public ICommand ExportLogCommand { get; }
 
         public JobResultBaseVM(IBatchJobBase batchJob,
-            IXLogger logger, CancellationTokenSource cancellationTokenSource)
+            IMessageService msgSvc, IXLogger logger, CancellationTokenSource cancellationTokenSource,
+            IBatchJobReportExporter[] reportExporters, IBatchJobLogExporter[] logExporters)
         {
             if (batchJob == null) 
             {
@@ -149,15 +161,26 @@ namespace Xarial.CadPlus.Plus.Shared.ViewModels
                 throw new ArgumentNullException(nameof(logger));
             }
 
+            if (msgSvc == null)
+            {
+                throw new ArgumentNullException(nameof(msgSvc));
+            }
+
             if (cancellationTokenSource == null)
             {
                 throw new ArgumentNullException(nameof(cancellationTokenSource));
             }
 
+            m_ReportExporters = reportExporters;
+            m_LogExporters = logExporters;
+
+            ExportReportCommand = new RelayCommand(TryExportReport, () => m_ReportExporters?.Any() == true);
+            ExportLogCommand = new RelayCommand(TryExportLog, () => m_LogExporters?.Any() == true);
+
             m_Lock = new object();
 
-            Output = new ObservableCollection<string>();
-            BindingOperations.EnableCollectionSynchronization(Output, m_Lock);
+            LogEntries = new ObservableCollection<string>();
+            BindingOperations.EnableCollectionSynchronization(LogEntries, m_Lock);
 
             m_JobItems = new List<JobItemVM>();
             BindingOperations.EnableCollectionSynchronization(m_JobItems, m_Lock);
@@ -173,6 +196,7 @@ namespace Xarial.CadPlus.Plus.Shared.ViewModels
             m_BatchJob.JobCompleted += OnJobCompleted;
             m_BatchJob.Log += OnLog;
 
+            m_MsgSvc = msgSvc;
             m_Logger = logger;
 
             m_CancellationTokenSource = cancellationTokenSource;
@@ -182,9 +206,63 @@ namespace Xarial.CadPlus.Plus.Shared.ViewModels
             IsInitializing = true;
         }
 
+        private void TryExportReport()
+        {
+            try
+            {
+                if (FileSystemBrowser.BrowseFileSave(out string filePath,
+                    $"Select file to export report for job",
+                        FileFilter.Combine(m_ReportExporters.Select(e => e.Filter).Concat(new FileFilter[] { FileFilter.AllFiles }).ToArray())))
+                {
+                    var reportWriter = m_ReportExporters.FirstOrDefault(j => TextUtils.MatchesAnyFilter(filePath, j.Filter.Extensions));
+
+                    if (reportWriter != null)
+                    {
+                        reportWriter.Export(m_BatchJob, filePath);
+                    }
+                    else
+                    {
+                        throw new UserException("Unrecognized file format of job report");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                m_Logger.Log(ex);
+                m_MsgSvc.ShowError(ex);
+            }
+        }
+
+        private void TryExportLog()
+        {
+            try
+            {
+                if (FileSystemBrowser.BrowseFileSave(out string filePath,
+                    $"Select file to export log for job",
+                        FileFilter.Combine(m_ReportExporters.Select(e => e.Filter).Concat(new FileFilter[] { FileFilter.AllFiles }).ToArray())))
+                {
+                    var logWriter = m_LogExporters.FirstOrDefault(j => TextUtils.MatchesAnyFilter(filePath, j.Filter.Extensions));
+
+                    if (logWriter != null)
+                    {
+                        logWriter.Export(m_BatchJob, filePath);
+                    }
+                    else
+                    {
+                        throw new UserException("Unrecognized file format of log");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                m_Logger.Log(ex);
+                m_MsgSvc.ShowError(ex);
+            }
+        }
+
         private void OnLog(IBatchJobBase sender, string line)
         {
-            Output.Add(line);
+            LogEntries.Add(line);
         }
 
         private void OnJobSet(IBatchJobBase sender, IReadOnlyList<IJobItem> items, IReadOnlyList<IJobItemOperationDefinition> operations, DateTime startTime)
@@ -300,8 +378,10 @@ namespace Xarial.CadPlus.Plus.Shared.ViewModels
     {
         private readonly IBatchJob m_BatchJob;
 
-        public JobResultVM(IBatchJob batchJob, IXLogger logger,
-            CancellationTokenSource cancellationTokenSource) : base(batchJob, logger, cancellationTokenSource)
+        public JobResultVM(IBatchJob batchJob, IMessageService msgSvc, IXLogger logger,
+            CancellationTokenSource cancellationTokenSource,
+            IBatchJobReportExporter[] reportExporters, IBatchJobLogExporter[] logExporters)
+            : base(batchJob, msgSvc, logger, cancellationTokenSource, reportExporters, logExporters)
         {
             m_BatchJob = batchJob;
         }
@@ -326,8 +406,10 @@ namespace Xarial.CadPlus.Plus.Shared.ViewModels
     {
         private readonly IAsyncBatchJob m_BatchJob;
 
-        public AsyncJobResultVM(IAsyncBatchJob batchJob, IXLogger logger,
-            CancellationTokenSource cancellationTokenSource) : base(batchJob, logger, cancellationTokenSource)
+        public AsyncJobResultVM(IAsyncBatchJob batchJob, IMessageService msgSvc, IXLogger logger,
+            CancellationTokenSource cancellationTokenSource,
+            IBatchJobReportExporter[] reportExporters, IBatchJobLogExporter[] logExporters)
+            : base(batchJob, msgSvc, logger, cancellationTokenSource, reportExporters, logExporters)
         {
             m_BatchJob = batchJob;
         }
