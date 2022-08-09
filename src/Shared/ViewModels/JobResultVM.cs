@@ -206,7 +206,7 @@ namespace Xarial.CadPlus.Plus.Shared.ViewModels
             IsInitializing = true;
         }
 
-        private void TryExportReport()
+        public void TryExportReport()
         {
             try
             {
@@ -233,7 +233,7 @@ namespace Xarial.CadPlus.Plus.Shared.ViewModels
             }
         }
 
-        private void TryExportLog()
+        public void TryExportLog()
         {
             try
             {
