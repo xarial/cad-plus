@@ -10,5 +10,6 @@ namespace Xarial.CadPlus.Plus.Services
 
     public interface IBatchJobHandlerService : IDisposable
     {
+        void Run();
     }
 }
