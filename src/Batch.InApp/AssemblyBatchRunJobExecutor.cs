@@ -53,7 +53,10 @@ namespace Xarial.CadPlus.Batch.InApp
 
         private readonly IMacroRunnerPopupHandler m_PopupHandler;
 
-        public IJobItem[] JobItems { get; private set; }
+        public IReadOnlyList<IJobItem> JobItems { get; private set; }
+        public IReadOnlyList<IJobItemOperationDefinition> OperationDefinitions { get; private set; }
+        public IReadOnlyList<string> LogEntries { get; private set; }
+
 
         private readonly ICadDescriptor m_CadDesc;
 
@@ -102,6 +105,7 @@ namespace Xarial.CadPlus.Batch.InApp
 
                     var jobItems = PrepareJob(out var macroDefs);
 
+                    OperationDefinitions = macroDefs;
                     JobItems = jobItems;
 
                     JobSet?.Invoke(this, jobItems, macroDefs, startTime);

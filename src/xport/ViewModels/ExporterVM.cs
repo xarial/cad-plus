@@ -128,7 +128,11 @@ namespace Xarial.CadPlus.Xport.ViewModels
 
         private readonly IAboutService m_AboutSvc;
 
-        public ExporterVM(IMessageService msgSvc, IJobProcessManager jobPrcMgr, IXLogger logger, IAboutService aboutSvc)
+        private readonly IBatchJobReportExporter[] m_ReportExporters;
+        private readonly IBatchJobLogExporter[] m_LogExporters;
+
+        public ExporterVM(IMessageService msgSvc, IJobProcessManager jobPrcMgr, IXLogger logger, IAboutService aboutSvc,
+            IEnumerable<IBatchJobReportExporter> reportExporters, IEnumerable<IBatchJobLogExporter> logExporters)
         {
             m_MsgSvc = msgSvc;
             m_Logger = logger;
@@ -137,6 +141,9 @@ namespace Xarial.CadPlus.Xport.ViewModels
 
             m_AboutSvc = aboutSvc;
 
+            m_ReportExporters = reportExporters.ToArray();
+            m_LogExporters = logExporters.ToArray();
+            
             Input = new ObservableCollection<string>();
             Format = Format_e.Html;
             Filter = "*.*";
@@ -166,7 +173,7 @@ namespace Xarial.CadPlus.Xport.ViewModels
 
                 using (var exporter = new Exporter(m_JobPrcMgr, opts)) 
                 {
-                    JobResult = new AsyncJobResultVM(exporter, m_Logger, new CancellationTokenSource());
+                    JobResult = new AsyncJobResultVM(exporter, m_MsgSvc, m_Logger, new CancellationTokenSource(), m_ReportExporters, m_LogExporters);
                     await JobResult.TryRunBatchAsync().ConfigureAwait(false);
                 }
 

@@ -106,9 +106,6 @@ namespace Xarial.CadPlus.Batch.StandAlone
             builder.RegisterSingleton<IXCadMacroProvider, XCadMacroProvider>();
 
             builder.RegisterSingleton<IMacroRunnerPopupHandlerFactory, MacroRunnerPopupHandlerFactory>();
-            
-            builder.RegisterSingleton<IJournalExporter, JournalTextExporter>().AsCollectionItem();
-            builder.RegisterSingleton<IResultsSummaryExcelExporter, ResultsSummaryExcelExporter>().AsCollectionItem();
         }
 
         private static void OnWindowCreated(MainWindow window, BatchArguments args)

@@ -155,7 +155,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
             {
                 if (!string.IsNullOrEmpty(filePath) ||
                     FileSystemBrowser.BrowseFileOpen(out filePath, "Select file to open",
-                        FileSystemBrowser.BuildFilterString(BatchDocumentVM.FileFilters)))
+                        FileFilter.BuildFilterString(BatchDocumentVM.FileFilters)))
                 {
                     if (!string.Equals(Document?.FilePath, filePath, StringComparison.CurrentCultureIgnoreCase))
                     {

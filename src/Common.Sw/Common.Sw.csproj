@@ -8,9 +8,9 @@
   </PropertyGroup>
   <Import Project="$(SolutionDir)common\common.module.props" />
   <ItemGroup>
-    <PackageReference Include="Xarial.CadPlusPlus" Version="0.4.0-dev.4311" />
+    <PackageReference Include="Xarial.CadPlusPlus" Version="0.4.0-dev.4322" />
     <PackageReference Include="Xarial.XCad.SolidWorks" Version="0.8.0-dev.4306" />
-    <PackageReference Include="Xarial.XToolkit.Wpf" Version="0.4.0-dev.4310" />
+    <PackageReference Include="Xarial.XToolkit.Wpf" Version="0.4.0-dev.4319" />
   </ItemGroup>
   <ItemGroup>
     <Compile Update="Properties\Resources.Designer.cs">

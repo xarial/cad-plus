@@ -111,7 +111,9 @@ namespace Xarial.CadPlus.Xport.Services
 
         private readonly ExportOptions m_Opts;
 
-        public IJobItem[] JobItems { get; private set; }
+        public IReadOnlyList<IJobItem> JobItems { get; private set; }
+        public IReadOnlyList<IJobItemOperationDefinition> OperationDefinitions { get; private set; }
+        public IReadOnlyList<string> LogEntries { get; private set; }
 
         public Exporter(IJobProcessManager jobMgr, ExportOptions opts)
         {
@@ -176,6 +178,7 @@ namespace Xarial.CadPlus.Xport.Services
             var jobFiles = ParseOptions(m_Opts, out var formats);
 
             JobItems = jobFiles;
+            OperationDefinitions = formats;
 
             JobSet?.Invoke(this, jobFiles, formats, startTime);
 

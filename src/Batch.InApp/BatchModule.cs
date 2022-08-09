@@ -94,7 +94,7 @@ namespace Xarial.CadPlus.Batch.InApp
         private IMacroExecutor m_MacroRunnerSvc;
         private IMessageService m_Msg;
         private IXLogger m_Logger;
-        private IProgressHandlerFactoryService m_PrgHandlerFactSvc;
+        private IBatchJobHandlerServiceFactory m_BatchJobHandlerSvcFact;
         private IMacroRunnerPopupHandlerFactory m_PopupHandlerFact;
 
         private ICadDescriptor m_CadDesc;
@@ -122,7 +122,7 @@ namespace Xarial.CadPlus.Batch.InApp
             m_MacroRunnerSvc = svcProvider.GetService<IMacroExecutor>();
             m_Msg = svcProvider.GetService<IMessageService>();
             m_Logger = svcProvider.GetService<IXLogger>();
-            m_PrgHandlerFactSvc = svcProvider.GetService<IProgressHandlerFactoryService>();
+            m_BatchJobHandlerSvcFact = svcProvider.GetService<IBatchJobHandlerServiceFactory>();
             m_PopupHandlerFact = svcProvider.GetService<IMacroRunnerPopupHandlerFactory>();
             m_CadDesc = svcProvider.GetService<ICadDescriptor>();
 
@@ -242,22 +242,12 @@ namespace Xarial.CadPlus.Batch.InApp
                     {
                         var cancellationTokenSource = new CancellationTokenSource();
 
-                        var vm = new JobResultVM(exec, m_Logger, cancellationTokenSource);
+                        var doc = m_Host.Extension.Application.Documents.Active;
 
-                        using (var prg = m_PrgHandlerFactSvc.Create(cancellationTokenSource))
+                        using (var prg = m_BatchJobHandlerSvcFact.Create(exec, $"{doc.Title} - batch macro run", cancellationTokenSource))
                         {
-                            exec.ItemProcessed += (s, i, p, r) =>
-                            {
-                                prg.ReportProgress(p);
-                            };
-
-                            vm.TryRunBatch();
+                            prg.Run();
                         }
-
-                        var wnd = m_Host.Extension.CreatePopupWindow<ResultsWindow>();
-                        wnd.Control.Title = $"{rootDoc.Title} batch job result";
-                        wnd.Control.DataContext = vm;
-                        wnd.Show();
                     }
                 }
                 catch (OperationCanceledException) 

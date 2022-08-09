@@ -21,6 +21,7 @@ using Xarial.XCad.Base;
 using Xarial.CadPlus.Batch.StandAlone.Services;
 using Xarial.CadPlus.Plus.Shared.ViewModels;
 using System.Threading;
+using Xarial.XToolkit.Services;
 
 namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
 {
@@ -28,8 +29,9 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
     {
         public string Name { get; }
 
-        public AsyncBatchStandAloneJobResultVM(string name, IAsyncBatchJob batchJob, IXLogger logger, CancellationTokenSource cancellationTokenSource) 
-            : base(batchJob, logger, cancellationTokenSource)
+        public AsyncBatchStandAloneJobResultVM(string name, IAsyncBatchJob batchJob, IMessageService msgSvc, IXLogger logger, CancellationTokenSource cancellationTokenSource,
+            IBatchJobReportExporter[] reportExporters, IBatchJobLogExporter[] logExporters) 
+            : base(batchJob, msgSvc, logger, cancellationTokenSource, reportExporters, logExporters)
         {
             Name = name;
         }
@@ -59,12 +61,21 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
 
         private readonly IXLogger m_Logger;
 
+        private readonly IMessageService m_MsgSvc;
+
+        private readonly IBatchJobReportExporter[] m_ReportExporters;
+        private readonly IBatchJobLogExporter[] m_LogExporters;
+
         public JobResultsVM(BatchJob job,
-            IBatchMacroRunJobStandAloneFactory jobFact, IXLogger logger) 
+            IBatchMacroRunJobStandAloneFactory jobFact, IXLogger logger, IMessageService msgSvc, IBatchJobReportExporter[] reportExporters, IBatchJobLogExporter[] logExporters) 
         {
             m_Job = job;
 
             m_Logger = logger;
+            m_MsgSvc = msgSvc;
+
+            m_ReportExporters = reportExporters;
+            m_LogExporters = logExporters;
 
             m_JobFact = jobFact;
             Items = new ObservableCollection<JobResultBaseVM>();
@@ -72,7 +83,8 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
 
         public async void StartNewJob()
         {
-            var newRes = new AsyncBatchStandAloneJobResultVM($"Job #{Items.Count + 1}", m_JobFact.Create(m_Job), m_Logger, new CancellationTokenSource());
+            var newRes = new AsyncBatchStandAloneJobResultVM($"Job #{Items.Count + 1}", m_JobFact.Create(m_Job), m_MsgSvc, m_Logger, new CancellationTokenSource(),
+                m_ReportExporters, m_LogExporters);
             Items.Add(newRes);
             Selected = newRes;
             await newRes.TryRunBatchAsync();

@@ -72,12 +72,17 @@ namespace Xarial.CadPlus.AddIn.Sw
         private void OnConfigureModuleServices(IContainerBuilder builder)
         {
             builder.RegisterSingleton<IPropertyPageHandlerProvider, CadPlusComunityPropertyPageHandlerProvider>();
-            builder.RegisterSingleton<IProgressHandlerFactoryService, CadProgressHandlerFactoryService>();
+            builder.RegisterSingleton<IBatchJobHandlerServiceFactory, CadBatchJobHandlerServiceFactory>();
 
             builder.RegisterAdapter<IXApplication, ISwApplication>(LifetimeScope_e.Singleton);
 
             builder.RegisterAdapter<ICadSpecificServiceFactory<IMacroExecutor>, IMacroExecutor>(f => f.GetService(CadApplicationIds.SolidWorks), LifetimeScope_e.Singleton);
             builder.RegisterAdapter<ICadSpecificServiceFactory<ICadDescriptor>, ICadDescriptor>(f => f.GetService(CadApplicationIds.SolidWorks), LifetimeScope_e.Singleton);
+        }
+
+        protected override void HandleException(Exception ex)
+        {
+            base.HandleException(ex);
         }
     }
 }

@@ -82,7 +82,9 @@ namespace Xarial.CadPlus.Batch.StandAlone.Services
 
         private readonly ITaskRunner m_TaskRunner;
 
-        public IJobItem[] JobItems { get; private set; }
+        public IReadOnlyList<IJobItem> JobItems { get; private set; }
+        public IReadOnlyList<IJobItemOperationDefinition> OperationDefinitions { get; private set; }
+        public IReadOnlyList<string> LogEntries { get; private set; }
 
         public BatchMacroRunJobStandAlone(BatchJob job, ICadApplicationInstanceProvider appProvider,
             IBatchApplicationProxy batchAppProxy,
@@ -174,6 +176,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.Services
                         var allFiles = PrepareJobScope(app, m_Job.Input, m_Job.Filters, m_Job.TopLevelFilesOnly, m_Job.Macros, out var macroDefs);
 
                         JobItems = allFiles;
+                        OperationDefinitions = macroDefs;
 
                         Log?.Invoke(this, $"Running batch processing for {allFiles.Length} file(s)");
 

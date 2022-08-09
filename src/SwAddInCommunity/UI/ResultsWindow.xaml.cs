@@ -20,7 +20,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Xarial.CadPlus.Batch.InApp.UI
+namespace Xarial.CadPlus.AddIn.Sw.UI
 {
     public partial class ResultsWindow : Window
     {

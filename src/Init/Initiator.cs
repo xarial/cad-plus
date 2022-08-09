@@ -20,6 +20,7 @@ using Xarial.CadPlus.Plus.Services;
 using Xarial.CadPlus.Plus.Shared.Services;
 using Xarial.XCad.Base;
 using Xarial.XCad.Exceptions;
+using Xarial.XToolkit;
 using Xarial.XToolkit.Helpers;
 using Xarial.XToolkit.Reflection;
 using Xarial.XToolkit.Reporting;
@@ -116,6 +117,20 @@ namespace Xarial.CadPlus.Init
             => About.Show(assm, icon, IntPtr.Zero);
     }
 
+    public class EmptyBatchJobReportExporter : IBatchJobReportExporter
+    {
+        public FileFilter Filter => FileFilter.Create("Text Files", "*.txt");
+
+        public void Export(IBatchJobBase job, string filePath) => throw new NotSupportedException();
+    }
+
+    public class EmptyBatchJobLogExporter : IBatchJobLogExporter
+    {
+        public FileFilter Filter => FileFilter.Create("Text Files", "*.txt");
+
+        public void Export(IBatchJobBase job, string filePath) => throw new NotSupportedException();
+    }
+
     public class Initiator : IInitiator
     {
         private IHost m_Host;
@@ -150,6 +165,8 @@ namespace Xarial.CadPlus.Init
             builder.RegisterSingleton<IPopupKillerFactory, PopupKillerFactory>();
             builder.RegisterSingleton<IExcelReader, ExcelReader>();
             builder.RegisterSingleton<IExcelWriter, ExcelWriter>();
+            builder.RegisterSingleton<IBatchJobReportExporter, EmptyBatchJobReportExporter>().AsCollectionItem();
+            builder.RegisterSingleton<IBatchJobLogExporter, EmptyBatchJobLogExporter>().AsCollectionItem();
         }
 
         public void Dispose()

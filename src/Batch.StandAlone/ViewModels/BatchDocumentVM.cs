@@ -114,16 +114,12 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
 
         private readonly IXLogger m_Logger;
 
-        private readonly IJournalExporter[] m_JournalExporters;
-        private readonly IResultsSummaryExcelExporter[] m_ResultsExporters;
-
         public BatchDocumentVM(FileInfo file, BatchJob job, ICadApplicationInstanceProvider appProvider,
-            IJournalExporter[] journalExporters, IResultsSummaryExcelExporter[] resultsExporters,
             IMessageService msgSvc, IXLogger logger,
-            IBatchMacroRunJobStandAloneFactory execFact,
+            IBatchMacroRunJobStandAloneFactory execFact, IBatchJobReportExporter[] reportExporters, IBatchJobLogExporter[] logExporters,
             IBatchApplicationProxy batchAppProxy, MainWindow parentWnd, IRibbonButtonCommand[] backstageCmds)
-            : this(Path.GetFileNameWithoutExtension(file.FullName), job, appProvider, journalExporters, resultsExporters,
-                  msgSvc, logger, execFact, batchAppProxy, parentWnd, backstageCmds)
+            : this(Path.GetFileNameWithoutExtension(file.FullName), job, appProvider,
+                  msgSvc, logger, execFact, reportExporters, logExporters, batchAppProxy, parentWnd, backstageCmds)
         {
             m_FilePath = file.FullName;
             IsDirty = false;
@@ -131,15 +127,12 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
 
         public BatchDocumentVM(string name, BatchJob job,
             ICadApplicationInstanceProvider appProvider,
-            IJournalExporter[] journalExporters, IResultsSummaryExcelExporter[] resultsExporters,
             IMessageService msgSvc, IXLogger logger, IBatchMacroRunJobStandAloneFactory execFact,
+            IBatchJobReportExporter[] reportExporters, IBatchJobLogExporter[] logExporters,
             IBatchApplicationProxy batchAppProxy, MainWindow parentWnd, IRibbonButtonCommand[] backstageCmds)
         {
             m_ExecFact = execFact;
             m_AppProvider = appProvider;
-            
-            m_JournalExporters = journalExporters;
-            m_ResultsExporters = resultsExporters;
 
             m_Job = job;
             m_MsgSvc = msgSvc;
@@ -164,7 +157,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
             Name = name;
             Settings = new BatchDocumentSettingsVM(m_Job, m_AppProvider, m_Logger);
             Settings.Modified += OnSettingsModified;
-            Results = new JobResultsVM(m_Job, m_ExecFact, m_Logger);
+            Results = new JobResultsVM(m_Job, m_ExecFact, m_Logger, m_MsgSvc, reportExporters, logExporters);
 
             Filters = new ObservableCollection<FilterVM>((m_Job.Filters ?? Enumerable.Empty<string>()).Select(f => new FilterVM(f)));
             Filters.CollectionChanged += OnFiltersCollectionChanged;
@@ -353,67 +346,14 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
             IsDirty = true;
         }
 
-        private void TryExportResults()
-        {
-            try
-            {
-                if (FileSystemBrowser.BrowseFileSave(out string filePath,
-                    $"Select file to export journal for job '{Results.Selected.Name}'",
-                    FileSystemBrowser.BuildFilterString(
-                        m_ResultsExporters.Select(e => e.Filter).Concat(new FileFilter[] { FileFilter.AllFiles }).ToArray())))
-                {
-                    var exp = m_ResultsExporters.FirstOrDefault(j => TextUtils.MatchesAnyFilter(filePath, j.Filter.Extensions));
-
-                    if (exp != null)
-                    {
-                        exp.Export(Results.Selected.Name, Results.Selected, filePath);
-                    }
-                    else
-                    {
-                        throw new UserException("Unrecognized file format");
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                m_Logger.Log(ex);
-                m_MsgSvc.ShowError(ex);
-            }
-        }
-
-        private void TryExportJournal()
-        {
-            try
-            {
-                if (FileSystemBrowser.BrowseFileSave(out string filePath,
-                    $"Select file to export journal for job '{Results.Selected.Name}'",
-                    FileSystemBrowser.BuildFilterString(
-                        m_JournalExporters.Select(e => e.Filter).Concat(new FileFilter[] { FileFilter.AllFiles }).ToArray())))
-                {
-                    var exp = m_JournalExporters.FirstOrDefault(j => TextUtils.MatchesAnyFilter(filePath, j.Filter.Extensions));
-
-                    if (exp != null)
-                    {
-                        exp.Export(Results.Selected, filePath);
-                    }
-                    else
-                    {
-                        throw new UserException("Unrecognized file format");
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                m_Logger.Log(ex);
-                m_MsgSvc.ShowError(ex);
-            }
-        }
+        private void TryExportResults() => Results.Selected.TryExportReport();
+        private void TryExportJournal() => Results.Selected.TryExportLog();
 
         internal void SaveAsDocument()
         {
             if (FileSystemBrowser.BrowseFileSave(out m_FilePath, 
                 "Select file path",
-                FileSystemBrowser.BuildFilterString(FileFilters)))
+                FileFilter.BuildFilterString(FileFilters)))
             {
                 SaveDocument();
                 Name = Path.GetFileNameWithoutExtension(m_FilePath);
@@ -492,7 +432,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
         private void AddFromFile()
         {
             if (FileSystemBrowser.BrowseFileOpen(out string path, "Select text file",
-                FileSystemBrowser.BuildFilterString(new FileFilter("Text Files", "*.txt", "*.csv"), FileFilter.AllFiles))) 
+                FileFilter.BuildFilterString(new FileFilter("Text Files", "*.txt", "*.csv"), FileFilter.AllFiles))) 
             {
                 if (File.Exists(path))
                 {

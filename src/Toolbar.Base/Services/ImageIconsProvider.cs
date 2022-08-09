@@ -16,6 +16,7 @@ using Xarial.CadPlus.CustomToolbar.Base;
 using Xarial.CadPlus.Plus.Data;
 using Xarial.CadPlus.Plus.Modules;
 using Xarial.XCad.UI;
+using Xarial.XToolkit;
 using Xarial.XToolkit.Wpf.Utils;
 
 namespace Xarial.CadPlus.CustomToolbar.Services
