@@ -212,7 +212,7 @@ namespace Xarial.CadPlus.Plus.Shared.ViewModels
             {
                 if (FileSystemBrowser.BrowseFileSave(out string filePath,
                     $"Select file to export report for job",
-                        FileFilter.Combine(m_ReportExporters.Select(e => e.Filter).Concat(new FileFilter[] { FileFilter.AllFiles }).ToArray())))
+                        FileFilter.BuildFilterString(m_ReportExporters.Select(e => e.Filter).Concat(new FileFilter[] { FileFilter.AllFiles }).ToArray())))
                 {
                     var reportWriter = m_ReportExporters.FirstOrDefault(j => TextUtils.MatchesAnyFilter(filePath, j.Filter.Extensions));
 
@@ -239,7 +239,7 @@ namespace Xarial.CadPlus.Plus.Shared.ViewModels
             {
                 if (FileSystemBrowser.BrowseFileSave(out string filePath,
                     $"Select file to export log for job",
-                        FileFilter.Combine(m_ReportExporters.Select(e => e.Filter).Concat(new FileFilter[] { FileFilter.AllFiles }).ToArray())))
+                        FileFilter.BuildFilterString(m_ReportExporters.Select(e => e.Filter).Concat(new FileFilter[] { FileFilter.AllFiles }).ToArray())))
                 {
                     var logWriter = m_LogExporters.FirstOrDefault(j => TextUtils.MatchesAnyFilter(filePath, j.Filter.Extensions));
 
