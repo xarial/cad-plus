@@ -126,7 +126,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.Services
             m_IsExecuted = false;
         }
 
-        public async Task<bool> ExecuteAsync(CancellationToken cancellationToken)
+        public async Task ExecuteAsync(CancellationToken cancellationToken)
         {
             cancellationToken.Register(() =>
             {
@@ -138,7 +138,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.Services
 
             try
             {
-                return await BatchRunAsync(cancellationToken).ConfigureAwait(false);
+                await BatchRunAsync(cancellationToken).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -205,7 +205,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.Services
 
                             m_CurrentContext.CurrentDocument = null;
 
-                            ItemProcessed?.Invoke(this, m_CurrentContext.CurrentJobItem, res);
+                            ItemProcessed?.Invoke(this, m_CurrentContext.CurrentJobItem);
                             ProgressChanged?.Invoke(this, (double)(i + 1) / (double)allFiles.Length);
 
                             if (!res && !m_Job.ContinueOnError)

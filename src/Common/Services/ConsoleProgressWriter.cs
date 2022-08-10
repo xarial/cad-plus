@@ -32,7 +32,7 @@ namespace Xarial.CadPlus.Common.Services
 
         private void OnJobCompleted(IBatchJobBase sender, TimeSpan duration) => ReportCompleted(duration);
         private void OnJobInitialized(IBatchJobBase sender, IReadOnlyList<IJobItem> jobItems, IReadOnlyList<IJobItemOperationDefinition> operations, DateTime startTime) => SetJobScope(jobItems, startTime);
-        private void OnItemProcessed(IBatchJobBase sender, IJobItem file, bool result) => ReportStatus(file, result);
+        private void OnItemProcessed(IBatchJobBase sender, IJobItem file) => ReportStatus(file);
         private void OnProgressChanged(IBatchJobBase sender, double progress) => ReportProgress(progress);
         private void OnLog(IBatchJobBase sender, string msg) => Log(msg);
 
@@ -45,7 +45,7 @@ namespace Xarial.CadPlus.Common.Services
             Console.ResetColor();
         }
 
-        private void ReportStatus(IJobItem file, bool result)
+        private void ReportStatus(IJobItem file)
         {
             Console.WriteLine($"Result: {file.State.Status}");
         }

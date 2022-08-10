@@ -7,7 +7,7 @@
              WindowStartupLocation="CenterOwner" WindowStyle="ToolWindow"
              mc:Ignorable="d" 
              Height="450" Width="600">
-    <TabControl Grid.Row="0">
+    <TabControl>
         <TabItem Header="Summary">
             <sharedui:JobSummaryControl/>
         </TabItem>

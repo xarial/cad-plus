@@ -93,7 +93,7 @@ namespace Xarial.CadPlus.Batch.InApp
             }
         }
 
-        public bool Execute(CancellationToken cancellationToken)
+        public void Execute(CancellationToken cancellationToken)
         {
             if (!m_IsExecuted)
             {
@@ -120,13 +120,11 @@ namespace Xarial.CadPlus.Batch.InApp
 
                         var jobItem = jobItems[i];
 
-                        var res = TryProcessFile(jobItem, cancellationToken);
+                        TryProcessFile(jobItem, cancellationToken);
 
-                        ItemProcessed?.Invoke(this, jobItem, res);
+                        ItemProcessed?.Invoke(this, jobItem);
                         ProgressChanged?.Invoke(this, (double)(i + 1) / (double)jobItems.Length);
                     }
-
-                    return true;
                 }
                 catch (OperationCanceledException)
                 {
@@ -135,7 +133,6 @@ namespace Xarial.CadPlus.Batch.InApp
                 catch (Exception ex)
                 {
                     m_Logger.Log(ex);
-                    return false;
                 }
                 finally
                 {

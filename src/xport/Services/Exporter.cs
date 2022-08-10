@@ -175,7 +175,7 @@ namespace Xarial.CadPlus.Xport.Services
             return tcs.Task;
         }
 
-        public async Task<bool> ExecuteAsync(CancellationToken cancellationToken)
+        public async Task ExecuteAsync(CancellationToken cancellationToken)
         {
             AddLogEntry($"Exporting Started");
 
@@ -216,7 +216,7 @@ namespace Xarial.CadPlus.Xport.Services
                         if (cancellationToken.IsCancellationRequested)
                         {
                             AddLogEntry($"Cancelled by the user");
-                            return false;
+                            return;
                         }
 
                         var prcStartInfo = new ProcessStartInfo()
@@ -258,7 +258,7 @@ namespace Xarial.CadPlus.Xport.Services
 
                 file.State.Status = file.ComposeStatus();
 
-                ItemProcessed?.Invoke(this, file, file.State.Status != JobItemStateStatus_e.Failed);
+                ItemProcessed?.Invoke(this, file);
                 ProgressChanged?.Invoke(this, (i + 1) / (double)jobFiles.Length);
             }
 
@@ -267,8 +267,6 @@ namespace Xarial.CadPlus.Xport.Services
             AddLogEntry($"Exporting completed in {duration.ToString(@"hh\:mm\:ss")}");
 
             Completed?.Invoke(this, duration);
-
-            return true;
         }
 
         private JobItemFile[] ParseOptions(ExportOptions opts, out JobItemExportFormatDefinition[] formatDefs)

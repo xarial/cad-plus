@@ -78,7 +78,7 @@ namespace Xarial.CadPlus.AddIn.Sw.Services
             m_ResultsWindow.ShowDialog();
         }
 
-        private void OnJobItemProcessed(IBatchJobBase sender, IJobItem item, bool result)
+        private void OnJobItemProcessed(IBatchJobBase sender, IJobItem item)
         {
             m_Progress.SetStatus($"Processed '{item.Title}'");
         }
