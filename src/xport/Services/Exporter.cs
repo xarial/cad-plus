@@ -116,12 +116,15 @@ namespace Xarial.CadPlus.Xport.Services
 
         public IReadOnlyList<IJobItem> JobItems { get; private set; }
         public IReadOnlyList<IJobItemOperationDefinition> OperationDefinitions { get; private set; }
-        public IReadOnlyList<string> LogEntries { get; private set; }
+        public IReadOnlyList<string> LogEntries => m_LogEntries;
+
+        private readonly List<string> m_LogEntries;
 
         public Exporter(IJobProcessManager jobMgr, ExportOptions opts)
         {
             m_JobMgr = jobMgr;
             m_Opts = opts;
+            m_LogEntries = new List<string>();
         }
 
         private Task<bool> StartWaitProcessAsync(ProcessStartInfo prcStartInfo,
@@ -141,7 +144,7 @@ namespace Xarial.CadPlus.Xport.Services
                 var tag = StandAloneExporter.Program.LOG_MESSAGE_TAG;
                 if (e.Data?.StartsWith(tag) == true)
                 {
-                    Log?.Invoke(this, e.Data.Substring(tag.Length));
+                    AddLogEntry(e.Data.Substring(tag.Length));
                 }
             };
 
@@ -174,7 +177,7 @@ namespace Xarial.CadPlus.Xport.Services
 
         public async Task<bool> ExecuteAsync(CancellationToken cancellationToken)
         {
-            Log?.Invoke(this, $"Exporting Started");
+            AddLogEntry($"Exporting Started");
 
             var startTime = DateTime.Now;
 
@@ -212,7 +215,7 @@ namespace Xarial.CadPlus.Xport.Services
 
                         if (cancellationToken.IsCancellationRequested)
                         {
-                            Log?.Invoke(this, $"Cancelled by the user");
+                            AddLogEntry($"Cancelled by the user");
                             return false;
                         }
 
@@ -245,7 +248,7 @@ namespace Xarial.CadPlus.Xport.Services
                     {
                         outFile.State.Status = JobItemStateStatus_e.Failed;
 
-                        Log?.Invoke(this, $"Error while processing '{file.FilePath}': {ex.Message}");
+                        AddLogEntry($"Error while processing '{file.FilePath}': {ex.Message}");
                         if (!m_Opts.ContinueOnError)
                         {
                             throw ex;
@@ -261,7 +264,7 @@ namespace Xarial.CadPlus.Xport.Services
 
             var duration = DateTime.Now.Subtract(startTime);
 
-            Log?.Invoke(this, $"Exporting completed in {duration.ToString(@"hh\:mm\:ss")}");
+            AddLogEntry($"Exporting completed in {duration.ToString(@"hh\:mm\:ss")}");
 
             Completed?.Invoke(this, duration);
 
@@ -361,6 +364,12 @@ namespace Xarial.CadPlus.Xport.Services
             }
 
             return jobs.ToArray();
+        }
+
+        private void AddLogEntry(string msg)
+        {
+            m_LogEntries.Add(msg);
+            Log?.Invoke(this, msg);
         }
 
         public void Dispose()
