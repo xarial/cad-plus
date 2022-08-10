@@ -22,10 +22,11 @@ namespace TestApp
 {
     public class MyAsyncBatchJob : IAsyncBatchJob
     {
-        public event JobSetDelegate JobSet;
-        public event JobCompletedDelegate JobCompleted;
+        public event JobInitializedDelegate Initialized;
+        public event JobCompletedDelegate Completed;
         public event JobItemProcessedDelegate ItemProcessed;
         public event JobLogDelegateDelegate Log;
+        public event JobProgressChangedDelegate ProgressChanged;
 
         public IReadOnlyList<IJobItem> JobItems => m_JobItems;
         public IReadOnlyList<string> LogEntries => m_LogEntries;
@@ -81,7 +82,7 @@ namespace TestApp
 
             m_OperationDefinitions.AddRange(new IJobItemOperationDefinition[] { oper1, oper2 });
 
-            JobSet?.Invoke(this, m_JobItems, m_OperationDefinitions, startTime);
+            Initialized?.Invoke(this, m_JobItems, m_OperationDefinitions, startTime);
 
             try
             {
@@ -96,7 +97,8 @@ namespace TestApp
 
                 item1.Update(item1.ComposeStatus(), null, null);
 
-                ItemProcessed?.Invoke(this, item1, 1d / 3d, true);
+                ItemProcessed?.Invoke(this, item1, true);
+                ProgressChanged?.Invoke(this, 1d / 3d);
 
                 //item2
                 item2.Update(JobItemStateStatus_e.InProgress, null, null);
@@ -109,7 +111,8 @@ namespace TestApp
 
                 item2.Update(item2.ComposeStatus(), new IJobItemIssue[] { new MyJobItemIssue(IssueType_e.Warning, "Some Warning") }, null);
 
-                ItemProcessed?.Invoke(this, item2, 2d / 3d, true);
+                ItemProcessed?.Invoke(this, item2, true);
+                ProgressChanged?.Invoke(this, 2d / 3d);
 
                 //item3
                 item3.Update(JobItemStateStatus_e.InProgress, null, null);
@@ -122,7 +125,8 @@ namespace TestApp
 
                 item3.Update(item3.ComposeStatus(), null, null);
 
-                ItemProcessed?.Invoke(this, item3, 3d / 3d, true);
+                ItemProcessed?.Invoke(this, item3, true);
+                ProgressChanged?.Invoke(this, 3d / 3d);
 
                 return true;
             }
@@ -132,7 +136,7 @@ namespace TestApp
             }
             finally 
             {
-                JobCompleted?.Invoke(this, DateTime.Now.Subtract(startTime));
+                Completed?.Invoke(this, DateTime.Now.Subtract(startTime));
             }
         }
 
@@ -185,6 +189,8 @@ namespace TestApp
 
     public class MyJobItem : IJobItem
     {
+        public event JobItemNestedItemsInitializedDelegate NestedItemsInitialized;
+
         public ImageSource Icon { get; }
         public ImageSource Preview { get; }
         public string Title { get; }

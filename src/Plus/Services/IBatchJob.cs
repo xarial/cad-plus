@@ -45,13 +45,18 @@ namespace Xarial.CadPlus.Plus.Services
 
     public delegate void JobItemOperationUserResultChangedDelegate(IJobItemOperation sender, object userResult);
 
-    public delegate void JobSetDelegate(IBatchJobBase sender, IReadOnlyList<IJobItem> jobItems, IReadOnlyList<IJobItemOperationDefinition> operations, DateTime startTime);
+    public delegate void JobInitializedDelegate(IBatchJobBase sender, IReadOnlyList<IJobItem> jobItems, IReadOnlyList<IJobItemOperationDefinition> operations, DateTime startTime);
     public delegate void JobCompletedDelegate(IBatchJobBase sender, TimeSpan duration);
-    public delegate void JobItemProcessedDelegate(IBatchJobBase sender, IJobItem item, double progress, bool result);
+    public delegate void JobItemProcessedDelegate(IBatchJobBase sender, IJobItem item, bool result);
+    public delegate void JobProgressChangedDelegate(IBatchJobBase sender, double progress);
     public delegate void JobLogDelegateDelegate(IBatchJobBase sender, string message);
+
+    public delegate void JobItemNestedItemsInitializedDelegate(IJobItem sender, IReadOnlyList<IJobItem> nestedItems);
 
     public interface IJobItem
     {
+        event JobItemNestedItemsInitializedDelegate NestedItemsInitialized;
+
         ImageSource Icon { get; }
         ImageSource Preview { get; }
         string Title { get; }
@@ -119,10 +124,11 @@ namespace Xarial.CadPlus.Plus.Services
 
     public interface IBatchJobBase : IDisposable
     {
-        event JobSetDelegate JobSet;
-        event JobCompletedDelegate JobCompleted;
+        event JobInitializedDelegate Initialized;
+        event JobCompletedDelegate Completed;
         event JobItemProcessedDelegate ItemProcessed;
         event JobLogDelegateDelegate Log;
+        event JobProgressChangedDelegate ProgressChanged;
 
         IReadOnlyList<IJobItemOperationDefinition> OperationDefinitions { get; }
         IReadOnlyList<string> LogEntries { get; }

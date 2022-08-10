@@ -191,9 +191,10 @@ namespace Xarial.CadPlus.Plus.Shared.ViewModels
             CancelJobCommand = new RelayCommand(CancelJob, () => IsBatchJobInProgress);
 
             m_BatchJob = batchJob;
-            m_BatchJob.JobSet += OnJobSet;
-            m_BatchJob.ItemProcessed += OnProgressChanged;
-            m_BatchJob.JobCompleted += OnJobCompleted;
+            m_BatchJob.Initialized += OnJobSet;
+            m_BatchJob.ItemProcessed += OnItemProcessed;
+            m_BatchJob.ProgressChanged += OnProgressChanged;
+            m_BatchJob.Completed += OnJobCompleted;
             m_BatchJob.Log += OnLog;
 
             m_MsgSvc = msgSvc;
@@ -260,6 +261,11 @@ namespace Xarial.CadPlus.Plus.Shared.ViewModels
             }
         }
 
+        private void OnProgressChanged(IBatchJobBase sender, double progress)
+        {
+            Progress = progress;
+        }
+
         private void OnLog(IBatchJobBase sender, string line)
         {
             LogEntries.Add(line);
@@ -281,7 +287,7 @@ namespace Xarial.CadPlus.Plus.Shared.ViewModels
             Duration = duration;
         }
 
-        private void OnProgressChanged(IBatchJobBase sender, IJobItem file, double progress, bool result)
+        private void OnItemProcessed(IBatchJobBase sender, IJobItem file, bool result)
         {
             if (result)
             {
@@ -291,8 +297,6 @@ namespace Xarial.CadPlus.Plus.Shared.ViewModels
             {
                 FailedItemsCount++;
             }
-
-            Progress = progress;
 
             if (StartTime.HasValue)
             {
