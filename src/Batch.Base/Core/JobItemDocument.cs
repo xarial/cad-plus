@@ -31,6 +31,8 @@ namespace Xarial.CadPlus.Batch.Base.Core
             internal ImageSource Drawing { get; set; }
         }
 
+        public event JobItemNestedItemsInitializedDelegate NestedItemsInitialized;
+
         IJobItemState IJobItem.State => State;
         IReadOnlyList<IJobItemOperation> IJobItem.Operations => Operations;
 
@@ -110,9 +112,9 @@ namespace Xarial.CadPlus.Batch.Base.Core
 
         public JobItemState State { get; }
 
-
         private readonly ICadDescriptor m_CadDesc;
 
+        
         public JobItemDocument(IXDocument doc, IReadOnlyList<JobItemMacro> macros, ICadDescriptor cadDesc)
         {
             if (doc == null)

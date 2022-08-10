@@ -30,9 +30,10 @@ namespace Xarial.CadPlus.Batch.InApp
 {
     public class AssemblyBatchRunJobExecutor : IBatchJob
     {
-        public event JobSetDelegate JobSet;
-        public event JobCompletedDelegate JobCompleted;
+        public event JobInitializedDelegate Initialized;
+        public event JobCompletedDelegate Completed;
         public event JobItemProcessedDelegate ItemProcessed;
+        public event JobProgressChangedDelegate ProgressChanged;
         public event JobLogDelegateDelegate Log;
 
         private readonly IXApplication m_App;
@@ -55,10 +56,11 @@ namespace Xarial.CadPlus.Batch.InApp
 
         public IReadOnlyList<IJobItem> JobItems { get; private set; }
         public IReadOnlyList<IJobItemOperationDefinition> OperationDefinitions { get; private set; }
-        public IReadOnlyList<string> LogEntries { get; private set; }
-
+        public IReadOnlyList<string> LogEntries => m_LogEntries;
 
         private readonly ICadDescriptor m_CadDesc;
+
+        private readonly List<string> m_LogEntries;
 
         internal AssemblyBatchRunJobExecutor(IXApplication app, IMacroExecutor macroRunnerSvc, ICadDescriptor cadDesc,
             IXDocument[] documents, IXLogger logger, IEnumerable<MacroData> macros,
@@ -79,6 +81,8 @@ namespace Xarial.CadPlus.Batch.InApp
             m_AllowReadOnly = allowReadOnly;
             m_AllowRapid = allowRapid;
             m_AutoSaveDocs = autoSaveDocs;
+
+            m_LogEntries = new List<string>();
         }
 
         private void OnMacroUserError(IMacroRunnerPopupHandler sender, Exception error)
@@ -99,7 +103,7 @@ namespace Xarial.CadPlus.Batch.InApp
 
                 try
                 {
-                    LogMessage("Preparing job");
+                    LogEntry("Preparing job");
 
                     m_PopupHandler.Start(m_App);
 
@@ -108,7 +112,7 @@ namespace Xarial.CadPlus.Batch.InApp
                     OperationDefinitions = macroDefs;
                     JobItems = jobItems;
 
-                    JobSet?.Invoke(this, jobItems, macroDefs, startTime);
+                    Initialized?.Invoke(this, jobItems, macroDefs, startTime);
 
                     for (int i = 0; i < jobItems.Length; i++)
                     {
@@ -118,7 +122,8 @@ namespace Xarial.CadPlus.Batch.InApp
 
                         var res = TryProcessFile(jobItem, cancellationToken);
 
-                        ItemProcessed?.Invoke(this, jobItem, (double)(i + 1) / (double)jobItems.Length, res);
+                        ItemProcessed?.Invoke(this, jobItem, res);
+                        ProgressChanged?.Invoke(this, (double)(i + 1) / (double)jobItems.Length);
                     }
 
                     return true;
@@ -135,7 +140,7 @@ namespace Xarial.CadPlus.Batch.InApp
                 finally
                 {
                     m_PopupHandler.Stop();
-                    JobCompleted?.Invoke(this, DateTime.Now - startTime);
+                    Completed?.Invoke(this, DateTime.Now - startTime);
                 }
             }
             else 
@@ -163,7 +168,7 @@ namespace Xarial.CadPlus.Batch.InApp
 
         private bool TryProcessFile(JobItemDocument file, CancellationToken cancellationToken) 
         {
-            LogMessage($"Processing '{file.Document.Path}'");
+            LogEntry($"Processing '{file.Document.Path}'");
             
             var doc = file.Document;
 
@@ -228,7 +233,7 @@ namespace Xarial.CadPlus.Batch.InApp
             }
             catch(Exception ex)
             {
-                LogMessage($"Failed to process file '{file.Document.Path}': {ex.ParseUserError()}");
+                LogEntry($"Failed to process file '{file.Document.Path}': {ex.ParseUserError()}");
                 file.State.Status = JobItemStateStatus_e.Failed;
                 file.State.ReportError(ex);
             }
@@ -312,14 +317,18 @@ namespace Xarial.CadPlus.Batch.InApp
                     errorDesc = ex.ParseUserError("Unknown error");
                 }
 
-                LogMessage($"Failed to run macro '{macro.Definition.MacroData.FilePath}': {errorDesc}");
+                LogEntry($"Failed to run macro '{macro.Definition.MacroData.FilePath}': {errorDesc}");
 
                 macro.State.ReportError(ex);
                 macro.State.Status = JobItemStateStatus_e.Failed;
             }
         }
 
-        private void LogMessage(string msg) => Log?.Invoke(this, msg);
+        private void LogEntry(string msg)
+        {
+            m_LogEntries.Add(msg);
+            Log?.Invoke(this, msg);
+        }
 
         public void Dispose()
         {

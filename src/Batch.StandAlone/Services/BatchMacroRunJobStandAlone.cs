@@ -59,9 +59,10 @@ namespace Xarial.CadPlus.Batch.StandAlone.Services
 
     public class BatchMacroRunJobStandAlone : IBatchMacroRunJobStandAlone
     {
-        public event JobSetDelegate JobSet;
-        public event JobCompletedDelegate JobCompleted;
+        public event JobInitializedDelegate Initialized;
+        public event JobCompletedDelegate Completed;
         public event JobItemProcessedDelegate ItemProcessed;
+        public event JobProgressChangedDelegate ProgressChanged;
         public event JobLogDelegateDelegate Log;
 
         private bool m_IsExecuted;
@@ -180,7 +181,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.Services
 
                         Log?.Invoke(this, $"Running batch processing for {allFiles.Length} file(s)");
 
-                        JobSet?.Invoke(this, allFiles, macroDefs, batchStartTime);
+                        Initialized?.Invoke(this, allFiles, macroDefs, batchStartTime);
 
                         if (!allFiles.Any())
                         {
@@ -200,7 +201,8 @@ namespace Xarial.CadPlus.Batch.StandAlone.Services
 
                             m_CurrentContext.CurrentDocument = null;
 
-                            ItemProcessed?.Invoke(this, m_CurrentContext.CurrentJobItem, (double)(i + 1) / (double)allFiles.Length, res);
+                            ItemProcessed?.Invoke(this, m_CurrentContext.CurrentJobItem, res);
+                            ProgressChanged?.Invoke(this, (double)(i + 1) / (double)allFiles.Length);
 
                             if (!res && !m_Job.ContinueOnError)
                             {
@@ -237,7 +239,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.Services
 
                 var duration = DateTime.Now.Subtract(batchStartTime);
 
-                JobCompleted?.Invoke(this, duration);
+                Completed?.Invoke(this, duration);
 
                 Log?.Invoke(this, $"Batch running completed in {duration.ToString(@"hh\:mm\:ss")}");
 

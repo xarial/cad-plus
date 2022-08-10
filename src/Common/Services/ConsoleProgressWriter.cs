@@ -23,25 +23,31 @@ namespace Xarial.CadPlus.Common.Services
         public ConsoleProgressWriter(IBatchJobBase job) 
         {
             m_Job = job;
-            m_Job.JobCompleted += OnJobCompleted;
-            m_Job.JobSet += OnJobSet;
-            m_Job.ItemProcessed += OnProgressChanged;
+            m_Job.Completed += OnJobCompleted;
+            m_Job.Initialized += OnJobInitialized;
+            m_Job.ItemProcessed += OnItemProcessed;
+            m_Job.ProgressChanged += OnProgressChanged;
             m_Job.Log += OnLog;
         }
 
         private void OnJobCompleted(IBatchJobBase sender, TimeSpan duration) => ReportCompleted(duration);
-        private void OnJobSet(IBatchJobBase sender, IReadOnlyList<IJobItem> jobItems, IReadOnlyList<IJobItemOperationDefinition> operations, DateTime startTime) => SetJobScope(jobItems, startTime);
-        private void OnProgressChanged(IBatchJobBase sender, IJobItem file, double progress, bool result) => ReportProgress(file, progress, result);
+        private void OnJobInitialized(IBatchJobBase sender, IReadOnlyList<IJobItem> jobItems, IReadOnlyList<IJobItemOperationDefinition> operations, DateTime startTime) => SetJobScope(jobItems, startTime);
+        private void OnItemProcessed(IBatchJobBase sender, IJobItem file, bool result) => ReportStatus(file, result);
+        private void OnProgressChanged(IBatchJobBase sender, double progress) => ReportProgress(progress);
         private void OnLog(IBatchJobBase sender, string msg) => Log(msg);
 
         private void Log(string msg) => Console.WriteLine(msg);
 
-        private void ReportProgress(IJobItem file, double progress, bool result)
+        private void ReportProgress(double progress)
         {
-            Console.WriteLine($"Result: {file.State.Status}");
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine($"Progress: {(progress * 100).ToString("F")}%");
             Console.ResetColor();
+        }
+
+        private void ReportStatus(IJobItem file, bool result)
+        {
+            Console.WriteLine($"Result: {file.State.Status}");
         }
 
         private void SetJobScope(IReadOnlyList<IJobItem> scope, DateTime startTime)
@@ -60,9 +66,10 @@ namespace Xarial.CadPlus.Common.Services
 
         public void Dispose()
         {
-            m_Job.JobCompleted -= OnJobCompleted;
-            m_Job.JobSet -= OnJobSet;
-            m_Job.ItemProcessed -= OnProgressChanged;
+            m_Job.Completed -= OnJobCompleted;
+            m_Job.Initialized -= OnJobInitialized;
+            m_Job.ItemProcessed -= OnItemProcessed;
+            m_Job.ProgressChanged -= OnProgressChanged;
             m_Job.Log -= OnLog;
         }
     }

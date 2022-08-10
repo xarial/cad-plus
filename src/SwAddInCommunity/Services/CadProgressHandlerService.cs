@@ -58,6 +58,7 @@ namespace Xarial.CadPlus.AddIn.Sw.Services
         {
             m_Job = job;
             m_Job.ItemProcessed += OnJobItemProcessed;
+            m_Job.ProgressChanged += OnProgressChanged;
             m_Logger = logger;
             m_Ext = ext;
 
@@ -77,7 +78,12 @@ namespace Xarial.CadPlus.AddIn.Sw.Services
             m_ResultsWindow.ShowDialog();
         }
 
-        private void OnJobItemProcessed(IBatchJobBase sender, IJobItem item, double progress, bool result)
+        private void OnJobItemProcessed(IBatchJobBase sender, IJobItem item, bool result)
+        {
+            m_Progress.SetStatus($"Processed '{item.Title}'");
+        }
+
+        private void OnProgressChanged(IBatchJobBase sender, double progress)
         {
             m_Progress.Report(progress);
         }

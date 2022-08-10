@@ -25,6 +25,8 @@ namespace Xarial.CadPlus.Xport.Services
 {
     public class JobItemFile : IJobItem
     {
+        public event JobItemNestedItemsInitializedDelegate NestedItemsInitialized;
+
         IReadOnlyList<IJobItemOperation> IJobItem.Operations => Operations;
         IJobItemState IJobItem.State => State;
 
@@ -104,10 +106,11 @@ namespace Xarial.CadPlus.Xport.Services
     {
         private readonly IJobProcessManager m_JobMgr;
 
-        public event JobSetDelegate JobSet;
+        public event JobInitializedDelegate Initialized;
         public event JobItemProcessedDelegate ItemProcessed;
+        public event JobProgressChangedDelegate ProgressChanged;
         public event JobLogDelegateDelegate Log;
-        public event JobCompletedDelegate JobCompleted;
+        public event JobCompletedDelegate Completed;
 
         private readonly ExportOptions m_Opts;
 
@@ -180,7 +183,7 @@ namespace Xarial.CadPlus.Xport.Services
             JobItems = jobFiles;
             OperationDefinitions = formats;
 
-            JobSet?.Invoke(this, jobFiles, formats, startTime);
+            Initialized?.Invoke(this, jobFiles, formats, startTime);
 
             for (int i = 0; i < jobFiles.Length; i++)
             {
@@ -250,16 +253,17 @@ namespace Xarial.CadPlus.Xport.Services
                     }
                 }
 
-                ItemProcessed?.Invoke(this, file, (i + 1) / (double)jobFiles.Length, true);
-
                 file.State.Status = file.ComposeStatus();
+
+                ItemProcessed?.Invoke(this, file, file.State.Status != JobItemStateStatus_e.Failed);
+                ProgressChanged?.Invoke(this, (i + 1) / (double)jobFiles.Length);
             }
 
             var duration = DateTime.Now.Subtract(startTime);
 
             Log?.Invoke(this, $"Exporting completed in {duration.ToString(@"hh\:mm\:ss")}");
 
-            JobCompleted?.Invoke(this, duration);
+            Completed?.Invoke(this, duration);
 
             return true;
         }
