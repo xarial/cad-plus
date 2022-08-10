@@ -28,20 +28,23 @@
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
-                <TextBlock Text="Start Time:" Grid.Row="0" Grid.Column="0" Margin="2"/>
+                <TextBlock Text="Start Time:" Grid.Row="0" Grid.Column="0" Margin="2" FontWeight="Bold"/>
                 <TextBlock Text="{Binding Path=StartTime}" Grid.Row="0" Grid.Column="2" Margin="2"/>
 
-                <TextBlock Text="Duration:" Grid.Row="1" Grid.Column="0" Margin="2"/>
+                <TextBlock Text="Duration:" Grid.Row="1" Grid.Column="0" Margin="2" FontWeight="Bold"/>
                 <TextBlock Text="{Binding Path=Duration, StringFormat=hh\\:mm\\:ss}" Grid.Row="1" Grid.Column="2" Margin="2"/>
 
-                <TextBlock Text="Total:" Grid.Row="2" Grid.Column="0" Margin="2"/>
+                <TextBlock Text="Total Items:" Grid.Row="2" Grid.Column="0" Margin="2" FontWeight="Bold"/>
                 <TextBlock Text="{Binding Path=JobItems.Count}" Grid.Row="2" Grid.Column="2" Margin="2"/>
 
-                <TextBlock Text="Processed:" Grid.Row="3" Grid.Column="0" Margin="2"/>
-                <TextBlock Text="{Binding Path=ProcessedItemsCount}" Grid.Row="3" Grid.Column="2" Margin="2"/>
+                <TextBlock Text="Succeeded Items:" Grid.Row="3" Grid.Column="0" Margin="2" FontWeight="Bold"/>
+                <TextBlock Text="{Binding Path=SucceededItemsCount}" Grid.Row="3" Grid.Column="2" Margin="2"/>
 
-                <TextBlock Text="Failed:" Grid.Row="4" Grid.Column="0" Margin="2"/>
-                <TextBlock Text="{Binding Path=FailedItemsCount}" Grid.Row="4" Grid.Column="2" Margin="2"/>
+                <TextBlock Text="Items With Warnings:" Grid.Row="4" Grid.Column="0" Margin="2" FontWeight="Bold"/>
+                <TextBlock Text="{Binding Path=WarningItemsCount}" Grid.Row="4" Grid.Column="2" Margin="2"/>
+
+                <TextBlock Text="Failed Items:" Grid.Row="5" Grid.Column="0" Margin="2" FontWeight="Bold"/>
+                <TextBlock Text="{Binding Path=FailedItemsCount}" Grid.Row="5" Grid.Column="2" Margin="2"/>
 
             </Grid>
         </Grid>

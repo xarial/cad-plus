@@ -47,7 +47,7 @@ namespace Xarial.CadPlus.Plus.Services
 
     public delegate void JobInitializedDelegate(IBatchJobBase sender, IReadOnlyList<IJobItem> jobItems, IReadOnlyList<IJobItemOperationDefinition> operations, DateTime startTime);
     public delegate void JobCompletedDelegate(IBatchJobBase sender, TimeSpan duration);
-    public delegate void JobItemProcessedDelegate(IBatchJobBase sender, IJobItem item, bool result);
+    public delegate void JobItemProcessedDelegate(IBatchJobBase sender, IJobItem item);
     public delegate void JobProgressChangedDelegate(IBatchJobBase sender, double progress);
     public delegate void JobLogDelegateDelegate(IBatchJobBase sender, string message);
 
@@ -137,11 +137,11 @@ namespace Xarial.CadPlus.Plus.Services
 
     public interface IBatchJob : IBatchJobBase
     {
-        bool Execute(CancellationToken cancellationToken);
+        void Execute(CancellationToken cancellationToken);
     }
 
     public interface IAsyncBatchJob : IBatchJobBase
     {
-        Task<bool> ExecuteAsync(CancellationToken cancellationToken);
+        Task ExecuteAsync(CancellationToken cancellationToken);
     }
 }

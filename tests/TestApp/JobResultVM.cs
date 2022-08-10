@@ -43,7 +43,7 @@ namespace TestApp
             m_OperationDefinitions = new List<IJobItemOperationDefinition>();
         }
 
-        public async Task<bool> ExecuteAsync(CancellationToken cancellationToken)
+        public async Task ExecuteAsync(CancellationToken cancellationToken)
         {
             async Task ProcessJobItemOperation(MyJobItemOperation oper, JobItemStateStatus_e res, object userRes, string[] issues) 
             {
@@ -97,7 +97,7 @@ namespace TestApp
 
                 item1.Update(item1.ComposeStatus(), null, null);
 
-                ItemProcessed?.Invoke(this, item1, true);
+                ItemProcessed?.Invoke(this, item1);
                 ProgressChanged?.Invoke(this, 1d / 3d);
 
                 //item2
@@ -111,7 +111,7 @@ namespace TestApp
 
                 item2.Update(item2.ComposeStatus(), new IJobItemIssue[] { new MyJobItemIssue(IssueType_e.Warning, "Some Warning") }, null);
 
-                ItemProcessed?.Invoke(this, item2, true);
+                ItemProcessed?.Invoke(this, item2);
                 ProgressChanged?.Invoke(this, 2d / 3d);
 
                 //item3
@@ -125,14 +125,8 @@ namespace TestApp
 
                 item3.Update(item3.ComposeStatus(), null, null);
 
-                ItemProcessed?.Invoke(this, item3, true);
+                ItemProcessed?.Invoke(this, item3);
                 ProgressChanged?.Invoke(this, 3d / 3d);
-
-                return true;
-            }
-            catch
-            {
-                return false;
             }
             finally 
             {

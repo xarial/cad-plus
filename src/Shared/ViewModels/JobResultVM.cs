@@ -31,8 +31,10 @@ namespace Xarial.CadPlus.Plus.Shared.ViewModels
 
         private JobStatus_e m_Status;
 
-        private int m_ProcessedItemsCount;
+        private int m_SucceededItemsCount;
         private int m_FailedItemsCount;
+        private int m_WarningItemsCount;
+
         private DateTime? m_StartTime;
         private TimeSpan? m_Duration;
 
@@ -99,12 +101,22 @@ namespace Xarial.CadPlus.Plus.Shared.ViewModels
         public IReadOnlyList<JobItemVM> JobItems => IsInitializing ? null : m_JobItems;
         public IReadOnlyList<JobItemOperationDefinitionVM> OperationDefinitions => IsInitializing ? null : m_OperationDefinitions;
 
-        public int ProcessedItemsCount
+        public int SucceededItemsCount
         {
-            get => m_ProcessedItemsCount;
+            get => m_SucceededItemsCount;
             private set
             {
-                m_ProcessedItemsCount = value;
+                m_SucceededItemsCount = value;
+                this.NotifyChanged();
+            }
+        }
+
+        public int WarningItemsCount
+        {
+            get => m_WarningItemsCount;
+            private set
+            {
+                m_WarningItemsCount = value;
                 this.NotifyChanged();
             }
         }
@@ -191,12 +203,12 @@ namespace Xarial.CadPlus.Plus.Shared.ViewModels
             CancelJobCommand = new RelayCommand(CancelJob, () => IsBatchJobInProgress);
 
             m_BatchJob = batchJob;
-            m_BatchJob.Initialized += OnJobSet;
+            m_BatchJob.Initialized += OnJobInitialized;
             m_BatchJob.ItemProcessed += OnItemProcessed;
             m_BatchJob.ProgressChanged += OnProgressChanged;
-            m_BatchJob.Completed += OnJobCompleted;
             m_BatchJob.Log += OnLog;
-
+            m_BatchJob.Completed += OnJobCompleted;
+            
             m_MsgSvc = msgSvc;
             m_Logger = logger;
 
@@ -271,7 +283,7 @@ namespace Xarial.CadPlus.Plus.Shared.ViewModels
             LogEntries.Add(line);
         }
 
-        private void OnJobSet(IBatchJobBase sender, IReadOnlyList<IJobItem> items, IReadOnlyList<IJobItemOperationDefinition> operations, DateTime startTime)
+        private void OnJobInitialized(IBatchJobBase sender, IReadOnlyList<IJobItem> items, IReadOnlyList<IJobItemOperationDefinition> operations, DateTime startTime)
         {
             m_JobItems.AddRange(items.Select(f => new JobItemVM(f)));
             m_OperationDefinitions.AddRange(operations.Select(o => new JobItemOperationDefinitionVM(o)));
@@ -287,15 +299,26 @@ namespace Xarial.CadPlus.Plus.Shared.ViewModels
             Duration = duration;
         }
 
-        private void OnItemProcessed(IBatchJobBase sender, IJobItem file, bool result)
+        private void OnItemProcessed(IBatchJobBase sender, IJobItem item)
         {
-            if (result)
+            switch (item.State.Status) 
             {
-                ProcessedItemsCount++;
-            }
-            else
-            {
-                FailedItemsCount++;
+                case JobItemStateStatus_e.Succeeded:
+                    SucceededItemsCount++;
+                    break;
+
+                case JobItemStateStatus_e.Warning:
+                    WarningItemsCount++;
+                    break;
+
+                case JobItemStateStatus_e.Failed:
+                    FailedItemsCount++;
+                    break;
+
+                default:
+                    m_Logger.Log($"'{item.Title}' status is not set to processed");
+                    FailedItemsCount++;
+                    break;
             }
 
             if (StartTime.HasValue)
@@ -346,18 +369,11 @@ namespace Xarial.CadPlus.Plus.Shared.ViewModels
             }
         }
 
-        protected void FinishRun(bool res, Exception err) 
+        protected void FinishRun(Exception err) 
         {
             if (err == null)
             {
-                if (res)
-                {
-                    UpdateJobStatus();
-                }
-                else
-                {
-                    Status = JobStatus_e.Failed;
-                }
+                UpdateJobStatus();
             }
             else 
             {
@@ -390,18 +406,18 @@ namespace Xarial.CadPlus.Plus.Shared.ViewModels
             m_BatchJob = batchJob;
         }
 
-        public void TryRunBatch()
+        public virtual void TryRunBatch()
         {
             var cancellationToken = StartRun();
 
             try
             {
-                var res = m_BatchJob.Execute(cancellationToken);
-                FinishRun(res, null);
+                m_BatchJob.Execute(cancellationToken);
+                FinishRun(null);
             }
             catch (Exception ex)
             {
-                FinishRun(false, ex);
+                FinishRun(ex);
             }
         }
     }
@@ -418,18 +434,18 @@ namespace Xarial.CadPlus.Plus.Shared.ViewModels
             m_BatchJob = batchJob;
         }
 
-        public async Task TryRunBatchAsync()
+        public virtual async Task TryRunBatchAsync()
         {
             var cancellationToken = StartRun();
             
             try
             {
-                var res = await m_BatchJob.ExecuteAsync(cancellationToken);
-                FinishRun(res, null);
+                await m_BatchJob.ExecuteAsync(cancellationToken);
+                FinishRun(null);
             }
             catch (Exception ex)
             {
-                FinishRun(false, ex);
+                FinishRun(ex);
             }
         }
     }
