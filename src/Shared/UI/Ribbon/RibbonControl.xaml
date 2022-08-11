@@ -11,7 +11,6 @@
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
         <local:DropDownButtonIsItemSelectedConverter x:Key="isDropDownItemSelectedConv"/>
-        <local:RibbonButtonCommandToCommandConverter x:Key="ribbonBtnToCmdConv"/>
         <local:ItemHeaderConverter x:Key="itemHeaderConv"/>
         <local:DropDownButtonItemCommandConverter x:Key="dropDownBtnItemCmdConv"/>
         <local:NumericSpinnerVisibilityConverter x:Key="numSpinVisConv"/>
@@ -47,7 +46,7 @@
                     <fluent:Button Header="{Binding Path=Title}" Margin="1" Style="{StaticResource RibbonCommandStyle}"
                                    Icon="{Binding Path=Icon, Converter={StaticResource imgToSrcConv}}"
                                    LargeIcon="{Binding Path=Icon, Converter={StaticResource imgToSrcConv}}" 
-                                   Command="{Binding Converter={StaticResource ribbonBtnToCmdConv}}"/>
+                                   Command="{Binding Path=Command}"/>
                 </DataTemplate>
             </local:RibbonCommandTemplateSelector.Button>
             <local:RibbonCommandTemplateSelector.Toggle>

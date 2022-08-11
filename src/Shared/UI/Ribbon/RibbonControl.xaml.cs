@@ -71,7 +71,7 @@ namespace Xarial.CadPlus.Plus.Shared.UI
 						var btnItem = new BackstageButton()
 						{
 							Header = btn.Title,
-							Command = new RelayCommand(btn.Handler, btn.CanExecuteHandler),
+							Command = btn.Command,
 							Icon = btn.Icon?.ToBitmapImage(),
 							DataContext = btn,
 						};

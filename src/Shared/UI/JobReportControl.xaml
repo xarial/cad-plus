@@ -15,7 +15,6 @@
         <conv:JobItemStateStatusToImageConverter x:Key="statusToImgConv"/>
         <xconv:EnumerableIsNotEmptyVisibilityConverter x:Key="hasIssuesToVisConv"/>
         <conv:IssuesToTextConverter x:Key="issuesToTextConv"/>
-        <conv:IsPreparingJobConverter x:Key="isPrepJobConv"/>
         <DataTemplate x:Key="JobItemStateTemplate">
             <Grid HorizontalAlignment="Center">
                 <Grid.ColumnDefinitions>
@@ -49,9 +48,12 @@
                 </Popup>
             </Grid>
         </DataTemplate>
+        <conv:IsPreparingJobConverter x:Key="isPrepJobConv"/>
+        <conv:IsPreparingJobConverter x:Key="isNotPrepJobConv" Reverse="True"/>
     </UserControl.Resources>
-    <xctrls:ProgressPanel Progress="{x:Null}" Message="Loading Job..." IsWorkInProgress="{Binding Path=Status, Converter={StaticResource isPrepJobConv}}">
-        <Grid>
+    <Grid>
+        <xctrls:LoadingWheel Color="Gray" Visibility="{Binding Path=Status, Converter={StaticResource isPrepJobConv}}" Diameter="50" StrokeThickness="5"/>
+        <Grid Visibility="{Binding Path=Status, Converter={StaticResource isNotPrepJobConv}}">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="Auto"/>
@@ -154,5 +156,5 @@
                 <TextBlock Text="Export Report..." Margin="5"/>
             </Button>
         </Grid>
-    </xctrls:ProgressPanel>
+    </Grid>
 </UserControl>

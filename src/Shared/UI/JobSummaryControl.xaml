@@ -9,9 +9,11 @@
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
         <conv:IsPreparingJobConverter x:Key="isPrepJobConv"/>
+        <conv:IsPreparingJobConverter x:Key="isNotPrepJobConv" Reverse="True"/>
     </UserControl.Resources>
-    <xctrls:ProgressPanel Progress="{x:Null}" Message="Loading Job..." IsWorkInProgress="{Binding Path=Status, Converter={StaticResource isPrepJobConv}}">
-        <Grid>
+    <Grid>
+        <xctrls:LoadingWheel Color="Gray" Visibility="{Binding Path=Status, Converter={StaticResource isPrepJobConv}}" Diameter="50" StrokeThickness="5"/>
+        <Grid Visibility="{Binding Path=Status, Converter={StaticResource isNotPrepJobConv}}">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
@@ -52,5 +54,5 @@
 
             </Grid>
         </Grid>
-    </xctrls:ProgressPanel>
+    </Grid>
 </UserControl>

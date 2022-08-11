@@ -133,7 +133,7 @@ namespace Xarial.CadPlus.Plus.Shared.ViewModels
                 (batchJob.OperationDefinitions ?? Enumerable.Empty<IJobItemOperationDefinition>()).Select(o => new JobItemOperationDefinitionVM(o)));
             BindingOperations.EnableCollectionSynchronization(m_OperationDefinitions, m_Lock);
 
-            CancelJobCommand = new RelayCommand(CancelJob, () => m_BatchJob.Status == JobStatus_e.Initializing || m_BatchJob.Status == JobStatus_e.InProgress);
+            CancelJobCommand = new RelayCommand(CancelJob, () => !m_CancellationTokenSource.IsCancellationRequested && m_BatchJob.Status == JobStatus_e.Initializing || m_BatchJob.Status == JobStatus_e.InProgress);
 
             m_BatchJob = batchJob;
             m_BatchJob.Started += OnJobStarted;
@@ -280,7 +280,13 @@ namespace Xarial.CadPlus.Plus.Shared.ViewModels
             }
         }
 
-        public void CancelJob() => m_CancellationTokenSource.Cancel();
+        public void CancelJob()
+        {
+            if (m_MsgSvc.ShowQuestion("Do you want to cancel this operation?") == true)
+            {
+                m_CancellationTokenSource.Cancel();
+            }
+        }
     }
 
     public class JobResultVM : JobResultBaseVM

@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using TestApp.Properties;
 using Xarial.CadPlus.Plus.UI;
+using Xarial.XToolkit.Wpf;
 
 namespace TestApp
 {
@@ -52,10 +53,10 @@ namespace TestApp
             CommandManager = new RibbonCommandManager(
                 new IRibbonButtonCommand[]
                 {
-                    new RibbonButtonCommand("Command1", Resources.icon1, "Backstage Command 1 Backstage Command 1 Backstage Command 1 Backstage Command 1 Backstage Command 1 Backstage Command 1 Backstage Command 1", () => MessageBox.Show("Command1 is clicked"), () => true),
+                    new RibbonButtonCommand("Command1", Resources.icon1, "Backstage Command 1 Backstage Command 1 Backstage Command 1 Backstage Command 1 Backstage Command 1 Backstage Command 1 Backstage Command 1", new RelayCommand(() => MessageBox.Show("Command1 is clicked"))),
                     null,
-                    new RibbonButtonCommand("Command2", null, "Backstage Command 2", () => Debug.Print("Command 2 is clicked"), null),
-                    new RibbonButtonCommand("Command3", Resources.icon2, "Backstage Command 3", () => { }, null),
+                    new RibbonButtonCommand("Command2", null, "Backstage Command 2", new RelayCommand(() => Debug.Print("Command 2 is clicked"))),
+                    new RibbonButtonCommand("Command3", Resources.icon2, "Backstage Command 3", new RelayCommand(() => { })),
                 },
                 new RibbonTab("Tab1", "Tab1",
                     new RibbonGroup("Group1", "Group1",
@@ -69,9 +70,9 @@ namespace TestApp
                         null,
                         new RibbonToggleCommand("Toggle3", Resources.icon4, "Some Toggle 3", () => m_Toggle3, x => m_Toggle3 = x)),
                     new RibbonGroup("Group3", "Group3",
-                        new RibbonButtonCommand("Button1", Resources.icon5, "Button1 Tooltip", () => { }, null),
+                        new RibbonButtonCommand("Button1", Resources.icon5, "Button1 Tooltip", new RelayCommand(() => MessageBox.Show("Button 1 is clicked"))),
                         null,
-                        new RibbonButtonCommand("Very Wide Button2", Resources.icon1, "Button 2 Tooltip", () => { }, null),
+                        new RibbonButtonCommand("Very Wide Button2", Resources.icon1, "Button 2 Tooltip", new RelayCommand(() => { }, () => m_Toggle1)),
                         new RibbonNumericSwitchCommand("NumericSwitch1", Resources.icon3, "Some numeric toggle switch", "Numeric Toggle On", "Numeric Toggle Off", () => m_NumericSwitch1, x => m_NumericSwitch1 = x, () => m_NumericValue1, x => m_NumericValue1 = x, new RibbonNumericSwitchCommandOptions(10, 100, true, "0")),
                         new RibbonSwitchCommand("Switch1", Resources.icon3, "Some toggle switch", "Toggle On", "Toggle Off", () => m_Switch1, x => m_Switch1 = x))));
         }

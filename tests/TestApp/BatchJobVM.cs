@@ -13,6 +13,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using TestApp.Properties;
 using Xarial.CadPlus.Plus.Services;
+using Xarial.CadPlus.Plus.Shared.Services;
 using Xarial.CadPlus.Plus.Shared.ViewModels;
 using Xarial.XCad.Base;
 using Xarial.XToolkit.Services;
@@ -302,7 +303,7 @@ namespace TestApp
         {
             m_CancellationTokenSource = new CancellationTokenSource();
 
-            var res = new AsyncJobResultVM(new MyAsyncBatchJob(), Mock.Of<IMessageService>(), Mock.Of<IXLogger>(), m_CancellationTokenSource, null, null);
+            var res = new AsyncJobResultVM(new MyAsyncBatchJob(), new GenericMessageService(), Mock.Of<IXLogger>(), m_CancellationTokenSource, null, null);
 
             Result = res;
 

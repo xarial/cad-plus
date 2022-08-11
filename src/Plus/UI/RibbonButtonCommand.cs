@@ -7,25 +7,23 @@
 
 using System;
 using System.Drawing;
+using System.Windows.Input;
 
 namespace Xarial.CadPlus.Plus.UI
 {
     public interface IRibbonButtonCommand : IRibbonCommand
     {
-        Action Handler { get; }
-        Func<bool> CanExecuteHandler { get; }
+        ICommand Command { get; }
     }
 
     public class RibbonButtonCommand : RibbonCommand, IRibbonButtonCommand
     {
-        public Action Handler { get; }
-        public Func<bool> CanExecuteHandler { get; }
+        public ICommand Command { get; }
 
-        public RibbonButtonCommand(string title, Image icon, string description, Action handler, Func<bool> canExecute)
+        public RibbonButtonCommand(string title, Image icon, string description, ICommand command)
             : base(title, icon, description)
         {
-            Handler = handler;
-            CanExecuteHandler = canExecute;
+            Command = command;
         }
     }
 }
