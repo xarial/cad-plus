@@ -20,6 +20,7 @@ namespace Xarial.CadPlus.Plus.Services
 
     public enum JobStatus_e
     {
+        Initializing,
         InProgress,
         Failed,
         Succeeded,
@@ -46,7 +47,7 @@ namespace Xarial.CadPlus.Plus.Services
     public delegate void JobItemOperationUserResultChangedDelegate(IJobItemOperation sender, object userResult);
 
     public delegate void JobInitializedDelegate(IBatchJobBase sender, IReadOnlyList<IJobItem> jobItems, IReadOnlyList<IJobItemOperationDefinition> operations, DateTime startTime);
-    public delegate void JobCompletedDelegate(IBatchJobBase sender, TimeSpan duration);
+    public delegate void JobCompletedDelegate(IBatchJobBase sender, TimeSpan duration, JobStatus_e status);
     public delegate void JobItemProcessedDelegate(IBatchJobBase sender, IJobItem item);
     public delegate void JobProgressChangedDelegate(IBatchJobBase sender, double progress);
     public delegate void JobLogDelegateDelegate(IBatchJobBase sender, string message);
@@ -130,6 +131,12 @@ namespace Xarial.CadPlus.Plus.Services
         event JobLogDelegateDelegate Log;
         event JobProgressChangedDelegate ProgressChanged;
 
+        DateTime StartTime { get; }
+        TimeSpan Duration { get; }
+
+        double Progress { get; }
+        JobStatus_e Status { get; }
+
         IReadOnlyList<IJobItemOperationDefinition> OperationDefinitions { get; }
         IReadOnlyList<string> LogEntries { get; }
         IReadOnlyList<IJobItem> JobItems { get; }
@@ -137,11 +144,104 @@ namespace Xarial.CadPlus.Plus.Services
 
     public interface IBatchJob : IBatchJobBase
     {
-        void Execute(CancellationToken cancellationToken);
+        void TryExecute(CancellationToken cancellationToken);
     }
 
     public interface IAsyncBatchJob : IBatchJobBase
     {
-        Task ExecuteAsync(CancellationToken cancellationToken);
+        Task TryExecuteAsync(CancellationToken cancellationToken);
+    }
+
+    public static class BatchJobExtension
+    {
+        public static void HandleExecute(this IAsyncBatchJob job, CancellationToken cancellationToken,
+            Action<CancellationToken> initFunc, Action<DateTime> raiseInitEventFunc, Action<DateTime> setStartTime,
+            Action<CancellationToken> doWorkFunc, Action<TimeSpan> raiseCompletedFunc, Action<TimeSpan> setDuration,
+            Action<JobStatus_e> setStatusFunc)
+        {
+            var startTime = DateTime.Now;
+
+            try
+            {
+                initFunc.Invoke(cancellationToken);
+
+                setStartTime.Invoke(startTime);
+
+                raiseInitEventFunc.Invoke(startTime);
+
+                setStatusFunc.Invoke(JobStatus_e.InProgress);
+
+                doWorkFunc.Invoke(cancellationToken);
+
+                setStatusFunc.Invoke(ComposeJobStatus(job));
+            }
+            catch (OperationCanceledException)
+            {
+                setStatusFunc.Invoke(JobStatus_e.Cancelled);
+            }
+            catch
+            {
+                setStatusFunc.Invoke(JobStatus_e.Failed);
+            }
+            finally
+            {
+                var duration = DateTime.Now.Subtract(startTime);
+                setDuration.Invoke(duration);
+                raiseCompletedFunc?.Invoke(duration);
+            }
+        }
+
+        public static async Task HandleExecuteAsync(this IAsyncBatchJob job, CancellationToken cancellationToken,
+            Func<CancellationToken, Task> initFunc, Action<DateTime> raiseInitEventFunc, Action<DateTime> setStartTime,
+            Func<CancellationToken, Task> doWorkFunc, Action<TimeSpan> raiseCompletedFunc, Action<TimeSpan> setDuration,
+            Action<JobStatus_e> setStatusFunc)
+        {
+            var startTime = DateTime.Now;
+
+            try
+            {
+                await initFunc.Invoke(cancellationToken);
+                
+                setStartTime.Invoke(startTime);
+
+                raiseInitEventFunc.Invoke(startTime);
+
+                setStatusFunc.Invoke(JobStatus_e.InProgress);
+
+                await doWorkFunc.Invoke(cancellationToken);
+
+                setStatusFunc.Invoke(ComposeJobStatus(job));
+            }
+            catch (OperationCanceledException)
+            {
+                setStatusFunc.Invoke(JobStatus_e.Cancelled);
+            }
+            catch
+            {
+                setStatusFunc.Invoke(JobStatus_e.Failed);
+            }
+            finally
+            {
+                var duration = DateTime.Now.Subtract(startTime);
+                setDuration.Invoke(duration);
+                raiseCompletedFunc?.Invoke(duration);
+            }
+        }
+
+        private static JobStatus_e ComposeJobStatus(IBatchJobBase job)
+        {
+            if (job.JobItems.All(i => i.State.Status == JobItemStateStatus_e.Succeeded))
+            {
+                return JobStatus_e.Succeeded;
+            }
+            else if (job.JobItems.Any(i => i.State.Status == JobItemStateStatus_e.Succeeded))
+            {
+                return JobStatus_e.CompletedWithWarning;
+            }
+            else
+            {
+                return JobStatus_e.Failed;
+            }
+        }
     }
 }
