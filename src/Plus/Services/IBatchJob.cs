@@ -154,7 +154,7 @@ namespace Xarial.CadPlus.Plus.Services
 
     public static class BatchJobExtension
     {
-        public static void HandleExecute(this IAsyncBatchJob job, CancellationToken cancellationToken,
+        public static void HandleExecute(this IBatchJob job, CancellationToken cancellationToken,
             Action<CancellationToken> initFunc, Action<DateTime> raiseInitEventFunc, Action<DateTime> setStartTime,
             Action<CancellationToken> doWorkFunc, Action<TimeSpan> raiseCompletedFunc, Action<TimeSpan> setDuration,
             Action<JobStatus_e> setStatusFunc)
