@@ -24,6 +24,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.Converters
 {
     public class JobStatusToImageConverter : IValueConverter
     {
+        private static readonly BitmapImage m_InitiatingImage;
         private static readonly BitmapImage m_CancelledImage;
         private static readonly BitmapImage m_FailedImage;
         private static readonly BitmapImage m_InProgressImage;
@@ -32,6 +33,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.Converters
 
         static JobStatusToImageConverter() 
         {
+            m_InitiatingImage = Resources.status_awaiting.ToBitmapImage();
             m_CancelledImage = Resources.status_cancelled.ToBitmapImage();
             m_FailedImage = Resources.status_failed.ToBitmapImage();
             m_InProgressImage = Resources.status_in_progress.ToBitmapImage();
@@ -41,10 +43,13 @@ namespace Xarial.CadPlus.Batch.StandAlone.Converters
 
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value is JobStatus_e)
+            if (value is JobStatus_e?)
             {
-                switch ((JobStatus_e)value) 
+                switch ((JobStatus_e?)value) 
                 {
+                    case null:
+                    case JobStatus_e.Initializing:
+                        return m_InitiatingImage;
                     case JobStatus_e.Cancelled:
                         return m_CancelledImage;
                     case JobStatus_e.Failed:

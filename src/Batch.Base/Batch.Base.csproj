@@ -9,7 +9,6 @@
     <Compile Remove="Converters\HasIssuesToVisibilityConverter.cs" />
     <Compile Remove="Converters\IssuesToTextConverter.cs" />
     <Compile Remove="Converters\JobItemStatusToImageConverter.cs" />
-    <Compile Remove="Exceptions\JobCancelledException.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Update="Properties\Resources.Designer.cs">
@@ -25,7 +24,6 @@
     <None Include="Converters\HasIssuesToVisibilityConverter.cs" />
     <None Include="Converters\IssuesToTextConverter.cs" />
     <None Include="Converters\JobItemStatusToImageConverter.cs" />
-    <None Include="Exceptions\JobCancelledException.cs" />
     <None Include="Resources\status-awaiting.png" />
   </ItemGroup>
   <ItemGroup>
@@ -62,6 +60,6 @@
     <Resource Include="Resources\info.png" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Xarial.CadPlusPlus.Shared" Version="0.4.0-dev.4324" />
+    <PackageReference Include="Xarial.CadPlusPlus.Shared" Version="0.4.0-dev.4331" />
   </ItemGroup>
 </Project>

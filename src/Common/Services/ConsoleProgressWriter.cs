@@ -23,6 +23,7 @@ namespace Xarial.CadPlus.Common.Services
         public ConsoleProgressWriter(IBatchJobBase job) 
         {
             m_Job = job;
+            m_Job.Started += OnJobStarted;
             m_Job.Completed += OnJobCompleted;
             m_Job.Initialized += OnJobInitialized;
             m_Job.ItemProcessed += OnItemProcessed;
@@ -30,8 +31,9 @@ namespace Xarial.CadPlus.Common.Services
             m_Job.Log += OnLog;
         }
 
-        private void OnJobCompleted(IBatchJobBase sender, TimeSpan duration) => ReportCompleted(duration);
-        private void OnJobInitialized(IBatchJobBase sender, IReadOnlyList<IJobItem> jobItems, IReadOnlyList<IJobItemOperationDefinition> operations, DateTime startTime) => SetJobScope(jobItems, startTime);
+        private void OnJobStarted(IBatchJobBase sender, DateTime startTime) => SetStarted(startTime);
+        private void OnJobCompleted(IBatchJobBase sender, TimeSpan duration, JobStatus_e status) => ReportCompleted(duration, status);
+        private void OnJobInitialized(IBatchJobBase sender, IReadOnlyList<IJobItem> jobItems, IReadOnlyList<IJobItemOperationDefinition> operations) => SetJobScope(jobItems);
         private void OnItemProcessed(IBatchJobBase sender, IJobItem file) => ReportStatus(file);
         private void OnProgressChanged(IBatchJobBase sender, double progress) => ReportProgress(progress);
         private void OnLog(IBatchJobBase sender, string msg) => Log(msg);
@@ -45,20 +47,25 @@ namespace Xarial.CadPlus.Common.Services
             Console.ResetColor();
         }
 
+        private void SetStarted(DateTime startTime)
+        {
+            Console.WriteLine($"Started: {startTime}");
+        }
+
         private void ReportStatus(IJobItem file)
         {
             Console.WriteLine($"Result: {file.State.Status}");
         }
 
-        private void SetJobScope(IReadOnlyList<IJobItem> scope, DateTime startTime)
+        private void SetJobScope(IReadOnlyList<IJobItem> scope)
         {
             m_Scope = scope;
-            Console.WriteLine($"Processing {scope.Count} file(s). {startTime}");
+            Console.WriteLine($"Processing {scope.Count} file(s)");
         }
 
-        private void ReportCompleted(TimeSpan duration)
+        private void ReportCompleted(TimeSpan duration, JobStatus_e status)
         {
-            Console.WriteLine($"Operation completed: {duration}");
+            Console.WriteLine($"Operation completed: {duration}: {status}");
             Console.WriteLine($"Processed: {m_Scope.Count(j => j.State.Status == JobItemStateStatus_e.Succeeded)}");
             Console.WriteLine($"Warning: {m_Scope.Count(j => j.State.Status == JobItemStateStatus_e.Warning)}");
             Console.WriteLine($"Failed: {m_Scope.Count(j => j.State.Status == JobItemStateStatus_e.Failed)}");

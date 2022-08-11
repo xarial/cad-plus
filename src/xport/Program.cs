@@ -49,7 +49,6 @@ namespace Xarial.CadPlus.Xport
         private static void OnConfigureServices(IContainerBuilder builder, Arguments args)
         {
             builder.RegisterSelfSingleton<ExporterVM>();
-            builder.RegisterSingleton<IAboutService, AboutService>();
             builder.RegisterSingleton<IParentWindowProvider, ParentWindowProvider>().UsingFactory(() => new ParentWindowProvider(() => m_Window));
         }
 
@@ -86,7 +85,7 @@ namespace Xarial.CadPlus.Xport
             {
                 using (var prgWriter = new ConsoleProgressWriter(exporter))
                 {
-                    await exporter.ExecuteAsync(default).ConfigureAwait(false);
+                    await exporter.TryExecuteAsync(default).ConfigureAwait(false);
                 }
             }
         }

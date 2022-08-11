@@ -30,6 +30,7 @@ namespace Xarial.CadPlus.Batch.InApp
 {
     public class AssemblyBatchRunJobExecutor : IBatchJob
     {
+        public event JobStartedDelegate Started;
         public event JobInitializedDelegate Initialized;
         public event JobCompletedDelegate Completed;
         public event JobItemProcessedDelegate ItemProcessed;
@@ -48,19 +49,34 @@ namespace Xarial.CadPlus.Batch.InApp
         private readonly bool m_AutoSaveDocs;
         private readonly IXLogger m_Logger;
 
-        private bool m_IsExecuted;
-
         private JobItemMacro m_CurrentMacro;
 
         private readonly IMacroRunnerPopupHandler m_PopupHandler;
 
-        public IReadOnlyList<IJobItem> JobItems { get; private set; }
+        public IReadOnlyList<IJobItem> JobItems => m_JobItems;
         public IReadOnlyList<IJobItemOperationDefinition> OperationDefinitions { get; private set; }
         public IReadOnlyList<string> LogEntries => m_LogEntries;
+
+        public DateTime? StartTime { get; private set; }
+        public TimeSpan? Duration { get; private set; }
+        public double? Progress 
+        {
+            get => m_Progress;
+            private set 
+            {
+                m_Progress = value;
+                this.ProgressChanged?.Invoke(this, value.Value);
+            }
+        }
+        public JobStatus_e? Status { get; private set;}
 
         private readonly ICadDescriptor m_CadDesc;
 
         private readonly List<string> m_LogEntries;
+
+        private double? m_Progress;
+
+        private JobItemDocument[] m_JobItems;
 
         internal AssemblyBatchRunJobExecutor(IXApplication app, IMacroExecutor macroRunnerSvc, ICadDescriptor cadDesc,
             IXDocument[] documents, IXLogger logger, IEnumerable<MacroData> macros,
@@ -93,56 +109,39 @@ namespace Xarial.CadPlus.Batch.InApp
             }
         }
 
-        public void Execute(CancellationToken cancellationToken)
+        public void TryExecute(CancellationToken cancellationToken)
+            => this.HandleExecute(cancellationToken,
+                t => Started?.Invoke(this, t),
+                t => StartTime = t,
+                Init, () => Initialized?.Invoke(this, JobItems, OperationDefinitions),
+                DoWork,
+                d => Completed?.Invoke(this, d, Status.Value),
+                d => Duration = d,
+                s => Status = s);
+
+        private void Init(CancellationToken cancellationToken)
         {
-            if (!m_IsExecuted)
+            LogEntry("Preparing job");
+
+            m_PopupHandler.Start(m_App);
+
+            m_JobItems = PrepareJob(out var macroDefs);
+
+            OperationDefinitions = macroDefs;
+        }
+
+        private void DoWork(CancellationToken cancellationToken)
+        {
+            for (int i = 0; i < m_JobItems.Length; i++)
             {
-                m_IsExecuted = true;
+                cancellationToken.ThrowIfCancellationRequested();
 
-                var startTime = DateTime.Now;
+                var jobItem = m_JobItems[i];
 
-                try
-                {
-                    LogEntry("Preparing job");
+                TryProcessFile(jobItem, cancellationToken);
 
-                    m_PopupHandler.Start(m_App);
-
-                    var jobItems = PrepareJob(out var macroDefs);
-
-                    OperationDefinitions = macroDefs;
-                    JobItems = jobItems;
-
-                    Initialized?.Invoke(this, jobItems, macroDefs, startTime);
-
-                    for (int i = 0; i < jobItems.Length; i++)
-                    {
-                        cancellationToken.ThrowIfCancellationRequested();
-
-                        var jobItem = jobItems[i];
-
-                        TryProcessFile(jobItem, cancellationToken);
-
-                        ItemProcessed?.Invoke(this, jobItem);
-                        ProgressChanged?.Invoke(this, (double)(i + 1) / (double)jobItems.Length);
-                    }
-                }
-                catch (OperationCanceledException)
-                {
-                    throw new JobCancelledException();
-                }
-                catch (Exception ex)
-                {
-                    m_Logger.Log(ex);
-                }
-                finally
-                {
-                    m_PopupHandler.Stop();
-                    Completed?.Invoke(this, DateTime.Now - startTime);
-                }
-            }
-            else 
-            {
-                throw new Exception("Job was already executed. This is a transient service and can onlyt be executed once");
+                ItemProcessed?.Invoke(this, jobItem);
+                Progress = (double)(i + 1) / (double)m_JobItems.Length;
             }
         }
 

@@ -53,6 +53,7 @@ namespace Xarial.CadPlus.Batch.Base.Core
             }
 
             ReportIssue(err, IssueType_e.Error);
+            Status = JobItemStateStatus_e.Failed;
         }
 
         public void ReportIssue(string content, IssueType_e type)

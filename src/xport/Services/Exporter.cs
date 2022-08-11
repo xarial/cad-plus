@@ -106,6 +106,7 @@ namespace Xarial.CadPlus.Xport.Services
     {
         private readonly IJobProcessManager m_JobMgr;
 
+        public event JobStartedDelegate Started;
         public event JobInitializedDelegate Initialized;
         public event JobItemProcessedDelegate ItemProcessed;
         public event JobProgressChangedDelegate ProgressChanged;
@@ -114,17 +115,131 @@ namespace Xarial.CadPlus.Xport.Services
 
         private readonly ExportOptions m_Opts;
 
-        public IReadOnlyList<IJobItem> JobItems { get; private set; }
+        public IReadOnlyList<IJobItem> JobItems => m_JobFiles;
         public IReadOnlyList<IJobItemOperationDefinition> OperationDefinitions { get; private set; }
         public IReadOnlyList<string> LogEntries => m_LogEntries;
 
+        public DateTime? StartTime { get; private set; }
+        public TimeSpan? Duration { get; private set; }
+        
+        public double? Progress 
+        {
+            get => m_Progress;
+            private set 
+            {
+                m_Progress = value;
+                this.ProgressChanged?.Invoke(this, value.Value);
+            }
+        }
+
+        public JobStatus_e? Status { get; private set; }
+
         private readonly List<string> m_LogEntries;
+
+        private double? m_Progress;
+
+        private JobItemFile[] m_JobFiles;
 
         public Exporter(IJobProcessManager jobMgr, ExportOptions opts)
         {
             m_JobMgr = jobMgr;
             m_Opts = opts;
             m_LogEntries = new List<string>();
+        }
+
+        public async Task TryExecuteAsync(CancellationToken cancellationToken)
+            => await this.HandleExecuteAsync(cancellationToken,
+                t => Started?.Invoke(this, t),
+                t => StartTime = t,
+                InitAsync,
+                () => Initialized?.Invoke(this, JobItems, OperationDefinitions),
+                DoWorkAsync,
+                d => Completed?.Invoke(this, d, Status.Value),
+                d => Duration = d,
+                s => Status = s);
+
+        private Task InitAsync(CancellationToken arg)
+        {
+            AddLogEntry($"Exporting Started");
+
+            m_JobFiles = ParseOptions(m_Opts, out var formats);
+
+            OperationDefinitions = formats;
+
+            return Task.CompletedTask;
+        }
+
+        private async Task DoWorkAsync(CancellationToken cancellationToken)
+        {
+            for (int i = 0; i < m_JobFiles.Length; i++)
+            {
+                var file = m_JobFiles[i];
+
+                var outFiles = file.Operations;
+
+                foreach (var outFile in outFiles)
+                {
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                    try
+                    {
+                        var desFile = outFile.OutputFilePath;
+
+                        int index = 0;
+
+                        while (File.Exists(desFile))
+                        {
+                            var outDir = Path.GetDirectoryName(outFile.OutputFilePath);
+                            var fileName = Path.GetFileNameWithoutExtension(outFile.OutputFilePath);
+                            var ext = Path.GetExtension(outFile.OutputFilePath);
+
+                            fileName = $"{fileName} ({++index})";
+
+                            desFile = Path.Combine(outDir, fileName + ext);
+                        }
+
+                        var prcStartInfo = new ProcessStartInfo()
+                        {
+                            CreateNoWindow = true,
+                            UseShellExecute = false,
+                            FileName = typeof(StandAloneExporter.Program).Assembly.Location,
+                            Arguments = $"\"{file.FilePath}\" \"{desFile}\" {m_Opts.Version}"
+                        };
+
+                        var tcs = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+                        if (m_Opts.Timeout > 0)
+                        {
+                            tcs.CancelAfter(TimeSpan.FromSeconds(m_Opts.Timeout));
+                        }
+
+                        var res = await StartWaitProcessAsync(prcStartInfo, tcs.Token).ConfigureAwait(false);
+
+                        if (res)
+                        {
+                            outFile.State.Status = JobItemStateStatus_e.Succeeded;
+                        }
+                        else
+                        {
+                            throw new Exception("Failed to process the file");
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        outFile.State.Status = JobItemStateStatus_e.Failed;
+
+                        AddLogEntry($"Error while processing '{file.FilePath}': {ex.Message}");
+                        if (!m_Opts.ContinueOnError)
+                        {
+                            throw ex;
+                        }
+                    }
+                }
+
+                file.State.Status = file.ComposeStatus();
+
+                ItemProcessed?.Invoke(this, file);
+                Progress = (i + 1) / (double)m_JobFiles.Length;
+            }
         }
 
         private Task<bool> StartWaitProcessAsync(ProcessStartInfo prcStartInfo,
@@ -173,100 +288,6 @@ namespace Xarial.CadPlus.Xport.Services
             m_JobMgr.AddProcess(process);
             process.BeginOutputReadLine();
             return tcs.Task;
-        }
-
-        public async Task ExecuteAsync(CancellationToken cancellationToken)
-        {
-            AddLogEntry($"Exporting Started");
-
-            var startTime = DateTime.Now;
-
-            var jobFiles = ParseOptions(m_Opts, out var formats);
-
-            JobItems = jobFiles;
-            OperationDefinitions = formats;
-
-            Initialized?.Invoke(this, jobFiles, formats, startTime);
-
-            for (int i = 0; i < jobFiles.Length; i++)
-            {
-                var file = jobFiles[i];
-
-                var outFiles = file.Operations;
-
-                foreach (var outFile in outFiles)
-                {
-                    try
-                    {
-                        var desFile = outFile.OutputFilePath;
-
-                        int index = 0;
-
-                        while (File.Exists(desFile))
-                        {
-                            var outDir = Path.GetDirectoryName(outFile.OutputFilePath);
-                            var fileName = Path.GetFileNameWithoutExtension(outFile.OutputFilePath);
-                            var ext = Path.GetExtension(outFile.OutputFilePath);
-
-                            fileName = $"{fileName} ({++index})";
-
-                            desFile = Path.Combine(outDir, fileName + ext);
-                        }
-
-                        if (cancellationToken.IsCancellationRequested)
-                        {
-                            AddLogEntry($"Cancelled by the user");
-                            return;
-                        }
-
-                        var prcStartInfo = new ProcessStartInfo()
-                        {
-                            CreateNoWindow = true,
-                            UseShellExecute = false,
-                            FileName = typeof(StandAloneExporter.Program).Assembly.Location,
-                            Arguments = $"\"{file.FilePath}\" \"{desFile}\" {m_Opts.Version}"
-                        };
-
-                        var tcs = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-                        if (m_Opts.Timeout > 0)
-                        {
-                            tcs.CancelAfter(TimeSpan.FromSeconds(m_Opts.Timeout));
-                        }
-
-                        var res = await StartWaitProcessAsync(prcStartInfo, tcs.Token).ConfigureAwait(false);
-
-                        if (res)
-                        {
-                            outFile.State.Status = JobItemStateStatus_e.Succeeded;
-                        }
-                        else
-                        {
-                            throw new Exception("Failed to process the file");
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        outFile.State.Status = JobItemStateStatus_e.Failed;
-
-                        AddLogEntry($"Error while processing '{file.FilePath}': {ex.Message}");
-                        if (!m_Opts.ContinueOnError)
-                        {
-                            throw ex;
-                        }
-                    }
-                }
-
-                file.State.Status = file.ComposeStatus();
-
-                ItemProcessed?.Invoke(this, file);
-                ProgressChanged?.Invoke(this, (i + 1) / (double)jobFiles.Length);
-            }
-
-            var duration = DateTime.Now.Subtract(startTime);
-
-            AddLogEntry($"Exporting completed in {duration.ToString(@"hh\:mm\:ss")}");
-
-            Completed?.Invoke(this, duration);
         }
 
         private JobItemFile[] ParseOptions(ExportOptions opts, out JobItemExportFormatDefinition[] formatDefs)

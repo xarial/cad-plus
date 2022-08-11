@@ -8,8 +8,8 @@
   <Import Project="$(SolutionDir)common\common.module.props" />
   <ItemGroup>
     <PackageReference Include="QRCoder" Version="1.4.3" />
-    <PackageReference Include="Xarial.CadPlusPlus" Version="0.4.0-dev.4324" />
-    <PackageReference Include="Xarial.XCad.SolidWorks" Version="0.8.0-dev.4306" />
+    <PackageReference Include="Xarial.CadPlusPlus" Version="0.4.0-dev.4331" />
+    <PackageReference Include="Xarial.XCad.SolidWorks" Version="0.8.0-dev.4328" />
     <PackageReference Include="Xarial.XCad.SolidWorks.Pdm.Interops" Version="0.1.0" />
   </ItemGroup>
   <ItemGroup>

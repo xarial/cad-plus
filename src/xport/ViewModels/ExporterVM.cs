@@ -102,8 +102,8 @@ namespace Xarial.CadPlus.Xport.ViewModels
             }
         }
 
-        public ICommand ExportCommand => m_ExportCommand ?? (m_ExportCommand = new RelayCommand(Export, () => JobResult?.IsBatchJobInProgress != true && Input.Any() && Format != 0));
-        public ICommand CancelExportCommand => m_CancelExportCommand ?? (m_CancelExportCommand = new RelayCommand(CancelExport, () => JobResult?.IsBatchJobInProgress == true));
+        public ICommand ExportCommand => m_ExportCommand ?? (m_ExportCommand = new RelayCommand(Export, () => JobResult != null && !JobResult.Status.HasValue && Input.Any() && Format != 0));
+        public ICommand CancelExportCommand => JobResult.CancelJobCommand;
         public ICommand BrowseOutputDirectoryCommand => m_BrowseOutputDirectoryCommand ?? (m_BrowseOutputDirectoryCommand = new RelayCommand(BrowseOutputDirectory));
 
         public ICommand AboutCommand { get; }

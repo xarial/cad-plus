@@ -72,7 +72,7 @@ namespace Xarial.CadPlus.Batch.StandAlone
                 {
                     using (var prgWriter = new ConsoleProgressWriter(batchRunner))
                     {
-                        await batchRunner.ExecuteAsync(default).ConfigureAwait(false);
+                        await batchRunner.TryExecuteAsync(default).ConfigureAwait(false);
                     }
                 }
             }
@@ -94,7 +94,6 @@ namespace Xarial.CadPlus.Batch.StandAlone
             builder.RegisterSingleton<IJobContectResilientWorkerFactory, PollyJobContectResilientWorkerFactory>().UsingParameters(Parameter<int>.Any(MAX_RETRIES));
 
             builder.RegisterSingleton<IBatchDocumentVMFactory, BatchDocumentVMFactory>();
-            builder.RegisterSingleton<IAboutService, AboutService>(RegistrationConflictResolveStrategy_e.KeepOriginal);
             builder.RegisterSingleton<IParentWindowProvider, ParentWindowProvider>().UsingFactory(() => new ParentWindowProvider(() => m_Window));
 
             builder.Register<IBatchApplicationProxy, BatchApplicationProxy>();

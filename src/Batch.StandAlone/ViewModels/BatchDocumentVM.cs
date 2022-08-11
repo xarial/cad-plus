@@ -140,8 +140,6 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
             m_BatchAppProxy = batchAppProxy;
             m_ParentWnd = parentWnd;
 
-            CommandManager = LoadRibbonCommands(backstageCmds);
-
             InputFilesFilter = GetFileFilters(m_AppProvider.Descriptor);
             MacroFilesFilter = m_AppProvider.Descriptor.MacroFileFilters
                 .Select(f => new FileFilter(f.Name, f.Extensions))
@@ -153,6 +151,10 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
             RunJobCommand = new RelayCommand(RunJob, () => CanRunJob);
             SaveDocumentCommand = new RelayCommand(SaveDocument, () => IsDirty);
             FilterEditEndingCommand = new RelayCommand<DataGridCellEditEndingEventArgs>(FilterEditEnding);
+
+            CancelSelectedJobCommand = new RelayCommand(() => Results.Selected?.CancelJobCommand.Execute(null), () => Results.Selected?.CancelJobCommand.CanExecute(null) == true);
+            ExportSelectedJobLogCommand = new RelayCommand(() => Results.Selected?.ExportLogCommand.Execute(null), () => Results.Selected?.ExportLogCommand.CanExecute(null) == true);
+            ExportSelectedJobReportCommand = new RelayCommand(() => Results.Selected?.ExportReportCommand.Execute(null), () => Results.Selected?.ExportReportCommand.CanExecute(null) == true);
 
             Name = name;
             Settings = new BatchDocumentSettingsVM(m_Job, m_AppProvider, m_Logger);
@@ -173,6 +175,8 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
             {
                 macro.Modified += OnMacroDataModified;
             }
+
+            CommandManager = LoadRibbonCommands(backstageCmds);
         }
 
         protected virtual FileFilter[] GetFileFilters(ICadDescriptor cadEntDesc)
@@ -195,16 +199,13 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
                 new RibbonTab(BatchApplicationCommandManager.InputTab.Name, "Input",
                     new RibbonGroup(BatchApplicationCommandManager.InputTab.FilesGroupName, "Files",
                         new RibbonButtonCommand("Add Files...", Resources.add_file, "Browse files to be added to the current scope",
-                            () => m_ParentWnd.lstInputs.AddFilesCommand.Execute(null),
-                            () => m_ParentWnd.lstInputs.AddFilesCommand.CanExecute(null)),
+                            m_ParentWnd.lstInputs.AddFilesCommand),
                         new RibbonButtonCommand("Add Folders...", Resources.add_folder, "Browse folders to be added to the current scope",
-                            () => m_ParentWnd.lstInputs.AddFoldersCommand.Execute(null),
-                            () => m_ParentWnd.lstInputs.AddFoldersCommand.CanExecute(null)),
+                            m_ParentWnd.lstInputs.AddFoldersCommand),
                         new RibbonButtonCommand("Add From File...", Resources.add_from_file, "Add files and folders from the text file",
-                            AddFromFile, null),
+                            new RelayCommand(AddFromFile)),
                         new RibbonButtonCommand("Remove Files And Folders", Resources.remove_file_folder, "Remove selected files and folders from the scope",
-                            () => m_ParentWnd.lstInputs.DeleteSelectedCommand.Execute(null),
-                            () => m_ParentWnd.lstInputs.DeleteSelectedCommand.CanExecute(null))),
+                            m_ParentWnd.lstInputs.DeleteSelectedCommand)),
                 new RibbonGroup("FolderOptions", "Folder Options",
                         new RibbonCustomCommand("Folder Filters", Resources.filter, "List of filters for the files in the folders in the scope",
                         this, (System.Windows.DataTemplate)m_ParentWnd.FindResource("folderFilterGridTemplate")),
@@ -212,11 +213,9 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
                         () => Settings.TopLevelFilesOnly, x => Settings.TopLevelFilesOnly = x)),
                 new RibbonGroup(BatchApplicationCommandManager.InputTab.MacrosGroupName, "Macros",
                         new RibbonButtonCommand("Add Macros...", Resources.add_macro, "Browse macros to add to the scope",
-                            () => m_ParentWnd.lstMacros.AddFilesCommand.Execute(null),
-                            () => m_ParentWnd.lstMacros.AddFilesCommand.CanExecute(null)),
+                            m_ParentWnd.lstMacros.AddFilesCommand),
                         new RibbonButtonCommand("Remove Macros", Resources.remove_macro, "Remove selected macros from the scope",
-                            () => m_ParentWnd.lstMacros.DeleteSelectedCommand.Execute(null),
-                            () => m_ParentWnd.lstMacros.DeleteSelectedCommand.CanExecute(null)))),
+                            m_ParentWnd.lstMacros.DeleteSelectedCommand))),
                 new RibbonTab(BatchApplicationCommandManager.SettingsTab.Name, "Settings",
                     new RibbonGroup(BatchApplicationCommandManager.SettingsTab.StartupOptionsGroupName, "Startup Options",
                         new RibbonDropDownButton("Version", m_AppProvider.Descriptor.ApplicationIcon, $"Version of {m_AppProvider.Descriptor.ApplicationName} to use in batch job",
@@ -272,52 +271,23 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
                             t => Settings.BatchSize = Convert.ToInt32(t == 0 ? 1 : t), new RibbonNumericSwitchCommandOptions(0, 1000, true, "0")))),//TODO: some issues when limit is set from 1 (binding does not work) - implemented workaround
                 new RibbonTab(BatchApplicationCommandManager.JobTab.Name, "Job",
                     new RibbonGroup(BatchApplicationCommandManager.JobTab.ExecutionGroupName, "Execution",
-                        new RibbonButtonCommand("Run Job", Resources.run_job, "Start the current job", RunJob, () => CanRunJob),
-                        new RibbonButtonCommand("Cancel Job", Resources.cancel_job, "Cancel currently running job",
-                        () =>
-                        {
-                            if (Results?.Selected != null)
-                            {
-                                Results.Selected.CancelJob();
-                            }
-                        },
-                        () =>
-                        {
-                            if (Results?.Selected != null)
-                            {
-                                return Results.Selected.IsBatchJobInProgress;
-                            }
-                            else
-                            {
-                                return false;
-                            }
-
-                        })),
+                        new RibbonButtonCommand("Run Job", Resources.run_job, "Start the current job", RunJobCommand),
+                        new RibbonButtonCommand("Cancel Job", Resources.cancel_job, "Cancel currently running job", CancelSelectedJobCommand)),
                     new RibbonGroup(BatchApplicationCommandManager.JobTab.ResultsGroupName, "Results",
                         new RibbonButtonCommand("Export Summary Results", Resources.export_summary, "Export results statuses",
-                        () =>
-                        {
-                            if (Results?.Selected != null)
-                            {
-                                TryExportResults();
-                            }
-                        },
-                        () => Results?.Selected != null),
+                        ExportSelectedJobReportCommand),
                         new RibbonButtonCommand("Export Journal", Resources.export_log, "Export journal to a text file",
-                        () =>
-                        {
-                            if (Results?.Selected != null)
-                            {
-                                TryExportJournal();
-                            }
-                        },
-                        () => Results?.Selected != null))
+                        ExportSelectedJobLogCommand))
                 ));
             
             m_BatchAppProxy.CreateCommandManager(cmdMgr);
 
             return cmdMgr;
         }
+
+        public ICommand CancelSelectedJobCommand { get; }
+        public ICommand ExportSelectedJobReportCommand { get; }
+        public ICommand ExportSelectedJobLogCommand { get; }
 
         public Func<string, object> PathToMacroDataConverter { get; }
             = new Func<string, object>(p => new MacroDataVM(new MacroData() { FilePath = p }));
@@ -345,9 +315,6 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
         {
             IsDirty = true;
         }
-
-        private void TryExportResults() => Results.Selected.TryExportReport();
-        private void TryExportJournal() => Results.Selected.TryExportLog();
 
         internal void SaveAsDocument()
         {

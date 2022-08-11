@@ -59,13 +59,13 @@ namespace Xarial.CadPlus.Batch.StandAlone.Services
 
     public class BatchMacroRunJobStandAlone : IBatchMacroRunJobStandAlone
     {
+        public event JobStartedDelegate Started;
         public event JobInitializedDelegate Initialized;
         public event JobCompletedDelegate Completed;
         public event JobItemProcessedDelegate ItemProcessed;
         public event JobProgressChangedDelegate ProgressChanged;
         public event JobLogDelegateDelegate Log;
 
-        private bool m_IsExecuted;
         private bool m_IsDisposed;
 
         private readonly IBatchApplicationProxy m_BatchAppProxy;
@@ -83,11 +83,30 @@ namespace Xarial.CadPlus.Batch.StandAlone.Services
 
         private readonly ITaskRunner m_TaskRunner;
 
-        public IReadOnlyList<IJobItem> JobItems { get; private set; }
+        public DateTime? StartTime { get; private set; }
+        public TimeSpan? Duration { get; private set; }
+
+        public double? Progress
+        {
+            get => m_Progress;
+            private set
+            {
+                m_Progress = value;
+                this.ProgressChanged?.Invoke(this, value.Value);
+            }
+        }
+
+        public JobStatus_e? Status { get; private set; }
+
+        public IReadOnlyList<IJobItem> JobItems => m_JobDocuments;
         public IReadOnlyList<IJobItemOperationDefinition> OperationDefinitions { get; private set; }
         public IReadOnlyList<string> LogEntries => m_LogEntries;
 
         private readonly List<string> m_LogEntries;
+
+        private double? m_Progress;
+
+        private JobItemDocument[] m_JobDocuments;
 
         public BatchMacroRunJobStandAlone(BatchJob job, ICadApplicationInstanceProvider appProvider,
             IBatchApplicationProxy batchAppProxy,
@@ -122,11 +141,9 @@ namespace Xarial.CadPlus.Batch.StandAlone.Services
             {
                 Job = m_Job
             };
-
-            m_IsExecuted = false;
         }
 
-        public async Task ExecuteAsync(CancellationToken cancellationToken)
+        public async Task TryExecuteAsync(CancellationToken cancellationToken)
         {
             cancellationToken.Register(() =>
             {
@@ -136,122 +153,95 @@ namespace Xarial.CadPlus.Batch.StandAlone.Services
                 TryShutDownApplication(m_CurrentContext);
             });
 
+            await this.HandleExecuteAsync(cancellationToken,
+                t => Started?.Invoke(this, t),
+                t => StartTime = t,
+                InitAsync,
+                () => Initialized?.Invoke(this, JobItems, OperationDefinitions),
+                DoWorkAsync,
+                d => Completed?.Invoke(this, d, Status.Value),
+                d => Duration = d,
+                s => Status = s);
+        }
+
+        private async Task InitAsync(CancellationToken cancellationToken)
+        {
             try
             {
-                await BatchRunAsync(cancellationToken).ConfigureAwait(false);
-            }
-            catch (Exception ex)
-            {
-                AddLogEntry(ex.ParseUserError());
-                throw;
+                await m_TaskRunner.Run(() =>
+                {
+
+                    AddLogEntry($"Collecting files for processing");
+
+                    var app = EnsureApplication(m_CurrentContext, cancellationToken);
+
+                    m_JobDocuments = PrepareJobScope(app, m_Job.Input, m_Job.Filters, m_Job.TopLevelFilesOnly, m_Job.Macros, out var macroDefs);
+
+                    OperationDefinitions = macroDefs;
+
+                    AddLogEntry($"Running batch processing for {m_JobDocuments.Length} file(s)");
+
+                    if (!m_JobDocuments.Any())
+                    {
+                        throw new UserException("Empty job. No files matching specified filter");
+                    }
+
+                }, cancellationToken).ConfigureAwait(false);
             }
             finally
             {
-                Dispose();
+                TryShutDownApplication(m_CurrentContext);
             }
         }
 
-        private async Task<bool> BatchRunAsync(CancellationToken cancellationToken = default)
+        private async Task DoWorkAsync(CancellationToken cancellationToken)
         {
-            if (!m_IsExecuted)
+            try
             {
-                m_IsExecuted = true;
-
-                AddLogEntry($"Batch macro running started");
-
-                var batchStartTime = DateTime.Now;
-
-                TimeSpan? timeout = null;
-
-                if (m_Job.Timeout > 0)
+                await m_TaskRunner.Run(() =>
                 {
-                    timeout = TimeSpan.FromSeconds(m_Job.Timeout);
-                }
+                    var curBatchSize = 0;
 
-                var jobResult = false;
-
-                try
-                {
-                    await m_TaskRunner.Run(() =>
+                    for (int i = 0; i < m_JobDocuments.Length; i++)
                     {
-                        AddLogEntry($"Collecting files for processing");
+                        var curAppPrc = m_CurrentContext.CurrentApplicationProcess?.Id;
 
-                        var app = EnsureApplication(m_CurrentContext, cancellationToken);
+                        m_CurrentContext.CurrentJobItem = m_JobDocuments[i];
+                        var res = TryProcessFile(m_CurrentContext, m_Worker, cancellationToken);
 
-                        var allFiles = PrepareJobScope(app, m_Job.Input, m_Job.Filters, m_Job.TopLevelFilesOnly, m_Job.Macros, out var macroDefs);
+                        TryCloseDocument(m_CurrentContext.CurrentDocument);
 
-                        JobItems = allFiles;
-                        OperationDefinitions = macroDefs;
+                        m_CurrentContext.CurrentDocument = null;
 
-                        AddLogEntry($"Running batch processing for {allFiles.Length} file(s)");
+                        ItemProcessed?.Invoke(this, m_CurrentContext.CurrentJobItem);
+                        Progress = (double)(i + 1) / (double)m_JobDocuments.Length;
 
-                        Initialized?.Invoke(this, allFiles, macroDefs, batchStartTime);
-
-                        if (!allFiles.Any())
+                        if (!res && !m_Job.ContinueOnError)
                         {
-                            throw new UserException("Empty job. No files matching specified filter");
+                            throw new UserException("Cancelling the job. Set 'Continue On Error' option to continue job if file failed");
                         }
 
-                        var curBatchSize = 0;
-
-                        for (int i = 0; i < allFiles.Length; i++)
+                        if (m_CurrentContext.CurrentApplicationProcess?.Id != curAppPrc)
                         {
-                            var curAppPrc = m_CurrentContext.CurrentApplicationProcess?.Id;
-
-                            m_CurrentContext.CurrentJobItem = allFiles[i];
-                            var res = TryProcessFile(m_CurrentContext, m_Worker, cancellationToken);
-
-                            TryCloseDocument(m_CurrentContext.CurrentDocument);
-
-                            m_CurrentContext.CurrentDocument = null;
-
-                            ItemProcessed?.Invoke(this, m_CurrentContext.CurrentJobItem);
-                            ProgressChanged?.Invoke(this, (double)(i + 1) / (double)allFiles.Length);
-
-                            if (!res && !m_Job.ContinueOnError)
-                            {
-                                throw new UserException("Cancelling the job. Set 'Continue On Error' option to continue job if file failed");
-                            }
-
-                            if (m_CurrentContext.CurrentApplicationProcess?.Id != curAppPrc)
-                            {
-                                curBatchSize = 1;
-                            }
-                            else
-                            {
-                                curBatchSize++;
-                            }
-
-                            if (m_Job.BatchSize > 0 && curBatchSize >= m_Job.BatchSize)
-                            {
-                                AddLogEntry("Closing application as batch size reached the limit");
-                                TryShutDownApplication(m_CurrentContext);
-                                curBatchSize = 0;
-                            }
+                            curBatchSize = 1;
                         }
-                    }, cancellationToken).ConfigureAwait(false);
-                    jobResult = true;
-                }
-                catch (OperationCanceledException)
-                {
-                    throw new JobCancelledException();
-                }
-                finally
-                {
-                    TryShutDownApplication(m_CurrentContext);
-                }
+                        else
+                        {
+                            curBatchSize++;
+                        }
 
-                var duration = DateTime.Now.Subtract(batchStartTime);
-
-                Completed?.Invoke(this, duration);
-
-                AddLogEntry($"Batch running completed in {duration.ToString(@"hh\:mm\:ss")}");
-
-                return jobResult;
+                        if (m_Job.BatchSize > 0 && curBatchSize >= m_Job.BatchSize)
+                        {
+                            AddLogEntry("Closing application as batch size reached the limit");
+                            TryShutDownApplication(m_CurrentContext);
+                            curBatchSize = 0;
+                        }
+                    }
+                }, cancellationToken).ConfigureAwait(false);
             }
-            else
+            finally 
             {
-                throw new Exception("Job was already executed. This is a transient service and can onlyt be executed once");
+                TryShutDownApplication(m_CurrentContext);
             }
         }
 
@@ -497,7 +487,10 @@ namespace Xarial.CadPlus.Batch.StandAlone.Services
                 }
             }
 
-            context.CurrentJobItem.State.Status = context.CurrentJobItem.ComposeStatus();
+            if (context.CurrentJobItem.State.Status != JobItemStateStatus_e.Failed)
+            {
+                context.CurrentJobItem.State.Status = context.CurrentJobItem.ComposeStatus();
+            }
 
             AddLogEntry($"Processing file '{context.CurrentJobItem.Document.Path}' completed. Execution time {DateTime.Now.Subtract(fileProcessStartTime).ToString(@"hh\:mm\:ss")}");
 

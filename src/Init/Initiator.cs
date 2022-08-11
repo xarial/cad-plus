@@ -155,7 +155,7 @@ namespace Xarial.CadPlus.Init
         private void OnConfigureServices(IContainerBuilder builder)
         {
             builder.RegisterSingleton<IXLogger, AppLogger>();
-            builder.RegisterSingleton<IAboutService, AboutService>();
+            builder.RegisterSingleton<IAboutService, AboutService>(RegistrationConflictResolveStrategy_e.KeepOriginal);
             builder.RegisterSingleton<ITaskRunnerFactory, TaskRunnerFactory>();
             builder.RegisterSingleton<ISettingsProvider, SettingsProvider>();
             builder.RegisterSingleton<ILicenseInfoProvider, LicenseInfoProvider>();
