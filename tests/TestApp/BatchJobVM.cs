@@ -23,52 +23,54 @@ namespace TestApp
 {
     public class MyAsyncBatchJob : IAsyncBatchJob
     {
+        public event JobStartedDelegate Started;
         public event JobInitializedDelegate Initialized;
         public event JobCompletedDelegate Completed;
         public event JobItemProcessedDelegate ItemProcessed;
         public event JobLogDelegateDelegate Log;
         public event JobProgressChangedDelegate ProgressChanged;
-
+        
         public IReadOnlyList<IJobItem> JobItems => m_JobItems;
         public IReadOnlyList<string> LogEntries => m_LogEntries;
         public IReadOnlyList<IJobItemOperationDefinition> OperationDefinitions => m_OperationDefinitions;
 
-        public double Progress 
+        public double? Progress 
         {
             get => m_Progress;
             private set 
             {
                 m_Progress = value;
-                ProgressChanged?.Invoke(this, value);
+                ProgressChanged?.Invoke(this, value.Value);
             }
         }
-        public JobStatus_e Status { get; private set; }
+        public JobStatus_e? Status { get; private set; }
 
-        public DateTime StartTime { get; private set; }
-        public TimeSpan Duration { get; private set; }
+        public DateTime? StartTime { get; private set; }
+        public TimeSpan? Duration { get; private set; }
 
 
         private List<MyJobItem> m_JobItems;
         private List<string> m_LogEntries;
         private List<IJobItemOperationDefinition> m_OperationDefinitions;
 
-        private double m_Progress;
+        private double? m_Progress;
 
         public MyAsyncBatchJob() 
         {
             m_JobItems = new List<MyJobItem>();
             m_LogEntries = new List<string>();
             m_OperationDefinitions = new List<IJobItemOperationDefinition>();
-            Status = JobStatus_e.Initializing;
+            Status = null;
         }
 
         public async Task TryExecuteAsync(CancellationToken cancellationToken)
             => await this.HandleExecuteAsync(cancellationToken,
-                Init,
-                t => Initialized?.Invoke(this, m_JobItems, m_OperationDefinitions, t),
+                t => Started?.Invoke(this, t),
                 t => StartTime = t,
+                Init,
+                () => Initialized?.Invoke(this, m_JobItems, m_OperationDefinitions),
                 DoWork,
-                d => Completed?.Invoke(this, d, Status),
+                d => Completed?.Invoke(this, d, Status.Value),
                 d => Duration = d,
                 s => Status = s);
 
@@ -126,7 +128,7 @@ namespace TestApp
             m_JobItems[0].Update(m_JobItems[0].ComposeStatus(), null, null);
 
             ItemProcessed?.Invoke(this, m_JobItems[0]);
-            ProgressChanged?.Invoke(this, 1d / 3d);
+            Progress = 1d / 3d;
 
             //item2
             m_JobItems[1].Update(JobItemStateStatus_e.InProgress, null, null);
@@ -140,7 +142,7 @@ namespace TestApp
             m_JobItems[1].Update(m_JobItems[1].ComposeStatus(), new IJobItemIssue[] { new MyJobItemIssue(IssueType_e.Warning, "Some Warning") }, null);
 
             ItemProcessed?.Invoke(this, m_JobItems[1]);
-            ProgressChanged?.Invoke(this, 2d / 3d);
+            Progress = 2d / 3d;
 
             //item3
             m_JobItems[2].Update(JobItemStateStatus_e.InProgress, null, null);
@@ -154,7 +156,7 @@ namespace TestApp
             m_JobItems[2].Update(m_JobItems[2].ComposeStatus(), null, null);
 
             ItemProcessed?.Invoke(this, m_JobItems[2]);
-            ProgressChanged?.Invoke(this, 3d / 3d);
+            Progress = 3d / 3d;
         }
 
         public void Dispose()
@@ -270,7 +272,7 @@ namespace TestApp
         }
     }
 
-    public class JobResultVM : INotifyPropertyChanged
+    public class BatchJobVM : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -291,10 +293,9 @@ namespace TestApp
 
         private CancellationTokenSource m_CancellationTokenSource;
 
-        public JobResultVM() 
+        public BatchJobVM() 
         {
             RunJobCommand = new RelayCommand(RunJob, () => m_CancellationTokenSource == null);
-            CancelJobCommand = new RelayCommand(CancelJob, () => m_CancellationTokenSource != null);
         }
 
         private async void RunJob()
@@ -309,12 +310,6 @@ namespace TestApp
 
             MessageBox.Show($"Completed: {res.Status}");
 
-            m_CancellationTokenSource = null;
-        }
-
-        private void CancelJob()
-        {
-            m_CancellationTokenSource.Cancel();
             m_CancellationTokenSource = null;
         }
     }

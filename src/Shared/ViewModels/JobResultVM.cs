@@ -25,18 +25,11 @@ namespace Xarial.CadPlus.Plus.Shared.ViewModels
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
-        private bool m_IsBatchJobInProgress;
-
         private readonly IBatchJobBase m_BatchJob;
-
-        private JobStatus_e m_Status;
 
         private int m_SucceededItemsCount;
         private int m_FailedItemsCount;
         private int m_WarningItemsCount;
-
-        private DateTime? m_StartTime;
-        private TimeSpan? m_Duration;
 
         private readonly List<JobItemVM> m_JobItems;
         private readonly List<JobItemOperationDefinitionVM> m_OperationDefinitions;
@@ -44,62 +37,17 @@ namespace Xarial.CadPlus.Plus.Shared.ViewModels
         private readonly IMessageService m_MsgSvc;
         private readonly IXLogger m_Logger;
 
-        private readonly CancellationTokenSource m_CancellationTokenSource;
-
-        private bool m_IsRun;
-
-        private double m_Progress;
-        private bool m_IsInitializing;
+        protected readonly CancellationTokenSource m_CancellationTokenSource;
 
         private object m_Lock;
 
-        public bool IsBatchJobInProgress
-        {
-            get => m_IsBatchJobInProgress;
-            private set
-            {
-                m_IsBatchJobInProgress = value;
-                this.NotifyChanged();
-            }
-        }
-
         public ICommand CancelJobCommand { get; }
 
-        public JobStatus_e Status
-        {
-            get => m_Status;
-            private set
-            {
-                m_Status = value;
-                this.NotifyChanged();
-            }
-        }
+        public JobStatus_e? Status => m_BatchJob.Status;
+        public double? Progress => m_BatchJob.Progress;
 
-        public double Progress
-        {
-            get => m_Progress;
-            private set
-            {
-                m_Progress = value;
-                this.NotifyChanged();
-            }
-        }
-
-        public bool IsInitializing
-        {
-            get => m_IsInitializing;
-            private set
-            {
-                if (value != m_IsInitializing)
-                {
-                    m_IsInitializing = value;
-                    this.NotifyChanged();
-                }
-            }
-        }
-
-        public IReadOnlyList<JobItemVM> JobItems => IsInitializing ? null : m_JobItems;
-        public IReadOnlyList<JobItemOperationDefinitionVM> OperationDefinitions => IsInitializing ? null : m_OperationDefinitions;
+        public IReadOnlyList<JobItemVM> JobItems => IsInitialized ? m_JobItems : null;
+        public IReadOnlyList<JobItemOperationDefinitionVM> OperationDefinitions => IsInitialized ? m_OperationDefinitions : null;
 
         public int SucceededItemsCount
         {
@@ -131,25 +79,9 @@ namespace Xarial.CadPlus.Plus.Shared.ViewModels
             }
         }
 
-        public DateTime? StartTime
-        {
-            get => m_StartTime;
-            private set
-            {
-                m_StartTime = value;
-                this.NotifyChanged();
-            }
-        }
+        public DateTime? StartTime => m_BatchJob.StartTime;
 
-        public TimeSpan? Duration
-        {
-            get => m_Duration;
-            private set
-            {
-                m_Duration = value;
-                this.NotifyChanged();
-            }
-        }
+        public TimeSpan? Duration => m_BatchJob.Duration;
 
         public ObservableCollection<string> LogEntries { get; }
 
@@ -201,9 +133,10 @@ namespace Xarial.CadPlus.Plus.Shared.ViewModels
                 (batchJob.OperationDefinitions ?? Enumerable.Empty<IJobItemOperationDefinition>()).Select(o => new JobItemOperationDefinitionVM(o)));
             BindingOperations.EnableCollectionSynchronization(m_OperationDefinitions, m_Lock);
 
-            CancelJobCommand = new RelayCommand(CancelJob, () => IsBatchJobInProgress);
+            CancelJobCommand = new RelayCommand(CancelJob, () => m_BatchJob.Status == JobStatus_e.Initializing || m_BatchJob.Status == JobStatus_e.InProgress);
 
             m_BatchJob = batchJob;
+            m_BatchJob.Started += OnJobStarted;
             m_BatchJob.Initialized += OnJobInitialized;
             m_BatchJob.ItemProcessed += OnItemProcessed;
             m_BatchJob.ProgressChanged += OnProgressChanged;
@@ -215,16 +148,8 @@ namespace Xarial.CadPlus.Plus.Shared.ViewModels
 
             m_CancellationTokenSource = cancellationTokenSource;
 
-            m_Progress = m_BatchJob.Progress;
-            m_IsRun = m_BatchJob.Status != JobStatus_e.Initializing;
-            m_IsBatchJobInProgress = m_BatchJob.Status == JobStatus_e.InProgress;
-            m_IsInitializing = m_BatchJob.Status == JobStatus_e.Initializing;
-
-            if (!m_IsInitializing)
+            if (IsInitialized)
             {
-                m_StartTime = batchJob.StartTime;
-                m_Duration = batchJob.Duration;
-
                 foreach (var jobItem in JobItems)
                 {
                     switch (jobItem.State.Status)
@@ -244,6 +169,8 @@ namespace Xarial.CadPlus.Plus.Shared.ViewModels
                 }
             }
         }
+
+        private bool IsInitialized => m_BatchJob.Status.HasValue && m_BatchJob.Status.Value != JobStatus_e.Initializing;
 
         public void TryExportReport()
         {
@@ -301,7 +228,7 @@ namespace Xarial.CadPlus.Plus.Shared.ViewModels
 
         private void OnProgressChanged(IBatchJobBase sender, double progress)
         {
-            Progress = progress;
+            this.NotifyChanged(nameof(Progress));
         }
 
         private void OnLog(IBatchJobBase sender, string line)
@@ -309,20 +236,25 @@ namespace Xarial.CadPlus.Plus.Shared.ViewModels
             LogEntries.Add(line);
         }
 
-        private void OnJobInitialized(IBatchJobBase sender, IReadOnlyList<IJobItem> items, IReadOnlyList<IJobItemOperationDefinition> operations, DateTime startTime)
+        private void OnJobStarted(IBatchJobBase sender, DateTime startTime)
+        {
+            this.NotifyChanged(nameof(StartTime));
+        }
+
+        private void OnJobInitialized(IBatchJobBase sender, IReadOnlyList<IJobItem> items, IReadOnlyList<IJobItemOperationDefinition> operations)
         {
             m_JobItems.AddRange(items.Select(f => new JobItemVM(f)));
             m_OperationDefinitions.AddRange(operations.Select(o => new JobItemOperationDefinitionVM(o)));
-            StartTime = startTime;
-            IsInitializing = false;
-
+            
+            this.NotifyChanged(nameof(Status));
             this.NotifyChanged(nameof(JobItems));
             this.NotifyChanged(nameof(OperationDefinitions));
         }
 
         private void OnJobCompleted(IBatchJobBase sender, TimeSpan duration, JobStatus_e status)
         {
-            Duration = duration;
+            this.NotifyChanged(nameof(Duration));
+            this.NotifyChanged(nameof(Status));
         }
 
         private void OnItemProcessed(IBatchJobBase sender, IJobItem item)
@@ -346,42 +278,9 @@ namespace Xarial.CadPlus.Plus.Shared.ViewModels
                     FailedItemsCount++;
                     break;
             }
-
-            if (StartTime.HasValue)
-            {
-                Duration = DateTime.Now - StartTime.Value;
-            }
-            else
-            {
-                Debug.Assert(false, "Start time must be set before progress");
-            }
         }
 
         public void CancelJob() => m_CancellationTokenSource.Cancel();
-
-        protected CancellationToken StartRun() 
-        {
-            if (!m_IsRun)
-            {
-                m_IsRun = true;
-
-                Status = JobStatus_e.InProgress;
-
-                IsBatchJobInProgress = true;
-
-                return m_CancellationTokenSource.Token;
-            }
-            else
-            {
-                throw new NotSupportedException("Job result can only be executed once");
-            }
-        }
-
-        protected void FinishRun() 
-        {
-            Status = m_BatchJob.Status;
-            IsBatchJobInProgress = false;
-        }
     }
 
     public class JobResultVM : JobResultBaseVM
@@ -398,11 +297,7 @@ namespace Xarial.CadPlus.Plus.Shared.ViewModels
 
         public virtual void TryRunBatch()
         {
-            var cancellationToken = StartRun();
-
-            m_BatchJob.TryExecute(cancellationToken);
-            
-            FinishRun();
+            m_BatchJob.TryExecute(m_CancellationTokenSource.Token);   
         }
     }
 
@@ -420,9 +315,7 @@ namespace Xarial.CadPlus.Plus.Shared.ViewModels
 
         public virtual async Task TryRunBatchAsync()
         {
-            var cancellationToken = StartRun();
-            await m_BatchJob.TryExecuteAsync(cancellationToken);
-            FinishRun();
+            await m_BatchJob.TryExecuteAsync(m_CancellationTokenSource.Token);
         }
     }
 }

@@ -15,6 +15,7 @@
         <conv:JobItemStateStatusToImageConverter x:Key="statusToImgConv"/>
         <xconv:EnumerableIsNotEmptyVisibilityConverter x:Key="hasIssuesToVisConv"/>
         <conv:IssuesToTextConverter x:Key="issuesToTextConv"/>
+        <conv:IsPreparingJobConverter x:Key="isPrepJobConv"/>
         <DataTemplate x:Key="JobItemStateTemplate">
             <Grid HorizontalAlignment="Center">
                 <Grid.ColumnDefinitions>
@@ -49,7 +50,7 @@
             </Grid>
         </DataTemplate>
     </UserControl.Resources>
-    <xctrls:ProgressPanel Progress="{x:Null}" Message="Loading Job..." IsWorkInProgress="{Binding Path=IsInitializing}">
+    <xctrls:ProgressPanel Progress="{x:Null}" Message="Loading Job..." IsWorkInProgress="{Binding Path=Status, Converter={StaticResource isPrepJobConv}}">
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="*"/>

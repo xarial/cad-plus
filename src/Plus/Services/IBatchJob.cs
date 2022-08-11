@@ -46,7 +46,8 @@ namespace Xarial.CadPlus.Plus.Services
 
     public delegate void JobItemOperationUserResultChangedDelegate(IJobItemOperation sender, object userResult);
 
-    public delegate void JobInitializedDelegate(IBatchJobBase sender, IReadOnlyList<IJobItem> jobItems, IReadOnlyList<IJobItemOperationDefinition> operations, DateTime startTime);
+    public delegate void JobStartedDelegate(IBatchJobBase sender, DateTime startTime);
+    public delegate void JobInitializedDelegate(IBatchJobBase sender, IReadOnlyList<IJobItem> jobItems, IReadOnlyList<IJobItemOperationDefinition> operations);
     public delegate void JobCompletedDelegate(IBatchJobBase sender, TimeSpan duration, JobStatus_e status);
     public delegate void JobItemProcessedDelegate(IBatchJobBase sender, IJobItem item);
     public delegate void JobProgressChangedDelegate(IBatchJobBase sender, double progress);
@@ -125,17 +126,17 @@ namespace Xarial.CadPlus.Plus.Services
 
     public interface IBatchJobBase : IDisposable
     {
+        event JobStartedDelegate Started;
         event JobInitializedDelegate Initialized;
         event JobCompletedDelegate Completed;
         event JobItemProcessedDelegate ItemProcessed;
         event JobLogDelegateDelegate Log;
         event JobProgressChangedDelegate ProgressChanged;
 
-        DateTime StartTime { get; }
-        TimeSpan Duration { get; }
-
-        double Progress { get; }
-        JobStatus_e Status { get; }
+        DateTime? StartTime { get; }
+        TimeSpan? Duration { get; }
+        double? Progress { get; }
+        JobStatus_e? Status { get; }
 
         IReadOnlyList<IJobItemOperationDefinition> OperationDefinitions { get; }
         IReadOnlyList<string> LogEntries { get; }
@@ -155,21 +156,26 @@ namespace Xarial.CadPlus.Plus.Services
     public static class BatchJobExtension
     {
         public static void HandleExecute(this IBatchJob job, CancellationToken cancellationToken,
-            Action<CancellationToken> initFunc, Action<DateTime> raiseInitEventFunc, Action<DateTime> setStartTime,
+            Action<DateTime> raiseStartEventFunc, Action<DateTime> setStartTimeFunc,
+            Action<CancellationToken> initFunc, Action raiseInitEventFunc,
             Action<CancellationToken> doWorkFunc, Action<TimeSpan> raiseCompletedFunc, Action<TimeSpan> setDuration,
             Action<JobStatus_e> setStatusFunc)
         {
             var startTime = DateTime.Now;
 
+            setStartTimeFunc.Invoke(startTime);
+
+            setStatusFunc.Invoke(JobStatus_e.Initializing);
+
+            raiseStartEventFunc.Invoke(startTime);
+
             try
             {
                 initFunc.Invoke(cancellationToken);
 
-                setStartTime.Invoke(startTime);
-
-                raiseInitEventFunc.Invoke(startTime);
-
                 setStatusFunc.Invoke(JobStatus_e.InProgress);
+
+                raiseInitEventFunc.Invoke();
 
                 doWorkFunc.Invoke(cancellationToken);
 
@@ -192,21 +198,26 @@ namespace Xarial.CadPlus.Plus.Services
         }
 
         public static async Task HandleExecuteAsync(this IAsyncBatchJob job, CancellationToken cancellationToken,
-            Func<CancellationToken, Task> initFunc, Action<DateTime> raiseInitEventFunc, Action<DateTime> setStartTime,
+            Action<DateTime> raiseStartEventFunc, Action<DateTime> setStartTimeFunc,
+            Func<CancellationToken, Task> initFunc, Action raiseInitEventFunc,
             Func<CancellationToken, Task> doWorkFunc, Action<TimeSpan> raiseCompletedFunc, Action<TimeSpan> setDuration,
             Action<JobStatus_e> setStatusFunc)
         {
             var startTime = DateTime.Now;
+            
+            setStartTimeFunc.Invoke(startTime);
+
+            setStatusFunc.Invoke(JobStatus_e.Initializing);
+
+            raiseStartEventFunc.Invoke(startTime);
 
             try
             {
                 await initFunc.Invoke(cancellationToken);
-                
-                setStartTime.Invoke(startTime);
-
-                raiseInitEventFunc.Invoke(startTime);
 
                 setStatusFunc.Invoke(JobStatus_e.InProgress);
+
+                raiseInitEventFunc.Invoke();
 
                 await doWorkFunc.Invoke(cancellationToken);
 

@@ -103,7 +103,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="JobResultVM.cs" />
+    <Compile Include="BatchJobVM.cs" />
     <Compile Include="MyWindow.xaml.cs">
       <DependentUpon>MyWindow.xaml</DependentUpon>
     </Compile>

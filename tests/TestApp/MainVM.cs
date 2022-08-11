@@ -24,14 +24,14 @@ namespace TestApp
         public ProgressPanelVM ProgressPanel { get; }
         public RibbonVM Ribbon { get; }
         public ObjectLabelVM ObjectLabel { get; }
-        public JobResultVM JobResult { get; }
+        public BatchJobVM JobResult { get; }
 
         public MainVM() 
         {
             ProgressPanel = new ProgressPanelVM();
             Ribbon = new RibbonVM();
             ObjectLabel = new ObjectLabelVM();
-            JobResult = new JobResultVM();
+            JobResult = new BatchJobVM();
         }
     }
 }
