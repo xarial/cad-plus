@@ -205,7 +205,7 @@ namespace Xarial.CadPlus.Plus.Shared.ViewModels
             {
                 if (FileSystemBrowser.BrowseFileSave(out string filePath,
                     $"Select file to export log for job",
-                        FileFilter.BuildFilterString(m_ReportExporters.Select(e => e.Filter).Concat(new FileFilter[] { FileFilter.AllFiles }).ToArray())))
+                        FileFilter.BuildFilterString(m_LogExporters.Select(e => e.Filter).Concat(new FileFilter[] { FileFilter.AllFiles }).ToArray())))
                 {
                     var logWriter = m_LogExporters.FirstOrDefault(j => TextUtils.MatchesAnyFilter(filePath, j.Filter.Extensions));
 
