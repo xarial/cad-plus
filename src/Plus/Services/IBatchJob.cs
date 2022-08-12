@@ -104,7 +104,7 @@ namespace Xarial.CadPlus.Plus.Services
     public interface IJobItemOperationDefinition 
     {
         string Name { get; }
-        ImageSource Icon { get; }
+        BitmapImage Icon { get; }
     }
 
     public interface IJobItemOperation 

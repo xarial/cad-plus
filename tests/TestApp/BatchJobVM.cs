@@ -181,12 +181,12 @@ namespace TestApp
     public class MyJobItemOperationDefinition : IJobItemOperationDefinition
     {
         public string Name { get; }
-        public ImageSource Icon { get; }
+        public BitmapImage Icon { get; }
 
         public MyJobItemOperationDefinition(string name, Image icon)
         {
             Name = name;
-            Icon = icon.ToBitmapImage();
+            Icon = icon.ToBitmapImage(true);
         }
     }
 
