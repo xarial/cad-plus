@@ -12,6 +12,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using Xarial.CadPlus.Batch.Base.Properties;
 using Xarial.CadPlus.Plus.Services;
 using Xarial.XToolkit.Wpf.Extensions;
@@ -20,7 +21,7 @@ namespace Xarial.CadPlus.Batch.Base.Core
 {
     public class JobItemOperationMacroDefinition : IJobItemOperationDefinition
     {
-        private static readonly ImageSource m_Icon;
+        private static readonly BitmapImage m_Icon;
 
         static JobItemOperationMacroDefinition() 
         {
@@ -29,7 +30,7 @@ namespace Xarial.CadPlus.Batch.Base.Core
 
         public string Name { get; }
 
-        public ImageSource Icon => m_Icon;
+        public BitmapImage Icon => m_Icon;
 
         public MacroData MacroData { get; }
 

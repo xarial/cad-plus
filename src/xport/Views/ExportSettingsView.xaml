@@ -90,7 +90,7 @@
             <TabItem Header="Summary">
                 <sharedui:JobSummaryControl DataContext="{Binding Path=JobResult}"/>
             </TabItem>
-            <TabItem Header="Status">
+            <TabItem Header="Report">
                 <sharedui:JobReportControl DataGridStyle="{StaticResource MahApps.Styles.DataGrid}" DataContext="{Binding Path=JobResult}"/>
             </TabItem>
             <TabItem Header="Journal" DataContext="{Binding Path=JobResult}">

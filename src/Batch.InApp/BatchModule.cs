@@ -99,6 +99,13 @@ namespace Xarial.CadPlus.Batch.InApp
 
         private ICadDescriptor m_CadDesc;
 
+        private readonly List<IBatchJobHandlerService> m_BatchJobHandlers;
+
+        public BatchModule()
+        {
+            m_BatchJobHandlers = new List<IBatchJobHandlerService>();
+        }
+
         public void Init(IHost host)
         {
             if (!(host is IHostCadExtension))
@@ -235,20 +242,20 @@ namespace Xarial.CadPlus.Batch.InApp
                     var input = docs.ToList();
                     ProcessInput?.Invoke(m_Host.Extension.Application, input);
 
-                    using (var exec = new AssemblyBatchRunJobExecutor(m_Host.Extension.Application, m_MacroRunnerSvc, m_CadDesc,
+                    var doc = m_Host.Extension.Application.Documents.Active;
+
+                    var job = new AssemblyBatchRunJobExecutor(m_Host.Extension.Application, m_MacroRunnerSvc, m_CadDesc,
                         input.ToArray(), m_Logger, m_Data.Macros.Macros.Macros.Select(x => x.Data).ToArray(),
                         m_Data.Options.ActivateDocuments, m_Data.Options.AllowReadOnly,
-                        m_Data.Options.AllowRapid, m_Data.Options.AutoSave, m_PopupHandlerFact.Create(m_Data.Options.Silent)))
-                    {
-                        var cancellationTokenSource = new CancellationTokenSource();
+                        m_Data.Options.AllowRapid, m_Data.Options.AutoSave, m_PopupHandlerFact.Create(m_Data.Options.Silent));
 
-                        var doc = m_Host.Extension.Application.Documents.Active;
+                    var jobHandler = m_BatchJobHandlerSvcFact.Create(job, $"Batch Macro Running: {doc.Title}", new CancellationTokenSource());
 
-                        using (var prg = m_BatchJobHandlerSvcFact.Create(exec, $"{doc.Title} - batch macro run", cancellationTokenSource))
-                        {
-                            prg.Run();
-                        }
-                    }
+                    jobHandler.Disposed += OnDisposed;
+
+                    m_BatchJobHandlers.Add(jobHandler);
+
+                    jobHandler.Run();
                 }
                 catch (OperationCanceledException) 
                 {
@@ -309,8 +316,22 @@ namespace Xarial.CadPlus.Batch.InApp
             }
         }
 
+        private void OnDisposed(IBatchJobHandlerService sender)
+        {
+            m_Logger.Log($"Removing the job handler");
+
+            if (m_BatchJobHandlers.Contains(sender))
+            {
+                m_BatchJobHandlers.Remove(sender);
+            }
+        }
+
         public void Dispose()
         {
+            foreach (var jobHandler in m_BatchJobHandlers)
+            {
+                jobHandler.Dispose();
+            }
         }
     }
 }

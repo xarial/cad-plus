@@ -26,9 +26,9 @@ namespace Xarial.CadPlus.Batch.Base.Core
     {
         private class CadObjectIcons
         {
-            internal ImageSource Part { get; set; }
-            internal ImageSource Assembly { get; set; }
-            internal ImageSource Drawing { get; set; }
+            internal BitmapImage Part { get; set; }
+            internal BitmapImage Assembly { get; set; }
+            internal BitmapImage Drawing { get; set; }
         }
 
         public event JobItemNestedItemsInitializedDelegate NestedItemsInitialized;
@@ -37,7 +37,7 @@ namespace Xarial.CadPlus.Batch.Base.Core
         IReadOnlyList<IJobItemOperation> IJobItem.Operations => Operations;
 
         private static readonly Dictionary<string, CadObjectIcons> m_Icons;
-        private static ImageSource m_DefaultIcon;
+        private static BitmapImage m_DefaultIcon;
 
         static JobItemDocument()
         {
@@ -46,7 +46,7 @@ namespace Xarial.CadPlus.Batch.Base.Core
 
         public IXDocument Document { get; }
 
-        public ImageSource Icon
+        public BitmapImage Icon
         {
             get
             {
@@ -73,7 +73,7 @@ namespace Xarial.CadPlus.Batch.Base.Core
             }
         }
 
-        public ImageSource Preview
+        public BitmapImage Preview
         {
             get
             {
@@ -113,8 +113,7 @@ namespace Xarial.CadPlus.Batch.Base.Core
         public JobItemState State { get; }
 
         private readonly ICadDescriptor m_CadDesc;
-
-        
+                
         public JobItemDocument(IXDocument doc, IReadOnlyList<JobItemMacro> macros, ICadDescriptor cadDesc)
         {
             if (doc == null)

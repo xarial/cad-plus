@@ -13,6 +13,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using Xarial.CadPlus.Batch.Base.Core;
 using Xarial.CadPlus.Common.Services;
 using Xarial.CadPlus.Plus.Extensions;
@@ -42,8 +43,8 @@ namespace Xarial.CadPlus.Xport.Services
             State = new JobItemState();
         }
 
-        public ImageSource Icon { get; }
-        public ImageSource Preview { get; }
+        public BitmapImage Icon { get; }
+        public BitmapImage Preview { get; }
         public string Title { get; }
         public string Description { get; }
 
@@ -70,7 +71,7 @@ namespace Xarial.CadPlus.Xport.Services
     public class JobItemExportFormatDefinition : IJobItemOperationDefinition
     {
         public string Name { get; }
-        public ImageSource Icon { get; }
+        public BitmapImage Icon { get; }
 
         public string Extension { get; }
 

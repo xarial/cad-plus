@@ -11,7 +11,7 @@
         <TabItem Header="Summary">
             <sharedui:JobSummaryControl/>
         </TabItem>
-        <TabItem Header="Status">
+        <TabItem Header="Report">
             <sharedui:JobReportControl/>
         </TabItem>
         <TabItem Header="Journal">

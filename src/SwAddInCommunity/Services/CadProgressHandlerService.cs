@@ -42,6 +42,8 @@ namespace Xarial.CadPlus.AddIn.Sw.Services
 
     public class CadBatchJobHandlerService : IBatchJobHandlerService
     {
+        public event Action<IBatchJobHandlerService> Disposed;
+
         private readonly IXExtension m_Ext;
         private readonly IXLogger m_Logger;
         private readonly IXProgress m_Progress;
@@ -51,6 +53,8 @@ namespace Xarial.CadPlus.AddIn.Sw.Services
         private readonly JobResultVM m_JobResult;
 
         private readonly IXPopupWindow<ResultsWindow> m_ResultsWindow;
+
+        private bool m_IsDisposed;
 
         public CadBatchJobHandlerService(IBatchJob job, IXLogger logger, IMessageService msgSvc, IXExtension ext, 
             string title, CancellationTokenSource cancellationTokenSource,
@@ -62,6 +66,8 @@ namespace Xarial.CadPlus.AddIn.Sw.Services
             m_Logger = logger;
             m_Ext = ext;
 
+            m_IsDisposed = false;
+
             m_Progress = m_Ext.Application.CreateProgress();
             m_CancellationTokenSource = cancellationTokenSource;
 
@@ -70,7 +76,11 @@ namespace Xarial.CadPlus.AddIn.Sw.Services
             m_ResultsWindow = m_Ext.CreatePopupWindow<ResultsWindow>();
             m_ResultsWindow.Control.Title = title;
             m_ResultsWindow.Control.DataContext = m_JobResult;
+            m_ResultsWindow.Closed += OnResultsWindowClosed;
         }
+
+        private void OnResultsWindowClosed(IXPopupWindow<ResultsWindow> sender)
+            => Dispose();
 
         public void Run() 
         {
@@ -79,19 +89,22 @@ namespace Xarial.CadPlus.AddIn.Sw.Services
         }
 
         private void OnJobItemProcessed(IBatchJobBase sender, IJobItem item)
-        {
-            m_Progress.SetStatus($"Processed '{item.Title}'");
-        }
+            => m_Progress.SetStatus($"Processed '{item.Title}'");
 
         private void OnProgressChanged(IBatchJobBase sender, double progress)
-        {
-            m_Progress.Report(progress);
-        }
+            => m_Progress.Report(progress);
 
         public void Dispose()
         {
-            m_Progress.Dispose();
-            m_CancellationTokenSource.Dispose();
+            if (!m_IsDisposed)
+            {
+                m_IsDisposed = true;
+
+                m_Progress.Dispose();
+                m_CancellationTokenSource.Dispose();
+
+                Disposed?.Invoke(this);
+            }
         }
     }
 }
