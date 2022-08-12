@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using TestApp.Properties;
 using Xarial.CadPlus.Plus.Services;
 using Xarial.CadPlus.Plus.Shared.Services;
@@ -213,8 +214,8 @@ namespace TestApp
 
         IReadOnlyList<IJobItemOperation> IJobItem.Operations => Operations;
 
-        public ImageSource Icon { get; }
-        public ImageSource Preview { get; }
+        public BitmapImage Icon { get; }
+        public BitmapImage Preview { get; }
         public string Title { get; }
         public string Description { get; }
         public Action Link { get; }

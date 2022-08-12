@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 
 namespace Xarial.CadPlus.Plus.Services
 {
@@ -59,8 +60,8 @@ namespace Xarial.CadPlus.Plus.Services
     {
         event JobItemNestedItemsInitializedDelegate NestedItemsInitialized;
 
-        ImageSource Icon { get; }
-        ImageSource Preview { get; }
+        BitmapImage Icon { get; }
+        BitmapImage Preview { get; }
         string Title { get; }
         string Description { get; }
         Action Link { get; }
