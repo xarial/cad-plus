@@ -42,6 +42,21 @@ namespace Xarial.CadPlus.Plus.Services
         string Content { get; }
     }
 
+    public interface IJobState 
+    {
+        event JobStateProgressChangedDelegate ProgressChanged;
+
+        int TotalItemsCount { get; }
+        int SucceededItemsCount { get; }
+        int WarningItemsCount { get; }
+        int FailedItemsCount { get; }
+
+        DateTime StartTime { get; }
+        TimeSpan Duration { get; }
+        double Progress { get; }
+        JobStatus_e Status { get; }
+    }
+
     public delegate void JobStateStatusChangedDelegate(IJobItemState sender, JobItemStateStatus_e status);
     public delegate void JobStateIssuesChangedDelegate(IJobItemState sender, IReadOnlyList<IJobItemIssue> issues);
 
@@ -51,7 +66,7 @@ namespace Xarial.CadPlus.Plus.Services
     public delegate void JobInitializedDelegate(IBatchJobBase sender, IReadOnlyList<IJobItem> jobItems, IReadOnlyList<IJobItemOperationDefinition> operations);
     public delegate void JobCompletedDelegate(IBatchJobBase sender, TimeSpan duration, JobStatus_e status);
     public delegate void JobItemProcessedDelegate(IBatchJobBase sender, IJobItem item);
-    public delegate void JobProgressChangedDelegate(IBatchJobBase sender, double progress);
+    public delegate void JobStateProgressChangedDelegate(IJobState sender, double progress);
     public delegate void JobLogDelegateDelegate(IBatchJobBase sender, string message);
 
     public delegate void JobItemNestedItemsInitializedDelegate(IJobItem sender, IReadOnlyList<IJobItem> nestedItems);
@@ -132,12 +147,8 @@ namespace Xarial.CadPlus.Plus.Services
         event JobCompletedDelegate Completed;
         event JobItemProcessedDelegate ItemProcessed;
         event JobLogDelegateDelegate Log;
-        event JobProgressChangedDelegate ProgressChanged;
-
-        DateTime? StartTime { get; }
-        TimeSpan? Duration { get; }
-        double? Progress { get; }
-        JobStatus_e? Status { get; }
+        
+        IJobState State { get; }
 
         IReadOnlyList<IJobItemOperationDefinition> OperationDefinitions { get; }
         IReadOnlyList<string> LogEntries { get; }

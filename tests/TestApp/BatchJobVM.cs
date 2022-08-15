@@ -30,51 +30,37 @@ namespace TestApp
         public event JobCompletedDelegate Completed;
         public event JobItemProcessedDelegate ItemProcessed;
         public event JobLogDelegateDelegate Log;
-        public event JobProgressChangedDelegate ProgressChanged;
-        
+
         public IReadOnlyList<IJobItem> JobItems => m_JobItems;
         public IReadOnlyList<string> LogEntries => m_LogEntries;
         public IReadOnlyList<IJobItemOperationDefinition> OperationDefinitions => m_OperationDefinitions;
 
-        public double? Progress 
-        {
-            get => m_Progress;
-            private set 
-            {
-                m_Progress = value;
-                ProgressChanged?.Invoke(this, value.Value);
-            }
-        }
-        public JobStatus_e? Status { get; private set; }
-
-        public DateTime? StartTime { get; private set; }
-        public TimeSpan? Duration { get; private set; }
-
+        public IJobState State => m_State;
 
         private List<MyJobItem> m_JobItems;
         private List<string> m_LogEntries;
         private List<IJobItemOperationDefinition> m_OperationDefinitions;
 
-        private double? m_Progress;
+        private readonly MyJobState m_State;
 
-        public MyAsyncBatchJob() 
+        public MyAsyncBatchJob()
         {
             m_JobItems = new List<MyJobItem>();
             m_LogEntries = new List<string>();
             m_OperationDefinitions = new List<IJobItemOperationDefinition>();
-            Status = null;
+            m_State = new MyJobState();
         }
 
         public async Task TryExecuteAsync(CancellationToken cancellationToken)
             => await this.HandleExecuteAsync(cancellationToken,
                 t => Started?.Invoke(this, t),
-                t => StartTime = t,
+                t => m_State.StartTime = t,
                 Init,
                 () => Initialized?.Invoke(this, m_JobItems, m_OperationDefinitions),
                 DoWork,
-                d => Completed?.Invoke(this, d, Status.Value),
-                d => Duration = d,
-                s => Status = s);
+                d => Completed?.Invoke(this, d, m_State.Status),
+                d => m_State.Duration = d,
+                s => m_State.Status = s);
 
         private async Task Init(CancellationToken cancellationToken)
         {
@@ -102,6 +88,8 @@ namespace TestApp
             m_JobItems.AddRange(new MyJobItem[] { item1, item2, item3 });
 
             m_OperationDefinitions.AddRange(new IJobItemOperationDefinition[] { oper1, oper2 });
+
+            m_State.TotalItemsCount = m_JobItems.Count;
         }
 
         private async Task DoWork(CancellationToken cancellationToken)
@@ -118,6 +106,8 @@ namespace TestApp
                 oper.Update(res, issues?.Select(i => new MyJobItemIssue(res == JobItemStateStatus_e.Failed ? IssueType_e.Error : IssueType_e.Information, i)).ToArray(), userRes);
             }
 
+            
+
             //item1
             m_JobItems[0].Update(JobItemStateStatus_e.InProgress, null, null);
 
@@ -129,8 +119,9 @@ namespace TestApp
 
             m_JobItems[0].Update(m_JobItems[0].ComposeStatus(), null, null);
 
+            m_State.SucceededItemsCount++;
             ItemProcessed?.Invoke(this, m_JobItems[0]);
-            Progress = 1d / 3d;
+            m_State.Progress = 1d / 3d;
 
             //item2
             m_JobItems[1].Update(JobItemStateStatus_e.InProgress, null, null);
@@ -143,8 +134,9 @@ namespace TestApp
 
             m_JobItems[1].Update(m_JobItems[1].ComposeStatus(), new IJobItemIssue[] { new MyJobItemIssue(IssueType_e.Warning, "Some Warning") }, null);
 
+            m_State.WarningItemsCount++;
             ItemProcessed?.Invoke(this, m_JobItems[1]);
-            Progress = 2d / 3d;
+            m_State.Progress = 2d / 3d;
 
             //item3
             m_JobItems[2].Update(JobItemStateStatus_e.InProgress, null, null);
@@ -157,13 +149,39 @@ namespace TestApp
 
             m_JobItems[2].Update(m_JobItems[2].ComposeStatus(), null, null);
 
+            m_State.FailedItemsCount++;
             ItemProcessed?.Invoke(this, m_JobItems[2]);
-            Progress = 3d / 3d;
+            m_State.Progress = 3d / 3d;
         }
 
         public void Dispose()
         {
         }
+    }
+
+    public class MyJobState : IJobState
+    {
+        public event JobStateProgressChangedDelegate ProgressChanged;
+        
+        public double Progress
+        {
+            get => m_Progress;
+            set
+            {
+                m_Progress = value;
+                ProgressChanged?.Invoke(this, value);
+            }
+        }
+
+        public int TotalItemsCount { get; set; }
+        public int SucceededItemsCount { get; set; }
+        public int WarningItemsCount { get; set; }
+        public int FailedItemsCount { get; set; }
+        public DateTime StartTime { get; set; }
+        public TimeSpan Duration { get; set; }
+        public JobStatus_e Status { get; set; }
+
+        private double m_Progress;
     }
 
     public class MyJobItemIssue : IJobItemIssue

@@ -27,12 +27,8 @@ namespace Xarial.CadPlus.Plus.Shared.ViewModels
 
         private readonly IBatchJobBase m_BatchJob;
 
-        private int m_SucceededItemsCount;
-        private int m_FailedItemsCount;
-        private int m_WarningItemsCount;
-
-        private readonly List<JobItemVM> m_JobItems;
-        private readonly List<JobItemOperationDefinitionVM> m_OperationDefinitions;
+        private readonly ObservableCollection<JobItemVM> m_JobItems;
+        private readonly ObservableCollection<JobItemOperationDefinitionVM> m_OperationDefinitions;
 
         private readonly IMessageService m_MsgSvc;
         private readonly IXLogger m_Logger;
@@ -43,45 +39,19 @@ namespace Xarial.CadPlus.Plus.Shared.ViewModels
 
         public ICommand CancelJobCommand { get; }
 
-        public JobStatus_e? Status => m_BatchJob.Status;
-        public double? Progress => m_BatchJob.Progress;
+        public JobStatus_e? Status => m_BatchJob.State?.Status;
+        public double? Progress => m_BatchJob.State?.Progress;
 
-        public IReadOnlyList<JobItemVM> JobItems => IsInitialized ? m_JobItems : null;
-        public IReadOnlyList<JobItemOperationDefinitionVM> OperationDefinitions => IsInitialized ? m_OperationDefinitions : null;
+        public ReadOnlyObservableCollection<JobItemVM> JobItems { get; }
+        public ReadOnlyObservableCollection<JobItemOperationDefinitionVM> OperationDefinitions { get; }
 
-        public int SucceededItemsCount
-        {
-            get => m_SucceededItemsCount;
-            private set
-            {
-                m_SucceededItemsCount = value;
-                this.NotifyChanged();
-            }
-        }
+        public int? TotalItemsCount => m_BatchJob?.State.TotalItemsCount;
+        public int? SucceededItemsCount => m_BatchJob?.State.SucceededItemsCount;
+        public int? WarningItemsCount => m_BatchJob?.State.WarningItemsCount;
+        public int? FailedItemsCount => m_BatchJob?.State.FailedItemsCount;
 
-        public int WarningItemsCount
-        {
-            get => m_WarningItemsCount;
-            private set
-            {
-                m_WarningItemsCount = value;
-                this.NotifyChanged();
-            }
-        }
-
-        public int FailedItemsCount
-        {
-            get => m_FailedItemsCount;
-            private set
-            {
-                m_FailedItemsCount = value;
-                this.NotifyChanged();
-            }
-        }
-
-        public DateTime? StartTime => m_BatchJob.StartTime;
-
-        public TimeSpan? Duration => m_BatchJob.Duration;
+        public DateTime? StartTime => m_BatchJob.State?.StartTime;
+        public TimeSpan? Duration => m_BatchJob.State?.Duration;
 
         public ObservableCollection<string> LogEntries { get; }
 
@@ -126,20 +96,26 @@ namespace Xarial.CadPlus.Plus.Shared.ViewModels
             LogEntries = new ObservableCollection<string>(batchJob.LogEntries ?? Enumerable.Empty<string>());
             BindingOperations.EnableCollectionSynchronization(LogEntries, m_Lock);
 
-            m_JobItems = new List<JobItemVM>((batchJob.JobItems ?? Enumerable.Empty<IJobItem>()).Select(j => new JobItemVM(j)));
+            m_JobItems = new ObservableCollection<JobItemVM>((batchJob.JobItems ?? Enumerable.Empty<IJobItem>()).Select(j => new JobItemVM(j)));
             BindingOperations.EnableCollectionSynchronization(m_JobItems, m_Lock);
 
-            m_OperationDefinitions = new List<JobItemOperationDefinitionVM>(
+            m_OperationDefinitions = new ObservableCollection<JobItemOperationDefinitionVM>(
                 (batchJob.OperationDefinitions ?? Enumerable.Empty<IJobItemOperationDefinition>()).Select(o => new JobItemOperationDefinitionVM(o)));
             BindingOperations.EnableCollectionSynchronization(m_OperationDefinitions, m_Lock);
 
-            CancelJobCommand = new RelayCommand(CancelJob, () => !m_CancellationTokenSource.IsCancellationRequested && m_BatchJob.Status == JobStatus_e.Initializing || m_BatchJob.Status == JobStatus_e.InProgress);
+            JobItems = new ReadOnlyObservableCollection<JobItemVM>(m_JobItems);
+            OperationDefinitions = new ReadOnlyObservableCollection<JobItemOperationDefinitionVM>(m_OperationDefinitions);
+
+            CancelJobCommand = new RelayCommand(CancelJob, 
+                () => !m_CancellationTokenSource.IsCancellationRequested
+                    && m_BatchJob.State?.Status == JobStatus_e.Initializing
+                    || m_BatchJob.State?.Status == JobStatus_e.InProgress);
 
             m_BatchJob = batchJob;
             m_BatchJob.Started += OnJobStarted;
             m_BatchJob.Initialized += OnJobInitialized;
             m_BatchJob.ItemProcessed += OnItemProcessed;
-            m_BatchJob.ProgressChanged += OnProgressChanged;
+            m_BatchJob.State.ProgressChanged += OnProgressChanged;
             m_BatchJob.Log += OnLog;
             m_BatchJob.Completed += OnJobCompleted;
             
@@ -147,30 +123,8 @@ namespace Xarial.CadPlus.Plus.Shared.ViewModels
             m_Logger = logger;
 
             m_CancellationTokenSource = cancellationTokenSource;
-
-            if (IsInitialized)
-            {
-                foreach (var jobItem in JobItems)
-                {
-                    switch (jobItem.State.Status)
-                    {
-                        case JobItemStateStatus_e.Succeeded:
-                            m_SucceededItemsCount++;
-                            break;
-
-                        case JobItemStateStatus_e.Warning:
-                            m_WarningItemsCount++;
-                            break;
-
-                        case JobItemStateStatus_e.Failed:
-                            m_FailedItemsCount++;
-                            break;
-                    }
-                }
-            }
         }
 
-        private bool IsInitialized => m_BatchJob.Status.HasValue && m_BatchJob.Status.Value != JobStatus_e.Initializing;
 
         public void TryExportReport()
         {
@@ -226,9 +180,10 @@ namespace Xarial.CadPlus.Plus.Shared.ViewModels
             }
         }
 
-        private void OnProgressChanged(IBatchJobBase sender, double progress)
+        private void OnProgressChanged(IJobState sender, double progress)
         {
             this.NotifyChanged(nameof(Progress));
+            this.NotifyChanged(nameof(Duration));
         }
 
         private void OnLog(IBatchJobBase sender, string line)
@@ -243,41 +198,38 @@ namespace Xarial.CadPlus.Plus.Shared.ViewModels
 
         private void OnJobInitialized(IBatchJobBase sender, IReadOnlyList<IJobItem> items, IReadOnlyList<IJobItemOperationDefinition> operations)
         {
-            m_JobItems.AddRange(items.Select(f => new JobItemVM(f)));
-            m_OperationDefinitions.AddRange(operations.Select(o => new JobItemOperationDefinitionVM(o)));
-            
+            foreach (var oper in operations) 
+            {
+                m_OperationDefinitions.Add(new JobItemOperationDefinitionVM(oper));
+            }
+
+            foreach (var item in items) 
+            {
+                m_JobItems.Add(new JobItemVM(item));
+            }
+
+            NotifyProcessedChanged();
             this.NotifyChanged(nameof(Status));
-            this.NotifyChanged(nameof(JobItems));
-            this.NotifyChanged(nameof(OperationDefinitions));
         }
 
         private void OnJobCompleted(IBatchJobBase sender, TimeSpan duration, JobStatus_e status)
         {
-            this.NotifyChanged(nameof(Duration));
+            NotifyProcessedChanged();
             this.NotifyChanged(nameof(Status));
         }
 
         private void OnItemProcessed(IBatchJobBase sender, IJobItem item)
         {
-            switch (item.State.Status) 
-            {
-                case JobItemStateStatus_e.Succeeded:
-                    SucceededItemsCount++;
-                    break;
+            NotifyProcessedChanged();
+        }
 
-                case JobItemStateStatus_e.Warning:
-                    WarningItemsCount++;
-                    break;
-
-                case JobItemStateStatus_e.Failed:
-                    FailedItemsCount++;
-                    break;
-
-                default:
-                    m_Logger.Log($"'{item.Title}' status is not set to processed");
-                    FailedItemsCount++;
-                    break;
-            }
+        private void NotifyProcessedChanged()
+        {
+            this.NotifyChanged(nameof(TotalItemsCount));
+            this.NotifyChanged(nameof(SucceededItemsCount));
+            this.NotifyChanged(nameof(WarningItemsCount));
+            this.NotifyChanged(nameof(FailedItemsCount));
+            this.NotifyChanged(nameof(Duration));
         }
 
         public void CancelJob()
