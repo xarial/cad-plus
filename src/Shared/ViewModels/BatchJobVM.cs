@@ -43,8 +43,8 @@ namespace Xarial.CadPlus.Plus.Shared.ViewModels
         public BatchJobStatus_e? Status => m_BatchJob.State?.Status;
         public double? Progress => m_BatchJob.State?.Progress;
 
-        public ReadOnlyObservableCollection<BatchJobItemVM> JobItems { get; }
-        public ReadOnlyObservableCollection<BatchJobItemOperationDefinitionVM> OperationDefinitions { get; }
+        public ObservableCollection<BatchJobItemVM> JobItems => m_JobItems;
+        public ObservableCollection<BatchJobItemOperationDefinitionVM> OperationDefinitions => m_OperationDefinitions;
 
         public int? TotalItemsCount => m_BatchJob?.State.TotalItemsCount;
         public int? SucceededItemsCount => m_BatchJob?.State.SucceededItemsCount;
@@ -103,12 +103,6 @@ namespace Xarial.CadPlus.Plus.Shared.ViewModels
             m_OperationDefinitions = new ObservableCollection<BatchJobItemOperationDefinitionVM>(
                 (batchJob.OperationDefinitions ?? Enumerable.Empty<IBatchJobItemOperationDefinition>()).Select(o => new BatchJobItemOperationDefinitionVM(o)));
             BindingOperations.EnableCollectionSynchronization(m_OperationDefinitions, m_Lock);
-
-            JobItems = new ReadOnlyObservableCollection<BatchJobItemVM>(m_JobItems);
-            BindingOperations.EnableCollectionSynchronization(JobItems, m_Lock);
-
-            OperationDefinitions = new ReadOnlyObservableCollection<BatchJobItemOperationDefinitionVM>(m_OperationDefinitions);
-            BindingOperations.EnableCollectionSynchronization(OperationDefinitions, m_Lock);
 
             CancelJobCommand = new RelayCommand(CancelJob, 
                 () => !m_CancellationTokenSource.IsCancellationRequested
