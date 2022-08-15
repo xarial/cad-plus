@@ -10,6 +10,7 @@
     <UserControl.Resources>
         <conv:IsPreparingBatchJobConverter x:Key="isPrepJobConv"/>
         <conv:IsPreparingBatchJobConverter x:Key="isNotPrepJobConv" Reverse="True"/>
+        <conv:BatchJobStatusToTextConverter x:Key="statusToTxtConv"/>
     </UserControl.Resources>
     <Grid>
         <xctrls:LoadingWheel Color="Gray" Visibility="{Binding Path=Status, Converter={StaticResource isPrepJobConv}}" Diameter="50" StrokeThickness="5"/>
@@ -26,6 +27,7 @@
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
@@ -51,6 +53,9 @@
 
                 <TextBlock Text="Failed Items:" Grid.Row="5" Grid.Column="0" Margin="2" FontWeight="Bold"/>
                 <TextBlock Text="{Binding Path=FailedItemsCount}" Grid.Row="5" Grid.Column="2" Margin="2"/>
+
+                <TextBlock Text="Status:" Grid.Row="6" Grid.Column="0" Margin="2" FontWeight="Bold"/>
+                <TextBlock Text="{Binding Path=Status, Converter={StaticResource statusToTxtConv}}" Grid.Row="6" Grid.Column="2" Margin="2"/>
 
             </Grid>
         </Grid>

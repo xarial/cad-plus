@@ -59,13 +59,15 @@
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
             <xctrls:XDataGrid x:Name="grdResults" IsReadOnly="True" Grid.Row="0"
-                      AutoGenerateColumns="False"
-                      ItemsSource="{Binding Path=JobItems}"
-                      ColumnsSource="{Binding Path=OperationDefinitions}"
-                      EnableColumnVirtualization="True" EnableRowVirtualization="True"
-                      VirtualizingPanel.VirtualizationMode="Standard"
-                      VirtualizingPanel.IsVirtualizing="True"
-                      ScrollViewer.CanContentScroll="True" ColumnsPreCreated="OnColumnsPreCreated">
+                              AutoGenerateColumns="False"
+                              ItemsSource="{Binding Path=JobItems}"
+                              ColumnsSource="{Binding Path=OperationDefinitions}"
+                              EnableColumnVirtualization="True" EnableRowVirtualization="True"
+                              VirtualizingPanel.VirtualizationMode="Standard"
+                              VirtualizingPanel.IsVirtualizing="True"
+                              ScrollViewer.CanContentScroll="True"
+                              ScrollViewer.IsDeferredScrollingEnabled="True"
+                              ColumnsPreCreated="OnColumnsPreCreated">
                 <xctrls:XDataGrid.CellContentSelector>
                     <local:BatchJobOperationCellContentSelector/>
                 </xctrls:XDataGrid.CellContentSelector>

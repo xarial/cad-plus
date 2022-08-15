@@ -30,21 +30,22 @@ namespace Xarial.CadPlus.Plus.Shared.ViewModels
 
         private readonly ObservableCollection<BatchJobItemVM> m_JobItems;
         private readonly ObservableCollection<BatchJobItemOperationDefinitionVM> m_OperationDefinitions;
+        private readonly ObservableCollection<string> m_LogEntries;
 
         private readonly IMessageService m_MsgSvc;
         private readonly IXLogger m_Logger;
 
         protected readonly CancellationTokenSource m_CancellationTokenSource;
 
-        private object m_Lock;
+        private readonly object m_Lock;
 
         public ICommand CancelJobCommand { get; }
 
         public BatchJobStatus_e? Status => m_BatchJob.State?.Status;
         public double? Progress => m_BatchJob.State?.Progress;
 
-        public ObservableCollection<BatchJobItemVM> JobItems => m_JobItems;
-        public ObservableCollection<BatchJobItemOperationDefinitionVM> OperationDefinitions => m_OperationDefinitions;
+        public ICollectionView JobItems { get; }
+        public ICollectionView OperationDefinitions { get; }
 
         public int? TotalItemsCount => m_BatchJob?.State.TotalItemsCount;
         public int? SucceededItemsCount => m_BatchJob?.State.SucceededItemsCount;
@@ -54,7 +55,7 @@ namespace Xarial.CadPlus.Plus.Shared.ViewModels
         public DateTime? StartTime => m_BatchJob.State?.StartTime;
         public TimeSpan? Duration => m_BatchJob.State?.Duration;
 
-        public ObservableCollection<string> LogEntries { get; }
+        public ICollectionView LogEntries { get; }
 
         private IBatchJobReportExporter[] m_ReportExporters;
         private IBatchJobLogExporter[] m_LogExporters;
@@ -86,23 +87,26 @@ namespace Xarial.CadPlus.Plus.Shared.ViewModels
                 throw new ArgumentNullException(nameof(cancellationTokenSource));
             }
 
+            m_Lock = new object();
+
             m_ReportExporters = reportExporters;
             m_LogExporters = logExporters;
 
             ExportReportCommand = new RelayCommand(TryExportReport, () => m_ReportExporters?.Any() == true);
             ExportLogCommand = new RelayCommand(TryExportLog, () => m_LogExporters?.Any() == true);
 
-            m_Lock = new object();
-
-            LogEntries = new ObservableCollection<string>(batchJob.LogEntries ?? Enumerable.Empty<string>());
-            BindingOperations.EnableCollectionSynchronization(LogEntries, m_Lock);
+            m_LogEntries = new ObservableCollection<string>(batchJob.LogEntries ?? Enumerable.Empty<string>());
+            BindingOperations.EnableCollectionSynchronization(m_LogEntries, m_Lock);
+            LogEntries = CollectionViewSource.GetDefaultView(m_LogEntries);
 
             m_JobItems = new ObservableCollection<BatchJobItemVM>((batchJob.JobItems ?? Enumerable.Empty<IBatchJobItem>()).Select(j => new BatchJobItemVM(j)));
             BindingOperations.EnableCollectionSynchronization(m_JobItems, m_Lock);
+            JobItems = CollectionViewSource.GetDefaultView(m_JobItems);
 
             m_OperationDefinitions = new ObservableCollection<BatchJobItemOperationDefinitionVM>(
                 (batchJob.OperationDefinitions ?? Enumerable.Empty<IBatchJobItemOperationDefinition>()).Select(o => new BatchJobItemOperationDefinitionVM(o)));
             BindingOperations.EnableCollectionSynchronization(m_OperationDefinitions, m_Lock);
+            OperationDefinitions = CollectionViewSource.GetDefaultView(m_OperationDefinitions);
 
             CancelJobCommand = new RelayCommand(CancelJob, 
                 () => !m_CancellationTokenSource.IsCancellationRequested
@@ -185,26 +189,36 @@ namespace Xarial.CadPlus.Plus.Shared.ViewModels
 
         private void OnLog(IBatchJobBase sender, string line)
         {
-            LogEntries.Add(line);
+            lock (m_Lock)
+            {
+                m_LogEntries.Add(line);
+            }
         }
 
         private void OnJobStarted(IBatchJobBase sender, DateTime startTime)
         {
             this.NotifyChanged(nameof(StartTime));
+            this.NotifyChanged(nameof(Status));
         }
 
         private void OnJobInitialized(IBatchJobBase sender, IReadOnlyList<IBatchJobItem> items, IReadOnlyList<IBatchJobItemOperationDefinition> operations)
         {
             m_Logger.Log($"Job initialized. Creating view models for {operations.Count} operation(s) and {items.Count} item(s)", LoggerMessageSeverity_e.Debug);
 
-            foreach (var oper in operations) 
+            foreach (var oper in operations)
             {
-                m_OperationDefinitions.Add(new BatchJobItemOperationDefinitionVM(oper));
+                lock (m_Lock)
+                {
+                    m_OperationDefinitions.Add(new BatchJobItemOperationDefinitionVM(oper));
+                }
             }
 
-            foreach (var item in items) 
+            foreach (var item in items)
             {
-                m_JobItems.Add(new BatchJobItemVM(item));
+                lock (m_Lock)
+                {
+                    m_JobItems.Add(new BatchJobItemVM(item));
+                }
             }
 
             NotifyProcessedChanged();
