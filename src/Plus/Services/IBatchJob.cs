@@ -10,17 +10,18 @@ using System.Windows.Media.Imaging;
 
 namespace Xarial.CadPlus.Plus.Services
 {
-    public enum JobItemStateStatus_e
+    public enum BatchJobItemStateStatus_e
     {
-        Initializing,
+        Queued,
         InProgress,
         Failed,
         Succeeded,
         Warning
     }
 
-    public enum JobStatus_e
+    public enum BatchJobStatus_e
     {
+        NotStarted,
         Initializing,
         InProgress,
         Failed,
@@ -29,22 +30,22 @@ namespace Xarial.CadPlus.Plus.Services
         Cancelled
     }
 
-    public enum IssueType_e
+    public enum BatchJobItemIssueType_e
     {
         Information,
         Warning,
         Error
     }
 
-    public interface IJobItemIssue 
+    public interface IBatchJobItemIssue 
     {
-        IssueType_e Type { get; }
+        BatchJobItemIssueType_e Type { get; }
         string Content { get; }
     }
 
-    public interface IJobState 
+    public interface IBatchJobState 
     {
-        event JobStateProgressChangedDelegate ProgressChanged;
+        event BatchJobStateProgressChangedDelegate ProgressChanged;
 
         int TotalItemsCount { get; }
         int SucceededItemsCount { get; }
@@ -54,26 +55,26 @@ namespace Xarial.CadPlus.Plus.Services
         DateTime StartTime { get; }
         TimeSpan Duration { get; }
         double Progress { get; }
-        JobStatus_e Status { get; }
+        BatchJobStatus_e Status { get; }
     }
 
-    public delegate void JobStateStatusChangedDelegate(IJobItemState sender, JobItemStateStatus_e status);
-    public delegate void JobStateIssuesChangedDelegate(IJobItemState sender, IReadOnlyList<IJobItemIssue> issues);
+    public delegate void BatchJobStateStatusChangedDelegate(IBatchJobItemState sender, BatchJobItemStateStatus_e status);
+    public delegate void BatchJobStateIssuesChangedDelegate(IBatchJobItemState sender, IReadOnlyList<IBatchJobItemIssue> issues);
 
-    public delegate void JobItemOperationUserResultChangedDelegate(IJobItemOperation sender, object userResult);
+    public delegate void BatchJobItemOperationUserResultChangedDelegate(IBatchJobItemOperation sender, object userResult);
 
-    public delegate void JobStartedDelegate(IBatchJobBase sender, DateTime startTime);
-    public delegate void JobInitializedDelegate(IBatchJobBase sender, IReadOnlyList<IJobItem> jobItems, IReadOnlyList<IJobItemOperationDefinition> operations);
-    public delegate void JobCompletedDelegate(IBatchJobBase sender, TimeSpan duration, JobStatus_e status);
-    public delegate void JobItemProcessedDelegate(IBatchJobBase sender, IJobItem item);
-    public delegate void JobStateProgressChangedDelegate(IJobState sender, double progress);
-    public delegate void JobLogDelegateDelegate(IBatchJobBase sender, string message);
+    public delegate void BatchJobStartedDelegate(IBatchJobBase sender, DateTime startTime);
+    public delegate void BatchJobInitializedDelegate(IBatchJobBase sender, IReadOnlyList<IBatchJobItem> jobItems, IReadOnlyList<IBatchJobItemOperationDefinition> operations);
+    public delegate void BatchJobCompletedDelegate(IBatchJobBase sender, TimeSpan duration, BatchJobStatus_e status);
+    public delegate void BatchJobItemProcessedDelegate(IBatchJobBase sender, IBatchJobItem item);
+    public delegate void BatchJobStateProgressChangedDelegate(IBatchJobState sender, double progress);
+    public delegate void BatchJobLogDelegateDelegate(IBatchJobBase sender, string message);
 
-    public delegate void JobItemNestedItemsInitializedDelegate(IJobItem sender, IReadOnlyList<IJobItem> nestedItems);
+    public delegate void BatchJobItemNestedItemsInitializedDelegate(IBatchJobItem sender, IReadOnlyList<IBatchJobItem> nestedItems);
 
-    public interface IJobItem
+    public interface IBatchJobItem
     {
-        event JobItemNestedItemsInitializedDelegate NestedItemsInitialized;
+        event BatchJobItemNestedItemsInitializedDelegate NestedItemsInitialized;
 
         BitmapImage Icon { get; }
         BitmapImage Preview { get; }
@@ -81,78 +82,78 @@ namespace Xarial.CadPlus.Plus.Services
         string Description { get; }
         Action Link { get; }
         
-        IJobItemState State { get; }
+        IBatchJobItemState State { get; }
 
-        IReadOnlyList<IJobItemOperation> Operations { get; }
-        IReadOnlyList<IJobItem> Nested { get; }
+        IReadOnlyList<IBatchJobItemOperation> Operations { get; }
+        IReadOnlyList<IBatchJobItem> Nested { get; }
     }
 
-    public static class JobItemExtension 
+    public static class BatchJobItemExtension 
     {
-        public static JobItemStateStatus_e ComposeStatus(this IJobItem jobItem) 
+        public static BatchJobItemStateStatus_e ComposeStatus(this IBatchJobItem jobItem) 
         {
             var statuses = jobItem.Operations.Select(o => o.State.Status).ToArray();
 
-            if (statuses.All(s => s == JobItemStateStatus_e.Initializing))
+            if (statuses.All(s => s == BatchJobItemStateStatus_e.Queued))
             {
-                return JobItemStateStatus_e.Initializing;
+                return BatchJobItemStateStatus_e.Queued;
             }
-            else if (statuses.All(s => s == JobItemStateStatus_e.Succeeded))
+            else if (statuses.All(s => s == BatchJobItemStateStatus_e.Succeeded))
             {
-                return JobItemStateStatus_e.Succeeded;
+                return BatchJobItemStateStatus_e.Succeeded;
             }
-            else if (statuses.All(s => s == JobItemStateStatus_e.Failed))
+            else if (statuses.All(s => s == BatchJobItemStateStatus_e.Failed))
             {
-                return JobItemStateStatus_e.Failed;
+                return BatchJobItemStateStatus_e.Failed;
             }
-            else if (statuses.All(s => s == JobItemStateStatus_e.Failed || s == JobItemStateStatus_e.Succeeded))
+            else if (statuses.All(s => s == BatchJobItemStateStatus_e.Failed || s == BatchJobItemStateStatus_e.Succeeded))
             {
-                return JobItemStateStatus_e.Warning;
+                return BatchJobItemStateStatus_e.Warning;
             }
             else
             {
-                return JobItemStateStatus_e.InProgress;
+                return BatchJobItemStateStatus_e.InProgress;
             }
         }
     }
 
-    public interface IJobItemOperationDefinition 
+    public interface IBatchJobItemOperationDefinition 
     {
         string Name { get; }
         BitmapImage Icon { get; }
     }
 
-    public interface IJobItemOperation 
+    public interface IBatchJobItemOperation 
     {
-        event JobItemOperationUserResultChangedDelegate UserResultChanged;
-        IJobItemOperationDefinition Definition { get; }
+        event BatchJobItemOperationUserResultChangedDelegate UserResultChanged;
+        IBatchJobItemOperationDefinition Definition { get; }
 
-        IJobItemState State { get; }
+        IBatchJobItemState State { get; }
         object UserResult { get; }
     }
 
-    public interface IJobItemState
+    public interface IBatchJobItemState
     {
-        event JobStateStatusChangedDelegate StatusChanged;
-        event JobStateIssuesChangedDelegate IssuesChanged;
+        event BatchJobStateStatusChangedDelegate StatusChanged;
+        event BatchJobStateIssuesChangedDelegate IssuesChanged;
 
-        JobItemStateStatus_e Status { get; }
-        IReadOnlyList<IJobItemIssue> Issues { get; }
+        BatchJobItemStateStatus_e Status { get; }
+        IReadOnlyList<IBatchJobItemIssue> Issues { get; }
     }
 
     public interface IBatchJobBase : IDisposable
     {
-        event JobStartedDelegate Started;
-        event JobInitializedDelegate Initialized;
-        event JobCompletedDelegate Completed;
-        event JobItemProcessedDelegate ItemProcessed;
-        event JobLogDelegateDelegate Log;
+        event BatchJobStartedDelegate Started;
+        event BatchJobInitializedDelegate Initialized;
+        event BatchJobCompletedDelegate Completed;
+        event BatchJobItemProcessedDelegate ItemProcessed;
+        event BatchJobLogDelegateDelegate Log;
         
-        IJobState State { get; }
+        IBatchJobState State { get; }
 
-        IReadOnlyList<IJobItemOperationDefinition> OperationDefinitions { get; }
+        IReadOnlyList<IBatchJobItemOperationDefinition> OperationDefinitions { get; }
         IReadOnlyList<string> LogEntries { get; }
-        IReadOnlyList<IJobItem> JobItems { get; }
+        IReadOnlyList<IBatchJobItem> JobItems { get; }
     }
 
     public interface IBatchJob : IBatchJobBase
@@ -171,13 +172,13 @@ namespace Xarial.CadPlus.Plus.Services
             Action<DateTime> raiseStartEventFunc, Action<DateTime> setStartTimeFunc,
             Action<CancellationToken> initFunc, Action raiseInitEventFunc,
             Action<CancellationToken> doWorkFunc, Action<TimeSpan> raiseCompletedFunc, Action<TimeSpan> setDuration,
-            Action<JobStatus_e> setStatusFunc)
+            Action<BatchJobStatus_e> setStatusFunc)
         {
             var startTime = DateTime.Now;
 
             setStartTimeFunc.Invoke(startTime);
 
-            setStatusFunc.Invoke(JobStatus_e.Initializing);
+            setStatusFunc.Invoke(BatchJobStatus_e.Initializing);
 
             raiseStartEventFunc.Invoke(startTime);
 
@@ -185,7 +186,7 @@ namespace Xarial.CadPlus.Plus.Services
             {
                 initFunc.Invoke(cancellationToken);
 
-                setStatusFunc.Invoke(JobStatus_e.InProgress);
+                setStatusFunc.Invoke(BatchJobStatus_e.InProgress);
 
                 raiseInitEventFunc.Invoke();
 
@@ -195,11 +196,11 @@ namespace Xarial.CadPlus.Plus.Services
             }
             catch (OperationCanceledException)
             {
-                setStatusFunc.Invoke(JobStatus_e.Cancelled);
+                setStatusFunc.Invoke(BatchJobStatus_e.Cancelled);
             }
             catch
             {
-                setStatusFunc.Invoke(JobStatus_e.Failed);
+                setStatusFunc.Invoke(BatchJobStatus_e.Failed);
             }
             finally
             {
@@ -213,13 +214,13 @@ namespace Xarial.CadPlus.Plus.Services
             Action<DateTime> raiseStartEventFunc, Action<DateTime> setStartTimeFunc,
             Func<CancellationToken, Task> initFunc, Action raiseInitEventFunc,
             Func<CancellationToken, Task> doWorkFunc, Action<TimeSpan> raiseCompletedFunc, Action<TimeSpan> setDuration,
-            Action<JobStatus_e> setStatusFunc)
+            Action<BatchJobStatus_e> setStatusFunc)
         {
             var startTime = DateTime.Now;
             
             setStartTimeFunc.Invoke(startTime);
 
-            setStatusFunc.Invoke(JobStatus_e.Initializing);
+            setStatusFunc.Invoke(BatchJobStatus_e.Initializing);
 
             raiseStartEventFunc.Invoke(startTime);
 
@@ -227,7 +228,7 @@ namespace Xarial.CadPlus.Plus.Services
             {
                 await initFunc.Invoke(cancellationToken);
 
-                setStatusFunc.Invoke(JobStatus_e.InProgress);
+                setStatusFunc.Invoke(BatchJobStatus_e.InProgress);
 
                 raiseInitEventFunc.Invoke();
 
@@ -237,11 +238,11 @@ namespace Xarial.CadPlus.Plus.Services
             }
             catch (OperationCanceledException)
             {
-                setStatusFunc.Invoke(JobStatus_e.Cancelled);
+                setStatusFunc.Invoke(BatchJobStatus_e.Cancelled);
             }
             catch
             {
-                setStatusFunc.Invoke(JobStatus_e.Failed);
+                setStatusFunc.Invoke(BatchJobStatus_e.Failed);
             }
             finally
             {
@@ -251,19 +252,19 @@ namespace Xarial.CadPlus.Plus.Services
             }
         }
 
-        private static JobStatus_e ComposeJobStatus(IBatchJobBase job)
+        private static BatchJobStatus_e ComposeJobStatus(IBatchJobBase job)
         {
-            if (job.JobItems.All(i => i.State.Status == JobItemStateStatus_e.Succeeded))
+            if (job.JobItems.All(i => i.State.Status == BatchJobItemStateStatus_e.Succeeded))
             {
-                return JobStatus_e.Succeeded;
+                return BatchJobStatus_e.Succeeded;
             }
-            else if (job.JobItems.Any(i => i.State.Status == JobItemStateStatus_e.Succeeded))
+            else if (job.JobItems.Any(i => i.State.Status == BatchJobItemStateStatus_e.Succeeded))
             {
-                return JobStatus_e.CompletedWithWarning;
+                return BatchJobStatus_e.CompletedWithWarning;
             }
             else
             {
-                return JobStatus_e.Failed;
+                return BatchJobStatus_e.Failed;
             }
         }
     }

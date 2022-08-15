@@ -49,13 +49,13 @@
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
                 <Border BorderThickness="1" BorderBrush="Black" Grid.Row="0" Grid.Column="0" Margin="5">
-                    <sharedui:JobSummaryControl  DataContext="{Binding Path=Result}"/>
+                    <sharedui:BatchJobSummaryControl  DataContext="{Binding Path=Result}"/>
                 </Border>
                 <Border BorderThickness="1" BorderBrush="Black" Grid.Row="0" Grid.Column="1" Margin="5">
-                    <sharedui:JobJournalControl  DataContext="{Binding Path=Result}"/>
+                    <sharedui:BatchJobJournalControl  DataContext="{Binding Path=Result}"/>
                 </Border>
                 <Border BorderThickness="1" BorderBrush="Black" Grid.Row="1" Grid.ColumnSpan="2" Margin="5">
-                    <sharedui:JobReportControl  DataContext="{Binding Path=Result}"/>
+                    <sharedui:BatchJobReportControl  DataContext="{Binding Path=Result}"/>
                 </Border>
                 <ProgressBar Grid.Row="2" Grid.ColumnSpan="2" Value="{Binding Path=Result.Progress, Mode=OneWay}" Minimum="0" Maximum="1" Height="15"/>
                 <Button Grid.Row="3" Margin="5" Grid.Column="0" HorizontalAlignment="Right" Command="{Binding Path=RunJobCommand}">

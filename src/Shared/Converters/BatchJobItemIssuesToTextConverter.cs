@@ -17,15 +17,15 @@ using Xarial.CadPlus.Plus.Services;
 
 namespace Xarial.CadPlus.Plus.Shared.Converters
 {
-    public class IssuesToTextConverter : IValueConverter
+    public class BatchJobItemIssuesToTextConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value is IReadOnlyList<IJobItemIssue>)
+            if (value is IReadOnlyList<IBatchJobItemIssue>)
             {
                 var issues = new StringBuilder();
 
-                foreach (var issue in (IReadOnlyList<IJobItemIssue>)value) 
+                foreach (var issue in (IReadOnlyList<IBatchJobItemIssue>)value) 
                 {
                     if (issues.Length != 0) 
                     {

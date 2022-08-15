@@ -17,20 +17,20 @@ using Xarial.XToolkit.Wpf.Controls;
 
 namespace Xarial.CadPlus.Plus.Shared.UI
 {
-	public class OperationCellContentSelector : ICellContentSelector
+	public class BatchJobOperationCellContentSelector : ICellContentSelector
 	{
 		public object SelectContent(object dataItem, DataGridColumn column, DataGridCell cell)
 		{
-			var jobItem = dataItem as JobItemVM;
-			var operationColumn = (JobItemOperationDefinitionVM)column.Header;
+			var jobItem = dataItem as BatchJobItemVM;
+			var operationColumn = (BatchJobItemOperationDefinitionVM)column.Header;
 
 			return jobItem.Operations.First(o => o.JobItemOperation.Definition == operationColumn.Definition);
 		}
 	}
 
-	public partial class JobReportControl : UserControl
+	public partial class BatchJobReportControl : UserControl
     {
-        public JobReportControl()
+        public BatchJobReportControl()
         {
             InitializeComponent();
         }
@@ -38,11 +38,11 @@ namespace Xarial.CadPlus.Plus.Shared.UI
         public static readonly DependencyProperty DataGridStyleProperty =
             DependencyProperty.Register(
                 nameof(DataGridStyle), typeof(Style),
-                typeof(JobReportControl), new PropertyMetadata(OnStyleChanged));
+                typeof(BatchJobReportControl), new PropertyMetadata(OnStyleChanged));
 
         private static void OnStyleChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            ((JobReportControl)d).SetStyle((Style)e.NewValue);
+            ((BatchJobReportControl)d).SetStyle((Style)e.NewValue);
         }
 
         private void SetStyle(Style style) 
@@ -58,9 +58,9 @@ namespace Xarial.CadPlus.Plus.Shared.UI
 
 		private void OnColumnsPreCreated(List<DataGridColumn> columns)
 		{
-			foreach (var operationCol in columns.Where(c => c.Header is JobItemOperationDefinitionVM))
+			foreach (var operationCol in columns.Where(c => c.Header is BatchJobItemOperationDefinitionVM))
 			{
-				operationCol.SortMemberPath = nameof(JobItemOperationVM.State);
+				operationCol.SortMemberPath = nameof(BatchJobItemOperationVM.State);
 			}
 		}
 	}

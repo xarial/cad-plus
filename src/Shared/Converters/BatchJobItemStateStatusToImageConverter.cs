@@ -19,17 +19,17 @@ using Xarial.XToolkit.Wpf.Extensions;
 
 namespace Xarial.CadPlus.Plus.Shared.Converters
 {
-    public class JobItemStateStatusToImageConverter : IValueConverter
+    public class BatchJobItemStateStatusToImageConverter : IValueConverter
     {
-        private static readonly BitmapImage m_InitializingImage;
+        private static readonly BitmapImage m_QueuedImage;
         private static readonly BitmapImage m_FailedImage;
         private static readonly BitmapImage m_InProgressImage;
         private static readonly BitmapImage m_SucceededImage;
         private static readonly BitmapImage m_WarningImage;
 
-        static JobItemStateStatusToImageConverter() 
+        static BatchJobItemStateStatusToImageConverter() 
         {
-            m_InitializingImage = Resources.status_awaiting.ToBitmapImage();
+            m_QueuedImage = Resources.status_awaiting.ToBitmapImage();
             m_FailedImage = Resources.status_failed.ToBitmapImage();
             m_InProgressImage = Resources.status_in_progress.ToBitmapImage();
             m_SucceededImage = Resources.status_succeeded.ToBitmapImage();
@@ -38,19 +38,19 @@ namespace Xarial.CadPlus.Plus.Shared.Converters
 
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value is JobItemStateStatus_e)
+            if (value is BatchJobItemStateStatus_e)
             {
-                switch ((JobItemStateStatus_e)value) 
+                switch ((BatchJobItemStateStatus_e)value) 
                 {
-                    case JobItemStateStatus_e.Initializing:
-                        return m_InitializingImage;
-                    case JobItemStateStatus_e.Failed:
+                    case BatchJobItemStateStatus_e.Queued:
+                        return m_QueuedImage;
+                    case BatchJobItemStateStatus_e.Failed:
                         return m_FailedImage;
-                    case JobItemStateStatus_e.InProgress:
+                    case BatchJobItemStateStatus_e.InProgress:
                         return m_InProgressImage;
-                    case JobItemStateStatus_e.Succeeded:
+                    case BatchJobItemStateStatus_e.Succeeded:
                         return m_SucceededImage;
-                    case JobItemStateStatus_e.Warning:
+                    case BatchJobItemStateStatus_e.Warning:
                         return m_WarningImage;
                     default:
                         return null;

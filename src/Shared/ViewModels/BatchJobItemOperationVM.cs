@@ -12,26 +12,26 @@ using Xarial.XToolkit.Wpf.Extensions;
 
 namespace Xarial.CadPlus.Plus.Shared.ViewModels
 {
-    public class JobItemOperationVM : INotifyPropertyChanged
+    public class BatchJobItemOperationVM : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
         public object UserResult => JobItemOperation.UserResult;
 
-        public IJobItemOperation JobItemOperation { get; }
+        public IBatchJobItemOperation JobItemOperation { get; }
 
-        public JobItemStateVM State { get; }
+        public BatchJobItemStateVM State { get; }
 
-        public JobItemOperationVM(IJobItemOperation jobItemOperation)
+        public BatchJobItemOperationVM(IBatchJobItemOperation jobItemOperation)
         {
             JobItemOperation = jobItemOperation;
 
             JobItemOperation.UserResultChanged += OnUserResultChanged;
 
-            State = new JobItemStateVM(JobItemOperation.State);
+            State = new BatchJobItemStateVM(JobItemOperation.State);
         }
 
-        private void OnUserResultChanged(IJobItemOperation sender, object userResult)
+        private void OnUserResultChanged(IBatchJobItemOperation sender, object userResult)
             => this.NotifyChanged(nameof(UserResult));
     }
 }

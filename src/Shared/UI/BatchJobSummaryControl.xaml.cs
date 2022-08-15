@@ -15,9 +15,9 @@ using System.Windows.Shapes;
 
 namespace Xarial.CadPlus.Plus.Shared.UI
 {
-    public partial class JobJournalControl : UserControl
+    public partial class BatchJobSummaryControl : UserControl
     {
-        public JobJournalControl()
+        public BatchJobSummaryControl()
         {
             InitializeComponent();
         }

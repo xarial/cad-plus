@@ -12,7 +12,7 @@ using Xarial.XToolkit.Wpf.Extensions;
 
 namespace Xarial.CadPlus.Plus.Shared.ViewModels
 {
-    public class JobItemVM : INotifyPropertyChanged
+    public class BatchJobItemVM : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -22,13 +22,13 @@ namespace Xarial.CadPlus.Plus.Shared.ViewModels
         public string Description => JobItem.Description;
         public ICommand LinkCommand { get; }
 
-        public IJobItem JobItem { get; }
+        public IBatchJobItem JobItem { get; }
 
-        public JobItemOperationVM[] Operations { get; }
+        public BatchJobItemOperationVM[] Operations { get; }
 
-        public JobItemStateVM State { get; }
+        public BatchJobItemStateVM State { get; }
 
-        public JobItemVM(IJobItem jobItem) 
+        public BatchJobItemVM(IBatchJobItem jobItem) 
         {
             JobItem = jobItem;
 
@@ -37,9 +37,9 @@ namespace Xarial.CadPlus.Plus.Shared.ViewModels
                 LinkCommand = new RelayCommand(jobItem.Link);
             }
 
-            Operations = (JobItem.Operations ?? new IJobItemOperation[0]).Select(o => new JobItemOperationVM(o)).ToArray();
+            Operations = (JobItem.Operations ?? new IBatchJobItemOperation[0]).Select(o => new BatchJobItemOperationVM(o)).ToArray();
 
-            State = new JobItemStateVM(JobItem.State);
+            State = new BatchJobItemStateVM(JobItem.State);
         }
     }
 }

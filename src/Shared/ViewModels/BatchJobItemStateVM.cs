@@ -12,15 +12,15 @@ using Xarial.XToolkit.Wpf.Extensions;
 
 namespace Xarial.CadPlus.Plus.Shared.ViewModels
 {
-    public class JobItemStateVM : INotifyPropertyChanged
+    public class BatchJobItemStateVM : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
-        private readonly IJobItemState m_State;
+        private readonly IBatchJobItemState m_State;
         
         public ICommand ShowErrorCommand { get; }
 
-        public JobItemStateVM(IJobItemState state) 
+        public BatchJobItemStateVM(IBatchJobItemState state) 
         {
             m_State = state;
 
@@ -30,13 +30,13 @@ namespace Xarial.CadPlus.Plus.Shared.ViewModels
             ShowErrorCommand = new RelayCommand<Popup>(ShowError);
         }
 
-        public IReadOnlyList<IJobItemIssue> Issues => m_State.Issues;
-        public JobItemStateStatus_e Status => m_State.Status;
+        public IReadOnlyList<IBatchJobItemIssue> Issues => m_State.Issues;
+        public BatchJobItemStateStatus_e Status => m_State.Status;
 
-        private void OnIssuesChanged(IJobItemState sender, IReadOnlyList<IJobItemIssue> issues)
+        private void OnIssuesChanged(IBatchJobItemState sender, IReadOnlyList<IBatchJobItemIssue> issues)
             => this.NotifyChanged(nameof(Issues));
 
-        private void OnStatusChanged(IJobItemState sender, JobItemStateStatus_e status)
+        private void OnStatusChanged(IBatchJobItemState sender, BatchJobItemStateStatus_e status)
             => this.NotifyChanged(nameof(Status));
 
         private void ShowError(Popup popup) => popup.IsOpen = true;

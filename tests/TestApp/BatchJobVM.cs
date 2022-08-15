@@ -25,21 +25,21 @@ namespace TestApp
 {
     public class MyAsyncBatchJob : IAsyncBatchJob
     {
-        public event JobStartedDelegate Started;
-        public event JobInitializedDelegate Initialized;
-        public event JobCompletedDelegate Completed;
-        public event JobItemProcessedDelegate ItemProcessed;
-        public event JobLogDelegateDelegate Log;
+        public event BatchJobStartedDelegate Started;
+        public event BatchJobInitializedDelegate Initialized;
+        public event BatchJobCompletedDelegate Completed;
+        public event BatchJobItemProcessedDelegate ItemProcessed;
+        public event BatchJobLogDelegateDelegate Log;
 
-        public IReadOnlyList<IJobItem> JobItems => m_JobItems;
+        public IReadOnlyList<IBatchJobItem> JobItems => m_JobItems;
         public IReadOnlyList<string> LogEntries => m_LogEntries;
-        public IReadOnlyList<IJobItemOperationDefinition> OperationDefinitions => m_OperationDefinitions;
+        public IReadOnlyList<IBatchJobItemOperationDefinition> OperationDefinitions => m_OperationDefinitions;
 
-        public IJobState State => m_State;
+        public IBatchJobState State => m_State;
 
         private List<MyJobItem> m_JobItems;
         private List<string> m_LogEntries;
-        private List<IJobItemOperationDefinition> m_OperationDefinitions;
+        private List<IBatchJobItemOperationDefinition> m_OperationDefinitions;
 
         private readonly MyJobState m_State;
 
@@ -47,7 +47,7 @@ namespace TestApp
         {
             m_JobItems = new List<MyJobItem>();
             m_LogEntries = new List<string>();
-            m_OperationDefinitions = new List<IJobItemOperationDefinition>();
+            m_OperationDefinitions = new List<IBatchJobItemOperationDefinition>();
             m_State = new MyJobState();
         }
 
@@ -87,35 +87,32 @@ namespace TestApp
 
             m_JobItems.AddRange(new MyJobItem[] { item1, item2, item3 });
 
-            m_OperationDefinitions.AddRange(new IJobItemOperationDefinition[] { oper1, oper2 });
+            m_OperationDefinitions.AddRange(new IBatchJobItemOperationDefinition[] { oper1, oper2 });
 
             m_State.TotalItemsCount = m_JobItems.Count;
         }
 
         private async Task DoWork(CancellationToken cancellationToken)
         {
-            async Task ProcessJobItemOperation(MyJobItemOperation oper, JobItemStateStatus_e res, object userRes, string[] issues)
+            async Task ProcessJobItemOperation(MyJobItemOperation oper, BatchJobItemStateStatus_e res, object userRes, string[] issues)
             {
                 cancellationToken.ThrowIfCancellationRequested();
-                oper.Update(JobItemStateStatus_e.Initializing, null, null);
+                oper.Update(BatchJobItemStateStatus_e.InProgress, null, null);
                 await Task.Delay(TimeSpan.FromSeconds(1));
                 cancellationToken.ThrowIfCancellationRequested();
-                oper.Update(JobItemStateStatus_e.InProgress, null, null);
                 await Task.Delay(TimeSpan.FromSeconds(2));
                 cancellationToken.ThrowIfCancellationRequested();
-                oper.Update(res, issues?.Select(i => new MyJobItemIssue(res == JobItemStateStatus_e.Failed ? IssueType_e.Error : IssueType_e.Information, i)).ToArray(), userRes);
+                oper.Update(res, issues?.Select(i => new MyJobItemIssue(res == BatchJobItemStateStatus_e.Failed ? BatchJobItemIssueType_e.Error : BatchJobItemIssueType_e.Information, i)).ToArray(), userRes);
             }
 
-            
-
             //item1
-            m_JobItems[0].Update(JobItemStateStatus_e.InProgress, null, null);
+            m_JobItems[0].Update(BatchJobItemStateStatus_e.InProgress, null, null);
 
             Log?.Invoke(this, "Processing item1oper1");
-            await ProcessJobItemOperation(m_JobItems[0].Operations[0], JobItemStateStatus_e.Succeeded, null, null);
+            await ProcessJobItemOperation(m_JobItems[0].Operations[0], BatchJobItemStateStatus_e.Succeeded, null, null);
 
             Log?.Invoke(this, "Processing item1oper2");
-            await ProcessJobItemOperation(m_JobItems[0].Operations[1], JobItemStateStatus_e.Succeeded, null, null);
+            await ProcessJobItemOperation(m_JobItems[0].Operations[1], BatchJobItemStateStatus_e.Succeeded, null, null);
 
             m_JobItems[0].Update(m_JobItems[0].ComposeStatus(), null, null);
 
@@ -124,28 +121,28 @@ namespace TestApp
             m_State.Progress = 1d / 3d;
 
             //item2
-            m_JobItems[1].Update(JobItemStateStatus_e.InProgress, null, null);
+            m_JobItems[1].Update(BatchJobItemStateStatus_e.InProgress, null, null);
 
             Log?.Invoke(this, "Processing item2oper1");
-            await ProcessJobItemOperation(m_JobItems[1].Operations[0], JobItemStateStatus_e.Failed, "Failed Result", new string[] { "Some Error 1", "Some Error 2" });
+            await ProcessJobItemOperation(m_JobItems[1].Operations[0], BatchJobItemStateStatus_e.Failed, "Failed Result", new string[] { "Some Error 1", "Some Error 2" });
 
             Log?.Invoke(this, "Processing item2oper2");
-            await ProcessJobItemOperation(m_JobItems[1].Operations[1], JobItemStateStatus_e.Succeeded, "Test Result", new string[] { "Some Info 1" });
+            await ProcessJobItemOperation(m_JobItems[1].Operations[1], BatchJobItemStateStatus_e.Succeeded, "Test Result", new string[] { "Some Info 1" });
 
-            m_JobItems[1].Update(m_JobItems[1].ComposeStatus(), new IJobItemIssue[] { new MyJobItemIssue(IssueType_e.Warning, "Some Warning") }, null);
+            m_JobItems[1].Update(m_JobItems[1].ComposeStatus(), new IBatchJobItemIssue[] { new MyJobItemIssue(BatchJobItemIssueType_e.Warning, "Some Warning") }, null);
 
             m_State.WarningItemsCount++;
             ItemProcessed?.Invoke(this, m_JobItems[1]);
             m_State.Progress = 2d / 3d;
 
             //item3
-            m_JobItems[2].Update(JobItemStateStatus_e.InProgress, null, null);
+            m_JobItems[2].Update(BatchJobItemStateStatus_e.InProgress, null, null);
 
             Log?.Invoke(this, "Processing item3oper1");
-            await ProcessJobItemOperation(m_JobItems[2].Operations[0], JobItemStateStatus_e.Failed, null, null);
+            await ProcessJobItemOperation(m_JobItems[2].Operations[0], BatchJobItemStateStatus_e.Failed, null, null);
 
             Log?.Invoke(this, "Processing item3oper2");
-            await ProcessJobItemOperation(m_JobItems[2].Operations[1], JobItemStateStatus_e.Failed, null, null);
+            await ProcessJobItemOperation(m_JobItems[2].Operations[1], BatchJobItemStateStatus_e.Failed, null, null);
 
             m_JobItems[2].Update(m_JobItems[2].ComposeStatus(), null, null);
 
@@ -159,9 +156,9 @@ namespace TestApp
         }
     }
 
-    public class MyJobState : IJobState
+    public class MyJobState : IBatchJobState
     {
-        public event JobStateProgressChangedDelegate ProgressChanged;
+        public event BatchJobStateProgressChangedDelegate ProgressChanged;
         
         public double Progress
         {
@@ -179,24 +176,24 @@ namespace TestApp
         public int FailedItemsCount { get; set; }
         public DateTime StartTime { get; set; }
         public TimeSpan Duration { get; set; }
-        public JobStatus_e Status { get; set; }
+        public BatchJobStatus_e Status { get; set; }
 
         private double m_Progress;
     }
 
-    public class MyJobItemIssue : IJobItemIssue
+    public class MyJobItemIssue : IBatchJobItemIssue
     {
-        public IssueType_e Type { get; }
+        public BatchJobItemIssueType_e Type { get; }
         public string Content { get; }
 
-        public MyJobItemIssue(IssueType_e type, string content)
+        public MyJobItemIssue(BatchJobItemIssueType_e type, string content)
         {
             Type = type;
             Content = content;
         }
     }
 
-    public class MyJobItemOperationDefinition : IJobItemOperationDefinition
+    public class MyJobItemOperationDefinition : IBatchJobItemOperationDefinition
     {
         public string Name { get; }
         public BitmapImage Icon { get; }
@@ -208,15 +205,15 @@ namespace TestApp
         }
     }
 
-    public class MyJobItemState : IJobItemState
+    public class MyJobItemState : IBatchJobItemState
     {
-        public event JobStateStatusChangedDelegate StatusChanged;
-        public event JobStateIssuesChangedDelegate IssuesChanged;
+        public event BatchJobStateStatusChangedDelegate StatusChanged;
+        public event BatchJobStateIssuesChangedDelegate IssuesChanged;
 
-        public JobItemStateStatus_e Status { get; private set; }
-        public IReadOnlyList<IJobItemIssue> Issues { get; private set; }
+        public BatchJobItemStateStatus_e Status { get; private set; }
+        public IReadOnlyList<IBatchJobItemIssue> Issues { get; private set; }
 
-        public void Update(JobItemStateStatus_e status, IJobItemIssue[] issues)
+        public void Update(BatchJobItemStateStatus_e status, IBatchJobItemIssue[] issues)
         {
             Status = status;
             Issues = issues;
@@ -226,11 +223,11 @@ namespace TestApp
         }
     }
 
-    public class MyJobItem : IJobItem
+    public class MyJobItem : IBatchJobItem
     {
-        public event JobItemNestedItemsInitializedDelegate NestedItemsInitialized;
+        public event BatchJobItemNestedItemsInitializedDelegate NestedItemsInitialized;
 
-        IReadOnlyList<IJobItemOperation> IJobItem.Operations => Operations;
+        IReadOnlyList<IBatchJobItemOperation> IBatchJobItem.Operations => Operations;
 
         public BitmapImage Icon { get; }
         public BitmapImage Preview { get; }
@@ -238,14 +235,14 @@ namespace TestApp
         public string Description { get; }
         public Action Link { get; }
         public IReadOnlyList<MyJobItemOperation> Operations { get; }
-        public IReadOnlyList<IJobItem> Nested { get; }
+        public IReadOnlyList<IBatchJobItem> Nested { get; }
 
-        public IJobItemState State => m_State;
+        public IBatchJobItemState State => m_State;
 
         private readonly MyJobItemState m_State;
 
         public MyJobItem(Image icon, Image preview, string title, string description,
-            Action link, MyJobItemOperation[] operations, IJobItem[] nested)
+            Action link, MyJobItemOperation[] operations, IBatchJobItem[] nested)
         {
             Icon = icon?.ToBitmapImage();
             Preview = preview?.ToBitmapImage();
@@ -258,32 +255,32 @@ namespace TestApp
             m_State = new MyJobItemState();
         }
 
-        public void Update(JobItemStateStatus_e status, IJobItemIssue[] issues, object userRes)
+        public void Update(BatchJobItemStateStatus_e status, IBatchJobItemIssue[] issues, object userRes)
         {
             m_State.Update(status, issues);
         }
     }
 
-    public class MyJobItemOperation : IJobItemOperation
+    public class MyJobItemOperation : IBatchJobItemOperation
     {
         
-        public event JobItemOperationUserResultChangedDelegate UserResultChanged;
+        public event BatchJobItemOperationUserResultChangedDelegate UserResultChanged;
 
-        public IJobItemOperationDefinition Definition { get; }
+        public IBatchJobItemOperationDefinition Definition { get; }
         
         public object UserResult { get; private set; }
 
-        public IJobItemState State => m_State;
+        public IBatchJobItemState State => m_State;
 
         private MyJobItemState m_State;
 
-        public MyJobItemOperation(IJobItemOperationDefinition def) 
+        public MyJobItemOperation(IBatchJobItemOperationDefinition def) 
         {
             Definition = def;
             m_State = new MyJobItemState();
         }
 
-        public void Update(JobItemStateStatus_e status, IJobItemIssue[] issues, object userRes) 
+        public void Update(BatchJobItemStateStatus_e status, IBatchJobItemIssue[] issues, object userRes) 
         {
             m_State.Update(status, issues);
 
@@ -296,7 +293,7 @@ namespace TestApp
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public JobResultBaseVM Result 
+        public BatchJobBaseVM Result 
         {
             get => m_Result;
             private set 
@@ -309,7 +306,7 @@ namespace TestApp
         public ICommand RunJobCommand { get; }
         public ICommand CancelJobCommand { get; }
 
-        private JobResultBaseVM m_Result;
+        private BatchJobBaseVM m_Result;
 
         private CancellationTokenSource m_CancellationTokenSource;
 
@@ -322,7 +319,7 @@ namespace TestApp
         {
             m_CancellationTokenSource = new CancellationTokenSource();
 
-            var res = new AsyncJobResultVM(new MyAsyncBatchJob(), new GenericMessageService(), Mock.Of<IXLogger>(), m_CancellationTokenSource, null, null);
+            var res = new AsyncBatchJobVM(new MyAsyncBatchJob(), new GenericMessageService(), Mock.Of<IXLogger>(), m_CancellationTokenSource, null, null);
 
             Result = res;
 

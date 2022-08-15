@@ -8,14 +8,14 @@ using Xarial.CadPlus.Plus.Services;
 
 namespace Xarial.CadPlus.Plus.Shared.ViewModels
 {
-	public class JobItemOperationDefinitionVM
+	public class BatchJobItemOperationDefinitionVM
 	{
 		public ImageSource Icon => Definition.Icon;
 		public string Name => Definition.Name;
 
-		public IJobItemOperationDefinition Definition { get; }
+		public IBatchJobItemOperationDefinition Definition { get; }
 
-		public JobItemOperationDefinitionVM(IJobItemOperationDefinition definition)
+		public BatchJobItemOperationDefinitionVM(IBatchJobItemOperationDefinition definition)
 		{
 			Definition = definition;
 		}
