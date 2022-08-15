@@ -7,18 +7,18 @@ using Xarial.CadPlus.Plus.Services;
 
 namespace Xarial.CadPlus.Common.Services
 {
-    public class JobItemIssue : IJobItemIssue, IEquatable<IJobItemIssue>
+    public class JobItemIssue : IBatchJobItemIssue, IEquatable<IBatchJobItemIssue>
     {
-        public IssueType_e Type { get; }
+        public BatchJobItemIssueType_e Type { get; }
         public string Content { get; }
 
-        public JobItemIssue(IssueType_e type, string content)
+        public JobItemIssue(BatchJobItemIssueType_e type, string content)
         {
             Type = type;
             Content = content;
         }
 
-        public bool Equals(IJobItemIssue other)
+        public bool Equals(IBatchJobItemIssue other)
         {
             if (other == null)
             {

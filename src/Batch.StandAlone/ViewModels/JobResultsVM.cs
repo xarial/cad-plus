@@ -25,7 +25,7 @@ using Xarial.XToolkit.Services;
 
 namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
 {
-    public class AsyncBatchStandAloneJobResultVM : AsyncJobResultVM
+    public class AsyncBatchStandAloneJobResultVM : AsyncBatchJobVM
     {
         public string Name { get; }
 
@@ -53,7 +53,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
             }
         }
 
-        public ObservableCollection<JobResultBaseVM> Items { get; }
+        public ObservableCollection<BatchJobBaseVM> Items { get; }
 
         private readonly BatchJob m_Job;
 
@@ -78,7 +78,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
             m_LogExporters = logExporters;
 
             m_JobFact = jobFact;
-            Items = new ObservableCollection<JobResultBaseVM>();
+            Items = new ObservableCollection<BatchJobBaseVM>();
         }
 
         public async void StartNewJob()

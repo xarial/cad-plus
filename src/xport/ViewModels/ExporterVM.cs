@@ -70,9 +70,9 @@ namespace Xarial.CadPlus.Xport.ViewModels
             }
         }
 
-        private AsyncJobResultVM m_JobResult;
+        private AsyncBatchJobVM m_JobResult;
 
-        public AsyncJobResultVM JobResult 
+        public AsyncBatchJobVM JobResult 
         {
             get => m_JobResult;
             private set 
@@ -173,7 +173,7 @@ namespace Xarial.CadPlus.Xport.ViewModels
 
                 using (var exporter = new Exporter(m_JobPrcMgr, opts)) 
                 {
-                    JobResult = new AsyncJobResultVM(exporter, m_MsgSvc, m_Logger, new CancellationTokenSource(), m_ReportExporters, m_LogExporters);
+                    JobResult = new AsyncBatchJobVM(exporter, m_MsgSvc, m_Logger, new CancellationTokenSource(), m_ReportExporters, m_LogExporters);
                     await JobResult.TryRunBatchAsync().ConfigureAwait(false);
                 }
 

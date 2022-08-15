@@ -16,7 +16,7 @@ namespace Xarial.CadPlus.Common.Services
 {
     public class ConsoleProgressWriter : IDisposable
     {
-        private IReadOnlyList<IJobItem> m_Scope;
+        private IReadOnlyList<IBatchJobItem> m_Scope;
 
         private readonly IBatchJobBase m_Job;
 
@@ -27,15 +27,15 @@ namespace Xarial.CadPlus.Common.Services
             m_Job.Completed += OnJobCompleted;
             m_Job.Initialized += OnJobInitialized;
             m_Job.ItemProcessed += OnItemProcessed;
-            m_Job.ProgressChanged += OnProgressChanged;
+            m_Job.State.ProgressChanged += OnProgressChanged;
             m_Job.Log += OnLog;
         }
 
         private void OnJobStarted(IBatchJobBase sender, DateTime startTime) => SetStarted(startTime);
-        private void OnJobCompleted(IBatchJobBase sender, TimeSpan duration, JobStatus_e status) => ReportCompleted(duration, status);
-        private void OnJobInitialized(IBatchJobBase sender, IReadOnlyList<IJobItem> jobItems, IReadOnlyList<IJobItemOperationDefinition> operations) => SetJobScope(jobItems);
-        private void OnItemProcessed(IBatchJobBase sender, IJobItem file) => ReportStatus(file);
-        private void OnProgressChanged(IBatchJobBase sender, double progress) => ReportProgress(progress);
+        private void OnJobCompleted(IBatchJobBase sender, TimeSpan duration, BatchJobStatus_e status) => ReportCompleted(duration, status);
+        private void OnJobInitialized(IBatchJobBase sender, IReadOnlyList<IBatchJobItem> jobItems, IReadOnlyList<IBatchJobItemOperationDefinition> operations) => SetJobScope(jobItems);
+        private void OnItemProcessed(IBatchJobBase sender, IBatchJobItem file) => ReportStatus(file);
+        private void OnProgressChanged(IBatchJobState sender, double progress) => ReportProgress(progress);
         private void OnLog(IBatchJobBase sender, string msg) => Log(msg);
 
         private void Log(string msg) => Console.WriteLine(msg);
@@ -52,23 +52,23 @@ namespace Xarial.CadPlus.Common.Services
             Console.WriteLine($"Started: {startTime}");
         }
 
-        private void ReportStatus(IJobItem file)
+        private void ReportStatus(IBatchJobItem file)
         {
             Console.WriteLine($"Result: {file.State.Status}");
         }
 
-        private void SetJobScope(IReadOnlyList<IJobItem> scope)
+        private void SetJobScope(IReadOnlyList<IBatchJobItem> scope)
         {
             m_Scope = scope;
             Console.WriteLine($"Processing {scope.Count} file(s)");
         }
 
-        private void ReportCompleted(TimeSpan duration, JobStatus_e status)
+        private void ReportCompleted(TimeSpan duration, BatchJobStatus_e status)
         {
             Console.WriteLine($"Operation completed: {duration}: {status}");
-            Console.WriteLine($"Processed: {m_Scope.Count(j => j.State.Status == JobItemStateStatus_e.Succeeded)}");
-            Console.WriteLine($"Warning: {m_Scope.Count(j => j.State.Status == JobItemStateStatus_e.Warning)}");
-            Console.WriteLine($"Failed: {m_Scope.Count(j => j.State.Status == JobItemStateStatus_e.Failed)}");
+            Console.WriteLine($"Processed: {m_Scope.Count(j => j.State.Status == BatchJobItemStateStatus_e.Succeeded)}");
+            Console.WriteLine($"Warning: {m_Scope.Count(j => j.State.Status == BatchJobItemStateStatus_e.Warning)}");
+            Console.WriteLine($"Failed: {m_Scope.Count(j => j.State.Status == BatchJobItemStateStatus_e.Failed)}");
         }
 
         public void Dispose()
@@ -76,7 +76,7 @@ namespace Xarial.CadPlus.Common.Services
             m_Job.Completed -= OnJobCompleted;
             m_Job.Initialized -= OnJobInitialized;
             m_Job.ItemProcessed -= OnItemProcessed;
-            m_Job.ProgressChanged -= OnProgressChanged;
+            m_Job.State.ProgressChanged -= OnProgressChanged;
             m_Job.Log -= OnLog;
         }
     }

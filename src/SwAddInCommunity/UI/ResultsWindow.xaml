@@ -9,13 +9,13 @@
              Height="450" Width="600">
     <TabControl>
         <TabItem Header="Summary">
-            <sharedui:JobSummaryControl/>
+            <sharedui:BatchJobSummaryControl/>
         </TabItem>
         <TabItem Header="Report">
-            <sharedui:JobReportControl/>
+            <sharedui:BatchJobReportControl/>
         </TabItem>
         <TabItem Header="Journal">
-            <sharedui:JobJournalControl/>
+            <sharedui:BatchJobJournalControl/>
         </TabItem>
     </TabControl>
 </Window>

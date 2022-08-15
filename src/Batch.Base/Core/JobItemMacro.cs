@@ -18,10 +18,10 @@ namespace Xarial.CadPlus.Batch.Base.Core
 {
     public class JobItemMacro : IJobItemOperationMacro
     {
-        public event JobItemOperationUserResultChangedDelegate UserResultChanged;
+        public event BatchJobItemOperationUserResultChangedDelegate UserResultChanged;
 
-        IJobItemOperationDefinition IJobItemOperation.Definition => Definition;
-        IJobItemState IJobItemOperation.State => State;
+        IBatchJobItemOperationDefinition IBatchJobItemOperation.Definition => Definition;
+        IBatchJobItemState IBatchJobItemOperation.State => State;
                 
         public Exception InternalMacroException { get; set; }
 

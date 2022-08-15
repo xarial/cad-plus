@@ -7,11 +7,11 @@ using Xarial.CadPlus.Plus.Services;
 
 namespace Xarial.CadPlus.Batch.Base.Services
 {
-    public interface IJobItemDocument : IJobItem
+    public interface IJobItemDocument : IBatchJobItem
     {
     }
 
-    public interface IJobItemOperationMacro : IJobItemOperation
+    public interface IJobItemOperationMacro : IBatchJobItemOperation
     {
     }
 

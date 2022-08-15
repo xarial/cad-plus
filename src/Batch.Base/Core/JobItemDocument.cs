@@ -31,10 +31,10 @@ namespace Xarial.CadPlus.Batch.Base.Core
             internal BitmapImage Drawing { get; set; }
         }
 
-        public event JobItemNestedItemsInitializedDelegate NestedItemsInitialized;
+        public event BatchJobItemNestedItemsInitializedDelegate NestedItemsInitialized;
 
-        IJobItemState IJobItem.State => State;
-        IReadOnlyList<IJobItemOperation> IJobItem.Operations => Operations;
+        IBatchJobItemState IBatchJobItem.State => State;
+        IReadOnlyList<IBatchJobItemOperation> IBatchJobItem.Operations => Operations;
 
         private static readonly Dictionary<string, CadObjectIcons> m_Icons;
         private static BitmapImage m_DefaultIcon;
@@ -108,7 +108,7 @@ namespace Xarial.CadPlus.Batch.Base.Core
         public IReadOnlyList<JobItemMacro> Operations { get; }
 
         //TODO: implement support for configurations and sheets
-        public IReadOnlyList<IJobItem> Nested { get; }
+        public IReadOnlyList<IBatchJobItem> Nested { get; }
 
         public JobItemState State { get; }
 

@@ -50,7 +50,7 @@ namespace Xarial.CadPlus.AddIn.Sw.Services
         private readonly IBatchJob m_Job;
 
         private readonly CancellationTokenSource m_CancellationTokenSource;
-        private readonly JobResultVM m_JobResult;
+        private readonly BatchJobVM m_JobResult;
 
         private readonly IXPopupWindow<ResultsWindow> m_ResultsWindow;
 
@@ -62,7 +62,7 @@ namespace Xarial.CadPlus.AddIn.Sw.Services
         {
             m_Job = job;
             m_Job.ItemProcessed += OnJobItemProcessed;
-            m_Job.ProgressChanged += OnProgressChanged;
+            m_Job.State.ProgressChanged += OnProgressChanged;
             m_Logger = logger;
             m_Ext = ext;
 
@@ -71,7 +71,7 @@ namespace Xarial.CadPlus.AddIn.Sw.Services
             m_Progress = m_Ext.Application.CreateProgress();
             m_CancellationTokenSource = cancellationTokenSource;
 
-            m_JobResult = new JobResultVM(m_Job, msgSvc, m_Logger, m_CancellationTokenSource, reportExporters, logExporters);
+            m_JobResult = new BatchJobVM(m_Job, msgSvc, m_Logger, m_CancellationTokenSource, reportExporters, logExporters);
 
             m_ResultsWindow = m_Ext.CreatePopupWindow<ResultsWindow>();
             m_ResultsWindow.Control.Title = title;
@@ -88,10 +88,10 @@ namespace Xarial.CadPlus.AddIn.Sw.Services
             m_ResultsWindow.ShowDialog();
         }
 
-        private void OnJobItemProcessed(IBatchJobBase sender, IJobItem item)
+        private void OnJobItemProcessed(IBatchJobBase sender, IBatchJobItem item)
             => m_Progress.SetStatus($"Processed '{item.Title}'");
 
-        private void OnProgressChanged(IBatchJobBase sender, double progress)
+        private void OnProgressChanged(IBatchJobState sender, double progress)
             => m_Progress.Report(progress);
 
         public void Dispose()

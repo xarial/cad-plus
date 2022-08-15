@@ -11,7 +11,7 @@
     <None Remove="UI\ResultsWindow.xaml" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Xarial.CadPlusPlus.Shared" Version="0.4.0-dev.4334" />
+    <PackageReference Include="Xarial.CadPlusPlus.Shared" Version="0.4.0-dev.4338" />
     <PackageReference Include="Xarial.XCad.SolidWorks" Version="0.8.0-dev.4328" />
   </ItemGroup>
   <ItemGroup>

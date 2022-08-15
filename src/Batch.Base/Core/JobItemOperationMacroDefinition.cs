@@ -19,7 +19,7 @@ using Xarial.XToolkit.Wpf.Extensions;
 
 namespace Xarial.CadPlus.Batch.Base.Core
 {
-    public class JobItemOperationMacroDefinition : IJobItemOperationDefinition
+    public class JobItemOperationMacroDefinition : IBatchJobItemOperationDefinition
     {
         private static readonly BitmapImage m_Icon;
 

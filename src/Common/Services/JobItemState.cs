@@ -10,12 +10,12 @@ using Xarial.CadPlus.Plus.Services;
 
 namespace Xarial.CadPlus.Batch.Base.Core
 {
-    public class JobItemState : IJobItemState
+    public class JobItemState : IBatchJobItemState
     {
-        public event JobStateStatusChangedDelegate StatusChanged;
-        public event JobStateIssuesChangedDelegate IssuesChanged;
+        public event BatchJobStateStatusChangedDelegate StatusChanged;
+        public event BatchJobStateIssuesChangedDelegate IssuesChanged;
 
-        public JobItemStateStatus_e Status 
+        public BatchJobItemStateStatus_e Status 
         {
             get => m_Status;
             set 
@@ -25,14 +25,14 @@ namespace Xarial.CadPlus.Batch.Base.Core
             }
         }
 
-        public IReadOnlyList<IJobItemIssue> Issues => m_Issues;
+        public IReadOnlyList<IBatchJobItemIssue> Issues => m_Issues;
 
-        private JobItemStateStatus_e m_Status;
-        private readonly List<IJobItemIssue> m_Issues;
+        private BatchJobItemStateStatus_e m_Status;
+        private readonly List<IBatchJobItemIssue> m_Issues;
 
         public JobItemState() 
         {
-            m_Issues = new List<IJobItemIssue>();
+            m_Issues = new List<IBatchJobItemIssue>();
         }
 
         public void ReportError(Exception ex, string genericError = "Unknown error")
@@ -52,11 +52,11 @@ namespace Xarial.CadPlus.Batch.Base.Core
                 err = ex.ParseUserError(genericError);
             }
 
-            ReportIssue(err, IssueType_e.Error);
-            Status = JobItemStateStatus_e.Failed;
+            ReportIssue(err, BatchJobItemIssueType_e.Error);
+            Status = BatchJobItemStateStatus_e.Failed;
         }
 
-        public void ReportIssue(string content, IssueType_e type)
+        public void ReportIssue(string content, BatchJobItemIssueType_e type)
         {
             var issue = new JobItemIssue(type, content);
 

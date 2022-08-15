@@ -24,12 +24,12 @@ using Xarial.XToolkit.Wpf.Utils;
 
 namespace Xarial.CadPlus.Xport.Services
 {
-    public class JobItemFile : IJobItem
+    public class JobItemFile : IBatchJobItem
     {
-        public event JobItemNestedItemsInitializedDelegate NestedItemsInitialized;
+        public event BatchJobItemNestedItemsInitializedDelegate NestedItemsInitialized;
 
-        IReadOnlyList<IJobItemOperation> IJobItem.Operations => Operations;
-        IJobItemState IJobItem.State => State;
+        IReadOnlyList<IBatchJobItemOperation> IBatchJobItem.Operations => Operations;
+        IBatchJobItemState IBatchJobItem.State => State;
 
         public string FilePath { get; }
 
@@ -54,7 +54,7 @@ namespace Xarial.CadPlus.Xport.Services
 
         public IReadOnlyList<JobItemExportFormat> Operations { get; }
 
-        public IReadOnlyList<IJobItem> Nested { get; }
+        public IReadOnlyList<IBatchJobItem> Nested { get; }
 
         private void TryOpenInFileExplorer()
         {
@@ -68,7 +68,7 @@ namespace Xarial.CadPlus.Xport.Services
         }
     }
 
-    public class JobItemExportFormatDefinition : IJobItemOperationDefinition
+    public class JobItemExportFormatDefinition : IBatchJobItemOperationDefinition
     {
         public string Name { get; }
         public BitmapImage Icon { get; }
@@ -83,14 +83,14 @@ namespace Xarial.CadPlus.Xport.Services
         }
     }
 
-    public class JobItemExportFormat : IJobItemOperation
+    public class JobItemExportFormat : IBatchJobItemOperation
     {
-        public event JobItemOperationUserResultChangedDelegate UserResultChanged;
+        public event BatchJobItemOperationUserResultChangedDelegate UserResultChanged;
 
-        IJobItemState IJobItemOperation.State => State;
+        IBatchJobItemState IBatchJobItemOperation.State => State;
 
         public string OutputFilePath { get; }
-        public IJobItemOperationDefinition Definition { get; }
+        public IBatchJobItemOperationDefinition Definition { get; }
 
         public JobItemState State { get; }
         public object UserResult { get; }
@@ -107,33 +107,19 @@ namespace Xarial.CadPlus.Xport.Services
     {
         private readonly IJobProcessManager m_JobMgr;
 
-        public event JobStartedDelegate Started;
-        public event JobInitializedDelegate Initialized;
-        public event JobItemProcessedDelegate ItemProcessed;
-        public event JobProgressChangedDelegate ProgressChanged;
-        public event JobLogDelegateDelegate Log;
-        public event JobCompletedDelegate Completed;
+        public event BatchJobStartedDelegate Started;
+        public event BatchJobInitializedDelegate Initialized;
+        public event BatchJobItemProcessedDelegate ItemProcessed;
+        public event BatchJobLogDelegateDelegate Log;
+        public event BatchJobCompletedDelegate Completed;
 
         private readonly ExportOptions m_Opts;
 
-        public IReadOnlyList<IJobItem> JobItems => m_JobFiles;
-        public IReadOnlyList<IJobItemOperationDefinition> OperationDefinitions { get; private set; }
+        public IReadOnlyList<IBatchJobItem> JobItems => m_JobFiles;
+        public IReadOnlyList<IBatchJobItemOperationDefinition> OperationDefinitions { get; private set; }
         public IReadOnlyList<string> LogEntries => m_LogEntries;
 
-        public DateTime? StartTime { get; private set; }
-        public TimeSpan? Duration { get; private set; }
-        
-        public double? Progress 
-        {
-            get => m_Progress;
-            private set 
-            {
-                m_Progress = value;
-                this.ProgressChanged?.Invoke(this, value.Value);
-            }
-        }
-
-        public JobStatus_e? Status { get; private set; }
+        public IBatchJobState State => m_State;
 
         private readonly List<string> m_LogEntries;
 
@@ -141,23 +127,26 @@ namespace Xarial.CadPlus.Xport.Services
 
         private JobItemFile[] m_JobFiles;
 
+        private readonly JobState m_State;
+
         public Exporter(IJobProcessManager jobMgr, ExportOptions opts)
         {
             m_JobMgr = jobMgr;
             m_Opts = opts;
             m_LogEntries = new List<string>();
+            m_State = new JobState();
         }
 
         public async Task TryExecuteAsync(CancellationToken cancellationToken)
             => await this.HandleExecuteAsync(cancellationToken,
                 t => Started?.Invoke(this, t),
-                t => StartTime = t,
+                t => m_State.StartTime = t,
                 InitAsync,
                 () => Initialized?.Invoke(this, JobItems, OperationDefinitions),
                 DoWorkAsync,
-                d => Completed?.Invoke(this, d, Status.Value),
-                d => Duration = d,
-                s => Status = s);
+                d => Completed?.Invoke(this, d, m_State.Status),
+                d => m_State.Duration = d,
+                s => m_State.Status = s);
 
         private Task InitAsync(CancellationToken arg)
         {
@@ -217,7 +206,7 @@ namespace Xarial.CadPlus.Xport.Services
 
                         if (res)
                         {
-                            outFile.State.Status = JobItemStateStatus_e.Succeeded;
+                            outFile.State.Status = BatchJobItemStateStatus_e.Succeeded;
                         }
                         else
                         {
@@ -226,7 +215,7 @@ namespace Xarial.CadPlus.Xport.Services
                     }
                     catch (Exception ex)
                     {
-                        outFile.State.Status = JobItemStateStatus_e.Failed;
+                        outFile.State.Status = BatchJobItemStateStatus_e.Failed;
 
                         AddLogEntry($"Error while processing '{file.FilePath}': {ex.Message}");
                         if (!m_Opts.ContinueOnError)
@@ -239,7 +228,7 @@ namespace Xarial.CadPlus.Xport.Services
                 file.State.Status = file.ComposeStatus();
 
                 ItemProcessed?.Invoke(this, file);
-                Progress = (i + 1) / (double)m_JobFiles.Length;
+                m_State.Progress = (i + 1) / (double)m_JobFiles.Length;
             }
         }
 

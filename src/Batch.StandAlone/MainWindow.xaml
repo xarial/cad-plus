@@ -29,7 +29,7 @@
         <conv:FileFolderIconConverter x:Key="fileFolderIconConv"/>
 
         <xconv:MatchValueUniversalConverter x:Key="statusToVisConv" 
-                                            TargetValue="{x:Static cppsvc:JobStatus_e.InProgress}"
+                                            TargetValue="{x:Static cppsvc:BatchJobStatus_e.InProgress}"
                                             TrueValue="{x:Static win:Visibility.Visible}"
                                             FalseValue="{x:Static win:Visibility.Collapsed}"/>
 
@@ -241,13 +241,13 @@
                             </Grid.RowDefinitions>
                             <TabControl Grid.Row="0" Style="{x:Null}">
                                 <TabItem Header="Summary">
-                                    <sharedui:JobSummaryControl/>
+                                    <sharedui:BatchJobSummaryControl/>
                                 </TabItem>
                                 <TabItem Header="Status">
-                                    <sharedui:JobReportControl DataGridStyle="{StaticResource MahApps.Styles.DataGrid}"/>
+                                    <sharedui:BatchJobReportControl DataGridStyle="{StaticResource MahApps.Styles.DataGrid}"/>
                                 </TabItem>
                                 <TabItem Header="Journal">
-                                    <sharedui:JobJournalControl/>
+                                    <sharedui:BatchJobJournalControl/>
                                 </TabItem>
                             </TabControl>
                             <metro:MetroProgressBar Grid.Row="1" IsIndeterminate="{Binding Path=IsInitializing}"

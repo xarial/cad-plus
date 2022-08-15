@@ -59,12 +59,11 @@ namespace Xarial.CadPlus.Batch.StandAlone.Services
 
     public class BatchMacroRunJobStandAlone : IBatchMacroRunJobStandAlone
     {
-        public event JobStartedDelegate Started;
-        public event JobInitializedDelegate Initialized;
-        public event JobCompletedDelegate Completed;
-        public event JobItemProcessedDelegate ItemProcessed;
-        public event JobProgressChangedDelegate ProgressChanged;
-        public event JobLogDelegateDelegate Log;
+        public event BatchJobStartedDelegate Started;
+        public event BatchJobInitializedDelegate Initialized;
+        public event BatchJobCompletedDelegate Completed;
+        public event BatchJobItemProcessedDelegate ItemProcessed;
+        public event BatchJobLogDelegateDelegate Log;
 
         private bool m_IsDisposed;
 
@@ -83,30 +82,17 @@ namespace Xarial.CadPlus.Batch.StandAlone.Services
 
         private readonly ITaskRunner m_TaskRunner;
 
-        public DateTime? StartTime { get; private set; }
-        public TimeSpan? Duration { get; private set; }
-
-        public double? Progress
-        {
-            get => m_Progress;
-            private set
-            {
-                m_Progress = value;
-                this.ProgressChanged?.Invoke(this, value.Value);
-            }
-        }
-
-        public JobStatus_e? Status { get; private set; }
-
-        public IReadOnlyList<IJobItem> JobItems => m_JobDocuments;
-        public IReadOnlyList<IJobItemOperationDefinition> OperationDefinitions { get; private set; }
+        public IReadOnlyList<IBatchJobItem> JobItems => m_JobDocuments;
+        public IReadOnlyList<IBatchJobItemOperationDefinition> OperationDefinitions { get; private set; }
         public IReadOnlyList<string> LogEntries => m_LogEntries;
+
+        public IBatchJobState State => m_State;
 
         private readonly List<string> m_LogEntries;
 
-        private double? m_Progress;
-
         private JobItemDocument[] m_JobDocuments;
+
+        private JobState m_State;
 
         public BatchMacroRunJobStandAlone(BatchJob job, ICadApplicationInstanceProvider appProvider,
             IBatchApplicationProxy batchAppProxy,
@@ -116,6 +102,8 @@ namespace Xarial.CadPlus.Batch.StandAlone.Services
             m_Job = job;
             m_AppProvider = appProvider;
             m_MacroRunnerSvc = m_AppProvider.MacroRunnerService;
+
+            m_State = new JobState();
 
             m_TaskRunner = taskRunner;
 
@@ -155,13 +143,13 @@ namespace Xarial.CadPlus.Batch.StandAlone.Services
 
             await this.HandleExecuteAsync(cancellationToken,
                 t => Started?.Invoke(this, t),
-                t => StartTime = t,
+                t => m_State.StartTime = t,
                 InitAsync,
                 () => Initialized?.Invoke(this, JobItems, OperationDefinitions),
                 DoWorkAsync,
-                d => Completed?.Invoke(this, d, Status.Value),
-                d => Duration = d,
-                s => Status = s);
+                d => Completed?.Invoke(this, d, m_State.Status),
+                d => m_State.Duration = d,
+                s => m_State.Status = s);
         }
 
         private async Task InitAsync(CancellationToken cancellationToken)
@@ -214,7 +202,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.Services
                         m_CurrentContext.CurrentDocument = null;
 
                         ItemProcessed?.Invoke(this, m_CurrentContext.CurrentJobItem);
-                        Progress = (double)(i + 1) / (double)m_JobDocuments.Length;
+                        m_State.Progress = (double)(i + 1) / (double)m_JobDocuments.Length;
 
                         if (!res && !m_Job.ContinueOnError)
                         {
@@ -455,7 +443,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.Services
             AddLogEntry($"Started processing file {context.CurrentJobItem.Document.Path}");
 
             context.ForbidSaving = null;
-            context.CurrentJobItem.State.Status = JobItemStateStatus_e.InProgress;
+            context.CurrentJobItem.State.Status = BatchJobItemStateStatus_e.InProgress;
 
             foreach (var macro in context.CurrentJobItem.Operations)
             {
@@ -487,14 +475,14 @@ namespace Xarial.CadPlus.Batch.StandAlone.Services
                 }
             }
 
-            if (context.CurrentJobItem.State.Status != JobItemStateStatus_e.Failed)
+            if (context.CurrentJobItem.State.Status != BatchJobItemStateStatus_e.Failed)
             {
                 context.CurrentJobItem.State.Status = context.CurrentJobItem.ComposeStatus();
             }
 
             AddLogEntry($"Processing file '{context.CurrentJobItem.Document.Path}' completed. Execution time {DateTime.Now.Subtract(fileProcessStartTime).ToString(@"hh\:mm\:ss")}");
 
-            return context.CurrentJobItem.State.Status != JobItemStateStatus_e.Failed;
+            return context.CurrentJobItem.State.Status != BatchJobItemStateStatus_e.Failed;
         }
 
         private void ProcessError(Exception err, BatchJobContext context)
@@ -530,7 +518,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.Services
 
             try
             {
-                context.CurrentMacro.State.Status = JobItemStateStatus_e.InProgress;
+                context.CurrentMacro.State.Status = BatchJobItemStateStatus_e.InProgress;
 
                 IXDocument macroDoc = null;
 
@@ -572,11 +560,11 @@ namespace Xarial.CadPlus.Batch.StandAlone.Services
                     }
                 }
 
-                context.CurrentMacro.State.Status = JobItemStateStatus_e.Succeeded;
+                context.CurrentMacro.State.Status = BatchJobItemStateStatus_e.Succeeded;
             }
             catch (Exception ex)
             {
-                context.CurrentMacro.State.Status = JobItemStateStatus_e.Failed;
+                context.CurrentMacro.State.Status = BatchJobItemStateStatus_e.Failed;
 
                 if (ex is ICriticalException)
                 {

@@ -88,13 +88,13 @@
                 </Grid>
             </TabItem>
             <TabItem Header="Summary">
-                <sharedui:JobSummaryControl DataContext="{Binding Path=JobResult}"/>
+                <sharedui:BatchJobSummaryControl DataContext="{Binding Path=JobResult}"/>
             </TabItem>
             <TabItem Header="Report">
-                <sharedui:JobReportControl DataGridStyle="{StaticResource MahApps.Styles.DataGrid}" DataContext="{Binding Path=JobResult}"/>
+                <sharedui:BatchJobReportControl DataGridStyle="{StaticResource MahApps.Styles.DataGrid}" DataContext="{Binding Path=JobResult}"/>
             </TabItem>
             <TabItem Header="Journal" DataContext="{Binding Path=JobResult}">
-                <sharedui:JobJournalControl/>
+                <sharedui:BatchJobJournalControl/>
             </TabItem>
         </TabControl>
         <Button Grid.Row="1" VerticalAlignment="Center" Width="75" HorizontalAlignment="Center" Margin="2"
