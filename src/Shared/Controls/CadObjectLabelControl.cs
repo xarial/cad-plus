@@ -21,6 +21,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Xarial.CadPlus.Plus.Services;
+using Xarial.XCad;
 using Xarial.XCad.Documents;
 using Xarial.XToolkit;
 using Xarial.XToolkit.Wpf.Utils;
@@ -54,12 +55,12 @@ namespace Xarial.CadPlus.Plus.Shared.Controls
         
         public static readonly DependencyProperty ObjectProperty =
             DependencyProperty.Register(
-            nameof(Object), typeof(object),
+            nameof(Object), typeof(IXObject),
             typeof(CadObjectLabelControl));
 
-        public object Object
+        public IXObject Object
         {
-            get { return (object)GetValue(ObjectProperty); }
+            get { return (IXObject)GetValue(ObjectProperty); }
             set { SetValue(ObjectProperty, value); }
         }
 
