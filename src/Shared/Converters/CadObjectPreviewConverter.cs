@@ -47,9 +47,6 @@ namespace Xarial.CadPlus.Plus.Shared.Converters
                     case IXCutListItem cutList:
                         //no preview
                         break;
-
-                    case ICustomObject custom:
-                        return custom.Preview;
                 }
             }
             catch

@@ -36,11 +36,7 @@ namespace Xarial.CadPlus.Plus.Shared.Converters
                 var ent = values[0];
                 var cadDesc = (ICadDescriptor)values[1];
 
-                if (ent is ICustomObject)
-                {
-                    return ((ICustomObject)ent).Icon;
-                }
-                else if (ent is IXObject)
+                if (ent is IXObject)
                 {
                     return CadObjectIconStore.Instance.GetIcon((IXObject)ent, cadDesc);
                 }
@@ -49,7 +45,7 @@ namespace Xarial.CadPlus.Plus.Shared.Converters
             {
             }
 
-            return m_DefaultIcon ?? (m_DefaultIcon = Resources.file_icon.ToBitmapImage());
+            return m_DefaultIcon ?? (m_DefaultIcon = Resources.file_icon.ToBitmapImage(true));
         }
 
         public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)

@@ -64,42 +64,42 @@ namespace Xarial.CadPlus.Plus.Shared.Helpers
 
                     if (obj is IXPart)
                     {
-                        return icons.Part ?? (icons.Part = cadDesc.PartIcon.ToBitmapImage());
+                        return icons.Part ?? (icons.Part = cadDesc.PartIcon.ToBitmapImage(true));
                     }
                     else if (obj is IXAssembly)
                     {
-                        return icons.Assembly ?? (icons.Assembly = cadDesc.AssemblyIcon.ToBitmapImage());
+                        return icons.Assembly ?? (icons.Assembly = cadDesc.AssemblyIcon.ToBitmapImage(true));
                     }
                     else if (obj is IXDrawing)
                     {
-                        return icons.Drawing ?? (icons.Drawing = cadDesc.DrawingIcon.ToBitmapImage());
+                        return icons.Drawing ?? (icons.Drawing = cadDesc.DrawingIcon.ToBitmapImage(true));
                     }
                     else if (obj is IXDocument)
                     {
                         if (MatchesExtension(obj as IXDocument, cadDesc.PartFileFilter.Extensions))
                         {
-                            return icons.Part ?? (icons.Part = cadDesc.PartIcon.ToBitmapImage());
+                            return icons.Part ?? (icons.Part = cadDesc.PartIcon.ToBitmapImage(true));
                         }
                         else if (MatchesExtension(obj as IXDocument, cadDesc.AssemblyFileFilter.Extensions))
                         {
-                            return icons.Assembly ?? (icons.Assembly = cadDesc.AssemblyIcon.ToBitmapImage());
+                            return icons.Assembly ?? (icons.Assembly = cadDesc.AssemblyIcon.ToBitmapImage(true));
                         }
                         else if (MatchesExtension(obj as IXDocument, cadDesc.DrawingFileFilter.Extensions))
                         {
-                            return icons.Drawing ?? (icons.Drawing = cadDesc.DrawingIcon.ToBitmapImage());
+                            return icons.Drawing ?? (icons.Drawing = cadDesc.DrawingIcon.ToBitmapImage(true));
                         }
                     }
                     else if (obj is IXConfiguration)
                     {
-                        return icons.Configuration ?? (icons.Configuration = cadDesc.ConfigurationIcon.ToBitmapImage());
+                        return icons.Configuration ?? (icons.Configuration = cadDesc.ConfigurationIcon.ToBitmapImage(true));
                     }
                     else if (obj is IXCutListItem)
                     {
-                        return icons.CutList ?? (icons.CutList = cadDesc.CutListIcon.ToBitmapImage());
+                        return icons.CutList ?? (icons.CutList = cadDesc.CutListIcon.ToBitmapImage(true));
                     }
                     else if (obj is IXSheet)
                     {
-                        return icons.Sheet ?? (icons.Sheet = cadDesc.SheetIcon.ToBitmapImage());
+                        return icons.Sheet ?? (icons.Sheet = cadDesc.SheetIcon.ToBitmapImage(true));
                     }
                 }
             }

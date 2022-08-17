@@ -24,7 +24,7 @@ namespace TestApp
         }
     }
 
-    public class ObjectMock 
+    public class ObjectLabelVM
     {
         public IXConfiguration Configuration { get; }
         public IXPart Document { get; }
@@ -32,7 +32,7 @@ namespace TestApp
 
         public ICadDescriptor Descriptor { get; }
 
-        public ObjectMock()
+        public ObjectLabelVM()
         {
             var descMock = new Mock<ICadDescriptor>();
             descMock.Setup(x => x.PartIcon).Returns(Resources.document_icon);
@@ -58,16 +58,6 @@ namespace TestApp
             partMock.Setup(x => x.Path).Returns(@"D:\SubFolder\SubFolder\SubFolder\SubFolder\SubFolder\SubFolder\MockPart.sldprt");
 
             Document = partMock.Object;
-        }
-    }
-
-    public class ObjectLabelVM
-    {
-        public ObjectMock Object1 { get; }
-
-        public ObjectLabelVM()
-        {
-            Object1 = new ObjectMock();
         }
     }
 }

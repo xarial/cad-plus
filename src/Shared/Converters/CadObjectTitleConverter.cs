@@ -19,18 +19,15 @@ using Xarial.XCad.Features;
 
 namespace Xarial.CadPlus.Plus.Shared.Converters
 {
-    public class CadObjectTitleConverter : IMultiValueConverter
+    public class CadObjectTitleConverter : IValueConverter
     {
-        public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            var obj = values[0];
-
             try
             {
-                switch (obj)
+                switch (value)
                 {
                     case IXDocument doc:
-                        var dispType = (DocumentTitleDisplayType_e)values[1];
 
                         var path = doc.Path;
                         var title = doc.Title;
@@ -48,29 +45,18 @@ namespace Xarial.CadPlus.Plus.Shared.Converters
                                 {
                                     title = Path.GetFileName(path); //Some path can be illegal
                                 }
-                                catch 
+                                catch
                                 {
                                     title = "???";
                                 }
                             }
-                            else 
+                            else
                             {
                                 title = "???";
                             }
                         }
 
-                        switch (dispType)
-                        {
-                            case DocumentTitleDisplayType_e.FilePath:
-                                return path;
-
-                            case DocumentTitleDisplayType_e.Title:
-                                return title;
-
-                            case DocumentTitleDisplayType_e.FileName:
-                                return Path.GetFileNameWithoutExtension(path);
-                        }
-                        break;
+                        return title;
 
                     case IXConfiguration conf:
                         return conf.Name;
@@ -80,9 +66,6 @@ namespace Xarial.CadPlus.Plus.Shared.Converters
 
                     case IXCutListItem cutList:
                         return cutList.Name;
-
-                    case ICustomObject custom:
-                        return custom.Title;
                 }
             }
             catch
@@ -91,8 +74,8 @@ namespace Xarial.CadPlus.Plus.Shared.Converters
 
             return "???";
         }
-        
-        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
             throw new NotImplementedException();
         }

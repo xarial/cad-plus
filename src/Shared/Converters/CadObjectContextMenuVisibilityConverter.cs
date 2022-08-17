@@ -22,7 +22,7 @@ namespace Xarial.CadPlus.Plus.Shared.Converters
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value is IXDocument || (value is ICustomObject && ((ICustomObject)value).CanOpenInExplorer))
+            if (value is IXDocument)
             {
                 return Visibility.Visible;
             }

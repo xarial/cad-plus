@@ -29,10 +29,9 @@
             <Grid DataContext="{Binding Path=ObjectLabel}">
                 <StackPanel Orientation="Vertical" Grid.Row="1">
                     <TextBlock Text="Hello World" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                    <sharedctrls:CadObjectLabelControl HorizontalAlignment="Stretch" Object="{Binding Path=Object1.Document}" Descriptor="{Binding Path=Object1.Descriptor}"/>
-                    <sharedctrls:CadObjectLabelControl HorizontalAlignment="Stretch" Object="{Binding Path=Object1.Document}" DocumentTitleDisplayType="FilePath" Descriptor="{Binding Path=Object1.Descriptor}"/>
-                    <sharedctrls:CadObjectLabelControl HorizontalAlignment="Stretch" Object="{Binding Path=Object1.Configuration}" Descriptor="{Binding Path=Object1.Descriptor}"/>
-                    <sharedctrls:CadObjectLabelControl HorizontalAlignment="Stretch" Object="{Binding Path=Object1.CutList}" Descriptor="{Binding Path=Object1.Descriptor}"/>
+                    <sharedctrls:CadObjectLabelControl HorizontalAlignment="Stretch" Object="{Binding Path=Document}" Descriptor="{Binding Path=Descriptor}"/>
+                    <sharedctrls:CadObjectLabelControl HorizontalAlignment="Stretch" Object="{Binding Path=Configuration}" Descriptor="{Binding Path=Descriptor}"/>
+                    <sharedctrls:CadObjectLabelControl HorizontalAlignment="Stretch" Object="{Binding Path=CutList}" Descriptor="{Binding Path=Descriptor}"/>
                 </StackPanel>
             </Grid>
         </TabItem>

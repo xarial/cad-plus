@@ -50,14 +50,8 @@
                             </Image.Source>
                         </Image>
                         <TextBlock Grid.Column="1"
-                                   FontWeight="{TemplateBinding FontWeight}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis">
-                            <TextBlock.Text>
-                                <MultiBinding Converter="{StaticResource objTitleConv}">
-                                    <Binding Path="Object" RelativeSource="{RelativeSource TemplatedParent}"/>
-                                    <Binding Path="DocumentTitleDisplayType" RelativeSource="{RelativeSource TemplatedParent}"/>
-                                </MultiBinding>
-                            </TextBlock.Text>
-                        </TextBlock>
+                                   FontWeight="{TemplateBinding FontWeight}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"
+                                   Text="{TemplateBinding Object, Converter={StaticResource objTitleConv}}"/>
                         <Grid.ContextMenu>
                             <ContextMenu Visibility="{Binding Path=Object, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource ctxMenuVisConv}}">
                                 <MenuItem x:Name="PART_ContextMenu_OpenInExplorer" Header="Open In File Explorer"/>

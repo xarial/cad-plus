@@ -27,23 +27,6 @@ using Xarial.XToolkit.Wpf.Utils;
 
 namespace Xarial.CadPlus.Plus.Shared.Controls
 {
-    public enum DocumentTitleDisplayType_e
-    {
-        FilePath,
-        Title,
-        FileName
-    }
-
-    public interface ICustomObject 
-    {
-        string Title { get; }
-        string Tooltip { get; }
-        string Path { get; }
-        ImageSource Preview { get; }
-        ImageSource Icon { get; }
-        bool CanOpenInExplorer { get; }
-    }
-
     public class CadObjectLabelControl : Control
     {
         static CadObjectLabelControl()
@@ -80,17 +63,6 @@ namespace Xarial.CadPlus.Plus.Shared.Controls
             set { SetValue(ObjectProperty, value); }
         }
 
-        public static readonly DependencyProperty DocumentTitleDisplayTypeProperty =
-            DependencyProperty.Register(
-            nameof(DocumentTitleDisplayType), typeof(DocumentTitleDisplayType_e),
-            typeof(CadObjectLabelControl), new PropertyMetadata(DocumentTitleDisplayType_e.Title));
-
-        public DocumentTitleDisplayType_e DocumentTitleDisplayType
-        {
-            get { return (DocumentTitleDisplayType_e)GetValue(DocumentTitleDisplayTypeProperty); }
-            set { SetValue(DocumentTitleDisplayTypeProperty, value); }
-        }
-
         private void OnOpenInFileExplorer(object sender, RoutedEventArgs e)
         {
             try
@@ -101,10 +73,6 @@ namespace Xarial.CadPlus.Plus.Shared.Controls
                 {
                     case IXDocument doc:
                         path = doc.Path;
-                        break;
-
-                    case ICustomObject customObj:
-                        path = customObj.Path;
                         break;
                 }
 
