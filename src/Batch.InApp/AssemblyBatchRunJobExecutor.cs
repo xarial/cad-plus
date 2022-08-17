@@ -25,6 +25,7 @@ using Xarial.XCad.Base.Enums;
 using Xarial.CadPlus.Batch.Base.Exceptions;
 using Xarial.CadPlus.Batch.Base.Services;
 using Xarial.CadPlus.Plus.Shared.Exceptions;
+using Xarial.CadPlus.Plus.Shared.Services;
 
 namespace Xarial.CadPlus.Batch.InApp
 {
@@ -64,7 +65,7 @@ namespace Xarial.CadPlus.Batch.InApp
 
         private JobItemDocument[] m_JobItems;
 
-        private readonly JobState m_State;
+        private readonly BatchJobState m_State;
 
         internal AssemblyBatchRunJobExecutor(IXApplication app, IMacroExecutor macroRunnerSvc, ICadDescriptor cadDesc,
             IXDocument[] documents, IXLogger logger, IEnumerable<MacroData> macros,
@@ -86,7 +87,7 @@ namespace Xarial.CadPlus.Batch.InApp
             m_AllowRapid = allowRapid;
             m_AutoSaveDocs = autoSaveDocs;
 
-            m_State = new JobState();
+            m_State = new BatchJobState();
 
             m_LogEntries = new List<string>();
         }

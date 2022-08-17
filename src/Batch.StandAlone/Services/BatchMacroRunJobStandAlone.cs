@@ -92,7 +92,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.Services
 
         private JobItemDocument[] m_JobDocuments;
 
-        private JobState m_State;
+        private BatchJobState m_State;
 
         public BatchMacroRunJobStandAlone(BatchJob job, ICadApplicationInstanceProvider appProvider,
             IBatchApplicationProxy batchAppProxy,
@@ -103,7 +103,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.Services
             m_AppProvider = appProvider;
             m_MacroRunnerSvc = m_AppProvider.MacroRunnerService;
 
-            m_State = new JobState();
+            m_State = new BatchJobState();
 
             m_TaskRunner = taskRunner;
 

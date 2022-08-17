@@ -13,6 +13,7 @@ using Xarial.CadPlus.Batch.Base.Services;
 using Xarial.CadPlus.Common.Services;
 using Xarial.CadPlus.Plus.Extensions;
 using Xarial.CadPlus.Plus.Services;
+using Xarial.CadPlus.Plus.Shared.Services;
 
 namespace Xarial.CadPlus.Batch.Base.Core
 {
@@ -29,12 +30,12 @@ namespace Xarial.CadPlus.Batch.Base.Core
        
         public object UserResult { get; }
 
-        public JobItemState State { get; }
+        public BatchJobItemState State { get; }
 
         public JobItemMacro(JobItemOperationMacroDefinition macroDef)
         {
             Definition = macroDef;
-            State = new JobItemState();
+            State = new BatchJobItemState();
         }
     }
 }

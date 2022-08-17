@@ -15,6 +15,7 @@ using Xarial.CadPlus.Batch.Base.Properties;
 using Xarial.CadPlus.Batch.Base.Services;
 using Xarial.CadPlus.Common.Services;
 using Xarial.CadPlus.Plus.Services;
+using Xarial.CadPlus.Plus.Shared.Services;
 using Xarial.XCad.Documents;
 using Xarial.XCad.UI;
 using Xarial.XToolkit;
@@ -110,7 +111,7 @@ namespace Xarial.CadPlus.Batch.Base.Core
         //TODO: implement support for configurations and sheets
         public IReadOnlyList<IBatchJobItem> Nested { get; }
 
-        public JobItemState State { get; }
+        public BatchJobItemState State { get; }
 
         private readonly ICadDescriptor m_CadDesc;
                 
@@ -123,7 +124,7 @@ namespace Xarial.CadPlus.Batch.Base.Core
 
             m_CadDesc = cadDesc;
 
-            State = new JobItemState();
+            State = new BatchJobItemState();
 
             Document = doc;
             Title = Path.GetFileName(doc.Path);

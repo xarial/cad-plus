@@ -14,10 +14,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using Xarial.CadPlus.Batch.Base.Core;
 using Xarial.CadPlus.Common.Services;
 using Xarial.CadPlus.Plus.Extensions;
 using Xarial.CadPlus.Plus.Services;
+using Xarial.CadPlus.Plus.Shared.Services;
 using Xarial.CadPlus.Xport.Core;
 using Xarial.XToolkit;
 using Xarial.XToolkit.Wpf.Utils;
@@ -40,7 +40,7 @@ namespace Xarial.CadPlus.Xport.Services
             Title = Path.GetFileName(filePath);
             Description = filePath;
             Link = TryOpenInFileExplorer;
-            State = new JobItemState();
+            State = new BatchJobItemState();
         }
 
         public BitmapImage Icon { get; }
@@ -50,7 +50,7 @@ namespace Xarial.CadPlus.Xport.Services
 
         public Action Link { get; }
 
-        public JobItemState State { get; }
+        public BatchJobItemState State { get; }
 
         public IReadOnlyList<JobItemExportFormat> Operations { get; }
 
@@ -92,14 +92,14 @@ namespace Xarial.CadPlus.Xport.Services
         public string OutputFilePath { get; }
         public IBatchJobItemOperationDefinition Definition { get; }
 
-        public JobItemState State { get; }
+        public BatchJobItemState State { get; }
         public object UserResult { get; }
 
         public JobItemExportFormat(string outFilePath, JobItemExportFormatDefinition def)
         {
             OutputFilePath = outFilePath;
             Definition = def;
-            State = new JobItemState();
+            State = new BatchJobItemState();
         }
     }
 
@@ -127,14 +127,14 @@ namespace Xarial.CadPlus.Xport.Services
 
         private JobItemFile[] m_JobFiles;
 
-        private readonly JobState m_State;
+        private readonly BatchJobState m_State;
 
         public Exporter(IJobProcessManager jobMgr, ExportOptions opts)
         {
             m_JobMgr = jobMgr;
             m_Opts = opts;
             m_LogEntries = new List<string>();
-            m_State = new JobState();
+            m_State = new BatchJobState();
         }
 
         public async Task TryExecuteAsync(CancellationToken cancellationToken)
