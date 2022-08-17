@@ -153,24 +153,29 @@ namespace Xarial.CadPlus.Batch.InApp
         public class OptionsGroup 
         {
             [Description("Open each document in its own window (activate)")]
-            [Title("Activate Documents")]
-            [ControlOptions(align: ControlLeftAlign_e.Indent)]
+            [ControlOptions(left: 20, top: 0)]
+            [BitmapButton(typeof(Resources), nameof(Resources.activate_document), 30, 30)]
             public bool ActivateDocuments { get; set; } = true;
 
             [Description("Allow opening documents which are not currently loaded into memory as read-only")]
-            [Title("Allow Read-Only")]
-            [ControlOptions(align: ControlLeftAlign_e.Indent)]
+            [ControlOptions(left: 45, top: 0)]
+            [BitmapButton(typeof(Resources), nameof(Resources.read_only_mode), 30, 30)]
             public bool AllowReadOnly { get; set; } = false;
 
             [Description("Allow opening documents which are not currently loaded into memory in a rapid mode")]
-            [Title("Allow Rapid")]
-            [ControlOptions(align: ControlLeftAlign_e.Indent)]
+            [ControlOptions(left: 70, top: 0)]
+            [BitmapButton(typeof(Resources), nameof(Resources.rapid_mode), 30, 30)]
             public bool AllowRapid { get; set; } = false;
 
             [Description("Save documents automatically after running the macros")]
-            [Title("Auto Save")]
-            [ControlOptions(align: ControlLeftAlign_e.Indent)]
+            [ControlOptions(left: 20, top: 25)]
+            [BitmapButton(typeof(Resources), nameof(Resources.auto_save_docs), 30, 30)]
             public bool AutoSave { get; set; } = false;
+
+            [Description("Automatically close all popup windows")]
+            [ControlOptions(left: 45, top: 25)]
+            [BitmapButton(typeof(Resources), nameof(Resources.silent_mode), 30, 30)]
+            public bool Silent { get; set; }
 
             [DynamicControls(BatchModuleGroup_e.Options)]
             public List<IRibbonCommand> AdditionalCommands { get; }

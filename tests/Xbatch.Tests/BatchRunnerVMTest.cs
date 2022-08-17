@@ -28,6 +28,8 @@ using Xarial.XCad.SolidWorks.Enums;
 using Xarial.XToolkit.Wpf.Utils;
 using Xarial.CadPlus.Batch.Base.Services;
 using Xarial.XToolkit.Services;
+using Xarial.CadPlus.Batch.StandAlone.Services;
+using Xarial.XToolkit;
 
 namespace Xbatch.Tests
 {
@@ -35,11 +37,11 @@ namespace Xbatch.Tests
     public class BatchDocumentMockVM : BatchDocumentVM
     {
         public BatchDocumentMockVM(string name, BatchJob job, ICadApplicationInstanceProvider appProvider,
-            IJournalExporter[] journalExporters, IResultsSummaryExcelExporter[] resultsExporters,
-            IMessageService msgSvc, IXLogger logger, IBatchRunJobExecutorFactory execFact,
+            IMessageService msgSvc, IXLogger logger, IBatchMacroRunJobStandAloneFactory execFact,
+            IBatchJobReportExporter[] reportExporters, IBatchJobLogExporter[] logExporters,
             IBatchApplicationProxy batchAppProxy, MainWindow parentWnd, IRibbonButtonCommand[] backstageCmds) 
-            : base(name, job, appProvider, journalExporters, resultsExporters,
-                  msgSvc, logger, execFact, batchAppProxy, parentWnd, backstageCmds)
+            : base(name, job, appProvider,
+                  msgSvc, logger, execFact, reportExporters, logExporters, batchAppProxy, parentWnd, backstageCmds)
         {
         }
 
@@ -132,15 +134,13 @@ namespace Xbatch.Tests
             var modelMock = mock.Object;
             var msgSvcMock = new Mock<IMessageService>().Object;
 
-            var jobExecFactMock = new Mock<IBatchRunJobExecutorFactory>();
-            jobExecFactMock.Setup(m => m.Create(It.IsAny<BatchJob>())).Returns(new Mock<IBatchRunJobExecutor>().Object);
+            var jobExecFactMock = new Mock<IBatchMacroRunJobStandAloneFactory>();
+            jobExecFactMock.Setup(m => m.Create(It.IsAny<BatchJob>())).Returns(new Mock<IBatchMacroRunJobStandAlone>().Object);
 
             var docVm = new BatchDocumentMockVM("", job,
                 appProviderMock.Object,
-                new IJournalExporter[] { new Mock<IJournalExporter>().Object },
-                new IResultsSummaryExcelExporter[] { new Mock<IResultsSummaryExcelExporter>().Object },
                 msgSvcMock, new Mock<IXLogger>().Object,
-                jobExecFactMock.Object,
+                jobExecFactMock.Object, new IBatchJobReportExporter[0], new IBatchJobLogExporter[0],
                 new Mock<IBatchApplicationProxy>().Object, null, null);
 
             action.Invoke(docVm);

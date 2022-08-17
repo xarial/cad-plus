@@ -6,7 +6,9 @@
   </PropertyGroup>
   <Import Project="$(SolutionDir)common\common.props" />
   <ItemGroup>
-    <PackageReference Include="Xarial.CadPlusPlus.Shared" Version="0.4.0-20220715.1" />
+    <Compile Remove="Converters\HasIssuesToVisibilityConverter.cs" />
+    <Compile Remove="Converters\IssuesToTextConverter.cs" />
+    <Compile Remove="Converters\JobItemStatusToImageConverter.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Update="Properties\Resources.Designer.cs">
@@ -19,6 +21,9 @@
     <ProjectReference Include="..\Common\Common.csproj" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Converters\HasIssuesToVisibilityConverter.cs" />
+    <None Include="Converters\IssuesToTextConverter.cs" />
+    <None Include="Converters\JobItemStatusToImageConverter.cs" />
     <None Include="Resources\status-awaiting.png" />
   </ItemGroup>
   <ItemGroup>
@@ -53,5 +58,8 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\info.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Xarial.CadPlusPlus.Shared" Version="0.4.0-dev.4349" />
   </ItemGroup>
 </Project>

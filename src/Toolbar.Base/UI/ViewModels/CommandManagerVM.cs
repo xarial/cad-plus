@@ -22,6 +22,7 @@ using Xarial.CadPlus.Plus.Services;
 using Xarial.CadPlus.Plus.Shared.Services;
 using Xarial.CadPlus.Toolbar.Services;
 using Xarial.XCad.Base;
+using Xarial.XToolkit;
 using Xarial.XToolkit.Services;
 using Xarial.XToolkit.Wpf;
 using Xarial.XToolkit.Wpf.Extensions;
@@ -184,7 +185,7 @@ namespace Xarial.CadPlus.CustomToolbar.UI.ViewModels
                     {
                         if (FileSystemBrowser.BrowseFileOpen(out string specFile,
                             "Select toolbar specification file",
-                            FileSystemBrowser.BuildFilterString(
+                            FileFilter.BuildFilterString(
                                 new FileFilter("Toolbar Specification File", "*.setts"))))
                         {
                             if (!string.Equals(specFile, ToolbarSpecificationPath, StringComparison.CurrentCultureIgnoreCase))

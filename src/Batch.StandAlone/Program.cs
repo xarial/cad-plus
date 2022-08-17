@@ -60,18 +60,20 @@ namespace Xarial.CadPlus.Batch.StandAlone
             m_AppLauncher.Start(args);
         }
 
-        private static Task OnRunConsoleAsync(BatchArguments args)
-            => RunConsoleBatch(args);
+        private static Task OnRunConsoleAsync(BatchArguments args) => RunConsoleBatch(args);
 
         private static async Task RunConsoleBatch(BatchArguments args)
         {
             try
             {
-                var batchRunFact = m_AppLauncher.Container.GetService<IBatchRunnerFactory>();
-
-                using (var batchRunner = batchRunFact.Create(args.Job, Console.Out, new ConsoleProgressWriter()))
+                var batchRunFact = m_AppLauncher.Container.GetService<IBatchMacroRunJobStandAloneFactory>();
+                
+                using (var batchRunner = batchRunFact.Create(args.Job))
                 {
-                    await batchRunner.BatchRunAsync().ConfigureAwait(false);
+                    using (var prgWriter = new ConsoleProgressWriter(batchRunner))
+                    {
+                        await batchRunner.TryExecuteAsync(default).ConfigureAwait(false);
+                    }
                 }
             }
             catch (Exception ex)
@@ -86,15 +88,12 @@ namespace Xarial.CadPlus.Batch.StandAlone
         private static void OnConfigureServices(IContainerBuilder builder, BatchArguments args)
         {
             builder.RegisterSingleton<IRecentFilesManager, RecentFilesManager>();
-            builder.RegisterSingleton<IBatchRunnerFactory, BatchRunnerFactory>();
             builder.RegisterSingleton<IBatchRunnerModel, BatchRunnerModel>();
-            builder.RegisterSingleton<IBatchRunJobExecutorFactory, BatchRunJobExecutorFactory>();
+            builder.RegisterSingleton<IBatchMacroRunJobStandAloneFactory, BatchMacroRunJobStandAloneFactory>();
             builder.RegisterSelfSingleton<BatchManagerVM>();
             builder.RegisterSingleton<IJobContectResilientWorkerFactory, PollyJobContectResilientWorkerFactory>().UsingParameters(Parameter<int>.Any(MAX_RETRIES));
 
-            builder.RegisterSingleton<IPopupKillerFactory, PopupKillerFactory>();
             builder.RegisterSingleton<IBatchDocumentVMFactory, BatchDocumentVMFactory>();
-            builder.RegisterSingleton<IAboutService, AboutService>();
             builder.RegisterSingleton<IParentWindowProvider, ParentWindowProvider>().UsingFactory(() => new ParentWindowProvider(() => m_Window));
 
             builder.Register<IBatchApplicationProxy, BatchApplicationProxy>();
@@ -105,10 +104,7 @@ namespace Xarial.CadPlus.Batch.StandAlone
 
             builder.RegisterSingleton<IXCadMacroProvider, XCadMacroProvider>();
 
-            builder.RegisterSingleton<IJobManager, JobManager>().UsingInitializer(x => x.Init());
-
-            builder.RegisterSingleton<IJournalExporter, JournalTextExporter>().AsCollectionItem();
-            builder.RegisterSingleton<IResultsSummaryExcelExporter, ResultsSummaryExcelExporter>().AsCollectionItem();
+            builder.RegisterSingleton<IMacroRunnerPopupHandlerFactory, MacroRunnerPopupHandlerFactory>();
         }
 
         private static void OnWindowCreated(MainWindow window, BatchArguments args)

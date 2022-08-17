@@ -27,7 +27,6 @@ using Xarial.CadPlus.Common.Attributes;
 using Xarial.CadPlus.Plus.Attributes;
 using Xarial.CadPlus.Plus.Services;
 using Xarial.CadPlus.Plus.Shared;
-using Xarial.CadPlus.Plus.Shared.Extensions;
 using Xarial.CadPlus.Toolbar.Properties;
 using Xarial.CadPlus.Toolbar.Services;
 using Xarial.CadPlus.CustomToolbar.Structs;
@@ -51,7 +50,7 @@ namespace Xarial.CadPlus.CustomToolbar
         Configuration
     }
 
-    [Module(typeof(IHostExtension))]
+    [Module(typeof(IHostCadExtension))]
     public class ToolbarModule : IToolbarModule
     {
         public event MacroRunningDelegate MacroRunning;
@@ -60,7 +59,7 @@ namespace Xarial.CadPlus.CustomToolbar
             where TService : class
             => m_SvcProvider.GetService<TService>();
 
-        private IHostExtension m_Host;
+        private IHostCadExtension m_Host;
         private ICommandsManager m_CmdsMgr;
         private ITriggersManager m_TriggersMgr;
         private IMessageService m_Msg;
@@ -81,12 +80,12 @@ namespace Xarial.CadPlus.CustomToolbar
 
         public void Init(IHost host)
         {
-            if (!(host is IHostExtension))
+            if (!(host is IHostCadExtension))
             {
                 throw new InvalidCastException("This module is only availabel for extensions");
             }
 
-            m_Host = (IHostExtension)host;
+            m_Host = (IHostCadExtension)host;
             m_Host.ConfigureServices += OnConfigureServices;
             m_Host.Initialized += OnHostInitialized;
             m_Host.Connect += OnConnect;

@@ -12,7 +12,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Xarial.CadPlus.Plus;
-using Xarial.CadPlus.Plus.Hosts;
 using Xarial.XCad.Base;
 
 namespace Xarial.CadPlus.Batch.Base.Services

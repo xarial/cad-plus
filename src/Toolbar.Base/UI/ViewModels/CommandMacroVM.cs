@@ -19,6 +19,7 @@ using Xarial.CadPlus.Plus.Services;
 using Xarial.CadPlus.Plus.Shared.Services;
 using Xarial.CadPlus.Toolbar.Properties;
 using Xarial.CadPlus.Toolbar.Services;
+using Xarial.XToolkit;
 using Xarial.XToolkit.Wpf;
 using Xarial.XToolkit.Wpf.Extensions;
 using Xarial.XToolkit.Wpf.Utils;
@@ -129,7 +130,7 @@ namespace Xarial.CadPlus.CustomToolbar.UI.ViewModels
                     m_BrowseMacroPathCommand = new RelayCommand(() =>
                     {
                         if (FileSystemBrowser.BrowseFileOpen(out string macroFile, 
-                            "Select macro file", FileSystemBrowser.BuildFilterString(m_MacroFileFilters)))
+                            "Select macro file", FileFilter.BuildFilterString(m_MacroFileFilters)))
                         {
                             MacroPath = macroFile;
                         }

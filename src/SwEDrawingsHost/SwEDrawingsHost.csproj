@@ -6,12 +6,13 @@
   </PropertyGroup>
   <Import Project="$(SolutionDir)common\common.props" />
   <ItemGroup>
-    <PackageReference Include="Xarial.CadPlusPlus.Shared" Version="0.4.0-20220715.1" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\Common\Common.csproj" />
+    <ProjectReference Include="..\Init\Init.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Xarial.CadPlusPlus.Shared" Version="0.4.0-dev.4349" />
   </ItemGroup>
 </Project>

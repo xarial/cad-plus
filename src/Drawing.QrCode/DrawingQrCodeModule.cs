@@ -78,10 +78,10 @@ namespace Xarial.CadPlus.Drawing.QrCode
     }
 
     //TODO: remove the dependency on application once the common APIs are used
-    [Module(typeof(IHostExtension), typeof(ISwAddInApplication))]
+    [Module(typeof(IHostCadExtension), typeof(ISwAddInApplication))]
     public class DrawingQrCodeModule : IModule
     {
-        private IHostExtension m_Host;
+        private IHostCadExtension m_Host;
 
         private IInsertQrCodeFeature m_InsertQrCodeFeature;
         private IEditQrCodeFeature m_EditQrCodeFeature;
@@ -93,7 +93,7 @@ namespace Xarial.CadPlus.Drawing.QrCode
 
         public void Init(IHost host)
         {
-            m_Host = (IHostExtension)host;
+            m_Host = (IHostCadExtension)host;
             m_Host.Initialized += OnHostInitialized;
             m_Host.Connect += OnConnect;
         }

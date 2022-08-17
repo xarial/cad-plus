@@ -34,8 +34,6 @@ namespace Xarial.CadPlus.Batch.Sw
 
         private readonly IXLogger m_Logger;
 
-        private readonly IXServiceCollection m_CustomServices;
-
         public IMacroExecutor MacroRunnerService { get; }
         public ICadDescriptor Descriptor { get; }
 
@@ -45,9 +43,7 @@ namespace Xarial.CadPlus.Batch.Sw
 
             MacroRunnerService = svc;
             Descriptor = entDesc;
-            m_CustomServices = new ServiceCollection();
-            m_CustomServices.Add(() => m_Logger);
-
+            
             m_ForceDisabledAddIns = new Dictionary<Process, List<string>>();
         }
 
@@ -94,7 +90,10 @@ namespace Xarial.CadPlus.Batch.Sw
             app.State = ApplicationState_e.Default;
             app.Version = (ISwVersion)vers;
 
-            app.CustomServices = m_CustomServices;
+            var customServices = new ServiceCollection();
+            customServices.Add(() => m_Logger);
+
+            app.CustomServices = customServices;
 
             List<string> forceDisabledAddIns = null;
 
@@ -122,6 +121,11 @@ namespace Xarial.CadPlus.Batch.Sw
             try
             {
                 app.Commit(cancellationToken);
+            }
+            catch (Exception ex)
+            {
+                m_Logger.Log(ex);
+                throw;
             }
             finally
             {

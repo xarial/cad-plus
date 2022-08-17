@@ -4,7 +4,6 @@
 
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="/Xarial.CadPlus.Common;component/Themes/PathListBox.xaml" />
-        <ResourceDictionary Source="/Xarial.CadPlus.Common;component/Themes/TaskDashboard.xaml" />
     </ResourceDictionary.MergedDictionaries>
 
 </ResourceDictionary>

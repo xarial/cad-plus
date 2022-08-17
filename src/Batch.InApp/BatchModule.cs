@@ -16,21 +16,15 @@ using Xarial.XCad.Base.Attributes;
 using Xarial.XCad.Extensions;
 using Xarial.XCad.UI.Commands.Attributes;
 using Xarial.XCad.UI.Commands.Enums;
-using Xarial.XCad.UI.Commands;
 using Xarial.CadPlus.Plus;
 using Xarial.XCad.UI.PropertyPage;
 using Xarial.XCad.UI.PropertyPage.Enums;
 using Xarial.XCad.Documents;
-using Xarial.CadPlus.Common.Services;
-using Xarial.XToolkit.Reporting;
 using Xarial.XCad.Base;
 using Xarial.CadPlus.Batch.InApp.UI;
 using Xarial.CadPlus.Batch.InApp.Properties;
 using System.IO;
 using Xarial.XCad.UI.PropertyPage.Structures;
-using Xarial.XCad.Documents.Enums;
-using Xarial.CadPlus.Common;
-using Xarial.CadPlus.Common.Attributes;
 using Xarial.CadPlus.Plus.Attributes;
 using Xarial.CadPlus.Batch.Base.ViewModels;
 using Xarial.CadPlus.Plus.Services;
@@ -40,11 +34,13 @@ using Xarial.CadPlus.Plus.Delegates;
 using Xarial.CadPlus.Plus.UI;
 using Xarial.XCad.UI.PropertyPage.Base;
 using Xarial.CadPlus.Batch.InApp.Controls;
-using Xarial.CadPlus.Plus.Data;
-using Xarial.XCad.Base.Enums;
-using Xarial.CadPlus.Batch.InApp.Services;
 using System.Windows.Threading;
 using Xarial.XToolkit.Services;
+using Xarial.CadPlus.Plus.Shared.Services;
+using System.Threading;
+using Xarial.CadPlus.Plus.DI;
+using Xarial.CadPlus.Batch.Base.Services;
+using Xarial.CadPlus.Plus.Shared.ViewModels;
 
 namespace Xarial.CadPlus.Batch.InApp
 {
@@ -85,12 +81,12 @@ namespace Xarial.CadPlus.Batch.InApp
         RunInApp
     }
 
-    [Module(typeof(IHostExtension))]
+    [Module(typeof(IHostCadExtension))]
     public class BatchModule : IBatchInAppModule
     {
         public event ProcessInAppBatchInputDelegate ProcessInput;
 
-        private IHostExtension m_Host;
+        private IHostCadExtension m_Host;
 
         private IXPropertyPage<AssemblyBatchData> m_Page;
         private AssemblyBatchData m_Data;
@@ -98,23 +94,34 @@ namespace Xarial.CadPlus.Batch.InApp
         private IMacroExecutor m_MacroRunnerSvc;
         private IMessageService m_Msg;
         private IXLogger m_Logger;
+        private IBatchJobHandlerServiceFactory m_BatchJobHandlerSvcFact;
+        private IMacroRunnerPopupHandlerFactory m_PopupHandlerFact;
 
         private ICadDescriptor m_CadDesc;
 
-        private Dispatcher m_Dispatcher;
+        private readonly List<IBatchJobHandlerService> m_BatchJobHandlers;
+
+        public BatchModule()
+        {
+            m_BatchJobHandlers = new List<IBatchJobHandlerService>();
+        }
 
         public void Init(IHost host)
         {
-            if (!(host is IHostExtension))
+            if (!(host is IHostCadExtension))
             {
                 throw new InvalidCastException("Only extension host is supported for this module");
             }
 
-            m_Dispatcher = Dispatcher.CurrentDispatcher;
-
-            m_Host = (IHostExtension)host;
+            m_Host = (IHostCadExtension)host;
+            m_Host.ConfigureServices += OnConfigureServices;
             m_Host.Connect += OnConnect;
             m_Host.Initialized += OnHostInitialized;
+        }
+
+        private void OnConfigureServices(IContainerBuilder builder)
+        {
+            builder.RegisterSingleton<IMacroRunnerPopupHandlerFactory, MacroRunnerPopupHandlerFactory>();
         }
 
         private void OnHostInitialized(IApplication app, IServiceProvider svcProvider, IModule[] modules)
@@ -122,7 +129,8 @@ namespace Xarial.CadPlus.Batch.InApp
             m_MacroRunnerSvc = svcProvider.GetService<IMacroExecutor>();
             m_Msg = svcProvider.GetService<IMessageService>();
             m_Logger = svcProvider.GetService<IXLogger>();
-
+            m_BatchJobHandlerSvcFact = svcProvider.GetService<IBatchJobHandlerServiceFactory>();
+            m_PopupHandlerFact = svcProvider.GetService<IMacroRunnerPopupHandlerFactory>();
             m_CadDesc = svcProvider.GetService<ICadDescriptor>();
 
             m_Data = new AssemblyBatchData(m_CadDesc);
@@ -234,22 +242,20 @@ namespace Xarial.CadPlus.Batch.InApp
                     var input = docs.ToList();
                     ProcessInput?.Invoke(m_Host.Extension.Application, input);
 
-                    var exec = new AssemblyBatchRunJobExecutor(m_Host.Extension.Application, m_MacroRunnerSvc,
+                    var doc = m_Host.Extension.Application.Documents.Active;
+
+                    var job = new AssemblyBatchRunJobExecutor(m_Host.Extension.Application, m_MacroRunnerSvc, m_CadDesc,
                         input.ToArray(), m_Logger, m_Data.Macros.Macros.Macros.Select(x => x.Data).ToArray(),
                         m_Data.Options.ActivateDocuments, m_Data.Options.AllowReadOnly,
-                        m_Data.Options.AllowRapid, m_Data.Options.AutoSave);
+                        m_Data.Options.AllowRapid, m_Data.Options.AutoSave, m_PopupHandlerFact.Create(m_Data.Options.Silent));
 
-                    var vm = new JobResultVM(rootDoc.Title, exec, m_CadDesc, m_Logger);
+                    var jobHandler = m_BatchJobHandlerSvcFact.Create(job, $"Batch Macro Running: {doc.Title}", new CancellationTokenSource());
 
-                    using (var cancelHandler = new EscapeBatchExecutorCancelHandler(exec, m_Host.Extension.Application, m_Dispatcher))
-                    {
-                        vm.TryRunBatch();
-                    }
+                    jobHandler.Disposed += OnDisposed;
 
-                    var wnd = m_Host.Extension.CreatePopupWindow<ResultsWindow>();
-                    wnd.Control.Title = $"{rootDoc.Title} batch job result";
-                    wnd.Control.DataContext = vm;
-                    wnd.Show();
+                    m_BatchJobHandlers.Add(jobHandler);
+
+                    jobHandler.Run();
                 }
                 catch (OperationCanceledException) 
                 {
@@ -310,8 +316,22 @@ namespace Xarial.CadPlus.Batch.InApp
             }
         }
 
+        private void OnDisposed(IBatchJobHandlerService sender)
+        {
+            m_Logger.Log($"Removing the job handler");
+
+            if (m_BatchJobHandlers.Contains(sender))
+            {
+                m_BatchJobHandlers.Remove(sender);
+            }
+        }
+
         public void Dispose()
         {
+            foreach (var jobHandler in m_BatchJobHandlers)
+            {
+                jobHandler.Dispose();
+            }
         }
     }
 }

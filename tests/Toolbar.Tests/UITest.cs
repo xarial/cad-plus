@@ -59,7 +59,7 @@ namespace CustomToolbar.Tests
         {
             var module = new CustomToolbarModuleMock();
 
-            var extMock = new Mock<IHostExtension>();
+            var extMock = new Mock<IHostCadExtension>();
             
             module.Init(extMock.Object);
         }

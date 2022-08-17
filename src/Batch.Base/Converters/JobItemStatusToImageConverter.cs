@@ -15,6 +15,7 @@ using System.Windows.Data;
 using System.Windows.Media.Imaging;
 using Xarial.CadPlus.Batch.Base.Properties;
 using Xarial.CadPlus.Common.Services;
+using Xarial.CadPlus.Plus.Services;
 using Xarial.XToolkit.Wpf.Extensions;
 
 namespace Xarial.CadPlus.Batch.Base.Converters

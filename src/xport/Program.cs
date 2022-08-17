@@ -22,7 +22,7 @@ using Xarial.CadPlus.Plus.Services;
 using Xarial.CadPlus.Plus.Shared;
 using Xarial.CadPlus.Plus.Shared.Services;
 using Xarial.CadPlus.Xport.Core;
-using Xarial.CadPlus.Xport.Models;
+using Xarial.CadPlus.Xport.Services;
 using Xarial.CadPlus.Xport.ViewModels;
 
 namespace Xarial.CadPlus.Xport
@@ -49,10 +49,7 @@ namespace Xarial.CadPlus.Xport
         private static void OnConfigureServices(IContainerBuilder builder, Arguments args)
         {
             builder.RegisterSelfSingleton<ExporterVM>();
-            builder.RegisterSingleton<IExporterModel, ExporterModel>();
-            builder.RegisterSingleton<IAboutService, AboutService>();
             builder.RegisterSingleton<IParentWindowProvider, ParentWindowProvider>().UsingFactory(() => new ParentWindowProvider(() => m_Window));
-            builder.RegisterSingleton<IJobManager, JobManager>().UsingInitializer(x => x.Init());
         }
 
         private static void OnWindowCreated(MainWindow window, Arguments args)
@@ -82,11 +79,14 @@ namespace Xarial.CadPlus.Xport
                 Version = args.Version
             };
 
-            var jobMgr = m_AppLauncher.Container.GetService<IJobManager>();
+            var jobMgr = m_AppLauncher.Container.GetService<IJobProcessManager>();
 
-            using (var exporter = new Exporter(Console.Out, jobMgr, new ConsoleProgressWriter()))
+            using (var exporter = new Exporter(jobMgr, opts))
             {
-                await exporter.Export(opts).ConfigureAwait(false);
+                using (var prgWriter = new ConsoleProgressWriter(exporter))
+                {
+                    await exporter.TryExecuteAsync(default).ConfigureAwait(false);
+                }
             }
         }
     }

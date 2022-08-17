@@ -155,7 +155,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
             {
                 if (!string.IsNullOrEmpty(filePath) ||
                     FileSystemBrowser.BrowseFileOpen(out filePath, "Select file to open",
-                        FileSystemBrowser.BuildFilterString(BatchDocumentVM.FileFilters)))
+                        FileFilter.BuildFilterString(BatchDocumentVM.FileFilters)))
                 {
                     if (!string.Equals(Document?.FilePath, filePath, StringComparison.CurrentCultureIgnoreCase))
                     {
@@ -259,16 +259,16 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
         {
             return new IRibbonButtonCommand[]
             {
-                new RibbonButtonCommand("New", Resources._new, "Create new Batch job", NewDocument, null),
-                new RibbonButtonCommand("Open...", Resources.open, "Open existing batch job", () => OpenDocument(""), null),
+                new RibbonButtonCommand("New", Resources._new, "Create new Batch job", new RelayCommand(NewDocument)),
+                new RibbonButtonCommand("Open...", Resources.open, "Open existing batch job", new RelayCommand(() => OpenDocument(""))),
                 null,
-                new RibbonButtonCommand("Save", Resources.save, "Save current batch job", () => Document.SaveDocument(), () => Document != null),
-                new RibbonButtonCommand("Save As...", null, "Save current batch job to a new file", () => Document.SaveAsDocument(), () => Document != null),
+                new RibbonButtonCommand("Save", Resources.save, "Save current batch job", new RelayCommand(() => Document.SaveDocument(), () => Document != null)),
+                new RibbonButtonCommand("Save As...", null, "Save current batch job to a new file", new RelayCommand(() => Document.SaveAsDocument(), () => Document != null)),
                 null,
-                new RibbonButtonCommand("Close", null, "Close current batch job", CloseDocument, () => Document != null),
+                new RibbonButtonCommand("Close", null, "Close current batch job", new RelayCommand(CloseDocument, () => Document != null)),
                 null,
-                new RibbonButtonCommand("Help...", Resources.help_icon, "Open help page", OpenHelp, null),
-                new RibbonButtonCommand("About...", Resources.about_icon, "About Batch+", ShowAbout, null)
+                new RibbonButtonCommand("Help...", Resources.help_icon, "Open help page", new RelayCommand(OpenHelp)),
+                new RibbonButtonCommand("About...", Resources.about_icon, "About Batch+", new RelayCommand(ShowAbout))
             };
         }
     }

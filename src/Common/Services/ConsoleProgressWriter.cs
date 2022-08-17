@@ -10,39 +10,74 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Xarial.CadPlus.Plus.Services;
 
 namespace Xarial.CadPlus.Common.Services
 {
-    public class ConsoleProgressWriter : IProgressHandler
+    public class ConsoleProgressWriter : IDisposable
     {
-        private int m_TotalFiles;
-        private int m_ProcessedFiles;
-        private IJobItem[] m_Scope;
+        private IReadOnlyList<IBatchJobItem> m_Scope;
 
-        public void ReportProgress(IJobItem file, bool result)
+        private readonly IBatchJobBase m_Job;
+
+        public ConsoleProgressWriter(IBatchJobBase job) 
         {
-            m_ProcessedFiles++;
-            var prg = m_ProcessedFiles / (double)m_TotalFiles;
+            m_Job = job;
+            m_Job.Started += OnJobStarted;
+            m_Job.Completed += OnJobCompleted;
+            m_Job.Initialized += OnJobInitialized;
+            m_Job.ItemProcessed += OnItemProcessed;
+            m_Job.State.ProgressChanged += OnProgressChanged;
+            m_Job.Log += OnLog;
+        }
 
-            Console.WriteLine($"Result: {file.Status}");
+        private void OnJobStarted(IBatchJobBase sender, DateTime startTime) => SetStarted(startTime);
+        private void OnJobCompleted(IBatchJobBase sender, TimeSpan duration, BatchJobStatus_e status) => ReportCompleted(duration, status);
+        private void OnJobInitialized(IBatchJobBase sender, IReadOnlyList<IBatchJobItem> jobItems, IReadOnlyList<IBatchJobItemOperationDefinition> operations) => SetJobScope(jobItems);
+        private void OnItemProcessed(IBatchJobBase sender, IBatchJobItem file) => ReportStatus(file);
+        private void OnProgressChanged(IBatchJobState sender, double progress) => ReportProgress(progress);
+        private void OnLog(IBatchJobBase sender, string msg) => Log(msg);
+
+        private void Log(string msg) => Console.WriteLine(msg);
+
+        private void ReportProgress(double progress)
+        {
             Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine($"Progress: {(prg * 100).ToString("F")}%");
+            Console.WriteLine($"Progress: {(progress * 100).ToString("F")}%");
             Console.ResetColor();
         }
 
-        public void SetJobScope(IJobItem[] scope, DateTime startTime)
+        private void SetStarted(DateTime startTime)
+        {
+            Console.WriteLine($"Started: {startTime}");
+        }
+
+        private void ReportStatus(IBatchJobItem file)
+        {
+            Console.WriteLine($"Result: {file.State.Status}");
+        }
+
+        private void SetJobScope(IReadOnlyList<IBatchJobItem> scope)
         {
             m_Scope = scope;
-            m_TotalFiles = scope.Length;
-            Console.WriteLine($"Processing {scope.Length} file(s). {startTime}");
+            Console.WriteLine($"Processing {scope.Count} file(s)");
         }
-        
-        public void ReportCompleted(TimeSpan duration)
+
+        private void ReportCompleted(TimeSpan duration, BatchJobStatus_e status)
         {
-            Console.WriteLine($"Operation completed: {duration}");
-            Console.WriteLine($"Processed: {m_Scope.Count(j => j.Status == JobItemStatus_e.Succeeded)}");
-            Console.WriteLine($"Warning: {m_Scope.Count(j => j.Status == JobItemStatus_e.Warning)}");
-            Console.WriteLine($"Failed: {m_Scope.Count(j => j.Status == JobItemStatus_e.Failed)}");
+            Console.WriteLine($"Operation completed: {duration}: {status}");
+            Console.WriteLine($"Processed: {m_Scope.Count(j => j.State.Status == BatchJobItemStateStatus_e.Succeeded)}");
+            Console.WriteLine($"Warning: {m_Scope.Count(j => j.State.Status == BatchJobItemStateStatus_e.Warning)}");
+            Console.WriteLine($"Failed: {m_Scope.Count(j => j.State.Status == BatchJobItemStateStatus_e.Failed)}");
+        }
+
+        public void Dispose()
+        {
+            m_Job.Completed -= OnJobCompleted;
+            m_Job.Initialized -= OnJobInitialized;
+            m_Job.ItemProcessed -= OnItemProcessed;
+            m_Job.State.ProgressChanged -= OnProgressChanged;
+            m_Job.Log -= OnLog;
         }
     }
 }

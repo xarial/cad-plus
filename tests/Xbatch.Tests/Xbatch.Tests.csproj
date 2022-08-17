@@ -11,9 +11,9 @@
     <PackageReference Include="nunit" Version="3.13.3" />
     <PackageReference Include="NUnit3TestAdapter" Version="4.2.1" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.2.0" />
-    <PackageReference Include="Xarial.CadPlusPlus" Version="0.4.0-20220715.1" />
-    <PackageReference Include="Xarial.XCad.SolidWorks" Version="0.8.0-20220715.1" />
-    <PackageReference Include="Xarial.XToolkit.Wpf" Version="0.4.0-20220710.2" />
+    <PackageReference Include="Xarial.CadPlusPlus" Version="0.4.0-dev.4349" />
+    <PackageReference Include="Xarial.XCad.SolidWorks" Version="0.8.0-dev.4328" />
+    <PackageReference Include="Xarial.XToolkit.Wpf" Version="0.4.0-dev.4339" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\Batch.Base\Batch.Base.csproj" />

@@ -14,6 +14,7 @@ using Xarial.CadPlus.CustomToolbar.Structs;
 using Xarial.CadPlus.Plus.Modules;
 using Xarial.CadPlus.Toolbar.Properties;
 using Xarial.CadPlus.Toolbar.Services;
+using Xarial.XToolkit;
 using Xarial.XToolkit.Wpf;
 using Xarial.XToolkit.Wpf.Extensions;
 using Xarial.XToolkit.Wpf.Utils;
@@ -96,7 +97,7 @@ namespace Xarial.CadPlus.CustomToolbar.UI.ViewModels
 
                         if (FileSystemBrowser.BrowseFileOpen(out string imgFile,
                             "Select image file for icon",
-                            FileSystemBrowser.BuildFilterString(filters))) 
+                            FileFilter.BuildFilterString(filters))) 
                         {
                             IconPath = imgFile;
                         }

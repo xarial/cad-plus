@@ -8,9 +8,6 @@
   </PropertyGroup>
   <Import Project="$(SolutionDir)common\common.module.props" />
   <ItemGroup>
-    <PackageReference Include="Xarial.CadPlusPlus.Shared" Version="0.4.0-20220715.1" />
-  </ItemGroup>
-  <ItemGroup>
     <Compile Update="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -25,5 +22,8 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Common\Common.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Xarial.CadPlusPlus.Shared" Version="0.4.0-dev.4349" />
   </ItemGroup>
 </Project>

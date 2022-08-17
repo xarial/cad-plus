@@ -12,8 +12,6 @@ using System.Windows.Interop;
 using Xarial.CadPlus.Common.Services;
 using Xarial.CadPlus.Plus.Shared.Services;
 using Xarial.CadPlus.Plus.Shared.Styles;
-using Xarial.CadPlus.Xport.Models;
-using Xarial.CadPlus.Xport.ViewModels;
 
 namespace Xarial.CadPlus.Xport
 {
