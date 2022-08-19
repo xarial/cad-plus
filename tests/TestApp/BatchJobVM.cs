@@ -14,6 +14,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using TestApp.Properties;
 using Xarial.CadPlus.Plus.Services;
+using Xarial.CadPlus.Plus.Shared.Helpers;
 using Xarial.CadPlus.Plus.Shared.Services;
 using Xarial.CadPlus.Plus.Shared.ViewModels;
 using Xarial.XCad.Base;
@@ -52,7 +53,7 @@ namespace TestApp
         }
 
         public async Task TryExecuteAsync(CancellationToken cancellationToken)
-            => await this.HandleExecuteAsync(cancellationToken,
+            => await BatchJobHelper.HandleExecuteAsync(this, cancellationToken,
                 t => Started?.Invoke(this, t),
                 t => m_State.StartTime = t,
                 Init,
