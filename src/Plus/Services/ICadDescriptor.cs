@@ -25,9 +25,16 @@ namespace Xarial.CadPlus.Plus.Services
         Image PartIcon { get; }
         Image AssemblyIcon { get; }
         Image DrawingIcon { get; }
+        
         Image ConfigurationIcon { get; }
         Image SheetIcon { get; }
-        Image CutListIcon { get; }
+        
+        Image SolidBodyIcon { get; }
+        Image SheetBodyIcon { get; }
+
+        Image CutListSolidBodyIcon { get; }
+        Image CutListSheetMetalIcon { get; }
+        Image CutListWeldmentIcon { get; }
 
         FileTypeFilter PartFileFilter { get; }
         FileTypeFilter AssemblyFileFilter { get; }

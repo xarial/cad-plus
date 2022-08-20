@@ -37,7 +37,7 @@ namespace TestApp
             var descMock = new Mock<ICadDescriptor>();
             descMock.Setup(x => x.PartIcon).Returns(Resources.document_icon);
             descMock.Setup(x => x.ConfigurationIcon).Returns(Resources.config_icon);
-            descMock.Setup(x => x.CutListIcon).Returns(Resources.cutlist_icon);
+            descMock.Setup(x => x.CutListSolidBodyIcon).Returns(Resources.cutlist_icon);
             descMock.Setup(x => x.ApplicationId).Returns("MockApp");
             Descriptor = descMock.Object;
 

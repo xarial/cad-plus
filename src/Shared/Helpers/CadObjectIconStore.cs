@@ -17,7 +17,9 @@ using Xarial.CadPlus.Plus.Shared.Controls;
 using Xarial.CadPlus.Plus.Shared.Properties;
 using Xarial.XCad;
 using Xarial.XCad.Documents;
+using Xarial.XCad.Enums;
 using Xarial.XCad.Features;
+using Xarial.XCad.Geometry;
 using Xarial.XToolkit.Wpf.Extensions;
 
 namespace Xarial.CadPlus.Plus.Shared.Helpers
@@ -29,7 +31,14 @@ namespace Xarial.CadPlus.Plus.Shared.Helpers
             internal ImageSource Part { get; set; }
             internal ImageSource Assembly { get; set; }
             internal ImageSource Drawing { get; set; }
-            internal ImageSource CutList { get; set; }
+            
+            internal ImageSource CutListSolidBody { get; set; }
+            internal ImageSource CutListSheetMetal { get; set; }
+            internal ImageSource CutListWeldment { get; set; }
+
+            internal ImageSource SolidBody { get; set; }
+            internal ImageSource SheetBody { get; set; }
+
             internal ImageSource Configuration { get; set; }
             internal ImageSource Sheet { get; set; }
         }
@@ -95,11 +104,30 @@ namespace Xarial.CadPlus.Plus.Shared.Helpers
                     }
                     else if (obj is IXCutListItem)
                     {
-                        return icons.CutList ?? (icons.CutList = cadDesc.CutListIcon.ToBitmapImage(true));
+                        switch (((IXCutListItem)obj).Type)
+                        {
+                            case CutListType_e.SheetMetal:
+                                return icons.CutListSheetMetal ?? (icons.CutListSheetMetal = cadDesc.CutListSheetMetalIcon.ToBitmapImage(true));
+
+                            case CutListType_e.Weldment:
+                                return icons.CutListWeldment ?? (icons.CutListWeldment = cadDesc.CutListWeldmentIcon.ToBitmapImage(true));
+
+                            case CutListType_e.SolidBody:
+                                return icons.CutListSolidBody ?? (icons.CutListSolidBody = cadDesc.CutListSolidBodyIcon.ToBitmapImage(true));
+                        }
+                        
                     }
                     else if (obj is IXSheet)
                     {
                         return icons.Sheet ?? (icons.Sheet = cadDesc.SheetIcon.ToBitmapImage(true));
+                    }
+                    else if (obj is IXSolidBody) 
+                    {
+                        return icons.SolidBody ?? (icons.SolidBody = cadDesc.SolidBodyIcon.ToBitmapImage(true));
+                    }
+                    else if (obj is IXSheetBody)
+                    {
+                        return icons.SheetBody ?? (icons.SheetBody = cadDesc.SheetBodyIcon.ToBitmapImage(true));
                     }
                 }
             }
