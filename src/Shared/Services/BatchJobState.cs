@@ -32,4 +32,30 @@ namespace Xarial.CadPlus.Plus.Shared.Services
 
         private double m_Progress;
     }
+
+    public static class BatchJobStateExtension 
+    {
+        public static void IncrementItemsCount(this BatchJobState jobState, IBatchJobItem batchJobItem) 
+        {
+            var status = batchJobItem.State.Status;
+
+            switch (status)
+            {
+                case BatchJobItemStateStatus_e.Succeeded:
+                    jobState.SucceededItemsCount++;
+                    break;
+
+                case BatchJobItemStateStatus_e.Warning:
+                    jobState.WarningItemsCount++;
+                    break;
+
+                case BatchJobItemStateStatus_e.Failed:
+                    jobState.FailedItemsCount++;
+                    break;
+
+                default:
+                    throw new Exception($"Job item '{batchJobItem.Title}' is not in the completed state: '{status}'");
+            }
+        }
+    }
 }

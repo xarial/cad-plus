@@ -53,7 +53,7 @@ namespace TestApp
         }
 
         public async Task TryExecuteAsync(CancellationToken cancellationToken)
-            => await BatchJobHelper.HandleExecuteAsync(this, cancellationToken,
+            => await this.HandleJobExecuteAsync(cancellationToken,
                 t => Started?.Invoke(this, t),
                 t => m_State.StartTime = t,
                 Init,

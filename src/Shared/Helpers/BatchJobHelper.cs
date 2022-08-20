@@ -11,7 +11,7 @@ namespace Xarial.CadPlus.Plus.Shared.Helpers
 {
     public static class BatchJobHelper
     {
-        public static void HandleExecute(this IBatchJob job, CancellationToken cancellationToken,
+        public static void HandleJobExecute(this IBatchJob job, CancellationToken cancellationToken,
             Action<DateTime> raiseStartEventFunc, Action<DateTime> setStartTimeFunc,
             Action<CancellationToken> initFunc, Action raiseInitEventFunc,
             Action<CancellationToken> doWorkFunc, Action<TimeSpan> raiseCompletedFunc, Action<TimeSpan> setDuration,
@@ -53,7 +53,7 @@ namespace Xarial.CadPlus.Plus.Shared.Helpers
             }
         }
 
-        public static async Task HandleExecuteAsync(IAsyncBatchJob job, CancellationToken cancellationToken,
+        public static async Task HandleJobExecuteAsync(this IAsyncBatchJob job, CancellationToken cancellationToken,
             Action<DateTime> raiseStartEventFunc, Action<DateTime> setStartTimeFunc,
             Func<CancellationToken, Task> initFunc, Action raiseInitEventFunc,
             Func<CancellationToken, Task> doWorkFunc, Action<TimeSpan> raiseCompletedFunc, Action<TimeSpan> setDuration,
@@ -95,46 +95,49 @@ namespace Xarial.CadPlus.Plus.Shared.Helpers
             }
         }
 
-        public static void ProcessJobItem<T>(T batchJobItem, BatchJobItemState jobItemState, BatchJobState jobState,
-            double progress, CancellationToken cancellationToken, Action<T, CancellationToken> runJobitemFunc,
-            Action<T> raiseItemProcessedEvent)
+        public static void ProcessJobItem<T>(this T batchJobItem,
+            Action<T, BatchJobItemStateStatus_e> setStatusFunc, Action<T> runJobItemFunc, Action<T, Exception> setErrorFunc,
+            Action<T> incrementStateItemsFunc,
+            Action updateProgressFunc, Action<T> raiseItemProcessedEventFunc)
             where T : IBatchJobItem
         {
-            if (jobItemState.Status == BatchJobItemStateStatus_e.Queued)
+            if (batchJobItem.State.Status == BatchJobItemStateStatus_e.Queued)
             {
-                HandleAction(jobItemState, () =>
+                try
                 {
-                    runJobitemFunc.Invoke(batchJobItem, cancellationToken);
-                    return batchJobItem.ComposeStatus();
-                });
+                    setStatusFunc.Invoke(batchJobItem, BatchJobItemStateStatus_e.InProgress);
+                    
+                    runJobItemFunc.Invoke(batchJobItem);
 
-                switch (jobItemState.Status)
-                {
-                    case BatchJobItemStateStatus_e.Succeeded:
-                        jobState.SucceededItemsCount++;
-                        break;
-
-                    case BatchJobItemStateStatus_e.Warning:
-                        jobState.WarningItemsCount++;
-                        break;
-
-                    case BatchJobItemStateStatus_e.Failed:
-                        jobState.FailedItemsCount++;
-                        break;
+                    setStatusFunc.Invoke(batchJobItem, batchJobItem.ComposeStatus());
                 }
+                catch (OperationCanceledException)
+                {
+                    throw;
+                }
+                catch (Exception ex)
+                {
+                    setErrorFunc.Invoke(batchJobItem, ex);
+
+                    setStatusFunc.Invoke(batchJobItem, BatchJobItemStateStatus_e.Failed);
+                }
+
+                incrementStateItemsFunc.Invoke(batchJobItem);
             }
 
-            jobState.Progress = progress;
-            raiseItemProcessedEvent?.Invoke(batchJobItem);
+            updateProgressFunc.Invoke();
+            raiseItemProcessedEventFunc.Invoke(batchJobItem);
         }
 
-        public static void HandleAction(BatchJobItemState state, Func<BatchJobItemStateStatus_e> action) 
+        public static void ProcessJobItemOperation<T>(this T oper,
+            Action<T, BatchJobItemStateStatus_e> setStatusFunc, Action<T> runJobItemFunc, Action<T, Exception> setErrorFunc)
+            where T : IBatchJobItemOperation
         {
             try
             {
-                state.Status = BatchJobItemStateStatus_e.InProgress;
-
-                state.Status = action.Invoke();
+                setStatusFunc.Invoke(oper, BatchJobItemStateStatus_e.InProgress);
+                runJobItemFunc.Invoke(oper);
+                setStatusFunc.Invoke(oper, BatchJobItemStateStatus_e.Succeeded);
             }
             catch (OperationCanceledException)
             {
@@ -142,7 +145,8 @@ namespace Xarial.CadPlus.Plus.Shared.Helpers
             }
             catch (Exception ex)
             {
-                state.ReportError(ex);
+                setErrorFunc.Invoke(oper, ex);
+                setStatusFunc.Invoke(oper, BatchJobItemStateStatus_e.Failed);
             }
         }
 
