@@ -19,7 +19,18 @@ namespace Xarial.CadPlus.Plus.Shared.Services
             }
             else if (statuses.All(s => s == BatchJobItemStateStatus_e.Succeeded))
             {
-                return BatchJobItemStateStatus_e.Succeeded;
+                if (jobItem.State.Issues?.Any(i => i.Type == BatchJobItemIssueType_e.Error) == true)
+                {
+                    return BatchJobItemStateStatus_e.Succeeded;
+                }
+                else if (jobItem.State.Issues?.Any(i => i.Type == BatchJobItemIssueType_e.Warning) == true)
+                {
+                    return BatchJobItemStateStatus_e.Warning;
+                }
+                else
+                {
+                    return BatchJobItemStateStatus_e.Succeeded;
+                }
             }
             else if (statuses.All(s => s == BatchJobItemStateStatus_e.Failed))
             {

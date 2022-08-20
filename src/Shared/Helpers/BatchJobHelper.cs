@@ -109,7 +109,10 @@ namespace Xarial.CadPlus.Plus.Shared.Helpers
                     
                     runJobItemFunc.Invoke(batchJobItem);
 
-                    setStatusFunc.Invoke(batchJobItem, batchJobItem.ComposeStatus());
+                    if (batchJobItem.State.Status == BatchJobItemStateStatus_e.InProgress)
+                    {
+                        setStatusFunc.Invoke(batchJobItem, batchJobItem.ComposeStatus());
+                    }
                 }
                 catch (OperationCanceledException)
                 {
@@ -119,7 +122,10 @@ namespace Xarial.CadPlus.Plus.Shared.Helpers
                 {
                     setErrorFunc.Invoke(batchJobItem, ex);
 
-                    setStatusFunc.Invoke(batchJobItem, BatchJobItemStateStatus_e.Failed);
+                    if (batchJobItem.State.Status != BatchJobItemStateStatus_e.Failed)
+                    {
+                        setStatusFunc.Invoke(batchJobItem, BatchJobItemStateStatus_e.Failed);
+                    }
                 }
 
                 incrementStateItemsFunc.Invoke(batchJobItem);
@@ -143,7 +149,10 @@ namespace Xarial.CadPlus.Plus.Shared.Helpers
 
                     await runJobItemAsyncFunc.Invoke(batchJobItem);
 
-                    setStatusFunc.Invoke(batchJobItem, batchJobItem.ComposeStatus());
+                    if (batchJobItem.State.Status == BatchJobItemStateStatus_e.InProgress)
+                    {
+                        setStatusFunc.Invoke(batchJobItem, batchJobItem.ComposeStatus());
+                    }
                 }
                 catch (OperationCanceledException)
                 {
@@ -153,7 +162,10 @@ namespace Xarial.CadPlus.Plus.Shared.Helpers
                 {
                     setErrorFunc.Invoke(batchJobItem, ex);
 
-                    setStatusFunc.Invoke(batchJobItem, BatchJobItemStateStatus_e.Failed);
+                    if (batchJobItem.State.Status != BatchJobItemStateStatus_e.Failed)
+                    {
+                        setStatusFunc.Invoke(batchJobItem, BatchJobItemStateStatus_e.Failed);
+                    }
                 }
 
                 incrementStateItemsFunc.Invoke(batchJobItem);
