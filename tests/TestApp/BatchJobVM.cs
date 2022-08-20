@@ -53,17 +53,18 @@ namespace TestApp
         }
 
         public async Task TryExecuteAsync(CancellationToken cancellationToken)
-            => await this.HandleJobExecuteAsync(cancellationToken,
+            => await this.HandleJobExecuteAsync(
                 t => Started?.Invoke(this, t),
                 t => m_State.StartTime = t,
                 Init,
+                c => m_State.TotalItemsCount = c,
                 () => Initialized?.Invoke(this, m_JobItems, m_OperationDefinitions),
                 DoWork,
                 d => Completed?.Invoke(this, d, m_State.Status),
                 d => m_State.Duration = d,
-                s => m_State.Status = s);
+                s => m_State.Status = s, cancellationToken, Mock.Of<IXLogger>());
 
-        private async Task Init(CancellationToken cancellationToken)
+        private async Task<int> Init(CancellationToken cancellationToken)
         {
             var oper1 = new MyJobItemOperationDefinition("Operation #1", Resources.icon1);
             var oper2 = new MyJobItemOperationDefinition("Operation #2", Resources.icon2);
@@ -90,7 +91,7 @@ namespace TestApp
 
             m_OperationDefinitions.AddRange(new IBatchJobItemOperationDefinition[] { oper1, oper2 });
 
-            m_State.TotalItemsCount = m_JobItems.Count;
+            return m_JobItems.Count;
         }
 
         private async Task DoWork(CancellationToken cancellationToken)

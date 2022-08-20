@@ -6,16 +6,18 @@ using System.Threading;
 using System.Threading.Tasks;
 using Xarial.CadPlus.Plus.Services;
 using Xarial.CadPlus.Plus.Shared.Services;
+using Xarial.XCad.Base;
+using Xarial.XCad.Base.Enums;
 
 namespace Xarial.CadPlus.Plus.Shared.Helpers
 {
     public static class BatchJobHelper
     {
-        public static void HandleJobExecute(this IBatchJob job, CancellationToken cancellationToken,
+        public static void HandleJobExecute(this IBatchJob job,
             Action<DateTime> raiseStartEventFunc, Action<DateTime> setStartTimeFunc,
-            Action<CancellationToken> initFunc, Action raiseInitEventFunc,
+            Func<CancellationToken, int> initFunc, Action<int> setTotalItemsFunc, Action raiseInitEventFunc,
             Action<CancellationToken> doWorkFunc, Action<TimeSpan> raiseCompletedFunc, Action<TimeSpan> setDuration,
-            Action<BatchJobStatus_e> setStatusFunc)
+            Action<BatchJobStatus_e> setStatusFunc, CancellationToken cancellationToken, IXLogger logger)
         {
             var startTime = DateTime.Now;
 
@@ -27,11 +29,17 @@ namespace Xarial.CadPlus.Plus.Shared.Helpers
 
             try
             {
-                initFunc.Invoke(cancellationToken);
+                logger.Log("Initiating a job", LoggerMessageSeverity_e.Debug);
+
+                var totalItems = initFunc.Invoke(cancellationToken);
+
+                setTotalItemsFunc.Invoke(totalItems);
 
                 setStatusFunc.Invoke(BatchJobStatus_e.InProgress);
 
                 raiseInitEventFunc.Invoke();
+
+                logger.Log("Performing a job work", LoggerMessageSeverity_e.Debug);
 
                 doWorkFunc.Invoke(cancellationToken);
 
@@ -41,8 +49,10 @@ namespace Xarial.CadPlus.Plus.Shared.Helpers
             {
                 setStatusFunc.Invoke(BatchJobStatus_e.Cancelled);
             }
-            catch
+            catch(Exception ex)
             {
+                logger.Log(ex);
+
                 setStatusFunc.Invoke(BatchJobStatus_e.Failed);
             }
             finally
@@ -53,11 +63,11 @@ namespace Xarial.CadPlus.Plus.Shared.Helpers
             }
         }
 
-        public static async Task HandleJobExecuteAsync(this IAsyncBatchJob job, CancellationToken cancellationToken,
+        public static async Task HandleJobExecuteAsync(this IAsyncBatchJob job,
             Action<DateTime> raiseStartEventFunc, Action<DateTime> setStartTimeFunc,
-            Func<CancellationToken, Task> initFuncAsync, Action raiseInitEventFunc,
+            Func<CancellationToken, Task<int>> initFuncAsync, Action<int> setTotalItemsFunc, Action raiseInitEventFunc,
             Func<CancellationToken, Task> doWorkFuncAsync, Action<TimeSpan> raiseCompletedFunc, Action<TimeSpan> setDuration,
-            Action<BatchJobStatus_e> setStatusFunc)
+            Action<BatchJobStatus_e> setStatusFunc, CancellationToken cancellationToken, IXLogger logger)
         {
             var startTime = DateTime.Now;
 
@@ -69,11 +79,17 @@ namespace Xarial.CadPlus.Plus.Shared.Helpers
 
             try
             {
-                await initFuncAsync.Invoke(cancellationToken);
+                logger.Log("Initiating a job", LoggerMessageSeverity_e.Debug);
+
+                var totalItems = await initFuncAsync.Invoke(cancellationToken);
+
+                setTotalItemsFunc.Invoke(totalItems);
 
                 setStatusFunc.Invoke(BatchJobStatus_e.InProgress);
 
                 raiseInitEventFunc.Invoke();
+
+                logger.Log("Performing a job work", LoggerMessageSeverity_e.Debug);
 
                 await doWorkFuncAsync.Invoke(cancellationToken);
 
@@ -83,8 +99,10 @@ namespace Xarial.CadPlus.Plus.Shared.Helpers
             {
                 setStatusFunc.Invoke(BatchJobStatus_e.Cancelled);
             }
-            catch
+            catch(Exception ex)
             {
+                logger.Log(ex);
+
                 setStatusFunc.Invoke(BatchJobStatus_e.Failed);
             }
             finally

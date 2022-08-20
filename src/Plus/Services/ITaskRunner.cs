@@ -14,7 +14,7 @@ namespace Xarial.CadPlus.Plus.Services
 
     public interface ITaskRunner : IDisposable
     {
-        Task Run(Action action, CancellationToken cancellationToken);
-        Task<T> Run<T>(Func<T> func, CancellationToken cancellationToken);
+        Task RunAsync(Action action, CancellationToken cancellationToken);
+        Task<T> RunAsync<T>(Func<T> func, CancellationToken cancellationToken);
     }
 }
