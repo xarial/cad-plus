@@ -24,6 +24,7 @@ using Xarial.CadPlus.Plus.Shared.Services;
 using Xarial.CadPlus.Xport.Core;
 using Xarial.CadPlus.Xport.Services;
 using Xarial.CadPlus.Xport.ViewModels;
+using Xarial.XCad.Base;
 
 namespace Xarial.CadPlus.Xport
 {
@@ -81,7 +82,7 @@ namespace Xarial.CadPlus.Xport
 
             var jobMgr = m_AppLauncher.Container.GetService<IJobProcessManager>();
 
-            using (var exporter = new Exporter(jobMgr, opts))
+            using (var exporter = new Exporter(jobMgr, opts, m_AppLauncher.Container.GetService<IXLogger>()))
             {
                 using (var prgWriter = new ConsoleProgressWriter(exporter))
                 {

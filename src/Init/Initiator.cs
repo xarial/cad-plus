@@ -83,10 +83,10 @@ namespace Xarial.CadPlus.Init
 
     internal class TaskRunner : ITaskRunner
     {
-        public Task Run(Action action, CancellationToken cancellationToken)
+        public Task RunAsync(Action action, CancellationToken cancellationToken)
             => Task.Run(action, cancellationToken);
 
-        public Task<T> Run<T>(Func<T> func, CancellationToken cancellationToken)
+        public Task<T> RunAsync<T>(Func<T> func, CancellationToken cancellationToken)
             => Task.Run(func, cancellationToken);
 
         public void Dispose()

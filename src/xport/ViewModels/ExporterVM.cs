@@ -171,7 +171,7 @@ namespace Xarial.CadPlus.Xport.ViewModels
                     Version = (int)Version
                 };
 
-                using (var exporter = new Exporter(m_JobPrcMgr, opts)) 
+                using (var exporter = new Exporter(m_JobPrcMgr, opts, m_Logger)) 
                 {
                     JobResult = new AsyncBatchJobVM(exporter, m_MsgSvc, m_Logger, new CancellationTokenSource(), m_ReportExporters, m_LogExporters);
                     await JobResult.TryRunBatchAsync().ConfigureAwait(false);
