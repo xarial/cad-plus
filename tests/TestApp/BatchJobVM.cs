@@ -66,15 +66,21 @@ namespace TestApp
 
         private async Task<int> Init(CancellationToken cancellationToken)
         {
+            var icon1 = Resources.icon1.ToBitmapImage(true);
+            var icon2 = Resources.icon2.ToBitmapImage(true);
+            var icon3 = Resources.icon3.ToBitmapImage(true);
+            var icon4 = Resources.icon4.ToBitmapImage(true);
+
             var opers = new MyJobItemOperationDefinition[]
             {
-                new MyJobItemOperationDefinition("Operation #1", Resources.icon1),
-                new MyJobItemOperationDefinition("Operation #2", Resources.icon2)
+                new MyJobItemOperationDefinition("Operation #1", icon1),
+                new MyJobItemOperationDefinition("Operation #2", icon2),
+                new MyJobItemOperationDefinition("Operation #3", icon1)
             };
 
-            var item1 = new MyJobItem(Resources.icon3, Resources.preview, "Item1", "First Item", null, opers, null);
-            var item2 = new MyJobItem(Resources.icon4, null, "Item2", "Second Item", () => MessageBox.Show("Item2 is clicked"), opers, null);
-            var item3 = new MyJobItem(Resources.icon3, null, "Item3", "Third Item", null, opers, null);
+            var item1 = new MyJobItem(icon3, Resources.preview.ToBitmapImage(true), "Item1", "First Item", null, opers, null);
+            var item2 = new MyJobItem(icon4, null, "Item2", "Second Item", () => MessageBox.Show("Item2 is clicked"), opers, null);
+            var item3 = new MyJobItem(icon3, null, "Item3", "Third Item", null, opers, null);
 
             var startTime = DateTime.Now;
 
@@ -110,6 +116,9 @@ namespace TestApp
             Log?.Invoke(this, "Processing item1oper2");
             await ProcessJobItemOperation(m_JobItems[0].Operations[1], BatchJobItemStateStatus_e.Succeeded, 10, null);
 
+            Log?.Invoke(this, "Processing item1oper3");
+            await ProcessJobItemOperation(m_JobItems[0].Operations[2], BatchJobItemStateStatus_e.Succeeded, 5, null);
+
             m_JobItems[0].Update(m_JobItems[0].ComposeStatus(), null);
 
             m_State.SucceededItemsCount++;
@@ -125,6 +134,9 @@ namespace TestApp
             Log?.Invoke(this, "Processing item2oper2");
             await ProcessJobItemOperation(m_JobItems[1].Operations[1], BatchJobItemStateStatus_e.Succeeded, "Test Result", new string[] { "Some Info 1" });
 
+            Log?.Invoke(this, "Processing item2oper3");
+            await ProcessJobItemOperation(m_JobItems[1].Operations[2], BatchJobItemStateStatus_e.Succeeded, "", null);
+
             m_JobItems[1].Update(m_JobItems[1].ComposeStatus(), new IBatchJobItemIssue[] { new BatchJobItemIssue(BatchJobItemIssueType_e.Warning, "Some Warning") });
 
             m_State.WarningItemsCount++;
@@ -139,6 +151,9 @@ namespace TestApp
 
             Log?.Invoke(this, "Processing item3oper2");
             await ProcessJobItemOperation(m_JobItems[2].Operations[1], BatchJobItemStateStatus_e.Failed, null, new string[] { "Some Error 3" });
+
+            Log?.Invoke(this, "Processing item3oper3");
+            await ProcessJobItemOperation(m_JobItems[2].Operations[2], BatchJobItemStateStatus_e.Failed, null, null);
 
             m_JobItems[2].Update(m_JobItems[2].ComposeStatus(), null);
 
@@ -182,10 +197,10 @@ namespace TestApp
         public string Name { get; }
         public BitmapImage Icon { get; }
 
-        public MyJobItemOperationDefinition(string name, Image icon)
+        public MyJobItemOperationDefinition(string name, BitmapImage icon)
         {
             Name = name;
-            Icon = icon.ToBitmapImage(true);
+            Icon = icon;
         }
     }
 
@@ -207,11 +222,11 @@ namespace TestApp
 
         private readonly BatchJobItemState m_State;
 
-        public MyJobItem(Image icon, Image preview, string title, string description,
+        public MyJobItem(BitmapImage icon, BitmapImage preview, string title, string description,
             Action link, MyJobItemOperationDefinition[] operationDefs, IBatchJobItem[] nested)
         {
-            Icon = icon?.ToBitmapImage();
-            Preview = preview?.ToBitmapImage();
+            Icon = icon;
+            Preview = preview;
             Title = title;
             Description = description;
             Link = link;
