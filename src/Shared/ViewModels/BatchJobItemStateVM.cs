@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Controls.Primitives;
+using System.Windows.Data;
 using System.Windows.Input;
 using Xarial.CadPlus.Plus.Services;
 using Xarial.XToolkit.Wpf;
@@ -18,11 +19,17 @@ namespace Xarial.CadPlus.Plus.Shared.ViewModels
         public event PropertyChangedEventHandler PropertyChanged;
 
         private readonly IBatchJobItemStateBase m_State;
-        
+
+        private readonly object m_Lock;
+
         public BatchJobItemStateBaseVM(IBatchJobItemStateBase state) 
         {
             m_State = state;
             Issues = new ObservableCollection<IBatchJobItemIssue>(m_State.Issues ?? new IBatchJobItemIssue[0]);
+
+            m_Lock = new object();
+
+            BindingOperations.EnableCollectionSynchronization(Issues, m_Lock);
         }
 
         public ObservableCollection<IBatchJobItemIssue> Issues { get; }
@@ -30,13 +37,19 @@ namespace Xarial.CadPlus.Plus.Shared.ViewModels
 
         protected void RaiseIssuesChanged(IReadOnlyList<IBatchJobItemIssue> issues)
         {
-            Issues.Clear();
+            lock (m_Lock)
+            {
+                Issues.Clear();
+            }
 
             if (issues != null)
             {
                 foreach (var issue in issues)
                 {
-                    Issues.Add(issue);
+                    lock (m_Lock)
+                    {
+                        Issues.Add(issue);
+                    }
                 }
             }
         }
