@@ -39,6 +39,8 @@ namespace Xarial.CadPlus.Plus.Shared.ViewModels
 
         private readonly object m_Lock;
 
+        public bool IsCancelling => m_CancellationTokenSource.IsCancellationRequested;
+
         public ICommand CancelJobCommand { get; }
 
         public BatchJobStatus_e? Status => m_BatchJob.State?.Status;
@@ -125,7 +127,11 @@ namespace Xarial.CadPlus.Plus.Shared.ViewModels
             m_Logger = logger;
 
             m_CancellationTokenSource = cancellationTokenSource;
+            m_CancellationTokenSource.Token.Register(OnCancellationRequested);
         }
+
+        private void OnCancellationRequested()
+            => this.NotifyChanged(nameof(IsCancelling));
 
         public void TryExportReport()
         {
