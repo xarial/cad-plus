@@ -154,9 +154,7 @@ namespace Xarial.CadPlus.Batch.InApp
 
             foreach (var doc in m_Docs) 
             {
-                var macros = m_Macros.Select(m => new JobItemMacro(macroDefsLocal.First(d => d.MacroData == m))).ToArray();
-                
-                jobItems.Add(new JobItemDocument(doc, macros, m_CadDesc));
+                jobItems.Add(new JobItemDocument(doc, macroDefsLocal, m_CadDesc));
             }
 
             return jobItems.ToArray();

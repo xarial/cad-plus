@@ -342,7 +342,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.Services
             m_BatchAppProxy.ProcessInput(app, m_AppProvider, inputDocs);
 
             return inputDocs
-                .Select(d => new JobItemDocument(d, macroDefsLocal.Select(m => new JobItemMacro(m)).ToArray(), m_AppProvider.Descriptor))
+                .Select(d => new JobItemDocument(d, macroDefsLocal, m_AppProvider.Descriptor))
                 .ToArray();
         }
 

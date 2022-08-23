@@ -22,7 +22,7 @@ namespace Xarial.CadPlus.Batch.Base.Core
         public event BatchJobItemOperationUserResultChangedDelegate UserResultChanged;
 
         IBatchJobItemOperationDefinition IBatchJobItemOperation.Definition => Definition;
-        IBatchJobItemState IBatchJobItemOperation.State => State;
+        IBatchJobItemOperationState IBatchJobItemOperation.State => State;
                 
         public Exception InternalMacroException { get; set; }
 
@@ -30,12 +30,14 @@ namespace Xarial.CadPlus.Batch.Base.Core
        
         public object UserResult { get; }
 
-        public BatchJobItemState State { get; }
+        public BatchJobItemOperationState State { get; }
 
-        public JobItemMacro(JobItemOperationMacroDefinition macroDef)
+        private readonly JobItemDocument m_ItemDoc;
+
+        public JobItemMacro(JobItemDocument itemDoc, JobItemOperationMacroDefinition macroDef)
         {
             Definition = macroDef;
-            State = new BatchJobItemState();
+            State = new BatchJobItemOperationState(m_ItemDoc, this);
         }
     }
 }

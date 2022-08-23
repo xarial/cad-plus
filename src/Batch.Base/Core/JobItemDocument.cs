@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
+using System.Linq;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using Xarial.CadPlus.Batch.Base.Properties;
@@ -115,7 +116,7 @@ namespace Xarial.CadPlus.Batch.Base.Core
 
         private readonly ICadDescriptor m_CadDesc;
                 
-        public JobItemDocument(IXDocument doc, IReadOnlyList<JobItemMacro> macros, ICadDescriptor cadDesc)
+        public JobItemDocument(IXDocument doc, IReadOnlyList<JobItemOperationMacroDefinition> macrosDefs, ICadDescriptor cadDesc)
         {
             if (doc == null)
             {
@@ -124,12 +125,12 @@ namespace Xarial.CadPlus.Batch.Base.Core
 
             m_CadDesc = cadDesc;
 
-            State = new BatchJobItemState();
+            State = new BatchJobItemState(this);
 
             Document = doc;
             Title = Path.GetFileName(doc.Path);
             Description = doc.Path;
-            Operations = macros;
+            Operations = macrosDefs.Select(m => new JobItemMacro(this, m)).ToArray();
             Link = TryOpenInExplorer;
         }
 

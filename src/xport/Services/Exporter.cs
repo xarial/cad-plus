@@ -30,19 +30,56 @@ namespace Xarial.CadPlus.Xport.Services
     {
         public event BatchJobItemNestedItemsInitializedDelegate NestedItemsInitialized;
 
+        private const string EDRW_FORMAT = ".e";
+
         IReadOnlyList<IBatchJobItemOperation> IBatchJobItem.Operations => Operations;
         IBatchJobItemState IBatchJobItem.State => State;
 
         public string FilePath { get; }
 
-        internal JobItemFile(string filePath, JobItemExportFormat[] formats)
+        internal JobItemFile(string filePath, string outDir, JobItemExportFormatDefinition[] formatDefs)
         {
             FilePath = filePath;
-            Operations = formats;
+            
             Title = Path.GetFileName(filePath);
             Description = filePath;
             Link = TryOpenInFileExplorer;
-            State = new BatchJobItemState();
+            State = new BatchJobItemState(this);
+
+            var outFiles = new JobItemExportFormat[formatDefs.Length];
+
+            for (int i = 0; i < formatDefs.Length; i++)
+            {
+                var formatDef = formatDefs[i];
+
+                var ext = formatDef.Extension;
+
+                if (ext.Equals(EDRW_FORMAT, StringComparison.CurrentCultureIgnoreCase))
+                {
+                    switch (Path.GetExtension(filePath).ToLower())
+                    {
+                        case ".sldprt":
+                            ext = ".eprt";
+                            break;
+
+                        case ".sldasm":
+                            ext = ".easm";
+                            break;
+
+                        case ".slddrw":
+                            ext = ".edrw";
+                            break;
+
+                        default:
+                            throw new ArgumentException($"{EDRW_FORMAT} format is only applicable for SOLIDWORKS files");
+                    }
+                }
+
+                outFiles[i] = new JobItemExportFormat(this, Path.Combine(!string.IsNullOrEmpty(outDir) ? outDir : Path.GetDirectoryName(filePath),
+                    Path.GetFileNameWithoutExtension(filePath) + ext), formatDef);
+            }
+
+            Operations = outFiles;
         }
 
         public BitmapImage Icon { get; }
@@ -89,19 +126,19 @@ namespace Xarial.CadPlus.Xport.Services
     {
         public event BatchJobItemOperationUserResultChangedDelegate UserResultChanged;
 
-        IBatchJobItemState IBatchJobItemOperation.State => State;
+        IBatchJobItemOperationState IBatchJobItemOperation.State => State;
 
         public string OutputFilePath { get; }
         public IBatchJobItemOperationDefinition Definition { get; }
 
-        public BatchJobItemState State { get; }
+        public BatchJobItemOperationState State { get; }
         public object UserResult { get; }
 
-        public JobItemExportFormat(string outFilePath, JobItemExportFormatDefinition def)
+        public JobItemExportFormat(JobItemFile file, string outFilePath, JobItemExportFormatDefinition def)
         {
             OutputFilePath = outFilePath;
             Definition = def;
-            State = new BatchJobItemState();
+            State = new BatchJobItemOperationState(file, this);
         }
     }
 
@@ -303,8 +340,6 @@ namespace Xarial.CadPlus.Xport.Services
 
         private JobItemFile[] ParseOptions(ExportOptions opts, out JobItemExportFormatDefinition[] formatDefs)
         {
-            const string EDRW_FORMAT = ".e";
-
             var outDir = opts.OutputDirectory;
 
             if (!string.IsNullOrEmpty(outDir))
@@ -358,39 +393,8 @@ namespace Xarial.CadPlus.Xport.Services
 
             foreach (var file in files)
             {
-                var outFiles = new JobItemExportFormat[opts.Format.Length];
-                jobs.Add(new JobItemFile(file, outFiles));
-
-                for (int i = 0; i < formatDefs.Length; i++)
-                {
-                    var formatDef = formatDefs[i];
-
-                    var ext = formatDef.Extension;
-
-                    if (ext.Equals(EDRW_FORMAT, StringComparison.CurrentCultureIgnoreCase))
-                    {
-                        switch (Path.GetExtension(file).ToLower())
-                        {
-                            case ".sldprt":
-                                ext = ".eprt";
-                                break;
-
-                            case ".sldasm":
-                                ext = ".easm";
-                                break;
-
-                            case ".slddrw":
-                                ext = ".edrw";
-                                break;
-
-                            default:
-                                throw new ArgumentException($"{EDRW_FORMAT} format is only applicable for SOLIDWORKS files");
-                        }
-                    }
-
-                    outFiles[i] = new JobItemExportFormat(Path.Combine(!string.IsNullOrEmpty(outDir) ? outDir : Path.GetDirectoryName(file),
-                        Path.GetFileNameWithoutExtension(file) + ext), formatDef);
-                }
+                var jobItemFile = new JobItemFile(file, outDir, formatDefs);
+                jobs.Add(jobItemFile);
             }
 
             return jobs.ToArray();
