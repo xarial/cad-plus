@@ -23,7 +23,7 @@ namespace Xarial.CadPlus.Plus.Shared.ViewModels
         public BatchJobItemStateBaseVM(IBatchJobItemStateBase state) 
         {
             m_State = state;
-            Issues = new ObservableCollection<IBatchJobItemIssue>(m_State.Issues ?? new IBatchJobItemIssue[0]);
+            Issues = m_State.Issues?.ToArray();
         }
 
         public IReadOnlyList<IBatchJobItemIssue> Issues { get; private set; }
@@ -32,7 +32,7 @@ namespace Xarial.CadPlus.Plus.Shared.ViewModels
         protected void RaiseIssuesChanged(IReadOnlyList<IBatchJobItemIssue> issues)
         {
             //need to create new instance as the DependencyProperty will not react on changes if pinter is the same, ObservableCollection requires cross-thread sync
-            Issues = Issues?.ToArray();
+            Issues = issues?.ToArray();
             this.NotifyChanged(nameof(Issues));
         }
 
