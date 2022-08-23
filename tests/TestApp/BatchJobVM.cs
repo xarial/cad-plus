@@ -42,14 +42,14 @@ namespace TestApp
         private List<string> m_LogEntries;
         private List<IBatchJobItemOperationDefinition> m_OperationDefinitions;
 
-        private readonly MyJobState m_State;
+        private readonly BatchJobState m_State;
 
         public MyAsyncBatchJob()
         {
             m_JobItems = new List<MyJobItem>();
             m_LogEntries = new List<string>();
             m_OperationDefinitions = new List<IBatchJobItemOperationDefinition>();
-            m_State = new MyJobState();
+            m_State = new BatchJobState();
         }
 
         public async Task TryExecuteAsync(CancellationToken cancellationToken)
@@ -165,31 +165,6 @@ namespace TestApp
         public void Dispose()
         {
         }
-    }
-
-    public class MyJobState : IBatchJobState
-    {
-        public event BatchJobStateProgressChangedDelegate ProgressChanged;
-        
-        public double Progress
-        {
-            get => m_Progress;
-            set
-            {
-                m_Progress = value;
-                ProgressChanged?.Invoke(this, value);
-            }
-        }
-
-        public int TotalItemsCount { get; set; }
-        public int SucceededItemsCount { get; set; }
-        public int WarningItemsCount { get; set; }
-        public int FailedItemsCount { get; set; }
-        public DateTime StartTime { get; set; }
-        public TimeSpan Duration { get; set; }
-        public BatchJobStatus_e Status { get; set; }
-
-        private double m_Progress;
     }
 
     public class MyJobItemOperationDefinition : IBatchJobItemOperationDefinition
