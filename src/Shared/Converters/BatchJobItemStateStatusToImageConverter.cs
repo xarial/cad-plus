@@ -29,11 +29,11 @@ namespace Xarial.CadPlus.Plus.Shared.Converters
 
         static BatchJobItemStateStatusToImageConverter() 
         {
-            m_QueuedImage = Resources.status_awaiting.ToBitmapImage();
-            m_FailedImage = Resources.status_failed.ToBitmapImage();
-            m_InProgressImage = Resources.status_in_progress.ToBitmapImage();
-            m_SucceededImage = Resources.status_succeeded.ToBitmapImage();
-            m_WarningImage = Resources.status_warning.ToBitmapImage();
+            m_QueuedImage = Resources.status_awaiting.ToBitmapImage(true);
+            m_FailedImage = Resources.status_failed.ToBitmapImage(true);
+            m_InProgressImage = Resources.status_in_progress.ToBitmapImage(true);
+            m_SucceededImage = Resources.status_succeeded.ToBitmapImage(true);
+            m_WarningImage = Resources.status_warning.ToBitmapImage(true);
         }
 
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)

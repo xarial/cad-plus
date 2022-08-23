@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Xarial.CadPlus.Plus.Shared.UI"
+             xmlns:ctrls="clr-namespace:Xarial.CadPlus.Plus.Shared.Controls"
              xmlns:xctrls="clr-namespace:Xarial.XToolkit.Wpf.Controls;assembly=Xarial.XToolkit.Wpf"
              xmlns:xconv="clr-namespace:Xarial.XToolkit.Wpf.Converters;assembly=Xarial.XToolkit.Wpf"
              xmlns:conv="clr-namespace:Xarial.CadPlus.Plus.Shared.Converters"
@@ -12,42 +13,7 @@
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
         <xconv:ObjectIsNotNullVisibilityConverter x:Key="objIsNotNullToVisConv"/>
-        <conv:BatchJobItemStateStatusToImageConverter x:Key="statusToImgConv"/>
-        <xconv:EnumerableIsNotEmptyVisibilityConverter x:Key="hasIssuesToVisConv"/>
-        <conv:BatchJobItemIssuesToTextConverter x:Key="issuesToTextConv"/>
-        <DataTemplate x:Key="JobItemStateTemplate">
-            <Grid HorizontalAlignment="Center">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
-                <Image Width="16" Height="16" Grid.Column="0"
-                                   Source="{Binding Path=Status, Converter={StaticResource statusToImgConv}}"/>
-                <TextBlock x:Name="txtIssues" Visibility="{Binding Path=Issues, Converter={StaticResource hasIssuesToVisConv}}"
-                                       Grid.Column="1" Margin="2" ToolTip="What's Wrong" FontSize="14" VerticalAlignment="Center">
-                                <Hyperlink Command="{Binding Path=ShowErrorCommand}" CommandParameter="{Binding ElementName=popupError}">?</Hyperlink>
-                </TextBlock>
-                <Popup x:Name="popupError" Placement="Bottom" MaxWidth="500"
-                                   StaysOpen="False" AllowsTransparency="True" PopupAnimation="Scroll"
-                                   PlacementTarget="{Binding ElementName=txtIssues}">
-                    <Grid Margin="5" Background="White">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-                        <Grid.Effect>
-                            <DropShadowEffect BlurRadius="2" Opacity="0.5" />
-                        </Grid.Effect>
-                        <Image Source="/Xarial.CadPlusPlus.Shared;component/Resources/info.png" Width="16" Height="16" Margin="4"
-                                           Grid.Column="0" VerticalAlignment="Center" />
-                        <TextBlock VerticalAlignment="Center" Text="{Binding Path=Issues, Converter={StaticResource issuesToTextConv}}"
-                                               Foreground="Black"
-                                               Margin="5" TextWrapping="Wrap"
-                                               Grid.Column="1"/>
-                    </Grid>
-                </Popup>
-            </Grid>
-        </DataTemplate>
+        <xconv:ObjectIsNotNullVisibilityConverter x:Key="showStatusIconConv" Reverse="True"/>
         <conv:IsPreparingBatchJobConverter x:Key="isPrepJobConv"/>
         <conv:IsPreparingBatchJobConverter x:Key="isNotPrepJobConv" Reverse="True"/>
     </UserControl.Resources>
@@ -78,18 +44,22 @@
                                 <ColumnDefinition Width="Auto"/>
                                 <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
-                            <ContentPresenter ContentTemplate="{StaticResource JobItemStateTemplate}" Content="{Binding Path=State}"/>
-                            <TextBlock Text="{Binding Path=UserResult}" TextTrimming="CharacterEllipsis" Margin="2" VerticalAlignment="Center" Grid.Column="2">
+                            <TextBlock Text="{Binding Path=UserResult}" TextTrimming="CharacterEllipsis" Margin="2" VerticalAlignment="Center" Grid.Column="0">
                                 <TextBlock.Style>
                                     <Style TargetType="{x:Type TextBlock}">
                                         <Style.Triggers>
                                             <DataTrigger Binding="{Binding Path=State.Status}" Value="{x:Static svc:BatchJobItemStateStatus_e.Failed}">
                                                 <Setter Property="Foreground" Value="Red"/>
                                             </DataTrigger>
+                                            <DataTrigger Binding="{Binding Path=State.Status}" Value="{x:Static svc:BatchJobItemStateStatus_e.Warning}">
+                                                <Setter Property="Foreground" Value="Goldenrod"/>
+                                            </DataTrigger>
                                         </Style.Triggers>
                                     </Style>
                                 </TextBlock.Style>
                             </TextBlock>
+                            <ctrls:JobItemStateControl Status="{Binding Path=State.Status}" Issues="{Binding Path=State.Issues}" Grid.Column="1"
+                                                       StatusIconVisibility="{Binding Path=UserResult, Converter={StaticResource showStatusIconConv}}"/>
                         </Grid>
                     </DataTemplate>
                 </xctrls:XDataGrid.CellTemplate>
@@ -110,7 +80,7 @@
                     <DataGridTemplateColumn Header="State" SortMemberPath="State">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <ContentPresenter ContentTemplate="{StaticResource JobItemStateTemplate}" Content="{Binding Path=State}" Margin="2"/>
+                                <ctrls:JobItemStateControl Status="{Binding Path=State.Status}" Issues="{Binding Path=State.Issues}" Margin="2"/>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>

@@ -20,7 +20,7 @@ namespace Xarial.CadPlus.Plus.Shared.ViewModels
 
         public IBatchJobItemOperation JobItemOperation { get; }
 
-        public BatchJobItemStateVM State { get; }
+        public BatchJobItemOperationStateVM State { get; }
 
         public BatchJobItemOperationVM(IBatchJobItemOperation jobItemOperation)
         {
@@ -28,7 +28,7 @@ namespace Xarial.CadPlus.Plus.Shared.ViewModels
 
             JobItemOperation.UserResultChanged += OnUserResultChanged;
 
-            State = new BatchJobItemStateVM(JobItemOperation.State);
+            State = new BatchJobItemOperationStateVM(JobItemOperation.State);
         }
 
         private void OnUserResultChanged(IBatchJobItemOperation sender, object userResult)

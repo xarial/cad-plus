@@ -14,6 +14,10 @@
     <xconv:BooleanVisibilityConverter x:Key="boolToVisConv"/>
     <xconv:ObjectIsNotNullVisibilityConverter x:Key="objIsNotNullToVisConv"/>
     
+    <conv:BatchJobItemStateStatusToImageConverter x:Key="statusToImgConv"/>
+    <conv:HasIssuesToVisibilityConverter x:Key="hasIssuesToVisConv"/>
+    <conv:BatchJobItemIssueTypeToImageConverter x:Key="issueTypeToImgConv"/>
+
     <Style TargetType="{x:Type local:CadObjectLabelControl}">
         <Setter Property="ToolTip">
             <Setter.Value>
@@ -73,4 +77,50 @@
         </Setter>
     </Style>
 
+
+    <Style TargetType="{x:Type local:JobItemStateControl}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type local:JobItemStateControl}">
+                    <Grid HorizontalAlignment="Center">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <Image Width="16" Height="16" Grid.Column="0" Visibility="{TemplateBinding StatusIconVisibility}"
+                               Source="{TemplateBinding Status, Converter={StaticResource statusToImgConv}}"/>
+                        <TextBlock x:Name="txtIssues" Visibility="{Binding Path=Issues.Count, RelativeSource={RelativeSource Mode=TemplatedParent}, Converter={StaticResource hasIssuesToVisConv}}"
+                                   Grid.Column="1" Margin="2" ToolTip="Show Issues" FontSize="14" VerticalAlignment="Center">
+                            <Hyperlink x:Name="PART_ShowIssuesLink">?</Hyperlink>
+                        </TextBlock>
+                        <Popup x:Name="PART_IssuesPopup" Placement="Bottom" MaxWidth="500"
+                                   StaysOpen="False" AllowsTransparency="True" PopupAnimation="Scroll"
+                                   PlacementTarget="{Binding ElementName=txtIssues}">
+                            <ItemsControl ItemsSource="{TemplateBinding Issues}" Margin="5" Background="White">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+                                            <Image Source="{Binding Path=Type, Converter={StaticResource issueTypeToImgConv}}" Width="16" Height="16" Margin="4"
+                                                   Grid.Column="0" VerticalAlignment="Center" />
+                                            <TextBlock VerticalAlignment="Center" Text="{Binding Path=Content}"
+                                                       Foreground="Black"
+                                                       Margin="5" TextWrapping="Wrap"
+                                                       Grid.Column="1"/>
+                                        </Grid>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                                <ItemsControl.Effect>
+                                    <DropShadowEffect BlurRadius="2" Opacity="0.5" />
+                                </ItemsControl.Effect>
+                            </ItemsControl>
+                        </Popup>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
 </ResourceDictionary>

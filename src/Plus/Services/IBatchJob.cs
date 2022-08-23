@@ -58,8 +58,11 @@ namespace Xarial.CadPlus.Plus.Services
         BatchJobStatus_e Status { get; }
     }
 
-    public delegate void BatchJobStateStatusChangedDelegate(IBatchJobItemState sender, BatchJobItemStateStatus_e status);
-    public delegate void BatchJobStateIssuesChangedDelegate(IBatchJobItemState sender, IReadOnlyList<IBatchJobItemIssue> issues);
+    public delegate void BatchJobItemStateStatusChangedDelegate(IBatchJobItemState sender, IBatchJobItem item, BatchJobItemStateStatus_e status);
+    public delegate void BatchJobItemStateIssuesChangedDelegate(IBatchJobItemState sender, IBatchJobItem item, IReadOnlyList<IBatchJobItemIssue> issues);
+
+    public delegate void BatchJobItemOperationStateStatusChangedDelegate(IBatchJobItemOperationState sender, IBatchJobItem item, IBatchJobItemOperation operation, BatchJobItemStateStatus_e status);
+    public delegate void BatchJobItemOperationStateIssuesChangedDelegate(IBatchJobItemOperationState sender, IBatchJobItem item, IBatchJobItemOperation operation, IReadOnlyList<IBatchJobItemIssue> issues);
 
     public delegate void BatchJobItemOperationUserResultChangedDelegate(IBatchJobItemOperation sender, object userResult);
 
@@ -99,17 +102,26 @@ namespace Xarial.CadPlus.Plus.Services
         event BatchJobItemOperationUserResultChangedDelegate UserResultChanged;
         IBatchJobItemOperationDefinition Definition { get; }
 
-        IBatchJobItemState State { get; }
+        IBatchJobItemOperationState State { get; }
         object UserResult { get; }
     }
 
-    public interface IBatchJobItemState
+    public interface IBatchJobItemStateBase
     {
-        event BatchJobStateStatusChangedDelegate StatusChanged;
-        event BatchJobStateIssuesChangedDelegate IssuesChanged;
-
         BatchJobItemStateStatus_e Status { get; }
         IReadOnlyList<IBatchJobItemIssue> Issues { get; }
+    }
+
+    public interface IBatchJobItemState : IBatchJobItemStateBase
+    {
+        event BatchJobItemStateStatusChangedDelegate StatusChanged;
+        event BatchJobItemStateIssuesChangedDelegate IssuesChanged;
+    }
+
+    public interface IBatchJobItemOperationState : IBatchJobItemStateBase
+    {
+        event BatchJobItemOperationStateStatusChangedDelegate StatusChanged;
+        event BatchJobItemOperationStateIssuesChangedDelegate IssuesChanged;
     }
 
     public interface IBatchJobBase : IDisposable

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
@@ -12,33 +13,65 @@ using Xarial.XToolkit.Wpf.Extensions;
 
 namespace Xarial.CadPlus.Plus.Shared.ViewModels
 {
-    public class BatchJobItemStateVM : INotifyPropertyChanged
+    public class BatchJobItemStateBaseVM : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
-        private readonly IBatchJobItemState m_State;
+        private readonly IBatchJobItemStateBase m_State;
         
-        public ICommand ShowErrorCommand { get; }
-
-        public BatchJobItemStateVM(IBatchJobItemState state) 
+        public BatchJobItemStateBaseVM(IBatchJobItemStateBase state) 
         {
             m_State = state;
-
-            m_State.StatusChanged += OnStatusChanged;
-            m_State.IssuesChanged += OnIssuesChanged;
-
-            ShowErrorCommand = new RelayCommand<Popup>(ShowError);
+            Issues = new ObservableCollection<IBatchJobItemIssue>(m_State.Issues ?? new IBatchJobItemIssue[0]);
         }
 
-        public IReadOnlyList<IBatchJobItemIssue> Issues => m_State.Issues;
+        public ObservableCollection<IBatchJobItemIssue> Issues { get; }
         public BatchJobItemStateStatus_e Status => m_State.Status;
 
-        private void OnIssuesChanged(IBatchJobItemState sender, IReadOnlyList<IBatchJobItemIssue> issues)
-            => this.NotifyChanged(nameof(Issues));
+        protected void RaiseIssuesChanged(IReadOnlyList<IBatchJobItemIssue> issues)
+        {
+            Issues.Clear();
 
-        private void OnStatusChanged(IBatchJobItemState sender, BatchJobItemStateStatus_e status)
+            if (issues != null)
+            {
+                foreach (var issue in issues)
+                {
+                    Issues.Add(issue);
+                }
+            }
+        }
+
+        protected void RaiseStatusChanged(BatchJobItemStateStatus_e status)
             => this.NotifyChanged(nameof(Status));
+    }
 
-        private void ShowError(Popup popup) => popup.IsOpen = true;
+    public class BatchJobItemStateVM : BatchJobItemStateBaseVM
+    {
+        public BatchJobItemStateVM(IBatchJobItemState state) : base(state)
+        {
+            state.StatusChanged += OnStatusChanged;
+            state.IssuesChanged += OnIssuesChanged;
+        }
+
+        private void OnIssuesChanged(IBatchJobItemState sender, IBatchJobItem item, IReadOnlyList<IBatchJobItemIssue> issues)
+            => RaiseIssuesChanged(issues);
+
+        private void OnStatusChanged(IBatchJobItemState sender, IBatchJobItem item, BatchJobItemStateStatus_e status)
+            => RaiseStatusChanged(status);
+    }
+
+    public class BatchJobItemOperationStateVM : BatchJobItemStateBaseVM
+    {
+        public BatchJobItemOperationStateVM(IBatchJobItemOperationState state) : base(state)
+        {
+            state.StatusChanged += OnStatusChanged;
+            state.IssuesChanged += OnIssuesChanged;
+        }
+
+        private void OnIssuesChanged(IBatchJobItemOperationState sender, IBatchJobItem item, IBatchJobItemOperation operation, IReadOnlyList<IBatchJobItemIssue> issues)
+            => RaiseIssuesChanged(issues);
+
+        private void OnStatusChanged(IBatchJobItemOperationState sender, IBatchJobItem item, IBatchJobItemOperation operation, BatchJobItemStateStatus_e status)
+            => RaiseStatusChanged(status);
     }
 }
