@@ -36,7 +36,7 @@ namespace Xarial.CadPlus.Plus.Shared.Services
             {
                 return BatchJobItemStateStatus_e.Failed;
             }
-            else if (statuses.All(s => s == BatchJobItemStateStatus_e.Failed || s == BatchJobItemStateStatus_e.Succeeded))
+            else if (statuses.All(s => s == BatchJobItemStateStatus_e.Failed || s == BatchJobItemStateStatus_e.Succeeded || s == BatchJobItemStateStatus_e.Warning))
             {
                 return BatchJobItemStateStatus_e.Warning;
             }

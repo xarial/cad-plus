@@ -60,7 +60,7 @@ namespace Xarial.CadPlus.Plus.Shared.UI
 		{
 			foreach (var operationCol in columns.Where(c => c.Header is BatchJobItemOperationDefinitionVM))
 			{
-				operationCol.SortMemberPath = nameof(BatchJobItemOperationVM.State);
+				operationCol.SortMemberPath = nameof(BatchJobItemOperationVM.State) + "." + nameof(BatchJobItemStateBaseVM.Status);
 			}
 		}
 	}

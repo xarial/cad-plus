@@ -14,6 +14,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Data;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using Xarial.CadPlus.Plus.Services;
 using Xarial.CadPlus.Plus.Shared.Controls;
 using Xarial.CadPlus.Plus.Shared.Helpers;
@@ -27,7 +28,7 @@ namespace Xarial.CadPlus.Plus.Shared.Converters
 {
     public class CadObjectIconConverter : IMultiValueConverter
     {
-        private static ImageSource m_DefaultIcon;
+        private static BitmapImage m_DefaultIcon;
 
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {

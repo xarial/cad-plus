@@ -75,19 +75,24 @@ namespace TestApp
             {
                 new MyJobItemOperationDefinition("Operation #1", icon1),
                 new MyJobItemOperationDefinition("Operation #2", icon2),
-                new MyJobItemOperationDefinition("Operation #3", icon1)
+                new MyJobItemOperationDefinition("Operation #3", icon1),
+                new MyJobItemOperationDefinition("Operation #4", null)
             };
 
-            var item1 = new MyJobItem(icon3, Resources.preview.ToBitmapImage(true), "Item1", "First Item", null, opers, null);
-            var item2 = new MyJobItem(icon4, null, "Item2", "Second Item", () => MessageBox.Show("Item2 is clicked"), opers, null);
-            var item3 = new MyJobItem(icon3, null, "Item3", "Third Item", null, opers, null);
+            var items = new MyJobItem[]
+            {
+                new MyJobItem(icon3, Resources.preview.ToBitmapImage(true), "Item1", "First Item", null, opers, null),
+                new MyJobItem(icon4, null, "Item2", "Second Item", () => MessageBox.Show("Item2 is clicked"), opers, null),
+                new MyJobItem(icon3, null, "Item3", "Third Item", null, opers, null),
+                new MyJobItem(null, null, "Item4", "Fourth Item", null, opers, null)
+            };
 
             var startTime = DateTime.Now;
 
             //Initializing
             await Task.Delay(TimeSpan.FromSeconds(2));
 
-            m_JobItems.AddRange(new MyJobItem[] { item1, item2, item3 });
+            m_JobItems.AddRange(items);
 
             m_OperationDefinitions.AddRange(opers);
 
@@ -100,9 +105,9 @@ namespace TestApp
             {
                 cancellationToken.ThrowIfCancellationRequested();
                 oper.Update(BatchJobItemStateStatus_e.InProgress, null, null);
-                await Task.Delay(TimeSpan.FromSeconds(1));
+                await Task.Delay(TimeSpan.FromSeconds(0.5));
                 cancellationToken.ThrowIfCancellationRequested();
-                await Task.Delay(TimeSpan.FromSeconds(2));
+                await Task.Delay(TimeSpan.FromSeconds(1));
                 cancellationToken.ThrowIfCancellationRequested();
                 oper.Update(res, issues?.Select(i => new BatchJobItemIssue(res == BatchJobItemStateStatus_e.Failed ? BatchJobItemIssueType_e.Error : BatchJobItemIssueType_e.Information, i)).ToArray(), userRes);
             }
@@ -119,11 +124,14 @@ namespace TestApp
             Log?.Invoke(this, "Processing item1oper3");
             await ProcessJobItemOperation(m_JobItems[0].Operations[2], BatchJobItemStateStatus_e.Succeeded, 5, null);
 
+            Log?.Invoke(this, "Processing item1oper4");
+            await ProcessJobItemOperation(m_JobItems[0].Operations[3], BatchJobItemStateStatus_e.Succeeded, 5, null);
+
             m_JobItems[0].Update(m_JobItems[0].ComposeStatus(), null);
 
             m_State.SucceededItemsCount++;
             ItemProcessed?.Invoke(this, m_JobItems[0]);
-            m_State.Progress = 1d / 3d;
+            m_State.Progress = 1d / 4d;
 
             //item2
             m_JobItems[1].Update(BatchJobItemStateStatus_e.InProgress, null);
@@ -135,13 +143,16 @@ namespace TestApp
             await ProcessJobItemOperation(m_JobItems[1].Operations[1], BatchJobItemStateStatus_e.Succeeded, "Test Result", new string[] { "Some Info 1" });
 
             Log?.Invoke(this, "Processing item2oper3");
-            await ProcessJobItemOperation(m_JobItems[1].Operations[2], BatchJobItemStateStatus_e.Succeeded, "", null);
+            await ProcessJobItemOperation(m_JobItems[1].Operations[2], BatchJobItemStateStatus_e.Warning, null, null);
+
+            Log?.Invoke(this, "Processing item2oper4");
+            await ProcessJobItemOperation(m_JobItems[1].Operations[3], BatchJobItemStateStatus_e.Succeeded, "", null);
 
             m_JobItems[1].Update(m_JobItems[1].ComposeStatus(), new IBatchJobItemIssue[] { new BatchJobItemIssue(BatchJobItemIssueType_e.Warning, "Some Warning") });
 
             m_State.WarningItemsCount++;
             ItemProcessed?.Invoke(this, m_JobItems[1]);
-            m_State.Progress = 2d / 3d;
+            m_State.Progress = 2d / 4d;
 
             //item3
             m_JobItems[2].Update(BatchJobItemStateStatus_e.InProgress, null);
@@ -155,11 +166,35 @@ namespace TestApp
             Log?.Invoke(this, "Processing item3oper3");
             await ProcessJobItemOperation(m_JobItems[2].Operations[2], BatchJobItemStateStatus_e.Failed, null, null);
 
+            Log?.Invoke(this, "Processing item3oper4");
+            await ProcessJobItemOperation(m_JobItems[2].Operations[3], BatchJobItemStateStatus_e.Failed, null, null);
+
             m_JobItems[2].Update(m_JobItems[2].ComposeStatus(), null);
 
             m_State.FailedItemsCount++;
             ItemProcessed?.Invoke(this, m_JobItems[2]);
-            m_State.Progress = 3d / 3d;
+            m_State.Progress = 3d / 4d;
+
+            //item4
+            m_JobItems[3].Update(BatchJobItemStateStatus_e.InProgress, null);
+
+            Log?.Invoke(this, "Processing item4oper1");
+            await ProcessJobItemOperation(m_JobItems[3].Operations[0], BatchJobItemStateStatus_e.Warning, null, null);
+
+            Log?.Invoke(this, "Processing item4oper2");
+            await ProcessJobItemOperation(m_JobItems[3].Operations[1], BatchJobItemStateStatus_e.Warning, null, null);
+
+            Log?.Invoke(this, "Processing item4oper3");
+            await ProcessJobItemOperation(m_JobItems[3].Operations[2], BatchJobItemStateStatus_e.Warning, null, null);
+
+            Log?.Invoke(this, "Processing item4oper4");
+            await ProcessJobItemOperation(m_JobItems[3].Operations[3], BatchJobItemStateStatus_e.Succeeded, null, null);
+
+            m_JobItems[3].Update(m_JobItems[3].ComposeStatus(), null);
+
+            m_State.FailedItemsCount++;
+            ItemProcessed?.Invoke(this, m_JobItems[3]);
+            m_State.Progress = 4d / 4d;
         }
 
         public void Dispose()

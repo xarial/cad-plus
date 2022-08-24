@@ -12,6 +12,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using Xarial.CadPlus.Plus.Services;
 using Xarial.CadPlus.Plus.Shared.Controls;
 using Xarial.CadPlus.Plus.Shared.Properties;
@@ -28,19 +29,19 @@ namespace Xarial.CadPlus.Plus.Shared.Helpers
     {
         private class CadObjectIcons
         {
-            internal ImageSource Part { get; set; }
-            internal ImageSource Assembly { get; set; }
-            internal ImageSource Drawing { get; set; }
+            internal BitmapImage Part { get; set; }
+            internal BitmapImage Assembly { get; set; }
+            internal BitmapImage Drawing { get; set; }
             
-            internal ImageSource CutListSolidBody { get; set; }
-            internal ImageSource CutListSheetMetal { get; set; }
-            internal ImageSource CutListWeldment { get; set; }
+            internal BitmapImage CutListSolidBody { get; set; }
+            internal BitmapImage CutListSheetMetal { get; set; }
+            internal BitmapImage CutListWeldment { get; set; }
 
-            internal ImageSource SolidBody { get; set; }
-            internal ImageSource SheetBody { get; set; }
+            internal BitmapImage SolidBody { get; set; }
+            internal BitmapImage SheetBody { get; set; }
 
-            internal ImageSource Configuration { get; set; }
-            internal ImageSource Sheet { get; set; }
+            internal BitmapImage Configuration { get; set; }
+            internal BitmapImage Sheet { get; set; }
         }
 
         public static CadObjectIconStore Instance { get; }
@@ -52,14 +53,14 @@ namespace Xarial.CadPlus.Plus.Shared.Helpers
 
         private readonly Dictionary<string, CadObjectIcons> m_Icons;
 
-        private ImageSource m_DefaultIcon;
+        private BitmapImage m_DefaultIcon;
 
         public CadObjectIconStore()
         {
             m_Icons = new Dictionary<string, CadObjectIcons>();
         }
 
-        public ImageSource GetIcon(IXObject obj, ICadDescriptor cadDesc)
+        public BitmapImage GetIcon(IXObject obj, ICadDescriptor cadDesc)
         {
             try
             {
