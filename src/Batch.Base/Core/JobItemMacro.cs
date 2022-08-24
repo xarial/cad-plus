@@ -32,12 +32,10 @@ namespace Xarial.CadPlus.Batch.Base.Core
 
         public BatchJobItemOperationState State { get; }
 
-        private readonly JobItemDocument m_ItemDoc;
-
         public JobItemMacro(JobItemDocument itemDoc, JobItemOperationMacroDefinition macroDef)
         {
             Definition = macroDef;
-            State = new BatchJobItemOperationState(m_ItemDoc, this);
+            State = new BatchJobItemOperationState(itemDoc, this);
         }
     }
 }
