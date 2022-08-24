@@ -71,11 +71,11 @@ namespace Xarial.CadPlus.Plus.Shared.Helpers
                         m_Icons.Add(cadDesc.ApplicationId, icons);
                     }
 
-                    if (obj is IXPart)
+                    if (obj is IXPart || obj is IXPartComponent)
                     {
                         return icons.Part ?? (icons.Part = cadDesc.PartIcon.ToBitmapImage(true));
                     }
-                    else if (obj is IXAssembly)
+                    else if (obj is IXAssembly || obj is IXAssemblyComponent)
                     {
                         return icons.Assembly ?? (icons.Assembly = cadDesc.AssemblyIcon.ToBitmapImage(true));
                     }

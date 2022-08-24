@@ -17,6 +17,7 @@ using System.Windows.Data;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using Xarial.CadPlus.Plus.Shared.Controls;
+using Xarial.CadPlus.Plus.Shared.Extensions;
 using Xarial.XCad.Documents;
 using Xarial.XCad.Features;
 using Xarial.XCad.UI;
@@ -33,16 +34,16 @@ namespace Xarial.CadPlus.Plus.Shared.Converters
                 switch (value)
                 {
                     case IXDocument3D doc:
-                        return ConvertImage(doc.Configurations.Active.Preview);
+                        return doc.Configurations.Active.Preview.TryConvertImage();
 
                     case IXDrawing drw:
-                        return ConvertImage(drw.Sheets.Active.Preview);
+                        return drw.Sheets.Active.Preview.TryConvertImage();
 
                     case IXConfiguration conf:
-                        return ConvertImage(conf.Preview);
+                        return conf.Preview.TryConvertImage();
 
                     case IXSheet sheet:
-                        return ConvertImage(sheet.Preview);
+                        return sheet.Preview.TryConvertImage();
 
                     case IXCutListItem cutList:
                         //no preview
@@ -59,29 +60,6 @@ namespace Xarial.CadPlus.Plus.Shared.Converters
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
             throw new NotImplementedException();
-        }
-
-        private BitmapImage ConvertImage(IXImage img) 
-        {
-            try
-            {
-                if (img != null && img.Buffer != null)
-                {
-                    using (var memStr = new MemoryStream(img.Buffer))
-                    {
-                        memStr.Seek(0, SeekOrigin.Begin);
-                        return Image.FromStream(memStr).ToBitmapImage();
-                    }
-                }
-                else
-                {
-                    return null;
-                }
-            }
-            catch 
-            {
-                return null;
-            }
         }
     }
 }
