@@ -180,9 +180,10 @@ namespace Xarial.CadPlus.Batch.StandAlone.Services
 
                 }, cancellationToken).ConfigureAwait(false);
             }
-            finally
+            catch
             {
                 TryShutDownApplication(m_CurrentContext);
+                throw;
             }
         }
 
@@ -459,7 +460,13 @@ namespace Xarial.CadPlus.Batch.StandAlone.Services
                 context.CurrentMacro = macro;
 
                 macro.HandleJobItemOperation(
-                    (m, s) => m.State.Status = s,
+                    (m, s) =>
+                    {
+                        if (context.CurrentDocument != null)//document was not opened thus reporting error on document item
+                        {
+                            m.State.Status = s;
+                        }
+                    },
                     m => worker.DoWork(RunMacro, context, cancellationToken),
                     (m, e) =>
                     {
@@ -478,7 +485,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.Services
 
                         m_Logger.Log(e);
 
-                        m.State.ReportError(e);
+                        //m.State.ReportError(e);
                     });
             }
 
@@ -738,7 +745,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.Services
                 m_IsDisposed = true;
 
                 TryShutDownApplication(m_CurrentContext);
-                //m_PopupKiller.Dispose();
+                m_PopupHandler.Dispose();
             }
         }
     }

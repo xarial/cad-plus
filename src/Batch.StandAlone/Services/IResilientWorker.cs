@@ -73,7 +73,7 @@ namespace Xarial.CadPlus.Batch.Base.Services
                         throw new TimeoutException("Timeout", timeoutEx);
 
                     case Exception ex:
-                        throw new UserException($"Failed to process the operation within {m_Retries} retries", res.FinalException);
+                        throw new Exception($"Failed to process the operation within {m_Retries} retries", res.FinalException);
 
                     default:
                         throw new NotSupportedException("Final exception is not set");

@@ -42,6 +42,7 @@ using Xarial.CadPlus.Plus.DI;
 using Xarial.CadPlus.Batch.Base.Services;
 using Xarial.CadPlus.Plus.Shared.ViewModels;
 using Xarial.CadPlus.Plus.Shared.Helpers;
+using Xarial.CadPlus.Plus.Exceptions;
 
 namespace Xarial.CadPlus.Batch.InApp
 {
@@ -182,29 +183,37 @@ namespace Xarial.CadPlus.Batch.InApp
         {
             if (reason == PageCloseReasons_e.Okay) 
             {
-                if (!m_Data.Macros.Macros.Macros.Any()) 
+                try
+                {
+                    ValidateData();
+                }
+                catch (Exception ex)
                 {
                     arg.Cancel = true;
-                    arg.ErrorMessage = "Select macros to run";
+                    arg.ErrorMessage = ex.ParseUserError();
                 }
+            }
+        }
 
-                switch (m_Data.Input.Scope) 
+        private void ValidateData()
+        {
+            if (!m_Data.Macros.Macros.Macros.Any())
+            {
+                throw new UserException("Select macros to run");
+            }
+
+            if (m_Data.Input.Filter == ComponentsFilter_e.Selection)
+            {
+                if (!m_Data.Input.Components?.Any() == true)
                 {
-                    case InputScope_e.Selection:
-                        if (!m_Data.Input.Components.Any())
-                        {
-                            arg.Cancel = true;
-                            arg.ErrorMessage = "Select components to process";
-                        }
-                        break;
-
-                    case InputScope_e.AllReferences:
-                        if (!m_Data.Input.AllDocuments.References.Any(d => d.IsChecked))
-                        {
-                            arg.Cancel = true;
-                            arg.ErrorMessage = "Select at least one reference to process";
-                        }
-                        break;
+                    throw new UserException("Select components to process");
+                }
+            }
+            else 
+            {
+                if (!m_Data.Input.FilterParts && !m_Data.Input.FilterAssemblies) 
+                {
+                    throw new UserException("Select filter part and/or assembly file type filter");
                 }
             }
         }
@@ -215,27 +224,36 @@ namespace Xarial.CadPlus.Batch.InApp
             {
                 try
                 {
-                    IXDocument[] docs = null;
-                    var rootDoc = m_Data.Input.Document;
+                    var assm = (IXAssembly)m_Host.Extension.Application.Documents.Active;
 
-                    switch (m_Data.Input.Scope)
+                    IEnumerable<IXComponent> inputComps;
+
+                    if (m_Data.Input.Filter == ComponentsFilter_e.Selection)
                     {
-                        case InputScope_e.AllReferences:
-                            docs = m_Data.Input.AllDocuments.References
-                                    .Where(d => d.IsChecked).Select(d => d.Document).ToArray();
-                            break;
+                        inputComps = m_Data.Input.Components;
+                    }
+                    else 
+                    {
+                        switch (m_Data.Input.Filter)
+                        {
+                            case ComponentsFilter_e.All:
+                                inputComps = assm.Configurations.Active.Components.Flatten();
+                                break;
 
-                        case InputScope_e.Selection:
-                            docs = m_Data.Input.Components
-                                .Distinct(new ComponentDocumentSafeEqualityComparer())
-                                .Select(c => c.ReferencedDocument).ToArray();
-                            break;
+                            case ComponentsFilter_e.TopLevel:
+                                inputComps = assm.Configurations.Active.Components;
+                                break;
 
-                        default:
-                            throw new NotSupportedException();
+                            default:
+                                throw new NotSupportedException();
+                        }
+
+                        inputComps = inputComps.Where(c => (m_Data.Input.FilterParts && c is IXPartComponent) || (m_Data.Input.FilterAssemblies && c is IXAssemblyComponent));
                     }
 
-                    var input = docs.ToList();
+                    var input = inputComps.Distinct(new ComponentDocumentSafeEqualityComparer())
+                        .Select<IXComponent, IXDocument>(c => c.ReferencedDocument).ToList();
+
                     ProcessInput?.Invoke(m_Host.Extension.Application, input);
 
                     var doc = m_Host.Extension.Application.Documents.Active;
@@ -282,12 +300,6 @@ namespace Xarial.CadPlus.Batch.InApp
                     break;
 
                 case Commands_e.RunInApp:
-                    var activeDoc = m_Host.Extension.Application.Documents.Active;
-                    m_Data.Input.Document = activeDoc;
-                    if (m_Data.Input.Scope == InputScope_e.AllReferences)
-                    {
-                        m_Data.Input.AllDocuments.UpdateReferences();
-                    }
                     m_Page.Show(m_Data);
                     break;
             }

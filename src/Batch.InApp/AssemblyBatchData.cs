@@ -35,39 +35,42 @@ using Xarial.XToolkit.Wpf.Extensions;
 
 namespace Xarial.CadPlus.Batch.InApp
 {
-    public class SelectionScopeDependencyHandler : IDependencyHandler
+    public class SelectionFilterDependencyHandler : IDependencyHandler
     {
         public void UpdateState(IXApplication app, IControl source, IControl[] dependencies)
         {
-            var scope = dependencies.First()?.GetValue();
+            var filter = dependencies.First()?.GetValue();
 
-            if (scope is InputScope_e) 
+            if (filter is ComponentsFilter_e) 
             {
-                source.Visible = (InputScope_e)scope == InputScope_e.Selection; 
+                source.Visible = (ComponentsFilter_e)filter == ComponentsFilter_e.Selection; 
             }
         }
     }
 
-    public class ReferencesScopeDependencyHandler : IDependencyHandler
+    public class FileTypeFilterDependencyHandler : IDependencyHandler
     {
         public void UpdateState(IXApplication app, IControl source, IControl[] dependencies)
         {
-            var scope = dependencies.First()?.GetValue();
+            var filter = dependencies.First()?.GetValue();
 
-            if (scope is InputScope_e)
+            if (filter is ComponentsFilter_e)
             {
-                source.Visible = (InputScope_e)scope != InputScope_e.Selection;
+                source.Visible = (ComponentsFilter_e)filter != ComponentsFilter_e.Selection;
             }
         }
     }
 
-    public enum InputScope_e
+    public enum ComponentsFilter_e
     {
         [Title("Selected Components")]
         Selection,
         
-        [Title("All Referenced Documents")]
-        AllReferences
+        [Title("Top Level Components")]
+        TopLevel,
+
+        [Title("All Components")]
+        All
     }
 
     [IconEx(typeof(Resources), nameof(Resources.batch_plus_assm_vector), nameof(Resources.batch_plus_assm_icon))]
@@ -77,54 +80,33 @@ namespace Xarial.CadPlus.Batch.InApp
     {
         public class InputGroup 
         {
-            [OptionBox]
             [ControlOptions(align: ControlLeftAlign_e.Indent)]
-            [ControlTag(nameof(Scope))]
-            public InputScope_e Scope
-            {
-                get => m_Scope;
-                set
-                {
-                    m_Scope = value;
+            [ControlTag(nameof(Filter))]
+            [IconEx(typeof(Resources), nameof(Resources.component_filter_vector), nameof(Resources.component_filter_icon))]
+            public ComponentsFilter_e Filter { get; set; }
 
-                    if (m_Scope == InputScope_e.AllReferences)
-                    {
-                        AllDocuments.UpdateReferences();
-                    }
-                }
-            }
+            [DependentOn(typeof(FileTypeFilterDependencyHandler), nameof(Filter))]
+            [Description("Include part components")]
+            [ControlOptions(left: 20, top: 20)]
+            [BitmapButton(typeof(Resources), nameof(Resources.part_icon), 30, 30)]
+            public bool FilterParts { get; set; }
+
+            [DependentOn(typeof(FileTypeFilterDependencyHandler), nameof(Filter))]
+            [Description("Include assembly components")]
+            [ControlOptions(left: 45, top: 20)]
+            [BitmapButton(typeof(Resources), nameof(Resources.assembly_icon), 30, 30)]
+            public bool FilterAssemblies { get; set; }
 
             [ControlOptions(height: 100)]
-            [DependentOn(typeof(SelectionScopeDependencyHandler), nameof(Scope))]
+            [DependentOn(typeof(SelectionFilterDependencyHandler), nameof(Filter))]
             [Description("List of components to run macros on")]
             public List<IXComponent> Components { get; set; }
 
-            [ControlOptions(height: 110)]
-            [DependentOn(typeof(ReferencesScopeDependencyHandler), nameof(Scope))]
-            [Description("All referenced docyments")]
-            [StandardControlIcon(BitmapLabelType_e.SelectComponent)]
-            [CustomControl(typeof(ReferencesList))]
-            public ReferenceDocumentsVM AllDocuments { get; }
-
-            private IXDocument m_Document;
-            private InputScope_e m_Scope;
-
-            [ExcludeControl]
-            internal IXDocument Document 
+            public InputGroup() 
             {
-                get => m_Document;
-                set 
-                {
-                    m_Document = value;
-                    
-                    Components = m_Document.Selections.OfType<IXComponent>().ToList();
-                    AllDocuments.SetDocument(value);
-                }
-            }
-
-            public InputGroup(ICadDescriptor cadEntDesc) 
-            {
-                AllDocuments = new ReferenceDocumentsVM(cadEntDesc);
+                Filter = ComponentsFilter_e.All;
+                FilterParts = true;
+                FilterAssemblies = true;
             }
         }
 
@@ -192,7 +174,7 @@ namespace Xarial.CadPlus.Batch.InApp
 
         public AssemblyBatchData(ICadDescriptor cadEntDesc)
         {
-            Input = new InputGroup(cadEntDesc);
+            Input = new InputGroup();
             Macros = new MacrosGroup(cadEntDesc.MacroFileFilters);
             Options = new OptionsGroup();
         }

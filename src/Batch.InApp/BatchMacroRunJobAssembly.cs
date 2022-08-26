@@ -235,15 +235,12 @@ namespace Xarial.CadPlus.Batch.InApp
                             {
                                 file.State.ReportIssue("The document has been modified and closed without saving changes. Use 'Auto Save' option or call Save API function from the macro directly if it is required to keep the changes", BatchJobItemIssueType_e.Warning);
                             }
-
-                            m_Logger.Log($"Closing '{doc.Path}'", LoggerMessageSeverity_e.Debug);
-                            doc.Close();
                         }
-                        else if (hideDoc)
+                        
+                        if (closeDoc || hideDoc)
                         {
-                            m_Logger.Log($"Hiding '{doc.Path}'", LoggerMessageSeverity_e.Debug);
-                            var hiddenState = doc.State | DocumentState_e.Hidden;
-                            doc.State = hiddenState;
+                            m_Logger.Log($"Closing [{closeDoc}]/hiding [{hideDoc}] '{doc.Path}'", LoggerMessageSeverity_e.Debug);
+                            doc.Close();
                         }
                     }
                 }
