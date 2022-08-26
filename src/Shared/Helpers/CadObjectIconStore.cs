@@ -136,7 +136,7 @@ namespace Xarial.CadPlus.Plus.Shared.Helpers
             {
             }
 
-            return m_DefaultIcon ?? (m_DefaultIcon = Resources.file_icon.ToBitmapImage());
+            return m_DefaultIcon ?? (m_DefaultIcon = Resources.file_icon.ToBitmapImage(true));
         }
 
         private bool MatchesExtension(IXDocument doc, string[] exts)
