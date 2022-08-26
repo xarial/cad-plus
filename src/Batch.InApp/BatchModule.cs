@@ -41,6 +41,7 @@ using System.Threading;
 using Xarial.CadPlus.Plus.DI;
 using Xarial.CadPlus.Batch.Base.Services;
 using Xarial.CadPlus.Plus.Shared.ViewModels;
+using Xarial.CadPlus.Plus.Shared.Helpers;
 
 namespace Xarial.CadPlus.Batch.InApp
 {
@@ -92,19 +93,13 @@ namespace Xarial.CadPlus.Batch.InApp
         private AssemblyBatchData m_Data;
 
         private IMacroExecutor m_MacroRunnerSvc;
-        private IMessageService m_Msg;
+        private IMessageService m_MsgSvc;
         private IXLogger m_Logger;
-        private IBatchJobHandlerServiceFactory m_BatchJobHandlerSvcFact;
         private IMacroRunnerPopupHandlerFactory m_PopupHandlerFact;
 
         private ICadDescriptor m_CadDesc;
 
-        private readonly List<IBatchJobHandlerService> m_BatchJobHandlers;
-
-        public BatchModule()
-        {
-            m_BatchJobHandlers = new List<IBatchJobHandlerService>();
-        }
+        private BatchJobHandlersRepository m_BatchJobHandlerRepo;
 
         public void Init(IHost host)
         {
@@ -127,13 +122,14 @@ namespace Xarial.CadPlus.Batch.InApp
         private void OnHostInitialized(IApplication app, IServiceProvider svcProvider, IModule[] modules)
         {
             m_MacroRunnerSvc = svcProvider.GetService<IMacroExecutor>();
-            m_Msg = svcProvider.GetService<IMessageService>();
+            m_MsgSvc = svcProvider.GetService<IMessageService>();
             m_Logger = svcProvider.GetService<IXLogger>();
-            m_BatchJobHandlerSvcFact = svcProvider.GetService<IBatchJobHandlerServiceFactory>();
             m_PopupHandlerFact = svcProvider.GetService<IMacroRunnerPopupHandlerFactory>();
             m_CadDesc = svcProvider.GetService<ICadDescriptor>();
 
             m_Data = new AssemblyBatchData(m_CadDesc);
+
+            m_BatchJobHandlerRepo = new BatchJobHandlersRepository(svcProvider.GetService<IBatchJobHandlerServiceFactory>(), m_Logger);
         }
 
         private void OnConnect()
@@ -244,25 +240,16 @@ namespace Xarial.CadPlus.Batch.InApp
 
                     var doc = m_Host.Extension.Application.Documents.Active;
 
-                    var job = new AssemblyBatchRunJobExecutor(m_Host.Extension.Application, m_MacroRunnerSvc, m_CadDesc,
+                    var job = new BatchMacroRunJobAssembly(m_Host.Extension.Application, m_MacroRunnerSvc, m_CadDesc,
                         input.ToArray(), m_Logger, m_Data.Macros.Macros.Macros.Select(x => x.Data).ToArray(),
                         m_Data.Options.ActivateDocuments, m_Data.Options.AllowReadOnly,
                         m_Data.Options.AllowRapid, m_Data.Options.AutoSave, m_PopupHandlerFact.Create(m_Data.Options.Silent));
 
-                    var jobHandler = m_BatchJobHandlerSvcFact.Create(job, $"Batch Macro Running: {doc.Title}", new CancellationTokenSource());
-
-                    jobHandler.Disposed += OnDisposed;
-
-                    m_BatchJobHandlers.Add(jobHandler);
-
-                    jobHandler.Run();
-                }
-                catch (OperationCanceledException) 
-                {
+                    m_BatchJobHandlerRepo.RunNew(job, $"Batch Macro Running: {doc.Title}");
                 }
                 catch (Exception ex)
                 {
-                    m_Msg.ShowError(ex);
+                    m_MsgSvc.ShowError(ex);
                     m_Logger.Log(ex);
                 }
             }
@@ -290,7 +277,7 @@ namespace Xarial.CadPlus.Batch.InApp
                     catch (Exception ex)
                     {
                         m_Logger.Log(ex);
-                        m_Msg.ShowError("Failed to run Batch+");
+                        m_MsgSvc.ShowError("Failed to run Batch+");
                     }
                     break;
 
@@ -316,22 +303,9 @@ namespace Xarial.CadPlus.Batch.InApp
             }
         }
 
-        private void OnDisposed(IBatchJobHandlerService sender)
-        {
-            m_Logger.Log($"Removing the job handler");
-
-            if (m_BatchJobHandlers.Contains(sender))
-            {
-                m_BatchJobHandlers.Remove(sender);
-            }
-        }
-
         public void Dispose()
         {
-            foreach (var jobHandler in m_BatchJobHandlers)
-            {
-                jobHandler.Dispose();
-            }
+            m_BatchJobHandlerRepo.Dispose();
         }
     }
 }

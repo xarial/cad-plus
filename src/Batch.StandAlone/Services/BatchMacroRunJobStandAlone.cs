@@ -32,6 +32,7 @@ using System.Linq;
 using Xarial.XCad.Exceptions;
 using Xarial.CadPlus.Batch.StandAlone.Exceptions;
 using Xarial.CadPlus.Plus.Shared.Exceptions;
+using Xarial.CadPlus.Plus.Shared.Helpers;
 
 namespace Xarial.CadPlus.Batch.StandAlone.Services
 {
@@ -141,24 +142,25 @@ namespace Xarial.CadPlus.Batch.StandAlone.Services
                 TryShutDownApplication(m_CurrentContext);
             });
 
-            await this.HandleExecuteAsync(cancellationToken,
+            await this.HandleJobExecuteAsync(
                 t => Started?.Invoke(this, t),
                 t => m_State.StartTime = t,
                 InitAsync,
+                c => m_State.TotalItemsCount = c,
                 () => Initialized?.Invoke(this, JobItems, OperationDefinitions),
                 DoWorkAsync,
                 d => Completed?.Invoke(this, d, m_State.Status),
                 d => m_State.Duration = d,
-                s => m_State.Status = s);
+                s => m_State.Status = s,
+                cancellationToken, m_Logger);
         }
 
-        private async Task InitAsync(CancellationToken cancellationToken)
+        private async Task<int> InitAsync(CancellationToken cancellationToken)
         {
             try
             {
-                await m_TaskRunner.Run(() =>
+                return await m_TaskRunner.RunAsync(() =>
                 {
-
                     AddLogEntry($"Collecting files for processing");
 
                     var app = EnsureApplication(m_CurrentContext, cancellationToken);
@@ -174,6 +176,8 @@ namespace Xarial.CadPlus.Batch.StandAlone.Services
                         throw new UserException("Empty job. No files matching specified filter");
                     }
 
+                    return m_JobDocuments.Length;
+
                 }, cancellationToken).ConfigureAwait(false);
             }
             finally
@@ -186,7 +190,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.Services
         {
             try
             {
-                await m_TaskRunner.Run(() =>
+                await m_TaskRunner.RunAsync(() =>
                 {
                     var curBatchSize = 0;
 
@@ -195,19 +199,24 @@ namespace Xarial.CadPlus.Batch.StandAlone.Services
                         var curAppPrc = m_CurrentContext.CurrentApplicationProcess?.Id;
 
                         m_CurrentContext.CurrentJobItem = m_JobDocuments[i];
-                        var res = TryProcessFile(m_CurrentContext, m_Worker, cancellationToken);
 
-                        TryCloseDocument(m_CurrentContext.CurrentDocument);
+                        m_CurrentContext.CurrentJobItem.HandleJobItem(
+                            (d, s) => d.State.Status = s,
+                            d => ProcessFile(m_CurrentContext, m_Worker, cancellationToken),
+                            (d, e) =>
+                            {
+                                d.State.ReportError(e);
+
+                                if (!m_Job.ContinueOnError)
+                                {
+                                    throw new UserException("Cancelling the job. Set 'Continue On Error' option to continue job if file failed");
+                                }
+                            },
+                            d => m_State.IncrementItemsCount(d),
+                            () => m_State.Progress = (double)(i + 1) / (double)m_JobDocuments.Length,
+                            d => ItemProcessed?.Invoke(this, m_CurrentContext.CurrentJobItem));
 
                         m_CurrentContext.CurrentDocument = null;
-
-                        ItemProcessed?.Invoke(this, m_CurrentContext.CurrentJobItem);
-                        m_State.Progress = (double)(i + 1) / (double)m_JobDocuments.Length;
-
-                        if (!res && !m_Job.ContinueOnError)
-                        {
-                            throw new UserException("Cancelling the job. Set 'Continue On Error' option to continue job if file failed");
-                        }
 
                         if (m_CurrentContext.CurrentApplicationProcess?.Id != curAppPrc)
                         {
@@ -333,7 +342,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.Services
             m_BatchAppProxy.ProcessInput(app, m_AppProvider, inputDocs);
 
             return inputDocs
-                .Select(d => new JobItemDocument(d, macroDefsLocal.Select(m => new JobItemMacro(m)).ToArray(), m_AppProvider.Descriptor))
+                .Select(d => new JobItemDocument(d, macroDefsLocal, m_AppProvider.Descriptor))
                 .ToArray();
         }
 
@@ -435,7 +444,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.Services
             }
         }
 
-        private bool TryProcessFile(BatchJobContext context,
+        private void ProcessFile(BatchJobContext context,
             IResilientWorker<BatchJobContext> worker,
             CancellationToken cancellationToken)
         {
@@ -449,40 +458,31 @@ namespace Xarial.CadPlus.Batch.StandAlone.Services
             {
                 context.CurrentMacro = macro;
 
-                try
-                {
-                    worker.DoWork(RunMacro, context, cancellationToken);
-                }
-                catch (OperationCanceledException)
-                {
-                    throw;
-                }
-                catch (Exception ex)
-                {
-                    ProcessError(ex, context);
-
-                    if (context.CurrentDocument == null)//document was not opened thus reporting error on document item
+                macro.HandleJobItemOperation(
+                    (m, s) => m.State.Status = s,
+                    m => worker.DoWork(RunMacro, context, cancellationToken),
+                    (m, e) =>
                     {
-                        context.CurrentJobItem.State.ReportError(ex);
-                    }
-                    else
-                    {
-                        context.CurrentMacro.State.ReportError(ex);
-                    }
+                        ProcessError(e, context);
 
-                    AddLogEntry(ex.ParseUserError(out _));
-                    m_Logger.Log(ex);
-                }
+                        if (context.CurrentDocument == null)//document was not opened thus reporting error on document item
+                        {
+                            context.CurrentJobItem.State.ReportError(e);
+                        }
+                        else
+                        {
+                            context.CurrentMacro.State.ReportError(e);
+                        }
+
+                        AddLogEntry(e.ParseUserError(out _));
+
+                        m_Logger.Log(e);
+
+                        m.State.ReportError(e);
+                    });
             }
 
-            if (context.CurrentJobItem.State.Status != BatchJobItemStateStatus_e.Failed)
-            {
-                context.CurrentJobItem.State.Status = context.CurrentJobItem.ComposeStatus();
-            }
-
-            AddLogEntry($"Processing file '{context.CurrentJobItem.Document.Path}' completed. Execution time {DateTime.Now.Subtract(fileProcessStartTime).ToString(@"hh\:mm\:ss")}");
-
-            return context.CurrentJobItem.State.Status != BatchJobItemStateStatus_e.Failed;
+            TryCloseDocument(m_CurrentContext.CurrentDocument);
         }
 
         private void ProcessError(Exception err, BatchJobContext context)

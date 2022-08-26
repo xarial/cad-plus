@@ -30,7 +30,7 @@ namespace Xarial.CadPlus.Batch.Sw
 {
     public class SwApplicationProvider : ICadApplicationInstanceProvider
     {
-        private readonly Dictionary<Process, List<string>> m_ForceDisabledAddIns;
+        private readonly Dictionary<Process, IReadOnlyList<string>> m_ForceDisabledAddIns;
 
         private readonly IXLogger m_Logger;
 
@@ -44,7 +44,7 @@ namespace Xarial.CadPlus.Batch.Sw
             MacroRunnerService = svc;
             Descriptor = entDesc;
             
-            m_ForceDisabledAddIns = new Dictionary<Process, List<string>>();
+            m_ForceDisabledAddIns = new Dictionary<Process, IReadOnlyList<string>>();
         }
 
         public IEnumerable<IXVersion> GetInstalledVersions()
@@ -95,7 +95,7 @@ namespace Xarial.CadPlus.Batch.Sw
 
             app.CustomServices = customServices;
 
-            List<string> forceDisabledAddIns = null;
+            IReadOnlyList<string> forceDisabledAddIns = null;
 
             if (opts.HasFlag(StartupOptions_e.Safe))
             {
@@ -154,7 +154,7 @@ namespace Xarial.CadPlus.Batch.Sw
             var prc = sender as Process;
             prc.Exited -= OnProcessExited;
 
-            if (m_ForceDisabledAddIns.TryGetValue(prc, out List<string> guids))
+            if (m_ForceDisabledAddIns.TryGetValue(prc, out IReadOnlyList<string> guids))
             {
                 TryEnableAddIns(guids);
             }
@@ -164,7 +164,7 @@ namespace Xarial.CadPlus.Batch.Sw
             }
         }
 
-        private void TryEnableAddIns(List<string> guids)
+        private void TryEnableAddIns(IReadOnlyList<string> guids)
         {
             try
             {
@@ -179,7 +179,7 @@ namespace Xarial.CadPlus.Batch.Sw
             }
         }
 
-        private void TryDisableAddIns(out List<string> guids)
+        private void TryDisableAddIns(out IReadOnlyList<string> guids)
         {
             try
             {

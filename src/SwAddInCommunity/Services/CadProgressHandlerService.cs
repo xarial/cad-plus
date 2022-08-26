@@ -56,6 +56,8 @@ namespace Xarial.CadPlus.AddIn.Sw.Services
 
         private bool m_IsDisposed;
 
+        public string Title { get; }
+
         public CadBatchJobHandlerService(IBatchJob job, IXLogger logger, IMessageService msgSvc, IXExtension ext, 
             string title, CancellationTokenSource cancellationTokenSource,
             IBatchJobReportExporter[] reportExporters, IBatchJobLogExporter[] logExporters)
@@ -65,6 +67,8 @@ namespace Xarial.CadPlus.AddIn.Sw.Services
             m_Job.State.ProgressChanged += OnProgressChanged;
             m_Logger = logger;
             m_Ext = ext;
+
+            Title = title;
 
             m_IsDisposed = false;
 

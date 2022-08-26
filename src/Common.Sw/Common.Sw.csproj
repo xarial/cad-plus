@@ -8,8 +8,8 @@
   </PropertyGroup>
   <Import Project="$(SolutionDir)common\common.module.props" />
   <ItemGroup>
-    <PackageReference Include="Xarial.CadPlusPlus" Version="0.4.0-dev.4349" />
-    <PackageReference Include="Xarial.XCad.SolidWorks" Version="0.8.0-dev.4328" />
+    <PackageReference Include="Xarial.CadPlusPlus" Version="0.4.0-dev.4380" />
+    <PackageReference Include="Xarial.XCad.SolidWorks" Version="0.8.0-dev.4379" />
     <PackageReference Include="Xarial.XToolkit.Wpf" Version="0.4.0-dev.4339" />
   </ItemGroup>
   <ItemGroup>
@@ -35,12 +35,15 @@
     <None Include="Resources\config-icon.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\cutlist-icon.png" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Resources\drawing-icon.png" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\sheet-icon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Update="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
 </Project>

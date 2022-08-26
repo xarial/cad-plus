@@ -33,9 +33,15 @@ namespace Xarial.CadPlus.Common.Sw.Services
         public Image PartIcon => Resources.document_icon;
         public Image AssemblyIcon => Resources.assembly_icon;
         public Image DrawingIcon => Resources.drawing_icon;
+        
         public Image ConfigurationIcon => Resources.config_icon;
         public Image SheetIcon => Resources.sheet_icon;
-        public Image CutListIcon => Resources.cutlist_icon;
+
+        public Image SolidBodyIcon => Resources.solid_body;
+        public Image SheetBodyIcon => Resources.surface_body;
+        public Image CutListSolidBodyIcon => Resources.cut_list_solid_body;
+        public Image CutListSheetMetalIcon => Resources.cut_list_sheet_metal;
+        public Image CutListWeldmentIcon => Resources.cut_list_weldment;
 
         public FileTypeFilter PartFileFilter => new FileTypeFilter("SOLIDWORKS Parts", "*.sldprt", "*.sldlfp", "*.sldblk", "*.prtdot");
         public FileTypeFilter AssemblyFileFilter => new FileTypeFilter("SOLIDWORKS Assemblies", "*.sldasm", "*.asmdot");

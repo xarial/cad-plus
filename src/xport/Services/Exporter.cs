@@ -17,8 +17,10 @@ using System.Windows.Media.Imaging;
 using Xarial.CadPlus.Common.Services;
 using Xarial.CadPlus.Plus.Extensions;
 using Xarial.CadPlus.Plus.Services;
+using Xarial.CadPlus.Plus.Shared.Helpers;
 using Xarial.CadPlus.Plus.Shared.Services;
 using Xarial.CadPlus.Xport.Core;
+using Xarial.XCad.Base;
 using Xarial.XToolkit;
 using Xarial.XToolkit.Wpf.Utils;
 
@@ -28,19 +30,56 @@ namespace Xarial.CadPlus.Xport.Services
     {
         public event BatchJobItemNestedItemsInitializedDelegate NestedItemsInitialized;
 
+        private const string EDRW_FORMAT = ".e";
+
         IReadOnlyList<IBatchJobItemOperation> IBatchJobItem.Operations => Operations;
         IBatchJobItemState IBatchJobItem.State => State;
 
         public string FilePath { get; }
 
-        internal JobItemFile(string filePath, JobItemExportFormat[] formats)
+        internal JobItemFile(string filePath, string outDir, JobItemExportFormatDefinition[] formatDefs)
         {
             FilePath = filePath;
-            Operations = formats;
+            
             Title = Path.GetFileName(filePath);
             Description = filePath;
             Link = TryOpenInFileExplorer;
-            State = new BatchJobItemState();
+            State = new BatchJobItemState(this);
+
+            var outFiles = new JobItemExportFormat[formatDefs.Length];
+
+            for (int i = 0; i < formatDefs.Length; i++)
+            {
+                var formatDef = formatDefs[i];
+
+                var ext = formatDef.Extension;
+
+                if (ext.Equals(EDRW_FORMAT, StringComparison.CurrentCultureIgnoreCase))
+                {
+                    switch (Path.GetExtension(filePath).ToLower())
+                    {
+                        case ".sldprt":
+                            ext = ".eprt";
+                            break;
+
+                        case ".sldasm":
+                            ext = ".easm";
+                            break;
+
+                        case ".slddrw":
+                            ext = ".edrw";
+                            break;
+
+                        default:
+                            throw new ArgumentException($"{EDRW_FORMAT} format is only applicable for SOLIDWORKS files");
+                    }
+                }
+
+                outFiles[i] = new JobItemExportFormat(this, Path.Combine(!string.IsNullOrEmpty(outDir) ? outDir : Path.GetDirectoryName(filePath),
+                    Path.GetFileNameWithoutExtension(filePath) + ext), formatDef);
+            }
+
+            Operations = outFiles;
         }
 
         public BitmapImage Icon { get; }
@@ -87,19 +126,19 @@ namespace Xarial.CadPlus.Xport.Services
     {
         public event BatchJobItemOperationUserResultChangedDelegate UserResultChanged;
 
-        IBatchJobItemState IBatchJobItemOperation.State => State;
+        IBatchJobItemOperationState IBatchJobItemOperation.State => State;
 
         public string OutputFilePath { get; }
         public IBatchJobItemOperationDefinition Definition { get; }
 
-        public BatchJobItemState State { get; }
+        public BatchJobItemOperationState State { get; }
         public object UserResult { get; }
 
-        public JobItemExportFormat(string outFilePath, JobItemExportFormatDefinition def)
+        public JobItemExportFormat(JobItemFile file, string outFilePath, JobItemExportFormatDefinition def)
         {
             OutputFilePath = outFilePath;
             Definition = def;
-            State = new BatchJobItemState();
+            State = new BatchJobItemOperationState(file, this);
         }
     }
 
@@ -123,32 +162,36 @@ namespace Xarial.CadPlus.Xport.Services
 
         private readonly List<string> m_LogEntries;
 
-        private double? m_Progress;
+        private readonly IXLogger m_Logger;
 
         private JobItemFile[] m_JobFiles;
 
         private readonly BatchJobState m_State;
 
-        public Exporter(IJobProcessManager jobMgr, ExportOptions opts)
+        public Exporter(IJobProcessManager jobMgr, ExportOptions opts, IXLogger logger)
         {
             m_JobMgr = jobMgr;
             m_Opts = opts;
+            m_Logger = logger;
+
             m_LogEntries = new List<string>();
             m_State = new BatchJobState();
         }
 
         public async Task TryExecuteAsync(CancellationToken cancellationToken)
-            => await this.HandleExecuteAsync(cancellationToken,
+            => await this.HandleJobExecuteAsync(
                 t => Started?.Invoke(this, t),
                 t => m_State.StartTime = t,
                 InitAsync,
+                c => m_State.TotalItemsCount = c,
                 () => Initialized?.Invoke(this, JobItems, OperationDefinitions),
                 DoWorkAsync,
                 d => Completed?.Invoke(this, d, m_State.Status),
                 d => m_State.Duration = d,
-                s => m_State.Status = s);
+                s => m_State.Status = s,
+                cancellationToken, m_Logger);
 
-        private Task InitAsync(CancellationToken arg)
+        private Task<int> InitAsync(CancellationToken arg)
         {
             AddLogEntry($"Exporting Started");
 
@@ -156,7 +199,7 @@ namespace Xarial.CadPlus.Xport.Services
 
             OperationDefinitions = formats;
 
-            return Task.CompletedTask;
+            return Task.FromResult(m_JobFiles.Length);
         }
 
         private async Task DoWorkAsync(CancellationToken cancellationToken)
@@ -165,71 +208,86 @@ namespace Xarial.CadPlus.Xport.Services
             {
                 var file = m_JobFiles[i];
 
-                var outFiles = file.Operations;
+                await file.HandleJobItemAsync(
+                    (f, s) => f.State.Status = s,
+                    f => ExportFormats(f, cancellationToken),
+                    (f, e) => f.State.ReportError(e),
+                    f => m_State.IncrementItemsCount(f),
+                    () => m_State.Progress = (i + 1) / (double)m_JobFiles.Length,
+                    f => ItemProcessed?.Invoke(this, f));
+            }
+        }
 
-                foreach (var outFile in outFiles)
-                {
-                    cancellationToken.ThrowIfCancellationRequested();
+        private async Task ExportFormats(JobItemFile file, CancellationToken cancellationToken)
+        {
+            foreach (var outFile in file.Operations)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
 
-                    try
+                await outFile.HandleJobItemOperationAsync(
+                    (f, s) => f.State.Status = s,
+                    f => ExportFormat(f, file.FilePath, cancellationToken),
+                    (f, e) =>
                     {
-                        var desFile = outFile.OutputFilePath;
+                        f.State.ReportError(e);
 
-                        int index = 0;
-
-                        while (File.Exists(desFile))
-                        {
-                            var outDir = Path.GetDirectoryName(outFile.OutputFilePath);
-                            var fileName = Path.GetFileNameWithoutExtension(outFile.OutputFilePath);
-                            var ext = Path.GetExtension(outFile.OutputFilePath);
-
-                            fileName = $"{fileName} ({++index})";
-
-                            desFile = Path.Combine(outDir, fileName + ext);
-                        }
-
-                        var prcStartInfo = new ProcessStartInfo()
-                        {
-                            CreateNoWindow = true,
-                            UseShellExecute = false,
-                            FileName = typeof(StandAloneExporter.Program).Assembly.Location,
-                            Arguments = $"\"{file.FilePath}\" \"{desFile}\" {m_Opts.Version}"
-                        };
-
-                        var tcs = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-                        if (m_Opts.Timeout > 0)
-                        {
-                            tcs.CancelAfter(TimeSpan.FromSeconds(m_Opts.Timeout));
-                        }
-
-                        var res = await StartWaitProcessAsync(prcStartInfo, tcs.Token).ConfigureAwait(false);
-
-                        if (res)
-                        {
-                            outFile.State.Status = BatchJobItemStateStatus_e.Succeeded;
-                        }
-                        else
-                        {
-                            throw new Exception("Failed to process the file");
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        outFile.State.Status = BatchJobItemStateStatus_e.Failed;
-
-                        AddLogEntry($"Error while processing '{file.FilePath}': {ex.Message}");
                         if (!m_Opts.ContinueOnError)
                         {
-                            throw ex;
+                            throw e;
                         }
-                    }
-                }
-
-                file.State.Status = file.ComposeStatus();
-
-                ItemProcessed?.Invoke(this, file);
-                m_State.Progress = (i + 1) / (double)m_JobFiles.Length;
+                    });
             }
+        }
+
+        private async Task ExportFormat(JobItemExportFormat outFile, string srcFilePath, CancellationToken cancellationToken)
+        {
+            var desFile = GetAvailableDestinationFile(outFile);
+
+            var prcStartInfo = new ProcessStartInfo()
+            {
+                CreateNoWindow = true,
+                UseShellExecute = false,
+                FileName = typeof(StandAloneExporter.Program).Assembly.Location,
+                Arguments = $"\"{srcFilePath}\" \"{desFile}\" {m_Opts.Version}"
+            };
+
+            var tcs = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+
+            if (m_Opts.Timeout > 0)
+            {
+                tcs.CancelAfter(TimeSpan.FromSeconds(m_Opts.Timeout));
+            }
+
+            var res = await StartWaitProcessAsync(prcStartInfo, tcs.Token).ConfigureAwait(false);
+
+            if (res)
+            {
+                outFile.State.Status = BatchJobItemStateStatus_e.Succeeded;
+            }
+            else
+            {
+                throw new Exception("Failed to process the file");
+            }
+        }
+
+        private string GetAvailableDestinationFile(JobItemExportFormat outFile)
+        {
+            var desFile = outFile.OutputFilePath;
+
+            int index = 0;
+
+            while (File.Exists(desFile))
+            {
+                var outDir = Path.GetDirectoryName(outFile.OutputFilePath);
+                var fileName = Path.GetFileNameWithoutExtension(outFile.OutputFilePath);
+                var ext = Path.GetExtension(outFile.OutputFilePath);
+
+                fileName = $"{fileName} ({++index})";
+
+                desFile = Path.Combine(outDir, fileName + ext);
+            }
+
+            return desFile;
         }
 
         private Task<bool> StartWaitProcessAsync(ProcessStartInfo prcStartInfo,
@@ -282,8 +340,6 @@ namespace Xarial.CadPlus.Xport.Services
 
         private JobItemFile[] ParseOptions(ExportOptions opts, out JobItemExportFormatDefinition[] formatDefs)
         {
-            const string EDRW_FORMAT = ".e";
-
             var outDir = opts.OutputDirectory;
 
             if (!string.IsNullOrEmpty(outDir))
@@ -337,39 +393,8 @@ namespace Xarial.CadPlus.Xport.Services
 
             foreach (var file in files)
             {
-                var outFiles = new JobItemExportFormat[opts.Format.Length];
-                jobs.Add(new JobItemFile(file, outFiles));
-
-                for (int i = 0; i < formatDefs.Length; i++)
-                {
-                    var formatDef = formatDefs[i];
-
-                    var ext = formatDef.Extension;
-
-                    if (ext.Equals(EDRW_FORMAT, StringComparison.CurrentCultureIgnoreCase))
-                    {
-                        switch (Path.GetExtension(file).ToLower())
-                        {
-                            case ".sldprt":
-                                ext = ".eprt";
-                                break;
-
-                            case ".sldasm":
-                                ext = ".easm";
-                                break;
-
-                            case ".slddrw":
-                                ext = ".edrw";
-                                break;
-
-                            default:
-                                throw new ArgumentException($"{EDRW_FORMAT} format is only applicable for SOLIDWORKS files");
-                        }
-                    }
-
-                    outFiles[i] = new JobItemExportFormat(Path.Combine(!string.IsNullOrEmpty(outDir) ? outDir : Path.GetDirectoryName(file),
-                        Path.GetFileNameWithoutExtension(file) + ext), formatDef);
-                }
+                var jobItemFile = new JobItemFile(file, outDir, formatDefs);
+                jobs.Add(jobItemFile);
             }
 
             return jobs.ToArray();
