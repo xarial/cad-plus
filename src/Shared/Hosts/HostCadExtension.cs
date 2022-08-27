@@ -57,20 +57,6 @@ namespace Xarial.CadPlus.Plus.Shared.Hosts
 
     public class HostCadExtension : IHostCadExtension
     {
-        private class DefaultDocumentAdapter : IDocumentLightweightAdapter
-        {
-            public void ApplyLightweigthDocumentChanges(IXDocument doc)
-            {
-            }
-
-            public void DisposeLightweightDocument(IXDocument doc)
-            {
-            }
-
-            public IXDocument GetLightweightDocument(IXDocument doc, bool allowReadOnly)
-                => doc;
-        }
-
         public IXExtension Extension { get; }
 
         public event Action Connect;
@@ -244,7 +230,6 @@ namespace Xarial.CadPlus.Plus.Shared.Hosts
             builder.RegisterInstance(Extension.Application);
             builder.RegisterSingleton<IMessageService, CadAppMessageService>().UsingParameters(Parameter<Type[]>.Any(UserException.AdditionalUserExceptions));
             builder.RegisterSingleton<IParentWindowProvider, CadParentWindowProvider>();
-            builder.RegisterSingleton<IDocumentLightweightAdapter, DefaultDocumentAdapter>();
             builder.RegisterSingleton<IXCadMacroProvider, XCadMacroProvider>();
         }
 
