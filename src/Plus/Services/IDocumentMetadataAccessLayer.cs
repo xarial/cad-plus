@@ -15,9 +15,10 @@ using Xarial.XCad.Documents;
 namespace Xarial.CadPlus.Plus.Services
 {
     /// <summary>
-    /// Dual document for acessing metadata
+    /// Document wrapper to access metadata
     /// </summary>
-    public interface IMetadataDocumentWrapper : IDisposable
+    /// <remarks>The implementation may load lightweight (metadata only) version of the document to access metadata</remarks>
+    public interface IDocumentMetadataAccessLayer : IDisposable
     {
         /// <summary>
         /// Actual document - may be an original document if it is accessible and loaded or fallback version of the document
@@ -39,8 +40,8 @@ namespace Xarial.CadPlus.Plus.Services
     /// Services allows to automatically create fallback version of the document to access lightweight metadata document
     /// </summary>
     /// <remarks>For example if SOLIDWORKS document is not loaded (lightweight, view only) or disconnected (closed) this methdo will create Document Manager version of the document</remarks>
-    public interface IMetadataDocumentWrapperProvider
+    public interface IDocumentMetadataAccessLayerProvider
     {
-        IMetadataDocumentWrapper Create(IXDocument doc, bool allowReadOnly);
+        IDocumentMetadataAccessLayer Create(IXDocument doc, bool allowReadOnly);
     }
 }
