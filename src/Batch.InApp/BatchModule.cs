@@ -99,6 +99,7 @@ namespace Xarial.CadPlus.Batch.InApp
         private IMacroRunnerPopupHandlerFactory m_PopupHandlerFact;
 
         private ICadDescriptor m_CadDesc;
+        private IDocumentMetadataAccessLayerProvider m_DocMalProvider;
 
         private BatchJobHandlersRepository m_BatchJobHandlerRepo;
 
@@ -127,6 +128,7 @@ namespace Xarial.CadPlus.Batch.InApp
             m_Logger = svcProvider.GetService<IXLogger>();
             m_PopupHandlerFact = svcProvider.GetService<IMacroRunnerPopupHandlerFactory>();
             m_CadDesc = svcProvider.GetService<ICadDescriptor>();
+            m_DocMalProvider = svcProvider.GetService<IDocumentMetadataAccessLayerProvider>();
 
             m_Data = new AssemblyBatchData(m_CadDesc);
 
@@ -261,7 +263,7 @@ namespace Xarial.CadPlus.Batch.InApp
                     var job = new BatchMacroRunJobAssembly(m_Host.Extension.Application, m_MacroRunnerSvc, m_CadDesc,
                         input.ToArray(), m_Logger, m_Data.Macros.Macros.Macros.Select(x => x.Data).ToArray(),
                         m_Data.Options.ActivateDocuments, m_Data.Options.AllowReadOnly,
-                        m_Data.Options.AllowRapid, m_Data.Options.AutoSave, m_PopupHandlerFact.Create(m_Data.Options.Silent));
+                        m_Data.Options.AllowRapid, m_Data.Options.AutoSave, m_PopupHandlerFact.Create(m_Data.Options.Silent), m_DocMalProvider);
 
                     m_BatchJobHandlerRepo.RunNew(job, $"Batch Macro Running: {doc.Title}");
                 }

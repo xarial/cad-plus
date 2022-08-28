@@ -40,12 +40,12 @@ namespace Xarial.CadPlus.Batch.Base.Core
         public BitmapImage Preview
         {
             get
-            {
+            {   
                 try
                 {
-                    if (!Document.IsCommitted || Document.IsAlive)
+                    using (var docMal = m_DocMalProvider.Create(Document, true))
                     {
-                        switch (Document)
+                        switch (docMal.Document)
                         {
                             case IXDocument3D doc3D:
                                 return doc3D.Configurations.Active.Preview?.TryConvertImage();
@@ -77,8 +77,10 @@ namespace Xarial.CadPlus.Batch.Base.Core
         public BatchJobItemState State { get; }
 
         private readonly ICadDescriptor m_CadDesc;
-                
-        public JobItemDocument(IXDocument doc, IReadOnlyList<JobItemOperationMacroDefinition> macrosDefs, ICadDescriptor cadDesc)
+
+        private readonly IDocumentMetadataAccessLayerProvider m_DocMalProvider;
+
+        public JobItemDocument(IXDocument doc, IReadOnlyList<JobItemOperationMacroDefinition> macrosDefs, ICadDescriptor cadDesc, IDocumentMetadataAccessLayerProvider docMalProvider)
         {
             if (doc == null)
             {
@@ -86,6 +88,8 @@ namespace Xarial.CadPlus.Batch.Base.Core
             }
 
             m_CadDesc = cadDesc;
+
+            m_DocMalProvider = docMalProvider;
 
             State = new BatchJobItemState(this);
 

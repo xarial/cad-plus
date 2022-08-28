@@ -45,8 +45,8 @@ namespace Xarial.CadPlus.Drawing.QrCode.Features
 
         private Tuple<int, double, int, double> m_CurPictTrans;
 
-        public EditQrCodeFeature(IXExtension ext, IMessageService msgSvc, IXLogger logger, IDocumentAdapter docAdapter)
-            : base(ext, msgSvc, logger, docAdapter)
+        public EditQrCodeFeature(IXExtension ext, IMessageService msgSvc, IXLogger logger, IDocumentMetadataAccessLayerProvider docMalProvider)
+            : base(ext, msgSvc, logger, docMalProvider)
         {
         }
 

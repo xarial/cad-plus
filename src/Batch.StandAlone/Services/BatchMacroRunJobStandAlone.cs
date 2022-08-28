@@ -95,16 +95,20 @@ namespace Xarial.CadPlus.Batch.StandAlone.Services
 
         private BatchJobState m_State;
 
+        private readonly IDocumentMetadataAccessLayerProvider m_DocMalProvider;
+
         public BatchMacroRunJobStandAlone(BatchJob job, ICadApplicationInstanceProvider appProvider,
             IBatchApplicationProxy batchAppProxy,
             IJobProcessManager jobMgr, IXLogger logger,
-            IResilientWorker<BatchJobContext> worker, IMacroRunnerPopupHandler popupHandler, ITaskRunner taskRunner)
+            IResilientWorker<BatchJobContext> worker, IMacroRunnerPopupHandler popupHandler, ITaskRunner taskRunner, IDocumentMetadataAccessLayerProvider docMalProvider)
         {
             m_Job = job;
             m_AppProvider = appProvider;
             m_MacroRunnerSvc = m_AppProvider.MacroRunnerService;
 
             m_State = new BatchJobState();
+
+            m_DocMalProvider = docMalProvider;
 
             m_TaskRunner = taskRunner;
 
@@ -343,7 +347,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.Services
             m_BatchAppProxy.ProcessInput(app, m_AppProvider, inputDocs);
 
             return inputDocs
-                .Select(d => new JobItemDocument(d, macroDefsLocal, m_AppProvider.Descriptor))
+                .Select(d => new JobItemDocument(d, macroDefsLocal, m_AppProvider.Descriptor, m_DocMalProvider))
                 .ToArray();
         }
 

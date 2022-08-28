@@ -392,8 +392,15 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
 
             for (int i = 0; i < Filters.Count; i++) 
             {
+                Filters[i].Changed -= OnFilterChanged;
+                Filters[i].Changed += OnFilterChanged;
                 Filters[i].SetBinding(m_Job.Filters, i);
             }
+        }
+
+        private void OnFilterChanged(string filter)
+        {
+            IsDirty = true;
         }
 
         private void AddFromFile()
