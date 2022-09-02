@@ -15,6 +15,7 @@ using Xarial.CadPlus.Plus.Exceptions;
 using Xarial.CadPlus.Plus.Services;
 using Xarial.XCad;
 using Xarial.XCad.Base;
+using Xarial.XCad.Base.Enums;
 using Xarial.XCad.Data;
 using Xarial.XCad.Documents;
 using Xarial.XCad.Documents.Enums;
@@ -23,40 +24,27 @@ namespace Xarial.CadPlus.Drawing.QrCode.Services
 {
     public class QrDataProvider
     {
-        private class ScopedDocument : IDisposable
+        private class DataSourceDocument : IDisposable
         {
             internal IXDocument Document { get; }
             internal IXConfiguration Configuration { get; }
-
-            private readonly IDocumentAdapter m_DocAdapter;
 
             private readonly IXDrawing m_Drawing;
 
             private readonly IXLogger m_Logger;
 
-            private readonly bool m_CloseDrawing;
-            private readonly bool m_CloseDocument;
+            private readonly IDocumentMetadataAccessLayer m_DrwMal;
+            private readonly IDocumentMetadataAccessLayer m_RefDocMal;
 
-            internal ScopedDocument(IDocumentAdapter docAdapter, IXDrawing drw, IXLogger logger, bool useRefDoc)
+            internal DataSourceDocument(IDocumentMetadataAccessLayerProvider docMalProvider, IXDrawing drw, IXLogger logger, bool useRefDoc)
             {
-                m_DocAdapter = docAdapter;
-
-                m_CloseDrawing = false;
-                m_CloseDocument = false;
-
                 m_Logger = logger;
 
-                m_Drawing = (IXDrawing)m_DocAdapter.GetDocumentReplacement(drw, true);
+                m_DrwMal = docMalProvider.Create(drw, true);
 
-                if (drw != m_Drawing)
-                {
-                    m_CloseDrawing = !m_Drawing.IsCommitted;
-                }
+                m_Logger.Log($"Data source drawing is fallback: {m_DrwMal.IsFallbackDocument}", LoggerMessageSeverity_e.Debug);
 
-                if (!m_Drawing.IsCommitted)
-                {
-                    m_Drawing.Commit();
-                }
+                m_Drawing = (IXDrawing)m_DrwMal.Document;
 
                 if (useRefDoc)
                 {
@@ -76,21 +64,13 @@ namespace Xarial.CadPlus.Drawing.QrCode.Services
 
                     var conf = view.ReferencedConfiguration;
 
-                    var replDoc = (IXDocument3D)m_DocAdapter.GetDocumentReplacement(refDoc, true);
+                    m_RefDocMal = docMalProvider.Create(refDoc, true);
 
-                    if (refDoc != replDoc)
-                    {
-                        refDoc = replDoc;
-                    }
+                    m_Logger.Log($"Data source reference document is fallback: {m_RefDocMal.IsFallbackDocument}", LoggerMessageSeverity_e.Debug);
 
-                    m_CloseDocument = m_CloseDrawing || !refDoc.IsCommitted;
+                    refDoc = (IXDocument3D)m_RefDocMal.Document;
 
-                    if (!refDoc.IsCommitted)
-                    {
-                        refDoc.Commit();
-                    }
-
-                    if (!conf.IsCommitted)
+                    if (m_RefDocMal.IsFallbackDocument)
                     {
                         conf = refDoc.Configurations[conf.Name];
                     }
@@ -106,61 +86,21 @@ namespace Xarial.CadPlus.Drawing.QrCode.Services
 
             public void Dispose()
             {
-                if (m_CloseDrawing)
-                {
-                    if (CanClose(m_Drawing))
-                    {
-                        m_Logger.Log("Closing temp drawing document for QR code");
-                        m_Drawing.Close();
-                    }
-                    else
-                    {
-                        Debug.Assert(false, "Drawing cannot be closed");
-                    }
-                }
-
-                if (m_CloseDocument)
-                {
-                    if (CanClose(Document))
-                    {
-                        m_Logger.Log("Closing temp referenced document for QR code");
-                        Document.Close();
-                    }
-                    else
-                    {
-                        Debug.Assert(false, "Document cannot be closed");
-                    }
-                }
-            }
-
-            //safety check - avoid closing of document which migth have been modified (although this should not be possible)
-            private bool CanClose(IXDocument doc)
-            {
-                try
-                {
-                    if (doc.IsDirty)
-                    {
-                        return false;
-                    }
-                }
-                catch
-                {
-                }
-
-                return doc.State.HasFlag(DocumentState_e.ReadOnly);
+                m_DrwMal?.Dispose();
+                m_RefDocMal?.Dispose();
             }
         }
 
         private readonly IXApplication m_App;
 
-        private readonly IDocumentAdapter m_DocAdapter;
+        private readonly IDocumentMetadataAccessLayerProvider m_DocMalProvider;
 
         private readonly IXLogger m_Logger;
 
-        public QrDataProvider(IXApplication app, IXLogger logger, IDocumentAdapter docAdapter)
+        public QrDataProvider(IXApplication app, IXLogger logger, IDocumentMetadataAccessLayerProvider docMalProvider)
         {
             m_App = app;
-            m_DocAdapter = docAdapter;
+            m_DocMalProvider = docMalProvider;
             m_Logger = logger;
         }
 
@@ -168,7 +108,7 @@ namespace Xarial.CadPlus.Drawing.QrCode.Services
         {
             var src = srcData.Source;
 
-            using (var scopedDoc = new ScopedDocument(m_DocAdapter, drw, m_Logger, srcData.ReferencedDocument))
+            using (var scopedDoc = new DataSourceDocument(m_DocMalProvider, drw, m_Logger, srcData.ReferencedDocument))
             {
                 IEdmVault5 vault;
 

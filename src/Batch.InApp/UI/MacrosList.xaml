@@ -9,12 +9,12 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <cmnctrls:PathListBox x:Name="lstMacros" ShowAddFolderButton="False" HorizontalAlignment="Stretch"
-                              ShowAddFileButton="False" AllowDropFolders="False"
-                              PathToItemConverter="{Binding Path=PathToMacroDataConverter}"
-                              ItemToPathConverter="{Binding Path=MacroDataToPathConverter}"
-                              AllowDropFiles="True"
-                              Filters="{Binding Path=MacroFilesFilter}"
-                              PathsSource="{Binding Path=Macros}">
+                          ShowAddFileButton="False" AllowDropFolders="False"
+                          PathToItemConverter="{Binding Path=PathToMacroDataConverter}"
+                          ItemToPathConverter="{Binding Path=MacroDataToPathConverter}"
+                          AllowDropFiles="True"
+                          Filters="{Binding Path=MacroFilesFilter}"
+                          PathsSource="{Binding Path=Macros}">
         <cmnctrls:PathListBox.ItemTemplate>
             <DataTemplate>
                 <ctrls:MacroDataControl ShowFullPath="False" HorizontalAlignment="Stretch"/>

@@ -95,16 +95,20 @@ namespace Xarial.CadPlus.Batch.StandAlone.Services
 
         private BatchJobState m_State;
 
+        private readonly IDocumentMetadataAccessLayerProvider m_DocMalProvider;
+
         public BatchMacroRunJobStandAlone(BatchJob job, ICadApplicationInstanceProvider appProvider,
             IBatchApplicationProxy batchAppProxy,
             IJobProcessManager jobMgr, IXLogger logger,
-            IResilientWorker<BatchJobContext> worker, IMacroRunnerPopupHandler popupHandler, ITaskRunner taskRunner)
+            IResilientWorker<BatchJobContext> worker, IMacroRunnerPopupHandler popupHandler, ITaskRunner taskRunner, IDocumentMetadataAccessLayerProvider docMalProvider)
         {
             m_Job = job;
             m_AppProvider = appProvider;
             m_MacroRunnerSvc = m_AppProvider.MacroRunnerService;
 
             m_State = new BatchJobState();
+
+            m_DocMalProvider = docMalProvider;
 
             m_TaskRunner = taskRunner;
 
@@ -180,9 +184,10 @@ namespace Xarial.CadPlus.Batch.StandAlone.Services
 
                 }, cancellationToken).ConfigureAwait(false);
             }
-            finally
+            catch
             {
                 TryShutDownApplication(m_CurrentContext);
+                throw;
             }
         }
 
@@ -342,7 +347,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.Services
             m_BatchAppProxy.ProcessInput(app, m_AppProvider, inputDocs);
 
             return inputDocs
-                .Select(d => new JobItemDocument(d, macroDefsLocal, m_AppProvider.Descriptor))
+                .Select(d => new JobItemDocument(d, macroDefsLocal, m_AppProvider.Descriptor, m_DocMalProvider))
                 .ToArray();
         }
 
@@ -459,7 +464,13 @@ namespace Xarial.CadPlus.Batch.StandAlone.Services
                 context.CurrentMacro = macro;
 
                 macro.HandleJobItemOperation(
-                    (m, s) => m.State.Status = s,
+                    (m, s) =>
+                    {
+                        if (context.CurrentDocument != null)//document was not opened thus reporting error on document item
+                        {
+                            m.State.Status = s;
+                        }
+                    },
                     m => worker.DoWork(RunMacro, context, cancellationToken),
                     (m, e) =>
                     {
@@ -478,7 +489,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.Services
 
                         m_Logger.Log(e);
 
-                        m.State.ReportError(e);
+                        //m.State.ReportError(e);
                     });
             }
 
@@ -738,7 +749,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.Services
                 m_IsDisposed = true;
 
                 TryShutDownApplication(m_CurrentContext);
-                //m_PopupKiller.Dispose();
+                m_PopupHandler.Dispose();
             }
         }
     }

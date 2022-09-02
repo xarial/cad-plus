@@ -113,11 +113,11 @@ namespace Xarial.CadPlus.Drawing.QrCode
 
             m_Host.RegisterCommands<Commands_e>(OnCommandClick);
 
-            var docAdapter = m_SvcProvider.GetService<IDocumentAdapter>();
+            var docMalProvider = m_SvcProvider.GetService<IDocumentMetadataAccessLayerProvider>();
 
-            m_InsertQrCodeFeature = new InsertQrCodeFeature(m_Host.Extension, m_MsgSvc, m_Logger, docAdapter);
+            m_InsertQrCodeFeature = new InsertQrCodeFeature(m_Host.Extension, m_MsgSvc, m_Logger, docMalProvider);
 
-            m_EditQrCodeFeature = new EditQrCodeFeature(m_Host.Extension, m_MsgSvc, m_Logger, docAdapter);
+            m_EditQrCodeFeature = new EditQrCodeFeature(m_Host.Extension, m_MsgSvc, m_Logger, docMalProvider);
 
             m_Host.Extension.Application.Documents.RegisterHandler(() => new QrCodeDrawingHandler(m_Logger));
         }

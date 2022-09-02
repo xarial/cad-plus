@@ -73,6 +73,26 @@ namespace Xarial.CadPlus.Batch.InApp.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap assembly_icon {
+            get {
+                object obj = ResourceManager.GetObject("assembly-icon", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] assembly_vector {
+            get {
+                object obj = ResourceManager.GetObject("assembly-vector", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap auto_save_docs {
             get {
                 object obj = ResourceManager.GetObject("auto-save-docs", resourceCulture);
@@ -123,6 +143,26 @@ namespace Xarial.CadPlus.Batch.InApp.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap component_filter_icon {
+            get {
+                object obj = ResourceManager.GetObject("component-filter-icon", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] component_filter_vector {
+            get {
+                object obj = ResourceManager.GetObject("component-filter-vector", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap macros_icon {
             get {
                 object obj = ResourceManager.GetObject("macros_icon", resourceCulture);
@@ -136,6 +176,26 @@ namespace Xarial.CadPlus.Batch.InApp.Properties {
         internal static byte[] macros_vector {
             get {
                 object obj = ResourceManager.GetObject("macros_vector", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap part_icon {
+            get {
+                object obj = ResourceManager.GetObject("part-icon", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] part_vector {
+            get {
+                object obj = ResourceManager.GetObject("part-vector", resourceCulture);
                 return ((byte[])(obj));
             }
         }
@@ -166,16 +226,6 @@ namespace Xarial.CadPlus.Batch.InApp.Properties {
         internal static System.Drawing.Bitmap silent_mode {
             get {
                 object obj = ResourceManager.GetObject("silent-mode", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap top_level_only {
-            get {
-                object obj = ResourceManager.GetObject("top_level_only", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

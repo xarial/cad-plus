@@ -35,10 +35,13 @@ namespace Xarial.CadPlus.Batch.StandAlone.Services
 
         private readonly ITaskRunnerFactory m_TaskRunnerFact;
 
+        private readonly ICadSpecificServiceFactory<IDocumentMetadataAccessLayerProvider> m_DocMalProviderFact;
+
         public BatchMacroRunJobStandAloneFactory(IJobApplicationProvider jobAppProvider,
             IBatchApplicationProxy batchAppProxy,
             IJobProcessManager jobPrcMgr, IXLogger logger,
-            IJobContectResilientWorkerFactory workerFact, IMacroRunnerPopupHandlerFactory popupHandlerFact, ITaskRunnerFactory taskRunnerFact)
+            IJobContectResilientWorkerFactory workerFact, IMacroRunnerPopupHandlerFactory popupHandlerFact, ITaskRunnerFactory taskRunnerFact,
+            ICadSpecificServiceFactory<IDocumentMetadataAccessLayerProvider> docMalProviderFact)
         {
             m_JobAppProvider = jobAppProvider;
 
@@ -52,13 +55,15 @@ namespace Xarial.CadPlus.Batch.StandAlone.Services
             m_JobPrcMgr = jobPrcMgr;
 
             m_TaskRunnerFact = taskRunnerFact;
+
+            m_DocMalProviderFact = docMalProviderFact;
         }
 
         public IBatchMacroRunJobStandAlone Create(BatchJob job)
         {
             return new BatchMacroRunJobStandAlone(job, m_JobAppProvider.GetApplicationProvider(job), this.m_BatchAppProxy, m_JobPrcMgr, this.m_Logger,
                 m_WorkerFact.Create(job.Timeout > 0 ? TimeSpan.FromSeconds(job.Timeout) : default),
-                m_PopupHandlerFact.Create(job.StartupOptions.HasFlag(StartupOptions_e.Silent)), m_TaskRunnerFact.Create());
+                m_PopupHandlerFact.Create(job.StartupOptions.HasFlag(StartupOptions_e.Silent)), m_TaskRunnerFact.Create(), m_DocMalProviderFact.GetService(job.ApplicationId));
         }
     }
 }

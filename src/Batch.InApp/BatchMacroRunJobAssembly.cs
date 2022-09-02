@@ -68,9 +68,11 @@ namespace Xarial.CadPlus.Batch.InApp
 
         private readonly BatchJobState m_State;
 
+        private readonly IDocumentMetadataAccessLayerProvider m_DocMalProvider;
+
         internal BatchMacroRunJobAssembly(IXApplication app, IMacroExecutor macroRunnerSvc, ICadDescriptor cadDesc,
             IXDocument[] documents, IXLogger logger, IEnumerable<MacroData> macros,
-            bool activateDocs, bool allowReadOnly, bool allowRapid, bool autoSaveDocs, IMacroRunnerPopupHandler popupHandler) 
+            bool activateDocs, bool allowReadOnly, bool allowRapid, bool autoSaveDocs, IMacroRunnerPopupHandler popupHandler, IDocumentMetadataAccessLayerProvider docMalProvider) 
         {
             m_App = app;
             m_Logger = logger;
@@ -79,6 +81,8 @@ namespace Xarial.CadPlus.Batch.InApp
             m_Docs = documents;
             m_Macros = macros;
             m_CadDesc = cadDesc;
+
+            m_DocMalProvider = docMalProvider;
 
             m_PopupHandler = popupHandler;
             m_PopupHandler.MacroUserError += OnMacroUserError;
@@ -154,7 +158,7 @@ namespace Xarial.CadPlus.Batch.InApp
 
             foreach (var doc in m_Docs) 
             {
-                jobItems.Add(new JobItemDocument(doc, macroDefsLocal, m_CadDesc));
+                jobItems.Add(new JobItemDocument(doc, macroDefsLocal, m_CadDesc, m_DocMalProvider));
             }
 
             return jobItems.ToArray();
@@ -235,15 +239,12 @@ namespace Xarial.CadPlus.Batch.InApp
                             {
                                 file.State.ReportIssue("The document has been modified and closed without saving changes. Use 'Auto Save' option or call Save API function from the macro directly if it is required to keep the changes", BatchJobItemIssueType_e.Warning);
                             }
-
-                            m_Logger.Log($"Closing '{doc.Path}'", LoggerMessageSeverity_e.Debug);
-                            doc.Close();
                         }
-                        else if (hideDoc)
+                        
+                        if (closeDoc || hideDoc)
                         {
-                            m_Logger.Log($"Hiding '{doc.Path}'", LoggerMessageSeverity_e.Debug);
-                            var hiddenState = doc.State | DocumentState_e.Hidden;
-                            doc.State = hiddenState;
+                            m_Logger.Log($"Closing [{closeDoc}]/hiding [{hideDoc}] '{doc.Path}'", LoggerMessageSeverity_e.Debug);
+                            doc.Close();
                         }
                     }
                 }

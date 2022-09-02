@@ -19,6 +19,7 @@ using Xarial.CadPlus.Plus.DI;
 using Xarial.CadPlus.Plus.Services;
 using Xarial.CadPlus.Plus.Shared.Services;
 using Xarial.XCad.Base;
+using Xarial.XCad.Documents;
 using Xarial.XCad.Exceptions;
 using Xarial.XToolkit;
 using Xarial.XToolkit.Helpers;
@@ -131,6 +132,34 @@ namespace Xarial.CadPlus.Init
         public void Export(IBatchJobBase job, string filePath) => throw new NotSupportedException();
     }
 
+    public class DefaultDocumentMetadataAccessLayer : IDocumentMetadataAccessLayer
+    {
+        public IXDocument Document { get; }
+
+        public bool IsFallbackDocument { get; }
+
+        public DefaultDocumentMetadataAccessLayer(IXDocument doc) 
+        {
+            Document = doc;
+            IsFallbackDocument = false;
+        }
+
+        public void ApplyChanges()
+        {
+            Document.IsDirty = true;
+        }
+
+        public void Dispose()
+        {
+        }
+    }
+
+    public class DefaultDocumentMetadataAccessLayerProvider : IDocumentMetadataAccessLayerProvider
+    {
+        public IDocumentMetadataAccessLayer Create(IXDocument doc, bool allowReadOnly)
+            => new DefaultDocumentMetadataAccessLayer(doc);
+    }
+
     public class Initiator : IInitiator
     {
         private IHost m_Host;
@@ -161,6 +190,8 @@ namespace Xarial.CadPlus.Init
             builder.RegisterSingleton<ILicenseInfoProvider, LicenseInfoProvider>();
             builder.RegisterSingleton<ICadSpecificServiceFactory<IMacroExecutor>, CadSpecificServiceFactory<IMacroExecutor>>();
             builder.RegisterSingleton<ICadSpecificServiceFactory<ICadDescriptor>, CadSpecificServiceFactory<ICadDescriptor>>();
+            builder.RegisterSingleton<ICadSpecificServiceFactory<IDocumentMetadataAccessLayerProvider>, CadSpecificServiceFactory<IDocumentMetadataAccessLayerProvider>>();
+            builder.RegisterSingleton<IDocumentMetadataAccessLayerProvider, DefaultDocumentMetadataAccessLayerProvider>().AsCollectionItem();
             builder.RegisterSingleton<IJobProcessManager, JobProcessManager>();
             builder.RegisterSingleton<IPopupKillerFactory, PopupKillerFactory>();
             builder.RegisterSingleton<IExcelReader, ExcelReader>();

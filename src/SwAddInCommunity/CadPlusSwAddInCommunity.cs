@@ -78,6 +78,7 @@ namespace Xarial.CadPlus.AddIn.Sw
 
             builder.RegisterAdapter<ICadSpecificServiceFactory<IMacroExecutor>, IMacroExecutor>(f => f.GetService(CadApplicationIds.SolidWorks), LifetimeScope_e.Singleton);
             builder.RegisterAdapter<ICadSpecificServiceFactory<ICadDescriptor>, ICadDescriptor>(f => f.GetService(CadApplicationIds.SolidWorks), LifetimeScope_e.Singleton);
+            builder.RegisterAdapter<ICadSpecificServiceFactory<IDocumentMetadataAccessLayerProvider>, IDocumentMetadataAccessLayerProvider>(f => f.GetService(CadApplicationIds.SolidWorks), LifetimeScope_e.Singleton);
         }
 
         protected override void HandleException(Exception ex)
