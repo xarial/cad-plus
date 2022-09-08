@@ -14,23 +14,12 @@ namespace Xarial.CadPlus.Plus.Shared.Data
     {
         public byte[] Buffer { get; }
 
-        public XDrawingImage(Image icon)
+        public XDrawingImage(Image icon) : this(icon, icon.RawFormat) 
         {
-            ImageFormat format = null;
+        }
 
-            try
-            {
-                format = icon.RawFormat;
-            }
-            catch 
-            {
-            }
-
-            if (format == null) 
-            {
-                format = ImageFormat.Png;
-            }
-
+        public XDrawingImage(Image icon, ImageFormat format)
+        {
             Buffer = icon.GetBytes(format);
         }
     }
