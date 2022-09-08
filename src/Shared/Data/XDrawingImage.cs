@@ -14,7 +14,7 @@ namespace Xarial.CadPlus.Plus.Shared.Data
     {
         public byte[] Buffer { get; }
 
-        internal XDrawingImage(Image icon)
+        public XDrawingImage(Image icon)
         {
             ImageFormat format = null;
 
