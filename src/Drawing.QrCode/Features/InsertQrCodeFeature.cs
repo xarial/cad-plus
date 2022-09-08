@@ -60,7 +60,7 @@ namespace Xarial.CadPlus.Drawing.QrCode.Features
             m_CurInsertQrCodePageData = new QrCodeData();
 
             m_QrDataProvider = qrDataProvider;
-            m_QrCodeManager = new QrCodePictureManager(m_App, m_QrDataProvider);
+            m_QrCodeManager = new QrCodePictureManager(m_QrDataProvider);
 
             m_InsertQrCodePage.DataChanged += OnPageDataChanged;
             m_InsertQrCodePage.Closed += OnInserQrCodePageClosed;

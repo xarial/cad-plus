@@ -21,8 +21,10 @@ using Xarial.XCad;
 using Xarial.XCad.Base;
 using Xarial.XCad.Documents;
 using Xarial.XCad.Extensions;
+using Xarial.XCad.Features;
 using Xarial.XCad.SolidWorks;
 using Xarial.XCad.SolidWorks.Documents;
+using Xarial.XCad.SolidWorks.Sketch;
 using Xarial.XCad.UI.PropertyPage;
 using Xarial.XCad.UI.PropertyPage.Enums;
 using Xarial.XCad.UI.PropertyPage.Structures;
@@ -33,14 +35,14 @@ namespace Xarial.CadPlus.Drawing.QrCode.Features
 {
     public interface IEditQrCodeFeature : IDisposable
     {
-        void UpdateInPlace(ISwObject pict, ISwDrawing drw);
-        void Reload(ISwObject pict, ISwDrawing drw);
-        void Edit(ISwObject pict, ISwDrawing drw);
+        void UpdateInPlace(IXSketchPicture pict, ISwDrawing drw);
+        void Reload(IXSketchPicture pict, ISwDrawing drw);
+        void Edit(IXSketchPicture pict, ISwDrawing drw);
     }
 
     public class EditQrCodeFeature : InsertQrCodeFeature, IEditQrCodeFeature
     {
-        private ISwObject m_CurPict;
+        private IXSketchPicture m_CurPict;
         private QrCodeInfo m_CurInfo;
 
         private Tuple<int, double, int, double> m_CurPictTrans;
@@ -66,7 +68,7 @@ namespace Xarial.CadPlus.Drawing.QrCode.Features
             HidePicture(m_CurPict, false);
         }
 
-        public void Edit(ISwObject pict, ISwDrawing drw)
+        public void Edit(IXSketchPicture pict, ISwDrawing drw)
         {
             m_CurPict = pict;
             m_CurInfo = FindInfo(pict, drw);
@@ -78,7 +80,7 @@ namespace Xarial.CadPlus.Drawing.QrCode.Features
             Insert(drw);
         }
 
-        public void Reload(ISwObject pict, ISwDrawing drw)
+        public void Reload(IXSketchPicture pict, ISwDrawing drw)
         {
             var info = FindInfo(pict, drw);
 
@@ -87,14 +89,14 @@ namespace Xarial.CadPlus.Drawing.QrCode.Features
             info.Picture = m_QrCodeManager.Reload(pict, data.Location, data.Source, drw);
         }
 
-        public void UpdateInPlace(ISwObject pict, ISwDrawing drw)
+        public void UpdateInPlace(IXSketchPicture pict, ISwDrawing drw)
         {
             var data = FindInfo(pict, drw);
 
             data.Picture = m_QrCodeManager.UpdateInPlace(pict, data.ToData().Source, drw);
         }
 
-        private QrCodeInfo FindInfo(ISwObject pict, ISwDrawing drw)
+        private QrCodeInfo FindInfo(IXSketchPicture pict, ISwDrawing drw)
         {
             var handler = m_App.Documents.GetHandler<QrCodeDrawingHandler>(drw);
             var qrCode = handler.QrCodes.FirstOrDefault(d => d.Picture.Equals(pict));
@@ -107,9 +109,9 @@ namespace Xarial.CadPlus.Drawing.QrCode.Features
             return qrCode;
         }
 
-        private void HidePicture(ISwObject pict, bool hide)
+        private void HidePicture(IXSketchPicture pict, bool hide)
         {
-            var skPict = (ISketchPicture)pict.Dispatch;
+            var skPict = ((ISwSketchPicture)pict).SketchPicture;
 
             if (hide)
             {

@@ -20,10 +20,16 @@ using Xarial.XToolkit.Services.UserSettings.Attributes;
 
 namespace Xarial.CadPlus.Batch.Base.Core
 {
-    public class BatchJobVersionTransformer : BaseUserSettingsVersionsTransformer
+    public class BatchJobVersionTransformer : IVersionsTransformer
     {
+        public IReadOnlyList<VersionTransform> Transforms => m_Transforms;
+
+        private readonly List<VersionTransform> m_Transforms;
+
         public BatchJobVersionTransformer()
         {
+            m_Transforms = new List<VersionTransform>();
+
             Add(new Version("1.0.0"), new Version("1.1.0"), t =>
             {
                 var macrosField = t.Children<JProperty>().First(p => p.Name == "Macros");
@@ -61,6 +67,9 @@ namespace Xarial.CadPlus.Batch.Base.Core
                 return t;
             });
         }
+
+        private void Add(Version from, Version to, Func<JToken, JToken> transform)
+            => m_Transforms.Add(new VersionTransform(from, to, transform));
     }
 
     [UserSettingVersion("1.2.1", typeof(BatchJobVersionTransformer))]

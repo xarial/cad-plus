@@ -39,6 +39,8 @@ using Xarial.XCad.SolidWorks.Features;
 using Xarial.XToolkit.Services;
 using Xarial.CadPlus.Drawing.QrCode.Features;
 using Xarial.CadPlus.Plus.DI;
+using Xarial.XCad.Features;
+using Xarial.XToolkit.Services.Expressions;
 
 namespace Xarial.CadPlus.Drawing.QrCode
 {
@@ -91,6 +93,7 @@ namespace Xarial.CadPlus.Drawing.QrCode
 
         private IXLogger m_Logger;
         private IMessageService m_MsgSvc;
+        private IExpressionParser m_Parser;
 
         public void Init(IHost host)
         {
@@ -113,6 +116,7 @@ namespace Xarial.CadPlus.Drawing.QrCode
 
             m_Logger = m_SvcProvider.GetService<IXLogger>();
             m_MsgSvc = m_SvcProvider.GetService<IMessageService>();
+            m_Parser = m_SvcProvider.GetService<IExpressionParser>();
         }
 
         private void OnConnect()
@@ -125,7 +129,7 @@ namespace Xarial.CadPlus.Drawing.QrCode
             m_InsertQrCodeFeature = m_SvcProvider.GetService<InsertQrCodeFeature>();
             m_EditQrCodeFeature = m_SvcProvider.GetService<EditQrCodeFeature>();
 
-            m_Host.Extension.Application.Documents.RegisterHandler(() => new QrCodeDrawingHandler(m_Logger));
+            m_Host.Extension.Application.Documents.RegisterHandler(() => new QrCodeDrawingHandler(m_Parser, m_Logger));
         }
 
         private void OnCommandClick(Commands_e cmd)
@@ -147,7 +151,7 @@ namespace Xarial.CadPlus.Drawing.QrCode
                     case PictureContextMenuCommands_e.EditQrCode:
                         {
                             var drw = (ISwDrawing)m_Host.Extension.Application.Documents.Active;
-                            var pict = GetSelectedPicture(drw);
+                            var pict = GetSelectedPictures(drw).Last();
                             m_EditQrCodeFeature.Edit(pict, drw);
                         }
                         break;
@@ -155,16 +159,22 @@ namespace Xarial.CadPlus.Drawing.QrCode
                     case PictureContextMenuCommands_e.UpdateQrCodeInPlace:
                         {
                             var drw = (ISwDrawing)m_Host.Extension.Application.Documents.Active;
-                            var pict = GetSelectedPicture(drw);
-                            m_EditQrCodeFeature.UpdateInPlace(pict, drw);
+                            
+                            foreach (var pict in GetSelectedPictures(drw))
+                            {
+                                m_EditQrCodeFeature.UpdateInPlace(pict, drw);
+                            }
                         }
                         break;
 
                     case PictureContextMenuCommands_e.Reload:
                         {
                             var drw = (ISwDrawing)m_Host.Extension.Application.Documents.Active;
-                            var pict = GetSelectedPicture(drw);
-                            m_EditQrCodeFeature.Reload(pict, drw);
+                            
+                            foreach (var pict in GetSelectedPictures(drw))
+                            {
+                                m_EditQrCodeFeature.Reload(pict, drw);
+                            }
                         }
                         break;
                 }
@@ -176,18 +186,8 @@ namespace Xarial.CadPlus.Drawing.QrCode
             }
         }
 
-        private ISwObject GetSelectedPicture(ISwDrawing drw)
-        {
-            var pict = (ISwObject)drw.Selections.Last();
-
-            if (pict is ISwFeature)
-            {
-                pict = drw.CreateObjectFromDispatch<ISwObject>(
-                    ((ISwFeature)pict).Feature.GetSpecificFeature2());
-            }
-
-            return pict;
-        }
+        private IXSketchPicture[] GetSelectedPictures(ISwDrawing drw)
+            => drw.Selections.OfType<IXSketchPicture>().ToArray();
 
         public void Dispose()
         {

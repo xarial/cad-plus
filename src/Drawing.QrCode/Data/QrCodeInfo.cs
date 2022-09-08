@@ -5,94 +5,119 @@
 //License: https://cadplus.xarial.com/license/
 //*********************************************************************
 
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Xarial.CadPlus.Drawing.QrCode.Services;
 using Xarial.XCad;
 using Xarial.XCad.Features;
+using Xarial.XToolkit.Services.Expressions;
 using Xarial.XToolkit.Services.UserSettings;
 using Xarial.XToolkit.Services.UserSettings.Attributes;
 
 namespace Xarial.CadPlus.Drawing.QrCode.Data
 {
-    public class QrCodeInfoVersionTransformer : BaseUserSettingsVersionsTransformer
+    public class QrCodeInfoVersionTransformer : IVersionsTransformer
     {
+        public IReadOnlyList<VersionTransform> Transforms { get; }
+
+        private IExpressionParser m_Parser;
+
         public QrCodeInfoVersionTransformer()
         {
-            //TODO: implement converter
-
-            Add(new Version("1.0"), new Version("2.0"), t => 
+            Transforms = new VersionTransform[]
             {
-                //public enum Source_e
-                //{
-                //    [Title("Custom Property")]
-                //    CustomProperty,
+                new VersionTransform(new Version(), new Version("2.0"), NoneToVersion2)
+            };
+        }
 
-                //    [Title("File Path")]
-                //    FilePath,
+        internal void SetExpressonParser(IExpressionParser parser) 
+        {
+            m_Parser = parser;
+        }
 
-                //    [Title("Part Number")]
-                //    PartNumber,
+        private JToken NoneToVersion2(JToken arr) 
+        {
+            foreach (var t in (JArray)arr)
+            {
+                var srcToken = t.Children<JProperty>().First(p => p.Name == "Source");
+                var refDocToken = t.Children<JProperty>().First(p => p.Name == "RefDocumentSource");
+                var argToken = t.Children<JProperty>().First(p => p.Name == "Argument");
 
-                //    [Title("PDM Vault Link")]
-                //    PdmVaultLink,
+                var src = srcToken.Value.Value<int>();
+                var refDoc = refDocToken.Value.Value<bool>();
+                var arg = argToken.Value.Value<string>();
 
-                //    [Title("PDM Web2 Url")]
-                //    PdmWeb2Url,
+                IExpressionToken expr;
 
-                //    Custom
-                //}
+                switch (src)
+                {
+                    case 0://CustomProperty
+                        expr = new ExpressionTokenVariable(QrCodeDataSourceExpressionSolver.VAR_CUSTOM_PRP, new IExpressionToken[]
+                        {
+                            new ExpressionTokenText(arg),
+                            new ExpressionTokenText(refDoc.ToString())
+                        });
+                        break;
 
-                //public Source_e Source
-                //{
-                //    get => m_Source;
-                //    set
-                //    {
-                //        m_Source = value;
-                //        Changed?.Invoke(this);
-                //    }
-                //}
+                    case 1://FilePath
+                        expr = new ExpressionTokenVariable(QrCodeDataSourceExpressionSolver.VAR_FILE_PATH, null);
+                        break;
 
-                //public bool RefDocumentSource
-                //{
-                //    get => m_RefDocumentSource;
-                //    set
-                //    {
-                //        m_RefDocumentSource = value;
-                //        Changed?.Invoke(this);
-                //    }
-                //}
+                    case 2://PartNumber
+                        expr = new ExpressionTokenVariable(QrCodeDataSourceExpressionSolver.VAR_PART_NUMBER, null);
+                        break;
 
-                //public string Argument
-                //{
-                //    get => m_Argument;
-                //    set
-                //    {
-                //        m_Argument = value;
-                //        Changed?.Invoke(this);
-                //    }
-                //}
+                    case 3://PdmVaultLink
+                        expr = new ExpressionTokenVariable(QrCodeDataSourceExpressionSolver.VAR_PDM_VAULT_LINK, new IExpressionToken[]
+                        {
+                            new ExpressionTokenText(PdmVaultLinkAction_e.Explore.ToString()),
+                            new ExpressionTokenText(refDoc.ToString())
+                        });
+                        break;
 
-                return t;
-            });
+                    case 4://PdmWeb2Url
+                        expr = new ExpressionTokenVariable(QrCodeDataSourceExpressionSolver.VAR_PDM_WEB2_URL, new IExpressionToken[]
+                        {
+                            new ExpressionTokenText(arg),
+                            new ExpressionTokenText(refDoc.ToString())
+                        });
+                        break;
+
+                    case 5://Custom
+                        expr = new ExpressionTokenText(arg);
+                        break;
+
+                    default:
+                        throw new NotSupportedException();
+                }
+
+                srcToken.Remove();
+                refDocToken.Remove();
+
+                argToken.Replace(new JProperty("Expression", m_Parser.CreateExpression(expr)));
+            }
+
+            return arr;
         }
     }
 
-    [UserSettingVersion("2.0", typeof(QrCodeInfoVersionTransformer))]
     public class QrCodeInfo
     {
         public event Action<QrCodeInfo> Changed;
 
-        private IXObject m_Picture;
+        private IXSketchPicture m_Picture;
         private string m_Expression;
         private double m_Size;
         private Dock_e m_Dock;
         private double m_OffsetX;
         private double m_OffsetY;
 
-        public IXObject Picture
+        public IXSketchPicture Picture
         {
             get => m_Picture;
             set
@@ -168,7 +193,7 @@ namespace Xarial.CadPlus.Drawing.QrCode.Data
                 }
             };
 
-        public void Fill(QrCodeData srcData, IXObject pict)
+        public void Fill(QrCodeData srcData, IXSketchPicture pict)
         {
             var src = srcData.Source;
             var loc = srcData.Location;
@@ -181,5 +206,10 @@ namespace Xarial.CadPlus.Drawing.QrCode.Data
             OffsetX = loc.OffsetX;
             OffsetY = loc.OffsetY;
         }
+    }
+
+    [UserSettingVersion("2.0", typeof(QrCodeInfoVersionTransformer))]
+    public class QrCodeInfoCollection : ObservableCollection<QrCodeInfo> 
+    {
     }
 }

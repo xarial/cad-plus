@@ -60,6 +60,6 @@
     <Resource Include="Resources\info.png" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Xarial.CadPlusPlus.Shared" Version="0.4.0-dev.4405" />
+    <PackageReference Include="Xarial.CadPlusPlus.Shared" Version="0.4.0-dev.4411" />
   </ItemGroup>
 </Project>
