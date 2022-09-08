@@ -16,10 +16,15 @@ using Xarial.XToolkit.Services.UserSettings.Attributes;
 
 namespace Xarial.CadPlus.Plus
 {
-    public class HostSettingsVersionTransformer : BaseUserSettingsVersionsTransformer
+    public class HostSettingsVersionTransformer : IVersionsTransformer
     {
+        public IReadOnlyList<VersionTransform> Transforms { get; }
+
         public HostSettingsVersionTransformer()
         {
+            Transforms = new VersionTransform[] 
+            {
+            };
         }
     }
 

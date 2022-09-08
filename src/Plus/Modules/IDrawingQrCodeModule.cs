@@ -8,7 +8,7 @@ using Xarial.XCad.Features;
 
 namespace Xarial.CadPlus.Plus.Modules
 {
-    public interface IQrCodeInfo 
+    public interface IQrCodeElement 
     {
         void Reload();
         void UpdateInPlace();
@@ -16,7 +16,7 @@ namespace Xarial.CadPlus.Plus.Modules
 
     public interface IDrawingQrCodeModule : IModule
     {
-        IQrCodeInfo GetQrCode(IXFeature qrCodeFeat);
-        IEnumerable<IQrCodeInfo> IterateQrCodes(IXDrawing drw);
+        IQrCodeElement GetQrCode(IXFeature qrCodeFeat);
+        IEnumerable<IQrCodeElement> IterateQrCodes(IXDrawing drw);
     }
 }
