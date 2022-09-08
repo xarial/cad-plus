@@ -38,6 +38,7 @@ using System.Linq;
 using Xarial.XCad.SolidWorks.Features;
 using Xarial.XToolkit.Services;
 using Xarial.CadPlus.Drawing.QrCode.Features;
+using Xarial.CadPlus.Plus.DI;
 
 namespace Xarial.CadPlus.Drawing.QrCode
 {
@@ -96,6 +97,14 @@ namespace Xarial.CadPlus.Drawing.QrCode
             m_Host = (IHostCadExtension)host;
             m_Host.Initialized += OnHostInitialized;
             m_Host.Connect += OnConnect;
+            m_Host.ConfigureServices += PnConfigureServices;
+        }
+
+        private void PnConfigureServices(IContainerBuilder builder)
+        {
+            builder.RegisterSelfSingleton<QrDataProvider>();
+            builder.RegisterSelfSingleton<InsertQrCodeFeature>();
+            builder.RegisterSelfSingleton<EditQrCodeFeature>();
         }
 
         private void OnHostInitialized(IApplication app, IServiceProvider svcProvider, IModule[] modules)
@@ -113,11 +122,8 @@ namespace Xarial.CadPlus.Drawing.QrCode
 
             m_Host.RegisterCommands<Commands_e>(OnCommandClick);
 
-            var docMalProvider = m_SvcProvider.GetService<IDocumentMetadataAccessLayerProvider>();
-
-            m_InsertQrCodeFeature = new InsertQrCodeFeature(m_Host.Extension, m_MsgSvc, m_Logger, docMalProvider);
-
-            m_EditQrCodeFeature = new EditQrCodeFeature(m_Host.Extension, m_MsgSvc, m_Logger, docMalProvider);
+            m_InsertQrCodeFeature = m_SvcProvider.GetService<InsertQrCodeFeature>();
+            m_EditQrCodeFeature = m_SvcProvider.GetService<EditQrCodeFeature>();
 
             m_Host.Extension.Application.Documents.RegisterHandler(() => new QrCodeDrawingHandler(m_Logger));
         }

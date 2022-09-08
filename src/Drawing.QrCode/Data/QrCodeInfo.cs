@@ -21,18 +21,72 @@ namespace Xarial.CadPlus.Drawing.QrCode.Data
     {
         public QrCodeInfoVersionTransformer()
         {
+            //TODO: implement converter
+
+            Add(new Version("1.0"), new Version("2.0"), t => 
+            {
+                //public enum Source_e
+                //{
+                //    [Title("Custom Property")]
+                //    CustomProperty,
+
+                //    [Title("File Path")]
+                //    FilePath,
+
+                //    [Title("Part Number")]
+                //    PartNumber,
+
+                //    [Title("PDM Vault Link")]
+                //    PdmVaultLink,
+
+                //    [Title("PDM Web2 Url")]
+                //    PdmWeb2Url,
+
+                //    Custom
+                //}
+
+                //public Source_e Source
+                //{
+                //    get => m_Source;
+                //    set
+                //    {
+                //        m_Source = value;
+                //        Changed?.Invoke(this);
+                //    }
+                //}
+
+                //public bool RefDocumentSource
+                //{
+                //    get => m_RefDocumentSource;
+                //    set
+                //    {
+                //        m_RefDocumentSource = value;
+                //        Changed?.Invoke(this);
+                //    }
+                //}
+
+                //public string Argument
+                //{
+                //    get => m_Argument;
+                //    set
+                //    {
+                //        m_Argument = value;
+                //        Changed?.Invoke(this);
+                //    }
+                //}
+
+                return t;
+            });
         }
     }
 
-    [UserSettingVersion("1.0", typeof(QrCodeInfoVersionTransformer))]
+    [UserSettingVersion("2.0", typeof(QrCodeInfoVersionTransformer))]
     public class QrCodeInfo
     {
         public event Action<QrCodeInfo> Changed;
 
         private IXObject m_Picture;
-        private Source_e m_Source;
-        private string m_Argument;
-        private bool m_RefDocumentSource;
+        private string m_Expression;
         private double m_Size;
         private Dock_e m_Dock;
         private double m_OffsetX;
@@ -48,32 +102,12 @@ namespace Xarial.CadPlus.Drawing.QrCode.Data
             }
         }
 
-        public Source_e Source
+        public string Expression
         {
-            get => m_Source;
+            get => m_Expression;
             set
             {
-                m_Source = value;
-                Changed?.Invoke(this);
-            }
-        }
-
-        public bool RefDocumentSource
-        {
-            get => m_RefDocumentSource;
-            set
-            {
-                m_RefDocumentSource = value;
-                Changed?.Invoke(this);
-            }
-        }
-
-        public string Argument
-        {
-            get => m_Argument;
-            set
-            {
-                m_Argument = value;
+                m_Expression = value;
                 Changed?.Invoke(this);
             }
         }
@@ -123,11 +157,7 @@ namespace Xarial.CadPlus.Drawing.QrCode.Data
             {
                 Source = new SourceData()
                 {
-                    Source = Source,
-                    ReferencedDocument = RefDocumentSource,
-                    CustomPropertyName = Source == Source_e.CustomProperty ? Argument : "",
-                    PdmWeb2Server = Source == Source_e.PdmWeb2Url ? Argument : "",
-                    CustomValue = Source == Source_e.Custom ? Argument : ""
+                    Expression = Expression
                 },
                 Location = new LocationData()
                 {
@@ -140,29 +170,11 @@ namespace Xarial.CadPlus.Drawing.QrCode.Data
 
         public void Fill(QrCodeData srcData, IXObject pict)
         {
-            var arg = "";
             var src = srcData.Source;
             var loc = srcData.Location;
 
-            switch (src.Source)
-            {
-                case Source_e.CustomProperty:
-                    arg = src.CustomPropertyName;
-                    break;
-
-                case Source_e.PdmWeb2Url:
-                    arg = src.PdmWeb2Server;
-                    break;
-
-                case Source_e.Custom:
-                    arg = src.CustomValue;
-                    break;
-            }
-
             Picture = pict;
-            Source = src.Source;
-            RefDocumentSource = src.ReferencedDocument;
-            Argument = arg;
+            Expression = src.Expression;
 
             Dock = loc.Dock;
             Size = loc.Size;

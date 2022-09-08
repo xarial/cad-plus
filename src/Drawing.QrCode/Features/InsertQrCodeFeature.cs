@@ -49,7 +49,7 @@ namespace Xarial.CadPlus.Drawing.QrCode.Features
         private readonly IMessageService m_MsgSvc;
         private readonly IXLogger m_Logger;
 
-        public InsertQrCodeFeature(IXExtension ext, IMessageService msgSvc, IXLogger logger, IDocumentMetadataAccessLayerProvider docMalProvider)
+        public InsertQrCodeFeature(IXExtension ext, IMessageService msgSvc, IXLogger logger, QrDataProvider qrDataProvider)
         {
             m_App = ext.Application;
             m_MsgSvc = msgSvc;
@@ -59,7 +59,7 @@ namespace Xarial.CadPlus.Drawing.QrCode.Features
 
             m_CurInsertQrCodePageData = new QrCodeData();
 
-            m_QrDataProvider = new QrDataProvider(m_App, m_Logger, docMalProvider);
+            m_QrDataProvider = qrDataProvider;
             m_QrCodeManager = new QrCodePictureManager(m_App, m_QrDataProvider);
 
             m_InsertQrCodePage.DataChanged += OnPageDataChanged;
