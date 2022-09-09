@@ -16,7 +16,7 @@ namespace Xarial.CadPlus.Plus.Modules
 
     public interface IDrawingQrCodeModule : IModule
     {
-        IQrCodeElement GetQrCode(IXFeature qrCodeFeat);
+        IQrCodeElement GetQrCode(IXSketchPicture qrCodePicture);
         IEnumerable<IQrCodeElement> IterateQrCodes(IXDrawing drw);
     }
 }
