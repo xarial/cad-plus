@@ -33,106 +33,33 @@ using Xarial.XToolkit.Services;
 
 namespace Xarial.CadPlus.Drawing.QrCode.Features
 {
-    public interface IEditQrCodeFeature : IDisposable
+    public class EditQrCodeFeature : InsertQrCodeFeature
     {
-        void UpdateInPlace(IXSketchPicture pict, ISwDrawing drw);
-        void Reload(IXSketchPicture pict, ISwDrawing drw);
-        void Edit(IXSketchPicture pict, ISwDrawing drw);
-    }
-
-    public class EditQrCodeFeature : InsertQrCodeFeature, IEditQrCodeFeature
-    {
-        private IXSketchPicture m_CurPict;
-        private QrCodeInfo m_CurInfo;
-
-        private Tuple<int, double, int, double> m_CurPictTrans;
-
-        public EditQrCodeFeature(IXExtension ext, IMessageService msgSvc, IXLogger logger, QrDataProvider qrDataProvider)
-            : base(ext, msgSvc, logger, qrDataProvider)
+        public EditQrCodeFeature(IXExtension ext, IMessageService msgSvc, IXLogger logger)
+            : base(ext, msgSvc, logger)
         {
         }
 
-        protected override void OnInsertQrCode()
+        public void Edit(QrCodeElement qrCodeElem)
         {
-            var pict = m_QrCodeManager.Reload(m_CurPict,
-                m_CurInsertQrCodePageData.Location,
-                m_CurInsertQrCodePageData.Source,
-                m_CurDrawing);
+            m_PageData = QrCodeData.FromQrCodeInfo(qrCodeElem.Info);
 
-            m_CurInfo.Fill(m_CurInsertQrCodePageData, pict);
+            qrCodeElem.Hide();
+
+            Insert(qrCodeElem);
         }
 
-        protected override void OnCancelInsertQrCode()
+        protected override void InsertQrCode()
         {
-            base.OnCancelInsertQrCode();
-            HidePicture(m_CurPict, false);
+            m_CurQrCodeElement.Edit(m_PageData.Location.Dock, m_PageData.Location.Size,
+                m_PageData.Location.OffsetX, m_PageData.Location.OffsetY,
+                m_PageData.Source.Expression);
         }
 
-        public void Edit(IXSketchPicture pict, ISwDrawing drw)
+        protected override void CancelInsertQrCode()
         {
-            m_CurPict = pict;
-            m_CurInfo = FindInfo(pict, drw);
-
-            m_CurInsertQrCodePageData = m_CurInfo.ToData();
-
-            HidePicture(m_CurPict, true);
-
-            Insert(drw);
-        }
-
-        public void Reload(IXSketchPicture pict, ISwDrawing drw)
-        {
-            var info = FindInfo(pict, drw);
-
-            var data = info.ToData();
-
-            info.Picture = m_QrCodeManager.Reload(pict, data.Location, data.Source, drw);
-        }
-
-        public void UpdateInPlace(IXSketchPicture pict, ISwDrawing drw)
-        {
-            var data = FindInfo(pict, drw);
-
-            data.Picture = m_QrCodeManager.UpdateInPlace(pict, data.ToData().Source, drw);
-        }
-
-        private QrCodeInfo FindInfo(IXSketchPicture pict, ISwDrawing drw)
-        {
-            var handler = m_App.Documents.GetHandler<QrCodeDrawingHandler>(drw);
-            var qrCode = handler.QrCodes.FirstOrDefault(d => d.Picture.Equals(pict));
-
-            if (qrCode == null)
-            {
-                throw new UserException("This picture does not contain QR code data");
-            }
-
-            return qrCode;
-        }
-
-        private void HidePicture(IXSketchPicture pict, bool hide)
-        {
-            var skPict = ((ISwSketchPicture)pict).SketchPicture;
-
-            if (hide)
-            {
-                int style = -1;
-                double trans = -1;
-                int matchColor = -1;
-                double matchTol = -1;
-
-                skPict.GetTransparency(ref style, ref trans, ref matchColor, ref matchTol);
-                m_CurPictTrans = new Tuple<int, double, int, double>(style, trans, matchColor, matchTol);
-
-                const int TRANSPARENT = 1;
-                const int COLOR_IGNORE = 0;
-                const int COLOR_EXACT_MATCH = 0;
-                skPict.SetTransparency((int)swSketchPictureTransparencyStyle_e.swSketchPictureTransparencyFullImage,
-                    TRANSPARENT, COLOR_IGNORE, COLOR_EXACT_MATCH);
-            }
-            else
-            {
-                skPict.SetTransparency(m_CurPictTrans.Item1, m_CurPictTrans.Item2, m_CurPictTrans.Item3, m_CurPictTrans.Item4);
-            }
+            base.CancelInsertQrCode();
+            m_CurQrCodeElement.Show();
         }
     }
 }

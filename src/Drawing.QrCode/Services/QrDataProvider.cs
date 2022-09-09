@@ -45,9 +45,9 @@ namespace Xarial.CadPlus.Drawing.QrCode.Services
             m_Solver = new QrCodeDataSourceExpressionSolver();
         }
 
-        public string GetData(IXDrawing drw, SourceData srcData)
+        public string GetData(IXDrawing drw, string expression)
         {
-            var token = m_ExpParser.Parse(srcData.Expression);
+            var token = m_ExpParser.Parse(expression);
 
             using (var scopedDoc = new DataSourceDocument(m_DocMalProvider, m_App, drw, m_Logger))
             {

@@ -110,11 +110,11 @@ namespace Xarial.CadPlus.Drawing.QrCode
             {
                 m_Drawing = (IXDrawing)model;
                 m_Drawing.StreamWriteAvailable += OnStreamWriteAvailable;
-                m_QrCodesLazy = new Lazy<QrCodeInfoCollection>(ReadQrCodeData);
+                m_QrCodesLazy = new Lazy<QrCodeInfoCollection>(ReadQrCodeInfo);
             }
         }
 
-        private QrCodeInfoCollection ReadQrCodeData()
+        private QrCodeInfoCollection ReadQrCodeInfo()
         {
             QrCodeInfoCollection data = null;
 
@@ -145,7 +145,7 @@ namespace Xarial.CadPlus.Drawing.QrCode
 
             if (data != null)
             {
-                var usedPictures = new List<IXObject>();
+                var usedPictures = new List<IXSketchPicture>();
 
                 for (int i = data.Count - 1; i >= 0; i--)
                 {
@@ -181,10 +181,10 @@ namespace Xarial.CadPlus.Drawing.QrCode
         private void OnDataCollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
             m_HasChanges = true;
-            Init((IEnumerable<QrCodeInfo>)sender);
+            Init((QrCodeInfoCollection)sender);
         }
 
-        private void Init(IEnumerable<QrCodeInfo> qrCodes)
+        private void Init(QrCodeInfoCollection qrCodes)
         {
             foreach (var qrCode in qrCodes)
             {

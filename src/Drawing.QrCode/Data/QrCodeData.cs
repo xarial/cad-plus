@@ -26,6 +26,22 @@ namespace Xarial.CadPlus.Drawing.QrCode.Data
     [Help("https://cadplus.xarial.com/drawing/qr-code/")]
     public class QrCodeData
     {
+        public static QrCodeData FromQrCodeInfo(QrCodeInfo info) 
+            => new QrCodeData()
+            {
+                Source = new SourceData()
+                {
+                    Expression = info.Expression
+                },
+                Location = new LocationData()
+                {
+                    Dock = info.Dock,
+                    Size = info.Size,
+                    OffsetX = info.OffsetX,
+                    OffsetY = info.OffsetY
+                }
+            };
+
         public SourceData Source { get; set; }
 
         public LocationData Location { get; set; }

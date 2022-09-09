@@ -28,28 +28,21 @@ using Xarial.CadPlus.Drawing.QrCode.Data;
 
 namespace Xarial.CadPlus.Drawing.QrCode.Features
 {
-    public interface IInsertQrCodeFeature : IDisposable
-    {
-        void Insert(IXDrawing drw);
-    }
-
-    public class InsertQrCodeFeature : IInsertQrCodeFeature
+    public class InsertQrCodeFeature
     {
         private readonly IXPropertyPage<QrCodeData> m_InsertQrCodePage;
-        private readonly QrDataProvider m_QrDataProvider;
-        protected readonly QrCodePictureManager m_QrCodeManager;
 
-        protected QrCodeData m_CurInsertQrCodePageData;
+        protected QrCodeData m_PageData;
+
+        protected QrCodeElement m_CurQrCodeElement;
         private QrCodePreviewer m_CurPreviewer;
-
-        protected IXDrawing m_CurDrawing;
 
         protected readonly IXApplication m_App;
 
         private readonly IMessageService m_MsgSvc;
         private readonly IXLogger m_Logger;
 
-        public InsertQrCodeFeature(IXExtension ext, IMessageService msgSvc, IXLogger logger, QrDataProvider qrDataProvider)
+        public InsertQrCodeFeature(IXExtension ext, IMessageService msgSvc, IXLogger logger)
         {
             m_App = ext.Application;
             m_MsgSvc = msgSvc;
@@ -57,10 +50,7 @@ namespace Xarial.CadPlus.Drawing.QrCode.Features
 
             m_InsertQrCodePage = ext.CreatePage<QrCodeData>();
 
-            m_CurInsertQrCodePageData = new QrCodeData();
-
-            m_QrDataProvider = qrDataProvider;
-            m_QrCodeManager = new QrCodePictureManager(m_QrDataProvider);
+            m_PageData = new QrCodeData();
 
             m_InsertQrCodePage.DataChanged += OnPageDataChanged;
             m_InsertQrCodePage.Closed += OnInserQrCodePageClosed;
@@ -73,7 +63,7 @@ namespace Xarial.CadPlus.Drawing.QrCode.Features
             {
                 try
                 {
-                    if (string.IsNullOrEmpty(m_QrDataProvider.GetData(m_CurDrawing, m_CurInsertQrCodePageData.Source)))
+                    if (string.IsNullOrEmpty(m_PageData.Source.Expression))
                     {
                         throw new UserException("Data for QR code is empty");
                     }
@@ -96,11 +86,11 @@ namespace Xarial.CadPlus.Drawing.QrCode.Features
 
                 if (reason == PageCloseReasons_e.Okay)
                 {
-                    OnInsertQrCode();
+                    InsertQrCode();
                 }
                 else if (reason == PageCloseReasons_e.Cancel)
                 {
-                    OnCancelInsertQrCode();
+                    CancelInsertQrCode();
                 }
             }
             catch (Exception ex)
@@ -110,27 +100,24 @@ namespace Xarial.CadPlus.Drawing.QrCode.Features
             }
         }
 
-        protected virtual void OnInsertQrCode()
+        protected virtual void InsertQrCode()
         {
-            var pict = m_QrCodeManager.Insert(m_CurDrawing, m_CurInsertQrCodePageData.Location, m_CurInsertQrCodePageData.Source);
-
-            var data = new QrCodeInfo();
-            data.Fill(m_CurInsertQrCodePageData, pict);
-
-            var handler = m_App.Documents.GetHandler<QrCodeDrawingHandler>(m_CurDrawing);
-
-            handler.QrCodes.Add(data);
+            m_CurQrCodeElement.Create(m_PageData.Location.Dock,
+                m_PageData.Location.Size,
+                m_PageData.Location.OffsetX,
+                m_PageData.Location.OffsetY,
+                m_PageData.Source.Expression);
         }
 
-        protected virtual void OnCancelInsertQrCode()
+        protected virtual void CancelInsertQrCode()
         {
         }
 
-        public void Insert(IXDrawing drw)
+        public void Insert(QrCodeElement qrCodeElem)
         {
-            m_CurDrawing = drw;
-            m_CurPreviewer = new QrCodePreviewer(m_CurDrawing, m_QrCodeManager);
-            m_InsertQrCodePage.Show(m_CurInsertQrCodePageData);
+            m_CurQrCodeElement = qrCodeElem;
+            m_CurPreviewer = new QrCodePreviewer(qrCodeElem.Drawing);
+            m_InsertQrCodePage.Show(m_PageData);
             UpdatePreview();
         }
 
@@ -142,10 +129,10 @@ namespace Xarial.CadPlus.Drawing.QrCode.Features
         private void UpdatePreview()
         {
             m_CurPreviewer.Preview(
-                m_CurInsertQrCodePageData.Location.Dock,
-                m_CurInsertQrCodePageData.Location.Size,
-                m_CurInsertQrCodePageData.Location.OffsetX,
-                m_CurInsertQrCodePageData.Location.OffsetY);
+                m_PageData.Location.Dock,
+                m_PageData.Location.Size,
+                m_PageData.Location.OffsetX,
+                m_PageData.Location.OffsetY);
         }
 
         public void Dispose()

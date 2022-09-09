@@ -176,36 +176,6 @@ namespace Xarial.CadPlus.Drawing.QrCode.Data
                 Changed?.Invoke(this);
             }
         }
-
-        public QrCodeData ToData()
-            => new QrCodeData()
-            {
-                Source = new SourceData()
-                {
-                    Expression = Expression
-                },
-                Location = new LocationData()
-                {
-                    Dock = Dock,
-                    Size = Size,
-                    OffsetX = OffsetX,
-                    OffsetY = OffsetY
-                }
-            };
-
-        public void Fill(QrCodeData srcData, IXSketchPicture pict)
-        {
-            var src = srcData.Source;
-            var loc = srcData.Location;
-
-            Picture = pict;
-            Expression = src.Expression;
-
-            Dock = loc.Dock;
-            Size = loc.Size;
-            OffsetX = loc.OffsetX;
-            OffsetY = loc.OffsetY;
-        }
     }
 
     [UserSettingVersion("2.0", typeof(QrCodeInfoVersionTransformer))]
