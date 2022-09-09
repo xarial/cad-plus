@@ -92,8 +92,8 @@
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
     <Reference Include="WindowsBase" />
-    <Reference Include="Xarial.XCad, Version=0.8.0.4418, Culture=neutral, PublicKeyToken=60dcaf351d4060db, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Xarial.XCad.0.8.0-dev.4418\lib\net461\Xarial.XCad.dll</HintPath>
+    <Reference Include="Xarial.XCad, Version=0.8.0.4420, Culture=neutral, PublicKeyToken=60dcaf351d4060db, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Xarial.XCad.0.8.0-dev.4420\lib\net461\Xarial.XCad.dll</HintPath>
     </Reference>
     <Reference Include="Xarial.XToolkit, Version=0.4.0.4408, Culture=neutral, PublicKeyToken=60dcaf351d4060db, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Xarial.XToolkit.0.4.0-dev.4408\lib\net461\Xarial.XToolkit.dll</HintPath>
