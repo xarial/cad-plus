@@ -28,7 +28,7 @@ namespace Xarial.CadPlus.Plus.Modules
     {
         IXSketchPicture Picture { get; }
         string Expression { get; }
-        QrCodeDock_e Doc { get; }
+        QrCodeDock_e Dock { get; }
         double Size { get; }
         double OffsetX { get; }
         double OffsetZ { get; }
