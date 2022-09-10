@@ -31,7 +31,7 @@ namespace Xarial.CadPlus.Plus.Modules
         QrCodeDock_e Dock { get; }
         double Size { get; }
         double OffsetX { get; }
-        double OffsetZ { get; }
+        double OffsetY { get; }
 
         void Edit(QrCodeDock_e dock, double size, double offsetX, double offsetY, string expression);
 
