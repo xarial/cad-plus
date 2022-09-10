@@ -22,7 +22,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Xarial.XCad" Version="0.8.0-dev.4422" />
+    <PackageReference Include="Xarial.XCad" Version="0.8.0-dev.4424" />
     <PackageReference Include="Xarial.XToolkit" Version="0.4.0-dev.4408" />
   </ItemGroup>
   <ItemGroup>
