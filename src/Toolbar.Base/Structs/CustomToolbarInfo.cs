@@ -7,16 +7,23 @@
 
 using Newtonsoft.Json.Linq;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Xarial.XToolkit.Services.UserSettings;
 using Xarial.XToolkit.Services.UserSettings.Attributes;
 
 namespace Xarial.CadPlus.CustomToolbar.Structs
 {
-    public class CustomToolbarInfoVersionTransformer : BaseUserSettingsVersionsTransformer
+    public class CustomToolbarInfoVersionTransformer : IVersionsTransformer
     {
+        public IReadOnlyList<VersionTransform> Transforms => m_Transforms;
+
+        private readonly List<VersionTransform> m_Transforms;
+
         public CustomToolbarInfoVersionTransformer()
         {
+            m_Transforms = new List<VersionTransform>();
+
             Add(new Version(), new Version("1.0"),
                 t =>
                 {
@@ -127,6 +134,9 @@ namespace Xarial.CadPlus.CustomToolbar.Structs
                     return t;
                 });
         }
+
+        private void Add(Version from, Version to, Func<JToken, JToken> transform)
+            => m_Transforms.Add(new VersionTransform(from, to, transform));
     }
 
     [UserSettingVersion("3.3", typeof(CustomToolbarInfoVersionTransformer))]

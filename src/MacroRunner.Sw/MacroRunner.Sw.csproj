@@ -13,7 +13,7 @@
     <Exec Command="%windir%\Microsoft.NET\Framework64\v4.0.30319\RegAsm.exe &quot;$(TargetPath)&quot; /codebase /tlb" Condition="Exists('$(TargetPath)')" />
   </Target>
   <ItemGroup>
-    <PackageReference Include="Xarial.XCad.SolidWorks" Version="0.8.0-dev.4400" />
+    <PackageReference Include="Xarial.XCad.SolidWorks" Version="0.8.0-dev.4424" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\MacroRunner\MacroRunner.csproj" />

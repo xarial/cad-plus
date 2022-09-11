@@ -15,6 +15,7 @@ using System.Threading.Tasks;
 using Xarial.CadPlus.CustomToolbar.Base;
 using Xarial.CadPlus.Plus.Data;
 using Xarial.CadPlus.Plus.Modules;
+using Xarial.CadPlus.Plus.Shared.Data;
 using Xarial.XCad.UI;
 using Xarial.XToolkit;
 using Xarial.XToolkit.Wpf.Utils;
@@ -34,7 +35,7 @@ namespace Xarial.CadPlus.CustomToolbar.Services
         public FileTypeFilter Filter 
             => new FileTypeFilter(FileFilter.ImageFiles.Name, FileFilter.ImageFiles.Extensions);
 
-        public IXImage GetIcon(string filePath) => new ImageIcon(Image.FromFile(filePath));
+        public IXImage GetIcon(string filePath) => new XDrawingImage(Image.FromFile(filePath));
 
         public Image GetThumbnail(string filePath) => Image.FromFile(filePath);
 

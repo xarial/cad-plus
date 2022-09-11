@@ -20,8 +20,10 @@ using Xarial.XCad.Base.Enums;
 using Xarial.XCad.Data.Enums;
 using Xarial.XCad.Documents;
 using Xarial.XCad.Documents.Services;
+using Xarial.XCad.Features;
 using Xarial.XCad.SolidWorks;
 using Xarial.XCad.SolidWorks.Documents;
+using Xarial.XToolkit.Services.Expressions;
 using Xarial.XToolkit.Services.UserSettings;
 
 namespace Xarial.CadPlus.Drawing.QrCode
@@ -32,7 +34,7 @@ namespace Xarial.CadPlus.Drawing.QrCode
     /// </summary>
     public class PictureValueSerializer : IValueSerializer
     {
-        public Type Type => typeof(IXObject);
+        public Type Type => typeof(IXSketchPicture);
 
         private readonly IXLogger m_Logger;
         private readonly IXDrawing m_Draw;
@@ -49,16 +51,7 @@ namespace Xarial.CadPlus.Drawing.QrCode
             {
                 if (!string.IsNullOrEmpty(val))
                 {
-                    var feat = (IFeature)((ISwDrawing)m_Draw).Drawing.FeatureByName(val);
-                    if (feat != null)
-                    {
-                        var skPict = (ISketchPicture)feat.GetSpecificFeature2();
-                        return ((ISwDrawing)m_Draw).CreateObjectFromDispatch<ISwObject>(skPict);
-                    }
-                    else
-                    {
-                        throw new Exception("Failed to find the picture");
-                    }
+                    return (IXSketchPicture)m_Draw.Features[val];
                 }
                 else
                 {
@@ -76,10 +69,7 @@ namespace Xarial.CadPlus.Drawing.QrCode
         {
             try
             {
-                var obj = (IXObject)val;
-
-                var skPict = ((ISwObject)obj).Dispatch as ISketchPicture;
-                return skPict.GetFeature().Name;
+                return ((IXSketchPicture)val).Name;
             }
             catch
             {
@@ -92,20 +82,24 @@ namespace Xarial.CadPlus.Drawing.QrCode
     {
         private const string STREAM_NAME = "_Xarial_CadPlus_QRCodeData_";
 
-        public ObservableCollection<QrCodeInfo> QrCodes => m_QrCodesLazy.Value;
+        public QrCodeInfoCollection QrCodes => m_QrCodesLazy.Value;
 
         private bool m_HasChanges;
 
-        private Lazy<ObservableCollection<QrCodeInfo>> m_QrCodesLazy;
+        private Lazy<QrCodeInfoCollection> m_QrCodesLazy;
         private IXDrawing m_Drawing;
 
         private readonly IXLogger m_Logger;
         private readonly UserSettingsService m_Serializer;
 
-        public QrCodeDrawingHandler(IXLogger logger)
-        {
-            m_Serializer = new UserSettingsService();
+        private readonly IExpressionParser m_ExprParser;
+
+        public QrCodeDrawingHandler(IExpressionParser exprParser, IXLogger logger)
+        {   
+            m_ExprParser = exprParser;
             m_Logger = logger;
+
+            m_Serializer = new UserSettingsService();
         }
 
         public void Init(IXApplication app, IXDocument model)
@@ -116,13 +110,13 @@ namespace Xarial.CadPlus.Drawing.QrCode
             {
                 m_Drawing = (IXDrawing)model;
                 m_Drawing.StreamWriteAvailable += OnStreamWriteAvailable;
-                m_QrCodesLazy = new Lazy<ObservableCollection<QrCodeInfo>>(ReadQrCodeData);
+                m_QrCodesLazy = new Lazy<QrCodeInfoCollection>(ReadQrCodeInfo);
             }
         }
 
-        private ObservableCollection<QrCodeInfo> ReadQrCodeData()
+        private QrCodeInfoCollection ReadQrCodeInfo()
         {
-            ObservableCollection<QrCodeInfo> data = null;
+            QrCodeInfoCollection data = null;
 
             try
             {
@@ -134,8 +128,12 @@ namespace Xarial.CadPlus.Drawing.QrCode
 
                         using (var reader = new StreamReader(stream))
                         {
-                            data = m_Serializer.ReadSettings<ObservableCollection<QrCodeInfo>>(
-                                reader, new PictureValueSerializer(m_Logger, m_Drawing));
+                            data = m_Serializer.ReadSettings<QrCodeInfoCollection>(
+                                reader, t => 
+                                {
+                                    ((QrCodeInfoVersionTransformer)t).SetExpressonParser(m_ExprParser);
+                                    return t;
+                                }, new PictureValueSerializer(m_Logger, m_Drawing));
                         }
                     }
                 }
@@ -147,7 +145,7 @@ namespace Xarial.CadPlus.Drawing.QrCode
 
             if (data != null)
             {
-                var usedPictures = new List<IXObject>();
+                var usedPictures = new List<IXSketchPicture>();
 
                 for (int i = data.Count - 1; i >= 0; i--)
                 {
@@ -170,7 +168,7 @@ namespace Xarial.CadPlus.Drawing.QrCode
             }
             else
             {
-                data = new ObservableCollection<QrCodeInfo>();
+                data = new QrCodeInfoCollection();
             }
 
             data.CollectionChanged += OnDataCollectionChanged;
@@ -183,10 +181,10 @@ namespace Xarial.CadPlus.Drawing.QrCode
         private void OnDataCollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
             m_HasChanges = true;
-            Init((IEnumerable<QrCodeInfo>)sender);
+            Init((QrCodeInfoCollection)sender);
         }
 
-        private void Init(IEnumerable<QrCodeInfo> qrCodes)
+        private void Init(QrCodeInfoCollection qrCodes)
         {
             foreach (var qrCode in qrCodes)
             {

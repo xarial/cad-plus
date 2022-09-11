@@ -6,6 +6,7 @@
 //*********************************************************************
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using Xarial.CadPlus.Plus;
 using Xarial.CadPlus.Plus.Attributes;
@@ -15,10 +16,15 @@ using Xarial.XToolkit.Services.UserSettings.Attributes;
 
 namespace Xarial.CadPlus.CustomToolbar.Structs
 {
-    public class ToolbarSettingsVersionTransformer : BaseUserSettingsVersionsTransformer
+    public class ToolbarSettingsVersionTransformer : IVersionsTransformer
     {
+        public IReadOnlyList<VersionTransform> Transforms { get; }
+
         public ToolbarSettingsVersionTransformer()
         {
+            Transforms = new VersionTransform[]
+            {
+            };
         }
     }
 

@@ -7,6 +7,7 @@
 
 using Xarial.CadPlus.Drawing.QrCode.Properties;
 using Xarial.CadPlus.Plus.Attributes;
+using Xarial.CadPlus.Plus.Modules;
 using Xarial.XCad.UI.PropertyPage.Attributes;
 using Xarial.XCad.UI.PropertyPage.Enums;
 
@@ -20,7 +21,7 @@ namespace Xarial.CadPlus.Drawing.QrCode.Data
         public double Size { get; set; }
 
         [IconEx(typeof(Resources), nameof(Resources.dock_vector), nameof(Resources.dock_icon))]
-        public Dock_e Dock { get; set; }
+        public QrCodeDock_e Dock { get; set; }
 
         [NumberBoxOptions(NumberBoxUnitType_e.Length, -1000, 1000, 0.01, false, 0.02, 0.001)]
         [IconEx(typeof(Resources), nameof(Resources.offsetx_vector), nameof(Resources.offsetx_icon))]
@@ -32,7 +33,7 @@ namespace Xarial.CadPlus.Drawing.QrCode.Data
 
         public LocationData()
         {
-            Dock = Dock_e.BottomRight;
+            Dock = QrCodeDock_e.BottomRight;
             Size = 0.1;
         }
     }

@@ -38,6 +38,10 @@ using System.Linq;
 using Xarial.XCad.SolidWorks.Features;
 using Xarial.XToolkit.Services;
 using Xarial.CadPlus.Drawing.QrCode.Features;
+using Xarial.CadPlus.Plus.DI;
+using Xarial.XCad.Features;
+using Xarial.XToolkit.Services.Expressions;
+using System.Collections.Generic;
 
 namespace Xarial.CadPlus.Drawing.QrCode
 {
@@ -64,14 +68,14 @@ namespace Xarial.CadPlus.Drawing.QrCode
         [IconEx(typeof(Resources), nameof(Resources.qr_code_edit_vector), nameof(Resources.qr_code_edit))]
         EditQrCode,
 
-        [Title("Update In Place")]
-        [Description("Updates QR code in the current location")]
+        [Title("Update")]
+        [Description("Updates QR code in the current location preserving the current size")]
         [CommandItemInfo(WorkspaceTypes_e.Drawing)]
         [IconEx(typeof(Resources), nameof(Resources.qr_code_update_in_place_vector), nameof(Resources.qr_code_update_in_place))]
         UpdateQrCodeInPlace,
 
         [Title("Reload")]
-        [Description("Reloads QR code and updates the location and size")]
+        [Description("Reloads QR code and updates the location and size according to sheet scale")]
         [CommandItemInfo(WorkspaceTypes_e.Drawing)]
         [IconEx(typeof(Resources), nameof(Resources.qr_code_update_vector), nameof(Resources.qr_code_update))]
         Reload
@@ -79,23 +83,34 @@ namespace Xarial.CadPlus.Drawing.QrCode
 
     //TODO: remove the dependency on application once the common APIs are used
     [Module(typeof(IHostCadExtension), typeof(ISwAddInApplication))]
-    public class DrawingQrCodeModule : IModule
+    public class DrawingQrCodeModule : IDrawingQrCodeModule
     {
         private IHostCadExtension m_Host;
 
-        private IInsertQrCodeFeature m_InsertQrCodeFeature;
-        private IEditQrCodeFeature m_EditQrCodeFeature;
+        private InsertQrCodeFeature m_InsertQrCodeFeature;
+        private EditQrCodeFeature m_EditQrCodeFeature;
+
+        private QrDataProvider m_DataProvider;
 
         private IServiceProvider m_SvcProvider;
 
         private IXLogger m_Logger;
         private IMessageService m_MsgSvc;
+        private IExpressionParser m_Parser;
 
         public void Init(IHost host)
         {
             m_Host = (IHostCadExtension)host;
             m_Host.Initialized += OnHostInitialized;
             m_Host.Connect += OnConnect;
+            m_Host.ConfigureServices += PnConfigureServices;
+        }
+
+        private void PnConfigureServices(IContainerBuilder builder)
+        {
+            builder.RegisterSelfSingleton<QrDataProvider>();
+            builder.RegisterSelfSingleton<InsertQrCodeFeature>();
+            builder.RegisterSelfSingleton<EditQrCodeFeature>();
         }
 
         private void OnHostInitialized(IApplication app, IServiceProvider svcProvider, IModule[] modules)
@@ -104,22 +119,20 @@ namespace Xarial.CadPlus.Drawing.QrCode
 
             m_Logger = m_SvcProvider.GetService<IXLogger>();
             m_MsgSvc = m_SvcProvider.GetService<IMessageService>();
+            m_Parser = m_SvcProvider.GetService<IExpressionParser>();
+            m_DataProvider = m_SvcProvider.GetService<QrDataProvider>();
         }
 
         private void OnConnect()
         {
-            m_Host.Extension.CommandManager.AddContextMenu<PictureContextMenuCommands_e>(
-                (SelectType_e)swSelectType_e.swSelSKETCHBITMAP).CommandClick += OnPictureContextMenuCommandClick;
+            m_Host.Extension.CommandManager.AddContextMenu<PictureContextMenuCommands_e>(SelectType_e.SketchPicture).CommandClick += OnPictureContextMenuCommandClick;
 
             m_Host.RegisterCommands<Commands_e>(OnCommandClick);
 
-            var docMalProvider = m_SvcProvider.GetService<IDocumentMetadataAccessLayerProvider>();
+            m_InsertQrCodeFeature = m_SvcProvider.GetService<InsertQrCodeFeature>();
+            m_EditQrCodeFeature = m_SvcProvider.GetService<EditQrCodeFeature>();
 
-            m_InsertQrCodeFeature = new InsertQrCodeFeature(m_Host.Extension, m_MsgSvc, m_Logger, docMalProvider);
-
-            m_EditQrCodeFeature = new EditQrCodeFeature(m_Host.Extension, m_MsgSvc, m_Logger, docMalProvider);
-
-            m_Host.Extension.Application.Documents.RegisterHandler(() => new QrCodeDrawingHandler(m_Logger));
+            m_Host.Extension.Application.Documents.RegisterHandler(() => new QrCodeDrawingHandler(m_Parser, m_Logger));
         }
 
         private void OnCommandClick(Commands_e cmd)
@@ -127,7 +140,8 @@ namespace Xarial.CadPlus.Drawing.QrCode
             switch (cmd)
             {
                 case Commands_e.InsertQrCode:
-                    m_InsertQrCodeFeature.Insert((IXDrawing)m_Host.Extension.Application.Documents.Active);
+                    var drw = (IXDrawing)m_Host.Extension.Application.Documents.Active;
+                    m_InsertQrCodeFeature.Insert(new QrCodeElement(m_Host.Extension.Application, drw, drw.Sheets.Active, m_DataProvider));
                     break;
             }
         }
@@ -140,25 +154,33 @@ namespace Xarial.CadPlus.Drawing.QrCode
                 {
                     case PictureContextMenuCommands_e.EditQrCode:
                         {
-                            var drw = (ISwDrawing)m_Host.Extension.Application.Documents.Active;
-                            var pict = GetSelectedPicture(drw);
-                            m_EditQrCodeFeature.Edit(pict, drw);
+                            var drw = (IXDrawing)m_Host.Extension.Application.Documents.Active;
+                            var pict = GetSelectedPictures(drw).Last();
+                            m_EditQrCodeFeature.Edit(QrCodeElement.FromSketchPicture(pict, drw, m_Host.Extension.Application, m_DataProvider));
                         }
                         break;
 
                     case PictureContextMenuCommands_e.UpdateQrCodeInPlace:
                         {
                             var drw = (ISwDrawing)m_Host.Extension.Application.Documents.Active;
-                            var pict = GetSelectedPicture(drw);
-                            m_EditQrCodeFeature.UpdateInPlace(pict, drw);
+
+                            foreach (var pict in GetSelectedPictures(drw))
+                            {
+                                var qrCodeElem = QrCodeElement.FromSketchPicture(pict, drw, m_Host.Extension.Application, m_DataProvider);
+                                qrCodeElem.Update();
+                            }
                         }
                         break;
 
                     case PictureContextMenuCommands_e.Reload:
                         {
                             var drw = (ISwDrawing)m_Host.Extension.Application.Documents.Active;
-                            var pict = GetSelectedPicture(drw);
-                            m_EditQrCodeFeature.Reload(pict, drw);
+
+                            foreach (var pict in GetSelectedPictures(drw))
+                            {
+                                var qrCodeElem = QrCodeElement.FromSketchPicture(pict, drw, m_Host.Extension.Application, m_DataProvider);
+                                qrCodeElem.Reload();
+                            }
                         }
                         break;
                 }
@@ -170,22 +192,36 @@ namespace Xarial.CadPlus.Drawing.QrCode
             }
         }
 
-        private ISwObject GetSelectedPicture(ISwDrawing drw)
-        {
-            var pict = (ISwObject)drw.Selections.Last();
-
-            if (pict is ISwFeature)
-            {
-                pict = drw.CreateObjectFromDispatch<ISwObject>(
-                    ((ISwFeature)pict).Feature.GetSpecificFeature2());
-            }
-
-            return pict;
-        }
+        private IXSketchPicture[] GetSelectedPictures(IXDrawing drw)
+            => drw.Selections.OfType<IXSketchPicture>().ToArray();
 
         public void Dispose()
         {
             m_InsertQrCodeFeature.Dispose();
+        }
+
+        public IQrCodeElement GetQrCode(IXDrawing drw, IXSketchPicture qrCodePicture) 
+            => QrCodeElement.FromSketchPicture(qrCodePicture, drw, m_Host.Extension.Application, m_DataProvider);
+        
+        public IEnumerable<IQrCodeElement> IterateQrCodes(IXDrawing drw)
+        {
+            var app = m_Host.Extension.Application;
+
+            var handler = app.Documents.GetHandler<QrCodeDrawingHandler>(drw);
+            
+            foreach (var qrCodeInfo in handler.QrCodes) 
+            {
+                yield return new QrCodeElement(qrCodeInfo, app, drw, m_DataProvider);
+            }
+        }
+
+        public IQrCodeElement Insert(IXDrawing drw, IXSheet sheet, QrCodeDock_e dock, double size, double offsetX, double offsetY, string expression)
+        {
+            var elem = new QrCodeElement(m_Host.Extension.Application, drw, sheet, m_DataProvider);
+
+            elem.Create(dock, size, offsetX, offsetY, expression);
+
+            return elem;
         }
     }
 }

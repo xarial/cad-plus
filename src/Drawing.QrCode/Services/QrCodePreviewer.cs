@@ -12,6 +12,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Xarial.CadPlus.Drawing.QrCode.Data;
+using Xarial.CadPlus.Plus.Modules;
 using Xarial.XCad.Documents;
 using Xarial.XCad.Geometry.Structures;
 using Xarial.XCad.SolidWorks.Documents;
@@ -24,42 +25,33 @@ namespace Xarial.CadPlus.Drawing.QrCode.Services
         private IXDrawing m_Drw;
         private ModelView m_View;
 
-        private Dock_e m_Dock;
-        private double m_Size;
-        private double m_OffsetX;
-        private double m_OffsetY;
+        private Point m_CenterPoint;
+        private double? m_Size;
 
-        private readonly QrCodePictureManager m_QrCodeMgr;
-
-        public QrCodePreviewer(IXDrawing drw, QrCodePictureManager qrCodeMgr)
+        public QrCodePreviewer(IXDrawing drw)
         {
             m_Drw = drw;
-            m_QrCodeMgr = qrCodeMgr;
 
             m_View = ((ISwDrawing)m_Drw).Model.IActiveView;
             m_View.BufferSwapNotify += OnBufferSwapNotify;
         }
 
-        public void Preview(Dock_e dock, double size, double offsetX, double offsetY)
+        public void Preview(QrCodeDock_e dock, double size, double offsetX, double offsetY)
         {
-            m_Dock = dock;
             m_Size = size;
-            m_OffsetX = offsetX;
-            m_OffsetY = offsetY;
+            QrCodeElement.CalculateLocation(m_Drw.Sheets.Active, dock, size, offsetX, offsetY, out m_CenterPoint);
+
             ((ISwDrawing)m_Drw).Model.GraphicsRedraw2();
         }
 
         private int OnBufferSwapNotify()
         {
-            m_QrCodeMgr.CalculateLocation(m_Drw, m_Dock, m_Size, m_OffsetX, m_OffsetY, out Point centerPt, out double scale);
-            RenderQrCodeTemplate(centerPt, m_Size);
-            return 0;
-        }
+            if (m_CenterPoint != null && m_Size.HasValue)
+            {
+                RenderQrCodeTemplate(m_CenterPoint, m_Size.Value);
+            }
 
-        public void Dispose()
-        {
-            m_View.BufferSwapNotify -= OnBufferSwapNotify;
-            ((ISwDrawing)m_Drw).Model.GraphicsRedraw2();
+            return 0;
         }
 
         private void RenderQrCodeTemplate(Point centerPt, double size)
@@ -91,7 +83,7 @@ namespace Xarial.CadPlus.Drawing.QrCode.Services
             glEnd();
         }
 
-        private static void RenderRectangle2D(Point center, double width, double height,
+        private void RenderRectangle2D(Point center, double width, double height,
             System.Drawing.Color color, bool fill)
         {
             RenderPolygon(new Point[]
@@ -103,7 +95,7 @@ namespace Xarial.CadPlus.Drawing.QrCode.Services
             }, color, fill);
         }
 
-        private static void RenderPolygon(Point[] vertices, System.Drawing.Color color, bool fill)
+        private void RenderPolygon(Point[] vertices, System.Drawing.Color color, bool fill)
         {
             glBegin(fill ? GL_TRIANGLE_FAN : GL_LINE_LOOP);
 
@@ -115,6 +107,12 @@ namespace Xarial.CadPlus.Drawing.QrCode.Services
             }
 
             glEnd();
+        }
+
+        public void Dispose()
+        {
+            m_View.BufferSwapNotify -= OnBufferSwapNotify;
+            ((ISwDrawing)m_Drw).Model.GraphicsRedraw2();
         }
     }
 }
