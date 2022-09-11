@@ -48,7 +48,7 @@ namespace Xarial.CadPlus.Plus.Modules
 
     public interface IDrawingQrCodeModule : IModule
     {
-        IQrCodeElement Insert(QrCodeDock_e dock, double size, double offsetX, double offsetY, string expression);
+        IQrCodeElement Insert(IXDrawing drw, IXSheet sheet, QrCodeDock_e dock, double size, double offsetX, double offsetY, string expression);
         IQrCodeElement GetQrCode(IXDrawing drw, IXSketchPicture qrCodePicture);
         IEnumerable<IQrCodeElement> IterateQrCodes(IXDrawing drw);
     }
