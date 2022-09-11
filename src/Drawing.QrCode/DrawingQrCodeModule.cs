@@ -195,11 +195,6 @@ namespace Xarial.CadPlus.Drawing.QrCode
         private IXSketchPicture[] GetSelectedPictures(IXDrawing drw)
             => drw.Selections.OfType<IXSketchPicture>().ToArray();
 
-        public void Dispose()
-        {
-            m_InsertQrCodeFeature.Dispose();
-        }
-
         public IQrCodeElement GetQrCode(IXDrawing drw, IXSketchPicture qrCodePicture) 
             => QrCodeElement.FromSketchPicture(qrCodePicture, drw, m_Host.Extension.Application, m_DataProvider);
         
@@ -222,6 +217,12 @@ namespace Xarial.CadPlus.Drawing.QrCode
             elem.Create(dock, size, offsetX, offsetY, expression);
 
             return elem;
+        }
+
+        public void Dispose()
+        {
+            m_InsertQrCodeFeature?.Dispose();
+            m_EditQrCodeFeature?.Dispose();
         }
     }
 }

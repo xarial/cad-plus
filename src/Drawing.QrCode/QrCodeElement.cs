@@ -235,9 +235,9 @@ namespace Xarial.CadPlus.Drawing.QrCode
 
         private IXSketchPicture InsertAt(string expression, double width, double height, double origX, double origY)
         {
-            var qrCodeData = m_QrCodeProvider.GetData(Drawing, expression);
+            var qrCodeText = m_QrCodeProvider.GetData(Drawing, expression);
 
-            var qrCodeData = m_QrGenerator.CreateQrCode(qrCodeData, QRCodeGenerator.ECCLevel.Q);
+            var qrCodeData = m_QrGenerator.CreateQrCode(qrCodeText, QRCodeGenerator.ECCLevel.Q);
 
             var qrCode = new QRCode(qrCodeData);
             var qrCodeImage = qrCode.GetGraphic(20, System.Drawing.Color.Black, System.Drawing.Color.White, false);
