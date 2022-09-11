@@ -12,6 +12,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Xarial.CadPlus.Drawing.QrCode.Data;
+using Xarial.CadPlus.Plus.Modules;
 using Xarial.XCad.Documents;
 using Xarial.XCad.Geometry.Structures;
 using Xarial.XCad.SolidWorks.Documents;
@@ -35,10 +36,10 @@ namespace Xarial.CadPlus.Drawing.QrCode.Services
             m_View.BufferSwapNotify += OnBufferSwapNotify;
         }
 
-        public void Preview(Dock_e dock, double size, double offsetX, double offsetY)
+        public void Preview(QrCodeDock_e dock, double size, double offsetX, double offsetY)
         {
             m_Size = size;
-            QrCodeElement.CalculateLocation(m_Drw.Sheets.Active, dock, size, offsetX, offsetY, out m_CenterPoint, out _);
+            QrCodeElement.CalculateLocation(m_Drw.Sheets.Active, dock, size, offsetX, offsetY, out m_CenterPoint);
 
             ((ISwDrawing)m_Drw).Model.GraphicsRedraw2();
         }

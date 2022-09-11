@@ -214,5 +214,14 @@ namespace Xarial.CadPlus.Drawing.QrCode
                 yield return new QrCodeElement(qrCodeInfo, app, drw, m_DataProvider);
             }
         }
+
+        public IQrCodeElement Insert(IXDrawing drw, IXSheet sheet, QrCodeDock_e dock, double size, double offsetX, double offsetY, string expression)
+        {
+            var elem = new QrCodeElement(m_Host.Extension.Application, drw, sheet, m_DataProvider);
+
+            elem.Create(dock, size, offsetX, offsetY, expression);
+
+            return elem;
+        }
     }
 }

@@ -13,6 +13,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Xarial.CadPlus.Drawing.QrCode.Services;
+using Xarial.CadPlus.Plus.Modules;
 using Xarial.XCad;
 using Xarial.XCad.Features;
 using Xarial.XToolkit.Services.Expressions;
@@ -113,7 +114,7 @@ namespace Xarial.CadPlus.Drawing.QrCode.Data
         private IXSketchPicture m_Picture;
         private string m_Expression;
         private double m_Size;
-        private Dock_e m_Dock;
+        private QrCodeDock_e m_Dock;
         private double m_OffsetX;
         private double m_OffsetY;
 
@@ -147,7 +148,7 @@ namespace Xarial.CadPlus.Drawing.QrCode.Data
             }
         }
 
-        public Dock_e Dock
+        public QrCodeDock_e Dock
         {
             get => m_Dock;
             set

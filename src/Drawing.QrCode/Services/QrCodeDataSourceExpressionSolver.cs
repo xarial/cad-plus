@@ -40,33 +40,31 @@ namespace Xarial.CadPlus.Drawing.QrCode.Services
 
             var view = Drawing.Sheets.Active.DrawingViews.FirstOrDefault();
 
-            if (view == null)
+            if (view != null)
             {
-                throw new UserException("No drawing views in this document");
+                var refDoc = view.ReferencedDocument;
+
+                if (refDoc == null)
+                {
+                    throw new UserException("View does not have a document");
+                }
+
+                var conf = view.ReferencedConfiguration;
+
+                m_RefDocMal = docMalProvider.Create(refDoc, true);
+
+                m_Logger.Log($"Data source reference document is fallback: {m_RefDocMal.IsFallbackDocument}", LoggerMessageSeverity_e.Debug);
+
+                refDoc = (IXDocument3D)m_RefDocMal.Document;
+
+                if (m_RefDocMal.IsFallbackDocument)
+                {
+                    conf = refDoc.Configurations[conf.Name];
+                }
+
+                ReferencedDocument = refDoc;
+                ReferencedConfiguration = conf;
             }
-
-            var refDoc = view.ReferencedDocument;
-
-            if (refDoc == null)
-            {
-                throw new UserException("View does not have a document");
-            }
-
-            var conf = view.ReferencedConfiguration;
-
-            m_RefDocMal = docMalProvider.Create(refDoc, true);
-
-            m_Logger.Log($"Data source reference document is fallback: {m_RefDocMal.IsFallbackDocument}", LoggerMessageSeverity_e.Debug);
-
-            refDoc = (IXDocument3D)m_RefDocMal.Document;
-
-            if (m_RefDocMal.IsFallbackDocument)
-            {
-                conf = refDoc.Configurations[conf.Name];
-            }
-
-            ReferencedDocument = refDoc;
-            ReferencedConfiguration = conf;
         }
 
         public void Dispose()
@@ -135,16 +133,23 @@ namespace Xarial.CadPlus.Drawing.QrCode.Services
 
             var targDoc = refDoc ? context.ReferencedDocument : context.Drawing;
 
-            switch (filePathSrc)
+            if (targDoc != null)
             {
-                case FilePathSource_e.FullPath:
-                    return targDoc.Path;
+                switch (filePathSrc)
+                {
+                    case FilePathSource_e.FullPath:
+                        return targDoc.Path;
 
-                case FilePathSource_e.Title:
-                    return targDoc.Title;
+                    case FilePathSource_e.Title:
+                        return targDoc.Title;
 
-                default:
-                    throw new NotSupportedException();
+                    default:
+                        throw new NotSupportedException();
+                }
+            }
+            else 
+            {
+                throw new UserException("No referenced document found in the drawing sheet");
             }
         }
 
@@ -164,22 +169,29 @@ namespace Xarial.CadPlus.Drawing.QrCode.Services
 
             var targDoc = refDoc ? context.ReferencedDocument : context.Drawing;
 
-            IXProperty prp;
-
-            if (refDoc)
+            if (targDoc != null)
             {
-                if (context.ReferencedConfiguration.Properties.TryGet(prpName, out prp))
+                IXProperty prp;
+
+                if (refDoc)
+                {
+                    if (context.ReferencedConfiguration.Properties.TryGet(prpName, out prp))
+                    {
+                        return prp.Value?.ToString();
+                    }
+                }
+
+                if (targDoc.Properties.TryGet(prpName, out prp))
                 {
                     return prp.Value?.ToString();
                 }
-            }
 
-            if (targDoc.Properties.TryGet(prpName, out prp))
+                throw new UserException($"Custom property '{prpName}' is not found");
+            }
+            else 
             {
-                return prp.Value?.ToString();
+                throw new UserException("No referenced document found in the drawing sheet");
             }
-
-            throw new UserException($"Property '{prpName}' is not found");
         }
 
         private static string GetPdmVaultLink(string[] args, DataSourceDocument context)
@@ -230,16 +242,23 @@ namespace Xarial.CadPlus.Drawing.QrCode.Services
 
             var targDoc = refDoc ? context.ReferencedDocument : context.Drawing;
 
-            var filePath = FindRelativeVaultPath(targDoc.Path, context.Application, out var vault);
-
-            var file = vault.GetFileFromPath(filePath, out var folder);
-
-            if (file == null)
+            if (targDoc != null)
             {
-                throw new UserException("File is not in the vault");
-            }
+                var filePath = FindRelativeVaultPath(targDoc.Path, context.Application, out var vault);
 
-            return $"conisio://{vault.Name}/{action}?projectid={folder.ID}&documentid={file.ID}&objecttype={(int)file.ObjectType}";
+                var file = vault.GetFileFromPath(filePath, out var folder);
+
+                if (file == null)
+                {
+                    throw new UserException("File is not in the vault");
+                }
+
+                return $"conisio://{vault.Name}/{action}?projectid={folder.ID}&documentid={file.ID}&objecttype={(int)file.ObjectType}";
+            }
+            else 
+            {
+                throw new UserException("No referenced document found in the drawing sheet");
+            }
         }
 
         private static string GetPdmWeb2Url(string[] args, DataSourceDocument context)
@@ -258,14 +277,21 @@ namespace Xarial.CadPlus.Drawing.QrCode.Services
 
             var targDoc = refDoc ? context.ReferencedDocument : context.Drawing;
 
-            if (string.IsNullOrEmpty(server))
+            if (targDoc != null)
             {
-                throw new UserException("Url of Web2 server is not specified");
+                if (string.IsNullOrEmpty(server))
+                {
+                    throw new UserException("Url of Web2 server is not specified");
+                }
+
+                var vaultRelPath = FindRelativeVaultPath(targDoc.Path, context.Application, out var vault);
+
+                return $"{server}/{vault.Name}/{Path.GetDirectoryName(vaultRelPath).Replace('\\', '/')}?view=bom&file={Path.GetFileName(vaultRelPath)}";
             }
-
-            var vaultRelPath = FindRelativeVaultPath(targDoc.Path, context.Application, out var vault);
-
-            return $"{server}/{vault.Name}/{Path.GetDirectoryName(vaultRelPath).Replace('\\', '/')}?view=bom&file={Path.GetFileName(vaultRelPath)}";
+            else 
+            {
+                throw new UserException("No referenced document found in the drawing sheet");
+            }
         }
 
         private static string FindRelativeVaultPath(string filePath, IXApplication app, out IEdmVault5 vault)

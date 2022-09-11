@@ -36,11 +36,10 @@ namespace Xarial.CadPlus.Drawing.QrCode
             return new QrCodeElement(qrCodeInfo, app, drw, dataProvider);
         }
 
-        public static void CalculateLocation(IXSheet sheet, Dock_e dock,
-            double size, double offsetX, double offsetY, out Point centerPt, out double scale)
+        public static void CalculateLocation(IXSheet sheet, QrCodeDock_e dock,
+            double size, double offsetX, double offsetY, out Point centerPt)
         {
             var paperSize = sheet.PaperSize;
-            scale = sheet.Scale.AsDouble();
             var sheetHeight = paperSize.Height.Value;
             var sheetWidth = paperSize.Width.Value;
 
@@ -52,28 +51,28 @@ namespace Xarial.CadPlus.Drawing.QrCode
 
             switch (dock)
             {
-                case Dock_e.BottomLeft:
+                case QrCodeDock_e.BottomLeft:
                     x = size / 2;
                     y = size / 2;
                     offsetXDir = 1;
                     offsetYDir = 1;
                     break;
 
-                case Dock_e.TopLeft:
+                case QrCodeDock_e.TopLeft:
                     x = size / 2;
                     y = sheetHeight - size / 2;
                     offsetXDir = 1;
                     offsetYDir = -1;
                     break;
 
-                case Dock_e.TopRight:
+                case QrCodeDock_e.TopRight:
                     x = sheetWidth - size / 2;
                     y = sheetHeight - size / 2;
                     offsetXDir = -1;
                     offsetYDir = -1;
                     break;
 
-                case Dock_e.BottomRight:
+                case QrCodeDock_e.BottomRight:
                     x = sheetWidth - size / 2;
                     y = size / 2;
                     offsetXDir = -1;
@@ -105,6 +104,18 @@ namespace Xarial.CadPlus.Drawing.QrCode
         public IXDrawing Drawing { get; }
         public IXSheet Sheet { get; }
 
+        public IXSketchPicture Picture => Info.Picture;
+
+        public string Expression => Info.Expression;
+
+        public QrCodeDock_e Dock => Info.Dock;
+
+        public double Size => Info.Size;
+
+        public double OffsetX => Info.OffsetX;
+
+        public double OffsetY => Info.OffsetY;
+
         private readonly IXApplication m_App;
 
         private readonly QrDataProvider m_QrCodeProvider;
@@ -128,7 +139,7 @@ namespace Xarial.CadPlus.Drawing.QrCode
             Info = info;
         }
 
-        public void Create(Dock_e dock, double size, double offsetX, double offsetY, string expression) 
+        public void Create(QrCodeDock_e dock, double size, double offsetX, double offsetY, string expression) 
         {
             if (Info == null)
             {
@@ -166,7 +177,7 @@ namespace Xarial.CadPlus.Drawing.QrCode
             }
         }
 
-        public void Edit(Dock_e dock, double size, double offsetX, double offsetY, string expression)
+        public void Edit(QrCodeDock_e dock, double size, double offsetX, double offsetY, string expression)
         {
             if (Info != null)
             {
@@ -210,9 +221,11 @@ namespace Xarial.CadPlus.Drawing.QrCode
 
         public void Hide() => ChangeVisibility(true);
 
-        private IXSketchPicture CalculateLocationAndInsert(Dock_e dock, double size, double offsetX, double offsetY, string expression)
+        private IXSketchPicture CalculateLocationAndInsert(QrCodeDock_e dock, double size, double offsetX, double offsetY, string expression)
         {
-            CalculateLocation(Sheet, dock, size, offsetX, offsetY, out Point centerPt, out double scale);
+            CalculateLocation(Sheet, dock, size, offsetX, offsetY, out Point centerPt);
+
+            var scale = Sheet.Scale.AsDouble();
 
             var x = centerPt.X / scale;
             var y = centerPt.Y / scale;
@@ -222,7 +235,9 @@ namespace Xarial.CadPlus.Drawing.QrCode
 
         private IXSketchPicture InsertAt(string expression, double width, double height, double origX, double origY)
         {
-            var qrCodeData = m_QrGenerator.CreateQrCode(m_QrCodeProvider.GetData(Drawing, expression), QRCodeGenerator.ECCLevel.Q);
+            var qrCodeData = m_QrCodeProvider.GetData(Drawing, expression);
+
+            var qrCodeData = m_QrGenerator.CreateQrCode(qrCodeData, QRCodeGenerator.ECCLevel.Q);
 
             var qrCode = new QRCode(qrCodeData);
             var qrCodeImage = qrCode.GetGraphic(20, System.Drawing.Color.Black, System.Drawing.Color.White, false);
