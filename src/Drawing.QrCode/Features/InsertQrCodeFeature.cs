@@ -25,6 +25,7 @@ using Xarial.XToolkit.Services;
 using Xarial.CadPlus.Drawing.QrCode;
 using Xarial.CadPlus.Drawing.QrCode.Services;
 using Xarial.CadPlus.Drawing.QrCode.Data;
+using Xarial.CadPlus.Plus.Modules;
 
 namespace Xarial.CadPlus.Drawing.QrCode.Features
 {
@@ -42,11 +43,15 @@ namespace Xarial.CadPlus.Drawing.QrCode.Features
         private readonly IMessageService m_MsgSvc;
         private readonly IXLogger m_Logger;
 
-        public InsertQrCodeFeature(IXExtension ext, IMessageService msgSvc, IXLogger logger)
+        protected readonly ExpressionSolveErrorHandlerDelegate m_ErrorHandler;
+        
+        public InsertQrCodeFeature(IXExtension ext, IMessageService msgSvc, IXLogger logger, ExpressionSolveErrorHandlerDelegate errHandler)
         {
             m_App = ext.Application;
             m_MsgSvc = msgSvc;
             m_Logger = logger;
+
+            m_ErrorHandler = errHandler;
 
             m_InsertQrCodePage = ext.CreatePage<QrCodeData>();
 
@@ -106,7 +111,7 @@ namespace Xarial.CadPlus.Drawing.QrCode.Features
                 m_PageData.Location.Size,
                 m_PageData.Location.OffsetX,
                 m_PageData.Location.OffsetY,
-                m_PageData.Source.Expression);
+                m_PageData.Source.Expression, m_ErrorHandler);
         }
 
         protected virtual void CancelInsertQrCode()

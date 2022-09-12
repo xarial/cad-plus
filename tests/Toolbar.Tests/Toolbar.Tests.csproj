@@ -9,7 +9,7 @@
     <PackageReference Include="nunit" Version="3.13.3" />
     <PackageReference Include="NUnit3TestAdapter" Version="4.2.1" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.2.0" />
-    <PackageReference Include="Xarial.CadPlusPlus" Version="0.4.0-dev.4428" />
+    <PackageReference Include="Xarial.CadPlusPlus" Version="0.4.0-dev.4436" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\Common\Common.csproj" />

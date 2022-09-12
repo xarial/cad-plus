@@ -16,6 +16,7 @@ using Xarial.CadPlus.Drawing.QrCode;
 using Xarial.CadPlus.Drawing.QrCode.Data;
 using Xarial.CadPlus.Drawing.QrCode.Services;
 using Xarial.CadPlus.Plus.Exceptions;
+using Xarial.CadPlus.Plus.Modules;
 using Xarial.CadPlus.Plus.Services;
 using Xarial.XCad;
 using Xarial.XCad.Base;
@@ -34,10 +35,11 @@ using Xarial.XToolkit.Services;
 namespace Xarial.CadPlus.Drawing.QrCode.Features
 {
     public class EditQrCodeFeature : InsertQrCodeFeature
-    {
-        public EditQrCodeFeature(IXExtension ext, IMessageService msgSvc, IXLogger logger)
-            : base(ext, msgSvc, logger)
+    {   
+        public EditQrCodeFeature(IXExtension ext, IMessageService msgSvc, IXLogger logger, ExpressionSolveErrorHandlerDelegate errHandler)
+            : base(ext, msgSvc, logger, errHandler)
         {
+            
         }
 
         public void Edit(QrCodeElement qrCodeElem)
@@ -53,7 +55,7 @@ namespace Xarial.CadPlus.Drawing.QrCode.Features
         {
             m_CurQrCodeElement.Edit(m_PageData.Location.Dock, m_PageData.Location.Size,
                 m_PageData.Location.OffsetX, m_PageData.Location.OffsetY,
-                m_PageData.Source.Expression);
+                m_PageData.Source.Expression, m_ErrorHandler);
         }
 
         protected override void CancelInsertQrCode()
