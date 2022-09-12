@@ -23,7 +23,7 @@ namespace Xarial.CadPlus.Drawing.QrCode
 {
     public class QrCodeElement : IQrCodeElement
     {
-        public static QrCodeElement FromSketchPicture(IXSketchPicture pict, IXDrawing drw, IXApplication app, QrDataProvider dataProvider)
+        public static QrCodeElement FromSketchPicture(IXSketchPicture pict, IXDrawing drw, IXApplication app, QrDataProvider dataProvider, IXLogger logger)
         {
             var handler = app.Documents.GetHandler<QrCodeDrawingHandler>(drw);
             var qrCodeInfo = handler.QrCodes.FirstOrDefault(d => d.Picture.Equals(pict));
@@ -33,7 +33,7 @@ namespace Xarial.CadPlus.Drawing.QrCode
                 throw new UserException("This picture does not contain QR code data");
             }
 
-            return new QrCodeElement(qrCodeInfo, app, drw, dataProvider);
+            return new QrCodeElement(qrCodeInfo, app, drw, dataProvider, logger);
         }
 
         public static void CalculateLocation(IXSheet sheet, QrCodeDock_e dock,
@@ -123,41 +123,53 @@ namespace Xarial.CadPlus.Drawing.QrCode
 
         private Tuple<int, double, int, double> m_PictTrans;
 
-        public QrCodeElement(IXApplication app, IXDrawing drw, IXSheet sheet, QrDataProvider dataProvider)
+        private readonly IXLogger m_Logger;
+
+        public QrCodeElement(IXApplication app, IXDrawing drw, IXSheet sheet, QrDataProvider dataProvider, IXLogger logger)
         {
             m_App = app;
             Drawing = drw;
             Sheet = sheet;
 
             m_QrCodeProvider = dataProvider;
+            m_Logger = logger;
+
             m_QrGenerator = new QRCodeGenerator();
         }
 
-        public QrCodeElement(QrCodeInfo info, IXApplication app, IXDrawing drw, QrDataProvider dataProvider) 
-            : this(app, drw, GetSheet(drw, info.Picture), dataProvider)
+        public QrCodeElement(QrCodeInfo info, IXApplication app, IXDrawing drw, QrDataProvider dataProvider, IXLogger logger) 
+            : this(app, drw, GetSheet(drw, info.Picture), dataProvider, logger)
         {
             Info = info;
         }
 
-        public void Create(QrCodeDock_e dock, double size, double offsetX, double offsetY, string expression) 
+        public void Create(QrCodeDock_e dock, double size, double offsetX, double offsetY, string expression, ExpressionSolveErrorHandlerDelegate errHandler) 
         {
             if (Info == null)
             {
-                var pict = CalculateLocationAndInsert(dock, size, offsetX, offsetY, expression);
-
-                Info = new QrCodeInfo()
+                try
                 {
-                    Picture = pict,
-                    Expression = expression,
-                    Dock = dock,
-                    Size = size,
-                    OffsetX = offsetX,
-                    OffsetY = offsetY
-                };
+                    var pict = CalculateLocationAndInsert(dock, size, offsetX, offsetY, expression, errHandler);
 
-                var handler = m_App.Documents.GetHandler<QrCodeDrawingHandler>(Drawing);
+                    Info = new QrCodeInfo()
+                    {
+                        Picture = pict,
+                        Expression = expression,
+                        Dock = dock,
+                        Size = size,
+                        OffsetX = offsetX,
+                        OffsetY = offsetY
+                    };
 
-                handler.QrCodes.Add(Info);
+                    var handler = m_App.Documents.GetHandler<QrCodeDrawingHandler>(Drawing);
+
+                    handler.QrCodes.Add(Info);
+                }
+                catch (OperationCanceledException)
+                {
+                    m_Logger.Log("QR code creation is cancelled by the user", XCad.Base.Enums.LoggerMessageSeverity_e.Debug);
+                    return;
+                }
             }
             else 
             {
@@ -165,11 +177,11 @@ namespace Xarial.CadPlus.Drawing.QrCode
             }
         }
 
-        public void Reload()
+        public void Reload(ExpressionSolveErrorHandlerDelegate errHandler)
         {
             if (Info != null)
             {
-                Edit(Info.Dock, Info.Size, Info.OffsetX, Info.OffsetY, Info.Expression);
+                Edit(Info.Dock, Info.Size, Info.OffsetX, Info.OffsetY, Info.Expression, errHandler);
             }
             else
             {
@@ -177,21 +189,29 @@ namespace Xarial.CadPlus.Drawing.QrCode
             }
         }
 
-        public void Edit(QrCodeDock_e dock, double size, double offsetX, double offsetY, string expression)
+        public void Edit(QrCodeDock_e dock, double size, double offsetX, double offsetY, string expression, ExpressionSolveErrorHandlerDelegate errHandler)
         {
             if (Info != null)
             {
-                var pict = Info.Picture;
+                try
+                {
+                    var pict = Info.Picture;
 
-                Drawing.Features.Remove(pict);
+                    Info.Picture = CalculateLocationAndInsert(dock, size, offsetX, offsetY, expression, errHandler);
 
-                Info.Picture = CalculateLocationAndInsert(dock, size, offsetX, offsetY, expression);
-                
-                Info.Expression = expression;
-                Info.Dock = dock;
-                Info.Size = size;
-                Info.OffsetX = offsetX;
-                Info.OffsetY = offsetY;
+                    Drawing.Features.Remove(pict);
+
+                    Info.Expression = expression;
+                    Info.Dock = dock;
+                    Info.Size = size;
+                    Info.OffsetX = offsetX;
+                    Info.OffsetY = offsetY;
+                }
+                catch (OperationCanceledException)
+                {
+                    m_Logger.Log("QR code editing is cancelled by the user", XCad.Base.Enums.LoggerMessageSeverity_e.Debug);
+                    return;
+                }
             }
             else
             {
@@ -199,7 +219,7 @@ namespace Xarial.CadPlus.Drawing.QrCode
             }
         }
 
-        public void Update()
+        public void Update(ExpressionSolveErrorHandlerDelegate errHandler)
         {
             if (Info != null)
             {
@@ -207,9 +227,16 @@ namespace Xarial.CadPlus.Drawing.QrCode
 
                 var bounds = pict.Boundary;
 
-                Drawing.Features.Remove(pict);
-
-                Info.Picture = InsertAt(Info.Expression, bounds.Width, bounds.Height, bounds.CenterPoint.X, bounds.CenterPoint.Y);
+                try
+                {
+                    Info.Picture = InsertAt(Info.Expression, bounds.Width, bounds.Height, bounds.CenterPoint.X, bounds.CenterPoint.Y, errHandler);
+                    Drawing.Features.Remove(pict);
+                }
+                catch (OperationCanceledException) 
+                {
+                    m_Logger.Log("QR code updating is cancelled by the user", XCad.Base.Enums.LoggerMessageSeverity_e.Debug);
+                    return;
+                }
             }
             else
             {
@@ -221,7 +248,7 @@ namespace Xarial.CadPlus.Drawing.QrCode
 
         public void Hide() => ChangeVisibility(true);
 
-        private IXSketchPicture CalculateLocationAndInsert(QrCodeDock_e dock, double size, double offsetX, double offsetY, string expression)
+        private IXSketchPicture CalculateLocationAndInsert(QrCodeDock_e dock, double size, double offsetX, double offsetY, string expression, ExpressionSolveErrorHandlerDelegate errHandler)
         {
             CalculateLocation(Sheet, dock, size, offsetX, offsetY, out Point centerPt);
 
@@ -230,17 +257,32 @@ namespace Xarial.CadPlus.Drawing.QrCode
             var x = centerPt.X / scale;
             var y = centerPt.Y / scale;
 
-            return InsertAt(expression, size / scale, size / scale, x, y);
+            return InsertAt(expression, size / scale, size / scale, x, y, errHandler);
         }
 
-        private IXSketchPicture InsertAt(string expression, double width, double height, double origX, double origY)
+        private IXSketchPicture InsertAt(string expression, double width, double height, double origX, double origY, ExpressionSolveErrorHandlerDelegate errHandler)
         {
-            var qrCodeText = m_QrCodeProvider.GetData(Drawing, expression);
+            System.Drawing.Bitmap qrCodeImage;
 
-            var qrCodeData = m_QrGenerator.CreateQrCode(qrCodeText, QRCodeGenerator.ECCLevel.Q);
+            try
+            {
+                var qrCodeText = m_QrCodeProvider.GetData(Drawing, expression);
 
-            var qrCode = new QRCode(qrCodeData);
-            var qrCodeImage = qrCode.GetGraphic(20, System.Drawing.Color.Black, System.Drawing.Color.White, false);
+                qrCodeImage = GetQrCodeImage(qrCodeText);
+            }
+            catch (Exception ex)
+            {
+                errHandler.Invoke(ex, expression, out var cancel);
+
+                if (cancel)
+                {
+                    throw new OperationCanceledException();
+                }
+                else 
+                {
+                    qrCodeImage = CreateErrorQrCode(width, height);
+                }
+            }
 
             try
             {
@@ -253,7 +295,44 @@ namespace Xarial.CadPlus.Drawing.QrCode
             }
             catch (Exception ex)
             {
+                m_Logger.Log(ex);
                 throw new UserException("Failed to insert picture", ex);
+            }
+        }
+
+        private System.Drawing.Bitmap GetQrCodeImage(string qrCodeText)
+        {
+            System.Drawing.Bitmap qrCodeImage;
+            var qrCodeData = m_QrGenerator.CreateQrCode(qrCodeText, QRCodeGenerator.ECCLevel.Q);
+
+            var qrCode = new QRCode(qrCodeData);
+            qrCodeImage = qrCode.GetGraphic(20, System.Drawing.Color.Black, System.Drawing.Color.White, false);
+            return qrCodeImage;
+        }
+
+        private System.Drawing.Bitmap CreateErrorQrCode(double width, double height) 
+        {
+            const string ERR_QR_CODE_TEXT = "!";
+
+            var bmp = GetQrCodeImage(ERR_QR_CODE_TEXT);
+
+            using (var graphics = System.Drawing.Graphics.FromImage(bmp))
+            {
+                var rect = new System.Drawing.Rectangle(0, 0, bmp.Width, bmp.Height);
+
+                var lineWidth = Math.Min(bmp.Width, bmp.Height) * 0.025f;
+
+                if (lineWidth < 1) 
+                {
+                    lineWidth = 1;
+                }
+
+                var pen = new System.Drawing.Pen(System.Drawing.Brushes.Red, lineWidth);
+                
+                graphics.DrawLine(pen, new System.Drawing.Point(rect.Left, rect.Top), new System.Drawing.Point(rect.Right, rect.Bottom));
+                graphics.DrawLine(pen, new System.Drawing.Point(rect.Left, rect.Bottom), new System.Drawing.Point(rect.Right, rect.Top));
+
+                return bmp;
             }
         }
 
