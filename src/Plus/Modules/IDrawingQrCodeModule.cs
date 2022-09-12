@@ -24,7 +24,7 @@ namespace Xarial.CadPlus.Plus.Modules
         BottomRight
     }
 
-    public delegate void ExpressionSolveErrorHandlerDelegate(Exception err, ref string expr, out bool cancel);
+    public delegate void ExpressionSolveErrorHandlerDelegate(Exception err, string expr, out bool cancel);
 
     public interface IQrCodeElement 
     {
