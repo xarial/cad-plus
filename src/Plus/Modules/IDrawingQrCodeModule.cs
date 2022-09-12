@@ -24,6 +24,8 @@ namespace Xarial.CadPlus.Plus.Modules
         BottomRight
     }
 
+    public delegate void ExpressionSolveErrorHandlerDelegate(Exception err, ref string expr, out bool cancel);
+
     public interface IQrCodeElement 
     {
         IXSketchPicture Picture { get; }
@@ -33,22 +35,22 @@ namespace Xarial.CadPlus.Plus.Modules
         double OffsetX { get; }
         double OffsetY { get; }
 
-        void Edit(QrCodeDock_e dock, double size, double offsetX, double offsetY, string expression);
+        void Edit(QrCodeDock_e dock, double size, double offsetX, double offsetY, string expression, ExpressionSolveErrorHandlerDelegate errHandler);
 
         /// <summary>
         /// Reloads the QR code and updates the size as per the scale
         /// </summary>
-        void Reload();
+        void Reload(ExpressionSolveErrorHandlerDelegate errHandler);
 
         /// <summary>
         /// Updates the QR code and keeps current size
         /// </summary>
-        void Update();
+        void Update(ExpressionSolveErrorHandlerDelegate errHandler);
     }
 
     public interface IDrawingQrCodeModule : IModule
     {
-        IQrCodeElement Insert(IXDrawing drw, IXSheet sheet, QrCodeDock_e dock, double size, double offsetX, double offsetY, string expression);
+        IQrCodeElement Insert(IXDrawing drw, IXSheet sheet, QrCodeDock_e dock, double size, double offsetX, double offsetY, string expression, ExpressionSolveErrorHandlerDelegate errHandler);
         IQrCodeElement GetQrCode(IXDrawing drw, IXSketchPicture qrCodePicture);
         IEnumerable<IQrCodeElement> IterateQrCodes(IXDrawing drw);
     }
