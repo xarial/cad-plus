@@ -1,14 +1,9 @@
-<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project>
+  <Import Project="common.props" />
   <PropertyGroup>
      <OutputPath>$(SolutionDir)_build\Modules\$(ModuleName)</OutputPath>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="$(SolutionDir)common\ProductInfo.cs">
-      <Link>Properties\ProductInfo.cs.cs</Link>
-    </Compile>
-	<Compile Include="$(SolutionDir)common\VersionInfo.cs">
-      <Link>Properties\VersionInfo.cs</Link>
-    </Compile>
+    <Reference Include="System.ComponentModel.Composition" />
   </ItemGroup>
 </Project>

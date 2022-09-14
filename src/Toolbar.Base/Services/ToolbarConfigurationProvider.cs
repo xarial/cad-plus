@@ -1,6 +1,6 @@
 ﻿//*********************************************************************
 //CAD+ Toolset
-//Copyright(C) 2021 Xarial Pty Limited
+//Copyright(C) 2022 Xarial Pty Limited
 //Product URL: https://cadplus.xarial.com
 //License: https://cadplus.xarial.com/license/
 //*********************************************************************
@@ -43,13 +43,20 @@ namespace Xarial.CadPlus.CustomToolbar.Services
 
         public bool IsReadOnly(string toolbarSpecFilePath)
         {
-            if (File.Exists(toolbarSpecFilePath))
+            try
             {
-                return !IsEditable(toolbarSpecFilePath);
+                if (File.Exists(toolbarSpecFilePath))
+                {
+                    return !IsEditable(toolbarSpecFilePath);
+                }
+                else
+                {
+                    return false;
+                }
             }
-            else
+            catch 
             {
-                return false;
+                return true;
             }
         }
 

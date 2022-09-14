@@ -118,6 +118,18 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="activate-document" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\activate-document.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="assembly-icon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\assembly-icon.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="assembly-vector" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\assembly-vector.svg;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="auto-save-docs" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\auto-save-docs.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="batch_plus_assm_icon" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\batch-plus-assm-icon.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
@@ -130,13 +142,31 @@
   <data name="batch_plus_vector" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\batch-plus-vector.svg;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
+  <data name="component-filter-icon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\component-filter-icon.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="component-filter-vector" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\component-filter-vector.svg;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
   <data name="macros_icon" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\macros-icon.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="macros_vector" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\macros-vector.svg;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="top_level_only" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\top-level-only.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="part-icon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\part-icon.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="part-vector" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\part-vector.svg;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="rapid-mode" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\rapid-mode.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="read-only-mode" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\read-only-mode.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="silent-mode" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\silent-mode.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
 </root>

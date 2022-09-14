@@ -1,6 +1,6 @@
 ﻿//*********************************************************************
 //CAD+ Toolset
-//Copyright(C) 2021 Xarial Pty Limited
+//Copyright(C) 2022 Xarial Pty Limited
 //Product URL: https://cadplus.xarial.com
 //License: https://cadplus.xarial.com/license/
 //*********************************************************************
@@ -12,7 +12,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Xarial.CadPlus.Plus;
-using Xarial.CadPlus.Plus.Hosts;
 using Xarial.XCad.Base;
 
 namespace Xarial.CadPlus.Batch.Base.Services

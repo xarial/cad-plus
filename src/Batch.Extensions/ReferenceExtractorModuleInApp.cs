@@ -1,6 +1,6 @@
 ﻿//*********************************************************************
 //CAD+ Toolset
-//Copyright(C) 2021 Xarial Pty Limited
+//Copyright(C) 2022 Xarial Pty Limited
 //Product URL: https://cadplus.xarial.com
 //License: https://cadplus.xarial.com/license/
 //*********************************************************************
@@ -16,7 +16,6 @@ using Xarial.CadPlus.Batch.Extensions.Services;
 using Xarial.CadPlus.Batch.Extensions.UI;
 using Xarial.CadPlus.Batch.Extensions.ViewModels;
 using Xarial.CadPlus.Plus;
-using Xarial.CadPlus.Plus.Atributes;
 using Xarial.CadPlus.Plus.Attributes;
 using Xarial.CadPlus.Plus.Modules;
 using Xarial.CadPlus.Plus.Services;
@@ -25,14 +24,16 @@ using Xarial.XCad;
 using Xarial.XCad.Documents;
 using Xarial.CadPlus.Plus.Extensions;
 using Xarial.XCad.Base;
+using Xarial.XToolkit.Services;
+using Xarial.XCad.Extensions;
 
 namespace Xarial.CadPlus.Batch.Extensions
 {
-    [Module(typeof(IHostExtension))]
+    [Module(typeof(IHostCadExtension))]
     [ModuleOrder(typeof(IInputSorterModule), ModuleRelativeOrder_e.Before)]
     public class ReferenceExtractorModuleInApp : IModule
     {
-        private IHostExtension m_Host;
+        private IHostCadExtension m_Host;
         private IBatchInAppModule m_BatchInAppModule;
         private bool m_FindDrawings;
         private ICadDescriptor m_EntDesc;
@@ -41,12 +42,12 @@ namespace Xarial.CadPlus.Batch.Extensions
 
         public void Init(IHost host)
         {
-            m_Host = (IHostExtension)host;
+            m_Host = (IHostCadExtension)host;
             m_Host.Initialized += OnInitialized;
             m_Host.Connect += OnConnect;
         }
 
-        private void OnInitialized(IApplication app, IServiceContainer svcProvider, IModule[] modules)
+        private void OnInitialized(IApplication app, IServiceProvider svcProvider, IModule[] modules)
         {
             m_BatchInAppModule = modules.OfType<IBatchInAppModule>().FirstOrDefault();
 

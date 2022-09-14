@@ -1,11 +1,10 @@
 ﻿//*********************************************************************
 //CAD+ Toolset
-//Copyright(C) 2021 Xarial Pty Limited
+//Copyright(C) 2022 Xarial Pty Limited
 //Product URL: https://cadplus.xarial.com
 //License: https://cadplus.xarial.com/license/
 //*********************************************************************
 
-using Autofac;
 using Moq;
 using NUnit.Framework;
 using System;
@@ -16,12 +15,14 @@ using Xarial.CadPlus.CustomToolbar.Structs;
 using Xarial.CadPlus.CustomToolbar.UI.Forms;
 using Xarial.CadPlus.CustomToolbar.UI.ViewModels;
 using Xarial.CadPlus.Plus;
+using Xarial.CadPlus.Plus.Modules;
 using Xarial.CadPlus.Plus.Services;
 using Xarial.CadPlus.Toolbar.Services;
 using Xarial.XCad;
 using Xarial.XCad.Base;
 using Xarial.XCad.Extensions;
 using Xarial.XCad.UI.Commands;
+using Xarial.XToolkit.Services;
 
 namespace CustomToolbar.Tests
 {
@@ -42,15 +43,15 @@ namespace CustomToolbar.Tests
 
         public class CustomToolbarModuleMock : ToolbarModule 
         {
-            protected override void CreateContainer()
-            {
-                var builder = new ContainerBuilder();
+            //protected override void CreateContainer()
+            //{
+            //    var builder = new ContainerBuilder();
 
-                builder.RegisterType<MacroEntryPointsExtractorMock>()
-                    .As<IMacroEntryPointsExtractor>();
+            //    builder.RegisterType<MacroEntryPointsExtractorMock>()
+            //        .As<IMacroEntryPointsExtractor>();
 
-                m_Container = builder.Build();
-            }
+            //    m_Container = builder.Build();
+            //}
         }
 
         [SetUp]
@@ -58,7 +59,7 @@ namespace CustomToolbar.Tests
         {
             var module = new CustomToolbarModuleMock();
 
-            var extMock = new Mock<IHostExtension>();
+            var extMock = new Mock<IHostCadExtension>();
             
             module.Init(extMock.Object);
         }
@@ -118,8 +119,7 @@ namespace CustomToolbar.Tests
 
             var vm = new CommandManagerVM(confProviderMock.Object,
                 new Mock<IMessageService>().Object, new Mock<IXLogger>().Object,
-                new Xarial.CadPlus.Plus.Modules.IIconsProvider[0], 
-                new Mock<ICadDescriptor>().Object, new Mock<IFilePathResolver>().Object);
+                new Mock<ICadDescriptor>().Object, new Mock<ICommandGroupVMFactory>().Object);
 
             var form = new CommandManagerForm();
             form.DataContext = vm;

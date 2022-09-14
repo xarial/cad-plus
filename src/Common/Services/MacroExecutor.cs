@@ -1,6 +1,6 @@
 ﻿//*********************************************************************
 //CAD+ Toolset
-//Copyright(C) 2021 Xarial Pty Limited
+//Copyright(C) 2022 Xarial Pty Limited
 //Product URL: https://cadplus.xarial.com
 //License: https://cadplus.xarial.com/license/
 //*********************************************************************
@@ -10,11 +10,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 using Xarial.CadPlus.Common.Exceptions;
-using Xarial.CadPlus.Common.Utils;
 using Xarial.CadPlus.MacroRunner;
 using Xarial.CadPlus.Plus;
 using Xarial.CadPlus.Plus.Exceptions;
 using Xarial.CadPlus.Plus.Services;
+using Xarial.CadPlus.Plus.Shared.Exceptions;
+using Xarial.CadPlus.Plus.Shared.Services;
 using Xarial.XCad;
 using Xarial.XCad.Base;
 using Xarial.XCad.Documents;
@@ -59,7 +60,7 @@ namespace Xarial.CadPlus.Common.Services
         {
             try
             {
-                var argsArr = !string.IsNullOrEmpty(args) ? CommandLineHelper.ParseCommandLine(args) : null;
+                var argsArr = !string.IsNullOrEmpty(args) ? CommandLineUtils.ParseCommandLine(args) : null;
 
                 var xCadMacro = GetXCadMacroIfExists(macroPath);
 
@@ -146,7 +147,7 @@ namespace Xarial.CadPlus.Common.Services
 
             try
             {
-                if (FileSystemUtils.MatchesAnyFilter(path, XCadMacroProvider.Filter.Extensions))
+                if (TextUtils.MatchesAnyFilter(path, XCadMacroProvider.Filter.Extensions))
                 {
                     macro = m_XCadMacroProvider.GetMacro(path);
                     m_XCadMacrosCache.Add(path, macro);

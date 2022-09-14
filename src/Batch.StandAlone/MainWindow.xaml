@@ -8,6 +8,7 @@
         xmlns:ctrlsbase="clr-namespace:Xarial.CadPlus.Batch.Base.Controls;assembly=Batch.Base"
         xmlns:conv="clr-namespace:Xarial.CadPlus.Batch.StandAlone.Converters"
         xmlns:xconv="clr-namespace:Xarial.XToolkit.Wpf.Converters;assembly=Xarial.XToolkit.Wpf"
+        xmlns:cppsvc="clr-namespace:Xarial.CadPlus.Plus.Services;assembly=Xarial.CadPlusPlus"
         xmlns:fluent="clr-namespace:Fluent;assembly=Fluent"
         xmlns:win="clr-namespace:System.Windows;assembly=PresentationCore"
         xmlns:vm="clr-namespace:Xarial.CadPlus.Batch.StandAlone.ViewModels"
@@ -28,7 +29,7 @@
         <conv:FileFolderIconConverter x:Key="fileFolderIconConv"/>
 
         <xconv:MatchValueUniversalConverter x:Key="statusToVisConv" 
-                                            TargetValue="{x:Static vmbase:JobState_e.InProgress}"
+                                            TargetValue="{x:Static cppsvc:BatchJobStatus_e.InProgress}"
                                             TrueValue="{x:Static win:Visibility.Visible}"
                                             FalseValue="{x:Static win:Visibility.Collapsed}"/>
 
@@ -206,16 +207,16 @@
                                                 <TextBlock.Text>
                                                     <MultiBinding Converter="{StaticResource jobTitleConv}">
                                                         <Binding Path="Name"/>
-                                                        <Binding Path="Summary.ProcessedFiles"/>
-                                                        <Binding Path="Summary.FailedFiles"/>
-                                                        <Binding Path="Summary.JobItemFiles.Length"/>
+                                                        <Binding Path="ProcessedItemsCount"/>
+                                                        <Binding Path="FailedItemsCount"/>
+                                                        <Binding Path="JobItems.Count"/>
                                                     </MultiBinding>
                                                 </TextBlock.Text>
                                             </TextBlock>
                                             <metro:MetroProgressBar Grid.Row="1" Grid.ColumnSpan="2" 
                                                                 Visibility="{Binding Path=Status, Converter={StaticResource statusToVisConv}}"
-                                                                IsIndeterminate="{Binding Path=Summary.IsInitializing}"
-                                                                Value="{Binding Path=Summary.Progress}" Minimum="0" Maximum="1"/>
+                                                                IsIndeterminate="{Binding Path=IsInitializing}"
+                                                                Value="{Binding Path=Progress, Mode=OneWay}" Minimum="0" Maximum="1"/>
                                             <Button Grid.Column="2" 
                                                 Visibility="{Binding Path=Status, Converter={StaticResource statusToVisConv}}"
                                                 Grid.RowSpan="2" Command="{Binding Path=CancelJobCommand}" Margin="2">
@@ -238,11 +239,21 @@
                                 <RowDefinition Height="*"/>
                                 <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
-                            <ctrlsbase:ResultsControl JobItemsDataGridStyle="{StaticResource MahApps.Styles.DataGrid}"  Grid.Row="0"/>
-                            <metro:MetroProgressBar Grid.Row="1" IsIndeterminate="{Binding Path=Summary.IsInitializing}"
+                            <TabControl Grid.Row="0" Style="{x:Null}">
+                                <TabItem Header="Summary">
+                                    <sharedui:BatchJobSummaryControl/>
+                                </TabItem>
+                                <TabItem Header="Status">
+                                    <sharedui:BatchJobReportControl DataGridStyle="{StaticResource MahApps.Styles.DataGrid}"/>
+                                </TabItem>
+                                <TabItem Header="Journal">
+                                    <sharedui:BatchJobJournalControl/>
+                                </TabItem>
+                            </TabControl>
+                            <metro:MetroProgressBar Grid.Row="1" IsIndeterminate="{Binding Path=IsInitializing}"
                                                 Margin="0,5"
-                                                Visibility="{Binding Path=IsBatchInProgress, Converter={StaticResource boolToVisConv}}"
-                                                Value="{Binding Path=Summary.Progress}" Minimum="0" Maximum="1"/>
+                                                Visibility="{Binding Path=IsBatchJobInProgress, Converter={StaticResource boolToVisConv}}"
+                                                Value="{Binding Path=Progress, Mode=OneWay}" Minimum="0" Maximum="1"/>
                         </Grid>
                     </Grid>
                 </Grid>

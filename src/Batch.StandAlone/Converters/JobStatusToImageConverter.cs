@@ -1,6 +1,6 @@
 ﻿//*********************************************************************
 //CAD+ Toolset
-//Copyright(C) 2021 Xarial Pty Limited
+//Copyright(C) 2022 Xarial Pty Limited
 //Product URL: https://cadplus.xarial.com
 //License: https://cadplus.xarial.com/license/
 //*********************************************************************
@@ -18,11 +18,13 @@ using Xarial.CadPlus.Batch.StandAlone.Properties;
 using Xarial.CadPlus.Batch.StandAlone.ViewModels;
 using Xarial.XToolkit.Wpf.Extensions;
 using Xarial.CadPlus.Batch.Base.ViewModels;
+using Xarial.CadPlus.Plus.Services;
 
 namespace Xarial.CadPlus.Batch.StandAlone.Converters
 {
     public class JobStatusToImageConverter : IValueConverter
     {
+        private static readonly BitmapImage m_InitiatingImage;
         private static readonly BitmapImage m_CancelledImage;
         private static readonly BitmapImage m_FailedImage;
         private static readonly BitmapImage m_InProgressImage;
@@ -31,6 +33,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.Converters
 
         static JobStatusToImageConverter() 
         {
+            m_InitiatingImage = Resources.status_awaiting.ToBitmapImage();
             m_CancelledImage = Resources.status_cancelled.ToBitmapImage();
             m_FailedImage = Resources.status_failed.ToBitmapImage();
             m_InProgressImage = Resources.status_in_progress.ToBitmapImage();
@@ -40,19 +43,22 @@ namespace Xarial.CadPlus.Batch.StandAlone.Converters
 
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value is JobState_e)
+            if (value is BatchJobStatus_e)
             {
-                switch ((JobState_e)value) 
+                switch ((BatchJobStatus_e)value) 
                 {
-                    case JobState_e.Cancelled:
+                    case BatchJobStatus_e.NotStarted:
+                    case BatchJobStatus_e.Initializing:
+                        return m_InitiatingImage;
+                    case BatchJobStatus_e.Cancelled:
                         return m_CancelledImage;
-                    case JobState_e.Failed:
+                    case BatchJobStatus_e.Failed:
                         return m_FailedImage;
-                    case JobState_e.InProgress:
+                    case BatchJobStatus_e.InProgress:
                         return m_InProgressImage;
-                    case JobState_e.Succeeded:
+                    case BatchJobStatus_e.Succeeded:
                         return m_SucceededImage;
-                    case JobState_e.CompletedWithWarning:
+                    case BatchJobStatus_e.CompletedWithWarning:
                         return m_WarningImage;
                     default:
                         return null;

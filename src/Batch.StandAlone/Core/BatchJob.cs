@@ -1,6 +1,6 @@
 ﻿//*********************************************************************
 //CAD+ Toolset
-//Copyright(C) 2021 Xarial Pty Limited
+//Copyright(C) 2022 Xarial Pty Limited
 //Product URL: https://cadplus.xarial.com
 //License: https://cadplus.xarial.com/license/
 //*********************************************************************
@@ -20,10 +20,16 @@ using Xarial.XToolkit.Services.UserSettings.Attributes;
 
 namespace Xarial.CadPlus.Batch.Base.Core
 {
-    public class BatchJobVersionTransformer : BaseUserSettingsVersionsTransformer
+    public class BatchJobVersionTransformer : IVersionsTransformer
     {
+        public IReadOnlyList<VersionTransform> Transforms => m_Transforms;
+
+        private readonly List<VersionTransform> m_Transforms;
+
         public BatchJobVersionTransformer()
         {
+            m_Transforms = new List<VersionTransform>();
+
             Add(new Version("1.0.0"), new Version("1.1.0"), t =>
             {
                 var macrosField = t.Children<JProperty>().First(p => p.Name == "Macros");
@@ -61,9 +67,12 @@ namespace Xarial.CadPlus.Batch.Base.Core
                 return t;
             });
         }
+
+        private void Add(Version from, Version to, Func<JToken, JToken> transform)
+            => m_Transforms.Add(new VersionTransform(from, to, transform));
     }
 
-    [UserSettingVersion("1.2.0", typeof(BatchJobVersionTransformer))]
+    [UserSettingVersion("1.2.1", typeof(BatchJobVersionTransformer))]
     public class BatchJob
     {
         internal static BatchJob FromFile(string filePath) 
@@ -79,6 +88,7 @@ namespace Xarial.CadPlus.Batch.Base.Core
 
         public string[] Input { get; set; }
         public string[] Filters { get; set; }
+        public bool TopLevelFilesOnly { get; set; }
         
         public bool ContinueOnError { get; set; }
         public int Timeout { get; set; }
@@ -99,23 +109,6 @@ namespace Xarial.CadPlus.Batch.Base.Core
             StartupOptions = StartupOptions_e.Silent | StartupOptions_e.Safe;
             OpenFileOptions = OpenFileOptions_e.Silent | OpenFileOptions_e.ForbidUpgrade;
             Actions = Actions_e.None;
-        }
-    }
-
-    public static class BatchJobExtension 
-    {
-        public static ICadApplicationInstanceProvider FindApplicationProvider(this BatchJob job, ICadApplicationInstanceProvider[] appProviders)
-        {
-            var appProvider = appProviders.FirstOrDefault(
-                p => string.Equals(p.Descriptor.ApplicationId, job.ApplicationId,
-                StringComparison.CurrentCultureIgnoreCase));
-
-            if (appProvider == null)
-            {
-                throw new UserException("Failed to find the application provider for this job file");
-            }
-
-            return appProvider;
         }
     }
 }

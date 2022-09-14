@@ -1,6 +1,6 @@
 ﻿//*********************************************************************
 //CAD+ Toolset
-//Copyright(C) 2021 Xarial Pty Limited
+//Copyright(C) 2022 Xarial Pty Limited
 //Product URL: https://cadplus.xarial.com
 //License: https://cadplus.xarial.com/license/
 //*********************************************************************
@@ -240,6 +240,17 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
                 {
                     m_Job.OpenFileOptions -= OpenFileOptions_e.Invisible;
                 }
+
+                Modified?.Invoke();
+            }
+        }
+
+        public bool TopLevelFilesOnly
+        {
+            get => m_Job.TopLevelFilesOnly;
+            set
+            {
+                m_Job.TopLevelFilesOnly = value;
 
                 Modified?.Invoke();
             }

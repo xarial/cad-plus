@@ -1,6 +1,6 @@
 ﻿//*********************************************************************
 //CAD+ Toolset
-//Copyright(C) 2021 Xarial Pty Limited
+//Copyright(C) 2022 Xarial Pty Limited
 //Product URL: https://cadplus.xarial.com
 //License: https://cadplus.xarial.com/license/
 //*********************************************************************
@@ -25,6 +25,7 @@ using Xarial.XCad;
 using Xarial.XCad.Base;
 using Xarial.XCad.Extensions;
 using Xarial.XCad.UI.Commands.Structures;
+using Xarial.XToolkit.Services;
 
 namespace Xarial.CadPlus.CustomToolbar.Services
 {
@@ -48,9 +49,11 @@ namespace Xarial.CadPlus.CustomToolbar.Services
 
         private string m_WorkDir;
 
+        private readonly IStateResolveCompiler m_StateResolveCompiler;
+
         public CommandsManager(IXExtension addIn, IXApplication app,
             IMacroRunner macroRunner, IMessageService msg,
-            IXLogger logger, IIconsProvider[] iconsProviders, IFilePathResolver pathResolver)
+            IXLogger logger, IIconsProvider[] iconsProviders, IFilePathResolver pathResolver, IStateResolveCompiler stateResolveCompiler)
         {
             m_AddIn = addIn;
             m_App = app;
@@ -58,6 +61,8 @@ namespace Xarial.CadPlus.CustomToolbar.Services
             m_Msg = msg;
             m_Logger = logger;
             m_IconsProviders = iconsProviders;
+
+            m_StateResolveCompiler = stateResolveCompiler;
 
             m_CachedToggleStates = new Dictionary<CommandMacroInfo, bool>();
             m_StateResolvers = new ConcurrentDictionary<CommandMacroInfo, IToggleButtonStateResolver>();
@@ -103,7 +108,7 @@ namespace Xarial.CadPlus.CustomToolbar.Services
                 LoadToggleStateResolvers(
                     toolbarInfo.Groups.SelectMany(
                         g => g.Commands ?? Enumerable.Empty<CommandMacroInfo>())
-                    .Where(m => m.Triggers.HasFlag(Triggers_e.ToggleButton) && m.ToggleButtonStateCodeType != ToggleButtonStateCode_e.None));
+                    .Where(m => m.Triggers.HasFlag(Triggers_e.ToggleButton) && m.EnableToggleButtonStateExpression));
             }
         }
         
@@ -111,7 +116,7 @@ namespace Xarial.CadPlus.CustomToolbar.Services
         {
             try
             {
-                await Task.Run(() => CompileStateResolveCodeCode(toggleMacros));
+                await Task.Run(() => CompileStateResolveExpressions(toggleMacros));
             }
             catch (Exception ex)
             {
@@ -159,27 +164,11 @@ namespace Xarial.CadPlus.CustomToolbar.Services
             }
         }
 
-        private void CompileStateResolveCodeCode(IEnumerable<CommandMacroInfo> macroInfos)
+        private void CompileStateResolveExpressions(IEnumerable<CommandMacroInfo> macroInfos)
         {
-            foreach (var grp in macroInfos.GroupBy(x => x.ToggleButtonStateCodeType))
+            foreach (var macroInfoResolverPair in m_StateResolveCompiler.CreateResolvers(macroInfos))
             {
-                IStateResolveCompiler compiler = null;
-                switch (grp.Key)
-                {
-                    //case ToggleButtonStateCode_e.CSharp:
-                    //    compiler = new CSharpStateResolveCompiler(Settings.Default.ToggleButtonResolverCSharp, m_App);
-                    //    break;
-                    case ToggleButtonStateCode_e.VBNET:
-                        compiler = new VbNetStateResolveCompiler(Settings.Default.ToggleButtonResolverVBNET, m_App);
-                        break;
-                    default:
-                        throw new NotSupportedException("Not supported language");
-                }
-
-                foreach (var macroInfoResolverPair in compiler.CreateResolvers(grp)) 
-                {
-                    m_StateResolvers.TryAdd(macroInfoResolverPair.Key, macroInfoResolverPair.Value);
-                }
+                m_StateResolvers.TryAdd(macroInfoResolverPair.Key, macroInfoResolverPair.Value);
             }
         }
         
@@ -210,7 +199,7 @@ namespace Xarial.CadPlus.CustomToolbar.Services
             {
                 if (macroInfo.Triggers.HasFlag(Triggers_e.ToggleButton))
                 {
-                    if (macroInfo.ResolveButtonStateCodeOnce || macroInfo.ToggleButtonStateCodeType == ToggleButtonStateCode_e.None)
+                    if (macroInfo.CacheToggleState || !macroInfo.EnableToggleButtonStateExpression)
                     {
                         if (m_CachedToggleStates.TryGetValue(macroInfo, out bool isChecked))
                         {
@@ -232,7 +221,7 @@ namespace Xarial.CadPlus.CustomToolbar.Services
 
             try
             {
-                if (macroInfo.ResolveButtonStateCodeOnce || macroInfo.ToggleButtonStateCodeType == ToggleButtonStateCode_e.None)
+                if (macroInfo.CacheToggleState || !macroInfo.EnableToggleButtonStateExpression)
                 {
                     if (!m_CachedToggleStates.TryGetValue(macroInfo, out isChecked))
                     {
@@ -255,7 +244,7 @@ namespace Xarial.CadPlus.CustomToolbar.Services
         
         private bool GetCheckState(CommandMacroInfo macroInfo)
         {
-            if (macroInfo.ToggleButtonStateCodeType == ToggleButtonStateCode_e.None)
+            if (!macroInfo.EnableToggleButtonStateExpression)
             {
                 return false;
             }

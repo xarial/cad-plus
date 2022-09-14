@@ -1,6 +1,6 @@
 ﻿//*********************************************************************
 //CAD+ Toolset
-//Copyright(C) 2021 Xarial Pty Limited
+//Copyright(C) 2022 Xarial Pty Limited
 //Product URL: https://cadplus.xarial.com
 //License: https://cadplus.xarial.com/license/
 //*********************************************************************
@@ -23,13 +23,14 @@ using Xarial.CadPlus.Plus.UI;
 using Xarial.XCad;
 using Xarial.XCad.Documents;
 using Xarial.CadPlus.Plus.Extensions;
+using Xarial.XCad.Extensions;
 
 namespace Xarial.CadPlus.Batch.Extensions
 {
-    [Module(typeof(IHostExtension))]
+    [Module(typeof(IHostCadExtension))]
     public class InputSorterModuleInApp : IInputSorterModule
     {
-        private IHostExtension m_Host;
+        private IHostCadExtension m_Host;
         private IBatchInAppModule m_BatchInAppModule;
         private bool m_EnableOrdering;
 
@@ -44,12 +45,12 @@ namespace Xarial.CadPlus.Batch.Extensions
 
         public void Init(IHost host)
         {
-            m_Host = (IHostExtension)host;
+            m_Host = (IHostCadExtension)host;
             m_Host.Initialized += OnInitialized;
             m_Host.Connect += OnConnect;
         }
 
-        private void OnInitialized(IApplication app, IServiceContainer svcProvider, IModule[] modules)
+        private void OnInitialized(IApplication app, IServiceProvider svcProvider, IModule[] modules)
         {
             m_BatchInAppModule = modules.OfType<IBatchInAppModule>().FirstOrDefault();
 

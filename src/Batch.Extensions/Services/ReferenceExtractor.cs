@@ -1,6 +1,6 @@
 ﻿//*********************************************************************
 //CAD+ Toolset
-//Copyright(C) 2021 Xarial Pty Limited
+//Copyright(C) 2022 Xarial Pty Limited
 //Product URL: https://cadplus.xarial.com
 //License: https://cadplus.xarial.com/license/
 //*********************************************************************
@@ -52,11 +52,11 @@ namespace Xarial.CadPlus.Batch.Extensions.Services
                 switch (scope) 
                 {
                     case ReferencesScope_e.TopLevelDependencies:
-                        deps = doc.Dependencies.ToArray();
+                        deps = doc.IterateDependencies(true).ToArray();
                         break;
 
                     case ReferencesScope_e.AllDependencies:
-                        deps = doc.GetAllDependencies().ToArray();
+                        deps = doc.IterateDependencies(false).ToArray();
                         break;
 
                     default:
@@ -108,7 +108,7 @@ namespace Xarial.CadPlus.Batch.Extensions.Services
                 var drw = m_App.Documents.PreCreate<IXDrawing>();
                 drw.Path = drwFile;
 
-                var drwDeps = drw.Dependencies.ToArray();
+                var drwDeps = drw.IterateDependencies(true).ToArray();
 
                 var usedDocs = drwDeps.Intersect(docs,
                     new DocumentComparer()).ToArray();

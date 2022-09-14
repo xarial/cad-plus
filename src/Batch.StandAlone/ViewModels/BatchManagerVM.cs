@@ -1,6 +1,6 @@
 ﻿//*********************************************************************
 //CAD+ Toolset
-//Copyright(C) 2021 Xarial Pty Limited
+//Copyright(C) 2022 Xarial Pty Limited
 //Product URL: https://cadplus.xarial.com
 //License: https://cadplus.xarial.com/license/
 //*********************************************************************
@@ -36,6 +36,8 @@ using Xarial.CadPlus.Plus.UI;
 using Xarial.CadPlus.Plus.Shared;
 using Xarial.XCad.Base;
 using Xarial.XToolkit;
+using Xarial.XToolkit.Services;
+using Xarial.CadPlus.Batch.StandAlone.Services;
 
 namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
 {
@@ -64,24 +66,23 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
         private readonly IMessageService m_MsgSvc;
         private readonly IXLogger m_Logger;
 
-        public ICadApplicationInstanceProvider[] AppProviders { get; }
+        public ICadApplicationInstanceProvider[] AppProviders => m_BatchApp.ApplicationProviders;
 
-        private readonly Func<System.IO.FileInfo, BatchJob, MainWindow, IRibbonButtonCommand[], BatchDocumentVM> m_OpenDocFunc;
-        private readonly Func<string, BatchJob, MainWindow, IRibbonButtonCommand[], BatchDocumentVM> m_NewDocFunc;
+        private readonly IBatchDocumentVMFactory m_BatchDocumentFactory;
 
         private readonly IAboutService m_AboutSvc;
 
-        public BatchManagerVM(ICadApplicationInstanceProvider[] appProviders,
+        private readonly IBatchApplication m_BatchApp;
+
+        public BatchManagerVM(IBatchApplication batchApp,
             IBatchRunnerModel model, IMessageService msgSvc, IXLogger logger,
-            Func<System.IO.FileInfo, BatchJob, MainWindow, IRibbonButtonCommand[], BatchDocumentVM> openDocFunc,
-            Func<string, BatchJob, MainWindow, IRibbonButtonCommand[], BatchDocumentVM> newDocFunc, IAboutService aboutSvc)
+            IBatchDocumentVMFactory batchDocVmFact, IAboutService aboutSvc)
         {
-            AppProviders = appProviders;
+            m_BatchApp = batchApp;
             m_Model = model;
             m_MsgSvc = msgSvc;
             m_Logger = logger;
-            m_OpenDocFunc = openDocFunc;
-            m_NewDocFunc = newDocFunc;
+            m_BatchDocumentFactory = batchDocVmFact;
 
             m_AboutSvc = aboutSvc;
 
@@ -154,14 +155,14 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
             {
                 if (!string.IsNullOrEmpty(filePath) ||
                     FileSystemBrowser.BrowseFileOpen(out filePath, "Select file to open",
-                        FileSystemBrowser.BuildFilterString(BatchDocumentVM.FileFilters)))
+                        FileFilter.BuildFilterString(BatchDocumentVM.FileFilters)))
                 {
                     if (!string.Equals(Document?.FilePath, filePath, StringComparison.CurrentCultureIgnoreCase))
                     {
                         if (Document == null)
                         {
                             var batchJob = m_Model.LoadJobFromFile(filePath);
-                            Document = m_OpenDocFunc.Invoke(new System.IO.FileInfo(filePath),
+                            Document = m_BatchDocumentFactory.CreateOpen(new System.IO.FileInfo(filePath),
                                 batchJob, ParentWindow,
                                 GetBackstageCommands());
                             Document.Save += OnSaveDocument;
@@ -198,7 +199,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
             {
                 var job = m_Model.CreateNewJobDocument(appId);
 
-                Document = m_NewDocFunc.Invoke($"Batch+ Document",
+                Document = m_BatchDocumentFactory.CreateNew($"Batch+ Document",
                     job, ParentWindow, GetBackstageCommands());
                 Document.Save += OnSaveDocument;
             }
@@ -258,16 +259,16 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
         {
             return new IRibbonButtonCommand[]
             {
-                new RibbonButtonCommand("New", Resources._new, "Create new Batch job", NewDocument, null),
-                new RibbonButtonCommand("Open...", Resources.open, "Open existing batch job", () => OpenDocument(""), null),
+                new RibbonButtonCommand("New", Resources._new, "Create new Batch job", new RelayCommand(NewDocument)),
+                new RibbonButtonCommand("Open...", Resources.open, "Open existing batch job", new RelayCommand(() => OpenDocument(""))),
                 null,
-                new RibbonButtonCommand("Save", Resources.save, "Save current batch job", () => Document.SaveDocument(), () => Document != null),
-                new RibbonButtonCommand("Save As...", null, "Save current batch job to a new file", () => Document.SaveAsDocument(), () => Document != null),
+                new RibbonButtonCommand("Save", Resources.save, "Save current batch job", new RelayCommand(() => Document.SaveDocument(), () => Document != null)),
+                new RibbonButtonCommand("Save As...", null, "Save current batch job to a new file", new RelayCommand(() => Document.SaveAsDocument(), () => Document != null)),
                 null,
-                new RibbonButtonCommand("Close", null, "Close current batch job", CloseDocument, () => Document != null),
+                new RibbonButtonCommand("Close", null, "Close current batch job", new RelayCommand(CloseDocument, () => Document != null)),
                 null,
-                new RibbonButtonCommand("Help...", Resources.help_icon, "Open help page", OpenHelp, null),
-                new RibbonButtonCommand("About...", Resources.about_icon, "About Batch+", ShowAbout, null)
+                new RibbonButtonCommand("Help...", Resources.help_icon, "Open help page", new RelayCommand(OpenHelp)),
+                new RibbonButtonCommand("About...", Resources.about_icon, "About Batch+", new RelayCommand(ShowAbout))
             };
         }
     }

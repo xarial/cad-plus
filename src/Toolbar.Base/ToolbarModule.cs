@@ -1,11 +1,10 @@
 ﻿//*********************************************************************
 //CAD+ Toolset
-//Copyright(C) 2021 Xarial Pty Limited
+//Copyright(C) 2022 Xarial Pty Limited
 //Product URL: https://cadplus.xarial.com
 //License: https://cadplus.xarial.com/license/
 //*********************************************************************
 
-using Autofac;
 using System;
 using System.ComponentModel;
 using Xarial.CadPlus.CustomToolbar.Services;
@@ -28,11 +27,13 @@ using Xarial.CadPlus.Common.Attributes;
 using Xarial.CadPlus.Plus.Attributes;
 using Xarial.CadPlus.Plus.Services;
 using Xarial.CadPlus.Plus.Shared;
-using Xarial.CadPlus.Plus.Shared.Extensions;
 using Xarial.CadPlus.Toolbar.Properties;
 using Xarial.CadPlus.Toolbar.Services;
 using Xarial.CadPlus.CustomToolbar.Structs;
 using System.IO;
+using Xarial.XToolkit.Services;
+using Xarial.CadPlus.Plus.Extensions;
+using Xarial.CadPlus.Plus.DI;
 
 namespace Xarial.CadPlus.CustomToolbar
 {
@@ -49,17 +50,16 @@ namespace Xarial.CadPlus.CustomToolbar
         Configuration
     }
 
-    [Module(typeof(IHostExtension))]
+    [Module(typeof(IHostCadExtension))]
     public class ToolbarModule : IToolbarModule
     {
         public event MacroRunningDelegate MacroRunning;
 
-        protected static Autofac.IContainer m_Container;
-
         public static TService Resolve<TService>()
-            => m_Container.Resolve<TService>();
+            where TService : class
+            => m_SvcProvider.GetService<TService>();
 
-        private IHostExtension m_Host;
+        private IHostCadExtension m_Host;
         private ICommandsManager m_CmdsMgr;
         private ITriggersManager m_TriggersMgr;
         private IMessageService m_Msg;
@@ -67,7 +67,7 @@ namespace Xarial.CadPlus.CustomToolbar
 
         private List<IIconsProvider> m_IconsProviders;
 
-        private IServiceProvider m_SvcProvider;
+        private static IServiceProvider m_SvcProvider;
         private IToolbarModuleProxy m_ToolbarProxy;
         private IToolbarConfigurationManager m_ToolbarConfMgr;
 
@@ -80,25 +80,29 @@ namespace Xarial.CadPlus.CustomToolbar
 
         public void Init(IHost host)
         {
-            if (!(host is IHostExtension))
+            if (!(host is IHostCadExtension))
             {
                 throw new InvalidCastException("This module is only availabel for extensions");
             }
 
-            m_Host = (IHostExtension)host;
+            m_Host = (IHostCadExtension)host;
+            m_Host.ConfigureServices += OnConfigureServices;
             m_Host.Initialized += OnHostInitialized;
             m_Host.Connect += OnConnect;
         }
 
-        private void OnHostInitialized(IApplication app, IServiceContainer svcProvider, IModule[] modules)
+        private void OnConfigureServices(IContainerBuilder builder)
+        {
+            CreateContainer(builder);
+        }
+
+        private void OnHostInitialized(IApplication app, IServiceProvider svcProvider, IModule[] modules)
         {
             m_SvcProvider = svcProvider;
         }
 
         private void OnConnect()
-        {
-            CreateContainer();
-            
+        {            
             m_Msg = Resolve<IMessageService>();
             m_Logger = Resolve<IXLogger>();
 
@@ -106,6 +110,8 @@ namespace Xarial.CadPlus.CustomToolbar
             m_ToolbarProxy.RequestMacroRunning += OnRequestMacroRunning;
 
             m_ToolbarConfMgr = Resolve<IToolbarConfigurationManager>();
+
+            m_Host.RegisterCommands<Commands_e>(OnCommandClick);
 
             try
             {
@@ -116,63 +122,45 @@ namespace Xarial.CadPlus.CustomToolbar
             catch (Exception ex)
             {
                 m_Logger.Log(ex);
-                m_Msg.ShowError(ex, "Failed to load toolbar specification");
+                m_Msg.ShowError(ex, "Failed to load Toolbar+ commands");
             }
         }
 
         private void OnRequestMacroRunning(EventType_e eventType, MacroRunningArguments args)
             => MacroRunning?.Invoke(eventType, args);
 
-        protected virtual void CreateContainer()
-        {
-            var builder = new ContainerBuilder();
-            
-            builder.RegisterInstance(m_Host.Extension).ExternallyOwned();
-            builder.RegisterInstance(m_Host.Extension.Application).ExternallyOwned();
-            builder.RegisterInstance(m_Host.Extension.Logger);
-            
-            builder.RegisterType<MacroEntryPointsExtractor>()
-                .As<IMacroEntryPointsExtractor>();
+        private void CreateContainer(IContainerBuilder builder)
+        {            
+            builder.RegisterSingleton<IMacroEntryPointsExtractor, MacroEntryPointsExtractor>();
 
-            builder.RegisterType<FilePathResolver>()
-                .As<IFilePathResolver>();
-            
-            builder.RegisterType<MacroRunner>()
-                .As<IMacroRunner>().SingleInstance();
+            builder.RegisterSingleton<IFilePathResolver, FilePathResolver>();
 
-            builder.RegisterType<ToolbarModuleProxy>()
-                .As<IToolbarModuleProxy>().SingleInstance();
+            builder.RegisterSingleton<IMacroRunner, CadMacroRunner>();
 
-            builder.RegisterType<ToolbarConfigurationProvider>()
-                .As<IToolbarConfigurationProvider>();
+            builder.RegisterSingleton<IToolbarModuleProxy, ToolbarModuleProxy>();
 
-            builder.RegisterType<ToolbarConfigurationManager>()
-                .As<IToolbarConfigurationManager>().SingleInstance();
+            builder.RegisterSingleton<IToolbarConfigurationProvider, ToolbarConfigurationProvider>();
 
-            builder.RegisterType<CommandManagerVM>();
+            builder.RegisterSingleton<IToolbarConfigurationManager, ToolbarConfigurationManager>();
 
-            builder.RegisterType<CommandsManager>()
-                .As<ICommandsManager>().SingleInstance();
+            builder.RegisterSelfSingleton<CommandManagerVM>();
 
-            builder.RegisterType<TriggersManager>()
-                .As<ITriggersManager>().SingleInstance();
+            builder.RegisterSingleton<ICommandMacroVMFactory, CommandMacroVMFactory>();
+            builder.RegisterSingleton<ICommandGroupVMFactory, CommandGroupVMFactory>();
 
-            builder.RegisterType<UserSettingsService>();
+            builder.RegisterSingleton<ICommandsManager, CommandsManager>();
 
-            builder.RegisterFromServiceProvider<IMacroExecutor>(m_SvcProvider);
-            builder.RegisterFromServiceProvider<IMessageService>(m_SvcProvider);
-            builder.RegisterFromServiceProvider<ICadDescriptor>(m_SvcProvider);
-            builder.RegisterFromServiceProvider<ISettingsProvider>(m_SvcProvider);
+            builder.RegisterSingleton<ITriggersManager, TriggersManager>();
+
+            builder.RegisterSingleton<IStateResolveCompiler, LambdaExpressionStateResolveCompiler>();
+
+            builder.RegisterSelfSingleton<UserSettingsService>();
 
             builder.RegisterInstance(m_IconsProviders.ToArray());
-
-            m_Container = builder.Build();
         }
 
         private void LoadCommands(CustomToolbarInfo toolbarInfo, string workDir)
-        {
-            m_Host.RegisterCommands<Commands_e>(OnCommandClick);
-            
+        {   
             m_CmdsMgr = Resolve<ICommandsManager>();
             m_TriggersMgr = Resolve<ITriggersManager>();
 
@@ -236,7 +224,6 @@ namespace Xarial.CadPlus.CustomToolbar
         public void Dispose()
         {
             m_ToolbarProxy.RequestMacroRunning -= OnRequestMacroRunning;
-            m_Container.Dispose();
         }
 
         public void RegisterIconsProvider(IIconsProvider provider) => m_IconsProviders.Add(provider);

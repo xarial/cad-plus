@@ -1,6 +1,6 @@
 ﻿//*********************************************************************
 //CAD+ Toolset
-//Copyright(C) 2021 Xarial Pty Limited
+//Copyright(C) 2022 Xarial Pty Limited
 //Product URL: https://cadplus.xarial.com
 //License: https://cadplus.xarial.com/license/
 //*********************************************************************
@@ -68,6 +68,12 @@ namespace Xarial.CadPlus.Batch.Base
         public IEnumerable<string> Filters
         {
             set => Job.Filters = value.ToArray();
+        }
+
+        [Option('t', "toplevelfiles", Required = false, HelpText = "Option to only process top-level files in the specified folders")]
+        public bool TopLevelFilesOnly
+        {
+            set => Job.TopLevelFilesOnly = value;
         }
 
         [Option('m', "macros", Required = true, HelpText = "List of macros to run")]

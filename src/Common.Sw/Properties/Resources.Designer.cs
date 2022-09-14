@@ -19,7 +19,7 @@ namespace Xarial.CadPlus.Common.Sw.Properties {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class Resources {
@@ -83,9 +83,29 @@ namespace Xarial.CadPlus.Common.Sw.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap cutlist_icon {
+        internal static System.Drawing.Bitmap cut_list_sheet_metal {
             get {
-                object obj = ResourceManager.GetObject("cutlist_icon", resourceCulture);
+                object obj = ResourceManager.GetObject("cut-list-sheet-metal", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap cut_list_solid_body {
+            get {
+                object obj = ResourceManager.GetObject("cut-list-solid-body", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap cut_list_weldment {
+            get {
+                object obj = ResourceManager.GetObject("cut-list-weldment", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -116,6 +136,26 @@ namespace Xarial.CadPlus.Common.Sw.Properties {
         internal static System.Drawing.Bitmap sheet_icon {
             get {
                 object obj = ResourceManager.GetObject("sheet_icon", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap solid_body {
+            get {
+                object obj = ResourceManager.GetObject("solid-body", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap surface_body {
+            get {
+                object obj = ResourceManager.GetObject("surface-body", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

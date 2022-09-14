@@ -1,6 +1,6 @@
 ﻿//*********************************************************************
 //CAD+ Toolset
-//Copyright(C) 2021 Xarial Pty Limited
+//Copyright(C) 2022 Xarial Pty Limited
 //Product URL: https://cadplus.xarial.com
 //License: https://cadplus.xarial.com/license/
 //*********************************************************************
@@ -13,6 +13,9 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Xarial.CadPlus.Batch.Base.Core;
+using Xarial.CadPlus.Batch.StandAlone.Services;
+using Xarial.CadPlus.Plus.Exceptions;
 
 namespace Xarial.CadPlus.Batch.Base.Services
 {
@@ -33,8 +36,12 @@ namespace Xarial.CadPlus.Batch.Base.Services
 
         private const string CONTEXT_PARAM_NAME = "_Context_";
 
+        private readonly int m_Retries;
+
         public PollyResilientWorker(int retries, TimeSpan? timeout) 
         {
+            m_Retries = retries;
+
             m_Policy = Policy
                     .Handle<Exception>()
                     .Retry(retries, OnRetry);
@@ -50,16 +57,28 @@ namespace Xarial.CadPlus.Batch.Base.Services
 
         public void DoWork(Action<TContext, CancellationToken> action, TContext context, CancellationToken cancellationToken)
         {
-            try
+            var res = m_Policy.ExecuteAndCapture((Context ctx, CancellationToken token) =>
             {
-                m_Policy.Execute((Context ctx, CancellationToken token) =>
+                action.Invoke(GetContext(ctx), token);
+            }, new Dictionary<string, object>() { { CONTEXT_PARAM_NAME, context } }, cancellationToken);
+
+            if (res.Outcome == OutcomeType.Failure)
+            {
+                switch (res.FinalException) 
                 {
-                    action.Invoke(GetContext(ctx), token);
-                }, new Dictionary<string, object>() { { CONTEXT_PARAM_NAME, context } }, cancellationToken);
-            }
-            catch (TimeoutRejectedException ex) 
-            {
-                throw new TimeoutException("Timeout", ex);
+                    case OperationCanceledException cancelledEx:
+                        throw cancelledEx;
+
+                    case TimeoutRejectedException timeoutEx:
+                        throw new TimeoutException("Timeout", timeoutEx);
+
+                    case Exception ex:
+                        throw new Exception($"Failed to process the operation within {m_Retries} retries", res.FinalException);
+
+                    default:
+                        throw new NotSupportedException("Final exception is not set");
+
+                }
             }
         }
 
@@ -70,5 +89,18 @@ namespace Xarial.CadPlus.Batch.Base.Services
 
         private void OnRetry(Exception err, int attempt, Context context)
             => Retry?.Invoke(err, attempt, GetContext(context));
+    }
+
+    public class PollyJobContectResilientWorkerFactory : IJobContectResilientWorkerFactory
+    {
+        private readonly int m_Retries;
+
+        public PollyJobContectResilientWorkerFactory(int retries) 
+        {
+            m_Retries = retries;
+        }
+
+        public IResilientWorker<BatchJobContext> Create(TimeSpan? timeout)
+            => new PollyResilientWorker<BatchJobContext>(m_Retries, timeout);
     }
 }

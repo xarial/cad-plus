@@ -1,6 +1,6 @@
 ﻿//*********************************************************************
 //CAD+ Toolset
-//Copyright(C) 2021 Xarial Pty Limited
+//Copyright(C) 2022 Xarial Pty Limited
 //Product URL: https://cadplus.xarial.com
 //License: https://cadplus.xarial.com/license/
 //*********************************************************************
@@ -27,9 +27,9 @@ namespace Xarial.CadPlus.CustomToolbar.Structs
 
         public string Arguments { get; set; }
 
-        public ToggleButtonStateCode_e ToggleButtonStateCodeType { get; set; } = ToggleButtonStateCode_e.None;
-        public string ToggleButtonStateCode { get; set; } = "";
-        public bool ResolveButtonStateCodeOnce { get; set; } = true;
+        public bool EnableToggleButtonStateExpression { get; set; }
+        public string ToggleButtonStateExpression { get; set; }
+        public bool CacheToggleState { get; set; } = true;
 
         internal CommandMacroInfo Clone()
             => new CommandMacroInfo()
@@ -45,9 +45,9 @@ namespace Xarial.CadPlus.CustomToolbar.Structs
                 UnloadAfterRun = UnloadAfterRun,
                 Location = Location,
                 Arguments = Arguments,
-                ToggleButtonStateCodeType = ToggleButtonStateCodeType,
-                ToggleButtonStateCode = ToggleButtonStateCode,
-                ResolveButtonStateCodeOnce = ResolveButtonStateCodeOnce
+                EnableToggleButtonStateExpression = EnableToggleButtonStateExpression,
+                ToggleButtonStateExpression = ToggleButtonStateExpression,
+                CacheToggleState = CacheToggleState
             };
     }
 }

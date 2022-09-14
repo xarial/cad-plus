@@ -1,6 +1,6 @@
 ﻿//*********************************************************************
 //CAD+ Toolset
-//Copyright(C) 2021 Xarial Pty Limited
+//Copyright(C) 2022 Xarial Pty Limited
 //Product URL: https://cadplus.xarial.com
 //License: https://cadplus.xarial.com/license/
 //*********************************************************************
@@ -13,6 +13,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Xarial.CadPlus.Batch.Extensions.ViewModels;
 using Xarial.XCad.Documents;
+using Xarial.XCad.Documents.Extensions;
 
 namespace Xarial.CadPlus.Batch.Extensions.Services
 {
@@ -76,7 +77,7 @@ namespace Xarial.CadPlus.Batch.Extensions.Services
 
                 try
                 {
-                    var dependencies = doc.Dependencies.ToArray();
+                    var dependencies = doc.IterateDependencies(true).ToArray();
 
                     if (dependencies?.Any() == true)
                     {

@@ -1,6 +1,6 @@
 ﻿//*********************************************************************
 //CAD+ Toolset
-//Copyright(C) 2021 Xarial Pty Limited
+//Copyright(C) 2022 Xarial Pty Limited
 //Product URL: https://cadplus.xarial.com
 //License: https://cadplus.xarial.com/license/
 //*********************************************************************
@@ -25,10 +25,11 @@ using Xarial.CadPlus.Common.Attributes;
 using Xarial.CadPlus.Plus.Attributes;
 using Xarial.CadPlus.Plus.Services;
 using Xarial.CadPlus.Plus.Extensions;
+using Xarial.XToolkit.Services;
 
 namespace Xarial.CadPlus.Export.InApp
 {
-    [Module(typeof(IHostExtension))]
+    [Module(typeof(IHostCadExtension))]
     public class ExportModule : IModule
     {
         [Title("eXport+")]
@@ -45,7 +46,7 @@ namespace Xarial.CadPlus.Export.InApp
             RunStandAlone,
         }
 
-        private IHostExtension m_Host;
+        private IHostCadExtension m_Host;
 
         private IMessageService m_Msg;
         private IXLogger m_Logger;
@@ -54,17 +55,17 @@ namespace Xarial.CadPlus.Export.InApp
 
         public void Init(IHost host)
         {
-            if (!(host is IHostExtension))
+            if (!(host is IHostCadExtension))
             {
                 throw new InvalidCastException("Only extension host is supported for this module");
             }
 
-            m_Host = (IHostExtension)host;
+            m_Host = (IHostCadExtension)host;
             m_Host.Initialized += OnHostInitialized;
             m_Host.Connect += OnConnect;
         }
 
-        private void OnHostInitialized(IApplication app, IServiceContainer svcProvider, IModule[] modules)
+        private void OnHostInitialized(IApplication app, IServiceProvider svcProvider, IModule[] modules)
         {
             m_SvcProvider = svcProvider;
         }

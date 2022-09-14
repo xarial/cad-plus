@@ -1,11 +1,10 @@
 ﻿//*********************************************************************
 //CAD+ Toolset
-//Copyright(C) 2021 Xarial Pty Limited
+//Copyright(C) 2022 Xarial Pty Limited
 //Product URL: https://cadplus.xarial.com
 //License: https://cadplus.xarial.com/license/
 //*********************************************************************
 
-using Autofac;
 using CommandLine;
 using System;
 using System.Collections.Generic;
@@ -31,6 +30,9 @@ using Xarial.CadPlus.Plus.Exceptions;
 using Xarial.CadPlus.Plus;
 using System.Windows;
 using Xarial.CadPlus.Plus.Extensions;
+using Xarial.XToolkit.Services;
+using Xarial.CadPlus.Plus.DI;
+using Xarial.CadPlus.Batch.StandAlone.Services;
 
 namespace Xarial.CadPlus.Batch.StandAlone
 {
@@ -58,22 +60,20 @@ namespace Xarial.CadPlus.Batch.StandAlone
             m_AppLauncher.Start(args);
         }
 
-        private static Task OnRunConsoleAsync(BatchArguments args)
-            => RunConsoleBatch(args);
+        private static Task OnRunConsoleAsync(BatchArguments args) => RunConsoleBatch(args);
 
         private static async Task RunConsoleBatch(BatchArguments args)
         {
             try
             {
-                using (var batchRunner = m_AppLauncher.Container.Resolve<BatchRunner>(
-                    new TypedParameter[]
-                    {
-                        new TypedParameter(typeof(BatchJob), args.Job),
-                        new TypedParameter(typeof(TextWriter), Console.Out),
-                        new TypedParameter(typeof(IProgressHandler), new ConsoleProgressWriter())
-                    }))
+                var batchRunFact = m_AppLauncher.Container.GetService<IBatchMacroRunJobStandAloneFactory>();
+                
+                using (var batchRunner = batchRunFact.Create(args.Job))
                 {
-                    await batchRunner.BatchRunAsync().ConfigureAwait(false);
+                    using (var prgWriter = new ConsoleProgressWriter(batchRunner))
+                    {
+                        await batchRunner.TryExecuteAsync(default).ConfigureAwait(false);
+                    }
                 }
             }
             catch (Exception ex)
@@ -85,35 +85,26 @@ namespace Xarial.CadPlus.Batch.StandAlone
             }
         }
 
-        private static void OnConfigureServices(ContainerBuilder builder, BatchArguments args)
+        private static void OnConfigureServices(IContainerBuilder builder, BatchArguments args)
         {
-            builder.RegisterType<RecentFilesManager>()
-                .As<IRecentFilesManager>();
+            builder.RegisterSingleton<IRecentFilesManager, RecentFilesManager>();
+            builder.RegisterSingleton<IBatchRunnerModel, BatchRunnerModel>();
+            builder.RegisterSingleton<IBatchMacroRunJobStandAloneFactory, BatchMacroRunJobStandAloneFactory>();
+            builder.RegisterSelfSingleton<BatchManagerVM>();
+            builder.RegisterSingleton<IJobContectResilientWorkerFactory, PollyJobContectResilientWorkerFactory>().UsingParameters(Parameter<int>.Any(MAX_RETRIES));
 
-            builder.RegisterType<BatchRunner>();
-            builder.RegisterType<BatchRunnerModel>().As<IBatchRunnerModel>();
-            builder.RegisterType<BatchRunJobExecutor>().As<IBatchRunJobExecutor>();
-            builder.RegisterType<BatchManagerVM>();
-            builder.RegisterType<PollyResilientWorker<BatchJobContext>>()
-                .As<IResilientWorker<BatchJobContext>>()
-                .WithParameter(new TypedParameter(typeof(int), MAX_RETRIES));
-            builder.RegisterType<PopupKiller>().As<IPopupKiller>();
-            builder.RegisterType<BatchDocumentVM>();
-            builder.RegisterType<AboutService>().As<IAboutService>();
-            builder.Register<Window>(c => m_Window);
+            builder.RegisterSingleton<IBatchDocumentVMFactory, BatchDocumentVMFactory>();
+            builder.RegisterSingleton<IParentWindowProvider, ParentWindowProvider>().UsingFactory(() => new ParentWindowProvider(() => m_Window));
 
-            builder.RegisterType<BatchApplicationProxy>().As<IBatchApplicationProxy>().SingleInstance();
-            
-            builder.RegisterAdapter<IApplication, ICadApplicationInstanceProvider[]>(x => ((IBatchApplication)x).ApplicationProviders);
+            builder.Register<IBatchApplicationProxy, BatchApplicationProxy>();
 
-            builder.RegisterType<XCadMacroProvider>().As<IXCadMacroProvider>();
+            builder.RegisterAdapter<IApplication, IBatchApplication>(LifetimeScope_e.Singleton);
 
-            builder.RegisterType<JobManager>().As<IJobManager>()
-                .SingleInstance()
-                .OnActivating(x => x.Instance.Init());
+            builder.RegisterSingleton<IJobApplicationProvider, JobApplicationProvider>();
 
-            builder.RegisterType<JournalTextExporter>().As<IJournalExporter>();
-            builder.RegisterType<ResultsSummaryExcelExporter>().As<IResultsSummaryExcelExporter>();
+            builder.RegisterSingleton<IXCadMacroProvider, XCadMacroProvider>();
+
+            builder.RegisterSingleton<IMacroRunnerPopupHandlerFactory, MacroRunnerPopupHandlerFactory>();
         }
 
         private static void OnWindowCreated(MainWindow window, BatchArguments args)
@@ -122,7 +113,7 @@ namespace Xarial.CadPlus.Batch.StandAlone
             {
                 m_Window = window;
 
-                m_BatchManager = m_AppLauncher.Container.Resolve<BatchManagerVM>();
+                m_BatchManager = m_AppLauncher.Container.GetService<BatchManagerVM>();
                 window.Closing += OnWindowClosing;
                 window.DataContext = m_BatchManager;
                 
@@ -147,11 +138,11 @@ namespace Xarial.CadPlus.Batch.StandAlone
 
                 try
                 {
-                    msgSvc = m_AppLauncher.Container.Resolve<IMessageService>();
+                    msgSvc = m_AppLauncher.Container.GetService<IMessageService>();
                 }
                 catch
                 {
-                    msgSvc = new GenericMessageService("Batch+");
+                    msgSvc = new GenericMessageService();
                 }
 
                 msgSvc.ShowError(ex.ParseUserError());

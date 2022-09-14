@@ -1,6 +1,6 @@
 ﻿//*********************************************************************
 //CAD+ Toolset
-//Copyright(C) 2021 Xarial Pty Limited
+//Copyright(C) 2022 Xarial Pty Limited
 //Product URL: https://cadplus.xarial.com
 //License: https://cadplus.xarial.com/license/
 //*********************************************************************
@@ -13,7 +13,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Data;
 using Xarial.CadPlus.Batch.Base.ViewModels;
-using Xarial.CadPlus.Common.Utils;
+using Xarial.XToolkit;
 
 namespace Xarial.CadPlus.Batch.Base.Converters
 {
@@ -25,7 +25,7 @@ namespace Xarial.CadPlus.Batch.Base.Converters
 
             if (!string.IsNullOrEmpty(args))
             {
-                var argsArr = CommandLineHelper.ParseCommandLine(args);
+                var argsArr = CommandLineUtils.ParseCommandLine(args);
 
                 var argsVm = new ArgumentVM[argsArr.Length];
 

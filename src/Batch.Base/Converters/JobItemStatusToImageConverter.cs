@@ -1,6 +1,6 @@
 ﻿//*********************************************************************
 //CAD+ Toolset
-//Copyright(C) 2021 Xarial Pty Limited
+//Copyright(C) 2022 Xarial Pty Limited
 //Product URL: https://cadplus.xarial.com
 //License: https://cadplus.xarial.com/license/
 //*********************************************************************
@@ -15,6 +15,7 @@ using System.Windows.Data;
 using System.Windows.Media.Imaging;
 using Xarial.CadPlus.Batch.Base.Properties;
 using Xarial.CadPlus.Common.Services;
+using Xarial.CadPlus.Plus.Services;
 using Xarial.XToolkit.Wpf.Extensions;
 
 namespace Xarial.CadPlus.Batch.Base.Converters

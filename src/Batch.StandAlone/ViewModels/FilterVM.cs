@@ -1,10 +1,11 @@
 ﻿//*********************************************************************
 //CAD+ Toolset
-//Copyright(C) 2021 Xarial Pty Limited
+//Copyright(C) 2022 Xarial Pty Limited
 //Product URL: https://cadplus.xarial.com
 //License: https://cadplus.xarial.com/license/
 //*********************************************************************
 
+using System;
 using System.ComponentModel;
 using Xarial.XToolkit.Wpf.Extensions;
 
@@ -13,6 +14,8 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
     public class FilterVM : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
+
+        internal event Action<string> Changed;
 
         private string[] m_Src;
         private int m_Index;
@@ -26,6 +29,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
                 m_Value = value;
                 m_Src[m_Index] = value;
                 this.NotifyChanged();
+                Changed?.Invoke(value);
             }
         }
 

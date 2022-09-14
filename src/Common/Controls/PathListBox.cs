@@ -1,6 +1,6 @@
 ﻿//*********************************************************************
 //CAD+ Toolset
-//Copyright(C) 2021 Xarial Pty Limited
+//Copyright(C) 2022 Xarial Pty Limited
 //Product URL: https://cadplus.xarial.com
 //License: https://cadplus.xarial.com/license/
 //*********************************************************************
@@ -23,6 +23,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using WK.Libraries.BetterFolderBrowserNS;
+using Xarial.XToolkit;
 using Xarial.XToolkit.Wpf;
 using Xarial.XToolkit.Wpf.Utils;
 
@@ -205,7 +206,7 @@ namespace Xarial.CadPlus.Common.Controls
             if (Filters != null)
             {
                 var filters = Filters?.Cast<FileFilter>()?.ToArray();
-                filter = FileSystemBrowser.BuildFilterString(filters);
+                filter = FileFilter.BuildFilterString(filters);
             }
 
             if (FileSystemBrowser.BrowseFilesOpen(out string[] paths, "Select file to process", filter))

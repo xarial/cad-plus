@@ -1,6 +1,6 @@
 ﻿//*********************************************************************
 //CAD+ Toolset
-//Copyright(C) 2021 Xarial Pty Limited
+//Copyright(C) 2022 Xarial Pty Limited
 //Product URL: https://cadplus.xarial.com
 //License: https://cadplus.xarial.com/license/
 //*********************************************************************
@@ -11,9 +11,11 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Xarial.CadPlus.Common.Helpers;
 using Xarial.CadPlus.Plus.Applications;
 using Xarial.CadPlus.Plus.Data;
 using Xarial.CadPlus.Plus.Services;
@@ -28,11 +30,9 @@ namespace Xarial.CadPlus.Batch.Sw
 {
     public class SwApplicationProvider : ICadApplicationInstanceProvider
     {
-        private readonly Dictionary<Process, List<string>> m_ForceDisabledAddIns;
+        private readonly Dictionary<Process, IReadOnlyList<string>> m_ForceDisabledAddIns;
 
         private readonly IXLogger m_Logger;
-
-        private readonly IXServiceCollection m_CustomServices;
 
         public IMacroExecutor MacroRunnerService { get; }
         public ICadDescriptor Descriptor { get; }
@@ -43,10 +43,8 @@ namespace Xarial.CadPlus.Batch.Sw
 
             MacroRunnerService = svc;
             Descriptor = entDesc;
-            m_CustomServices = new ServiceCollection();
-            m_CustomServices.AddOrReplace<IXLogger>(() => m_Logger);
-
-            m_ForceDisabledAddIns = new Dictionary<Process, List<string>>();
+            
+            m_ForceDisabledAddIns = new Dictionary<Process, IReadOnlyList<string>>();
         }
 
         public IEnumerable<IXVersion> GetInstalledVersions()
@@ -92,9 +90,12 @@ namespace Xarial.CadPlus.Batch.Sw
             app.State = ApplicationState_e.Default;
             app.Version = (ISwVersion)vers;
 
-            app.CustomServices = m_CustomServices;
+            var customServices = new ServiceCollection();
+            customServices.Add(() => m_Logger);
 
-            List<string> forceDisabledAddIns = null;
+            app.CustomServices = customServices;
+
+            IReadOnlyList<string> forceDisabledAddIns = null;
 
             if (opts.HasFlag(StartupOptions_e.Safe))
             {
@@ -121,6 +122,11 @@ namespace Xarial.CadPlus.Batch.Sw
             {
                 app.Commit(cancellationToken);
             }
+            catch (Exception ex)
+            {
+                m_Logger.Log(ex);
+                throw;
+            }
             finally
             {
                 if (forceDisabledAddIns != null)
@@ -138,6 +144,8 @@ namespace Xarial.CadPlus.Batch.Sw
             prc.Exited += OnProcessExited;
             m_ForceDisabledAddIns.Add(prc, forceDisabledAddIns);
 
+            WindowHelper.TrySendWindowBackground(app.WindowHandle);
+
             return app;
         }
         
@@ -146,7 +154,7 @@ namespace Xarial.CadPlus.Batch.Sw
             var prc = sender as Process;
             prc.Exited -= OnProcessExited;
 
-            if (m_ForceDisabledAddIns.TryGetValue(prc, out List<string> guids))
+            if (m_ForceDisabledAddIns.TryGetValue(prc, out IReadOnlyList<string> guids))
             {
                 TryEnableAddIns(guids);
             }
@@ -156,7 +164,7 @@ namespace Xarial.CadPlus.Batch.Sw
             }
         }
 
-        private void TryEnableAddIns(List<string> guids)
+        private void TryEnableAddIns(IReadOnlyList<string> guids)
         {
             try
             {
@@ -171,7 +179,7 @@ namespace Xarial.CadPlus.Batch.Sw
             }
         }
 
-        private void TryDisableAddIns(out List<string> guids)
+        private void TryDisableAddIns(out IReadOnlyList<string> guids)
         {
             try
             {

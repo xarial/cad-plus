@@ -1,6 +1,6 @@
 ﻿//*********************************************************************
 //CAD+ Toolset
-//Copyright(C) 2021 Xarial Pty Limited
+//Copyright(C) 2022 Xarial Pty Limited
 //Product URL: https://cadplus.xarial.com
 //License: https://cadplus.xarial.com/license/
 //*********************************************************************
@@ -14,6 +14,7 @@ using Xarial.CadPlus.CustomToolbar.Structs;
 using Xarial.CadPlus.Plus.Modules;
 using Xarial.CadPlus.Toolbar.Properties;
 using Xarial.CadPlus.Toolbar.Services;
+using Xarial.XToolkit;
 using Xarial.XToolkit.Wpf;
 using Xarial.XToolkit.Wpf.Extensions;
 using Xarial.XToolkit.Wpf.Utils;
@@ -96,7 +97,7 @@ namespace Xarial.CadPlus.CustomToolbar.UI.ViewModels
 
                         if (FileSystemBrowser.BrowseFileOpen(out string imgFile,
                             "Select image file for icon",
-                            FileSystemBrowser.BuildFilterString(filters))) 
+                            FileFilter.BuildFilterString(filters))) 
                         {
                             IconPath = imgFile;
                         }
@@ -109,7 +110,7 @@ namespace Xarial.CadPlus.CustomToolbar.UI.ViewModels
 
         CommandItemInfo ICommandVM.Command => Command;
 
-        public string WorkingDirectory
+        public virtual string WorkingDirectory
         {
             get => m_WorkingDirectory;
             set 

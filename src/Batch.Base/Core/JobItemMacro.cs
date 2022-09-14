@@ -1,26 +1,41 @@
 ﻿//*********************************************************************
 //CAD+ Toolset
-//Copyright(C) 2021 Xarial Pty Limited
+//Copyright(C) 2022 Xarial Pty Limited
 //Product URL: https://cadplus.xarial.com
 //License: https://cadplus.xarial.com/license/
 //*********************************************************************
 
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using Xarial.CadPlus.Batch.Base.Services;
 using Xarial.CadPlus.Common.Services;
+using Xarial.CadPlus.Plus.Extensions;
+using Xarial.CadPlus.Plus.Services;
+using Xarial.CadPlus.Plus.Shared.Services;
 
 namespace Xarial.CadPlus.Batch.Base.Core
 {
-    public class JobItemMacro : JobItem, IJobItemOperation
+    public class JobItemMacro : IJobItemOperationMacro
     {
-        public MacroData Macro { get; }
+        public event BatchJobItemOperationUserResultChangedDelegate UserResultChanged;
 
+        IBatchJobItemOperationDefinition IBatchJobItemOperation.Definition => Definition;
+        IBatchJobItemOperationState IBatchJobItemOperation.State => State;
+                
         public Exception InternalMacroException { get; set; }
 
-        public JobItemMacro(MacroData macro) : base(macro.FilePath)
+        public JobItemOperationMacroDefinition Definition { get; }
+       
+        public object UserResult { get; }
+
+        public BatchJobItemOperationState State { get; }
+
+        public JobItemMacro(JobItemDocument itemDoc, JobItemOperationMacroDefinition macroDef)
         {
-            Macro = macro;
-            DisplayName = Path.GetFileNameWithoutExtension(macro.FilePath);
+            Definition = macroDef;
+            State = new BatchJobItemOperationState(itemDoc, this);
         }
     }
 }

@@ -1,22 +1,29 @@
 ﻿//*********************************************************************
 //CAD+ Toolset
-//Copyright(C) 2021 Xarial Pty Limited
+//Copyright(C) 2022 Xarial Pty Limited
 //Product URL: https://cadplus.xarial.com
 //License: https://cadplus.xarial.com/license/
 //*********************************************************************
 
 using Newtonsoft.Json.Linq;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Xarial.XToolkit.Services.UserSettings;
 using Xarial.XToolkit.Services.UserSettings.Attributes;
 
 namespace Xarial.CadPlus.CustomToolbar.Structs
 {
-    public class CustomToolbarInfoVersionTransformer : BaseUserSettingsVersionsTransformer
+    public class CustomToolbarInfoVersionTransformer : IVersionsTransformer
     {
+        public IReadOnlyList<VersionTransform> Transforms => m_Transforms;
+
+        private readonly List<VersionTransform> m_Transforms;
+
         public CustomToolbarInfoVersionTransformer()
         {
+            m_Transforms = new List<VersionTransform>();
+
             Add(new Version(), new Version("1.0"),
                 t =>
                 {
@@ -92,10 +99,47 @@ namespace Xarial.CadPlus.CustomToolbar.Structs
 
                     return t;
                 });
+
+            Add(new Version("3.2"), new Version("3.3"),
+                t =>
+                {
+                    foreach (var group in t["Groups"])
+                    {
+                        foreach (JObject cmd in group["Commands"])
+                        {
+                            var stateCodeType = cmd.Children<JProperty>().FirstOrDefault(p => p.Name == "ToggleButtonStateCodeType");
+                            
+                            if (stateCodeType != null) 
+                            {
+                                var val = stateCodeType.Value?.ToString() != "0";
+                                stateCodeType.Replace(new JProperty("EnableToggleButtonStateExpression", val));
+                            }
+
+                            var stateCodeExp = cmd.Children<JProperty>().FirstOrDefault(p => p.Name == "ToggleButtonStateCode");
+
+                            if (stateCodeExp != null)
+                            {
+                                stateCodeExp.Replace(new JProperty("ToggleButtonStateExpression", stateCodeExp.Value));
+                            }
+
+                            var stateCodeResOnce = cmd.Children<JProperty>().FirstOrDefault(p => p.Name == "ResolveButtonStateCodeOnce");
+
+                            if (stateCodeResOnce != null)
+                            {
+                                stateCodeResOnce.Replace(new JProperty("CacheToggleState", stateCodeResOnce.Value));
+                            }
+                        }
+                    }
+
+                    return t;
+                });
         }
+
+        private void Add(Version from, Version to, Func<JToken, JToken> transform)
+            => m_Transforms.Add(new VersionTransform(from, to, transform));
     }
 
-    [UserSettingVersion("3.2", typeof(CustomToolbarInfoVersionTransformer))]
+    [UserSettingVersion("3.3", typeof(CustomToolbarInfoVersionTransformer))]
     public class CustomToolbarInfo
     {
         public CommandGroupInfo[] Groups { get; set; }

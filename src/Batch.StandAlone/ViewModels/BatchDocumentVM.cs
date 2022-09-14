@@ -1,6 +1,6 @@
 ﻿//*********************************************************************
 //CAD+ Toolset
-//Copyright(C) 2021 Xarial Pty Limited
+//Copyright(C) 2022 Xarial Pty Limited
 //Product URL: https://cadplus.xarial.com
 //License: https://cadplus.xarial.com/license/
 //*********************************************************************
@@ -15,7 +15,6 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Input;
-using Xarial.CadPlus.Batch.Base.Models;
 using Xarial.CadPlus.Batch.StandAlone.Properties;
 using Xarial.CadPlus.Batch.StandAlone.ViewModels;
 using Xarial.CadPlus.Common.Exceptions;
@@ -38,6 +37,8 @@ using Xarial.XToolkit.Wpf.Extensions;
 using Xarial.XToolkit.Wpf.Utils;
 using Xarial.CadPlus.Batch.Base.Services;
 using Xarial.CadPlus.Batch.Base.ViewModels;
+using Xarial.XToolkit.Services;
+using Xarial.CadPlus.Batch.StandAlone.Services;
 
 namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
 {
@@ -102,7 +103,7 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
 
         public string FilePath => m_FilePath;
 
-        private readonly Func<BatchJob, IBatchRunJobExecutor> m_ExecFact;
+        private readonly IBatchMacroRunJobStandAloneFactory m_ExecFact;
         private readonly ICadApplicationInstanceProvider m_AppProvider;
 
         public event Action<BatchDocumentVM, BatchJob, string> Save;
@@ -113,38 +114,31 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
 
         private readonly IXLogger m_Logger;
 
-        private readonly IJournalExporter[] m_JournalExporters;
-        private readonly IResultsSummaryExcelExporter[] m_ResultsExporters;
-
-        public BatchDocumentVM(FileInfo file, BatchJob job, ICadApplicationInstanceProvider[] appProviders,
-            IJournalExporter[] journalExporters, IResultsSummaryExcelExporter[] resultsExporters,
+        public BatchDocumentVM(FileInfo file, BatchJob job, ICadApplicationInstanceProvider appProvider,
             IMessageService msgSvc, IXLogger logger,
-            Func<BatchJob, IBatchRunJobExecutor> execFact,
+            IBatchMacroRunJobStandAloneFactory execFact, IBatchJobReportExporter[] reportExporters, IBatchJobLogExporter[] logExporters,
             IBatchApplicationProxy batchAppProxy, MainWindow parentWnd, IRibbonButtonCommand[] backstageCmds)
-            : this(Path.GetFileNameWithoutExtension(file.FullName), job, appProviders, 
-                  msgSvc, logger, execFact, batchAppProxy, parentWnd, backstageCmds)
+            : this(Path.GetFileNameWithoutExtension(file.FullName), job, appProvider,
+                  msgSvc, logger, execFact, reportExporters, logExporters, batchAppProxy, parentWnd, backstageCmds)
         {
-            m_JournalExporters = journalExporters;
-            m_ResultsExporters = resultsExporters;
-
             m_FilePath = file.FullName;
             IsDirty = false;
         }
 
         public BatchDocumentVM(string name, BatchJob job,
-            ICadApplicationInstanceProvider[] appProviders,
-            IMessageService msgSvc, IXLogger logger, Func<BatchJob, IBatchRunJobExecutor> execFact,
+            ICadApplicationInstanceProvider appProvider,
+            IMessageService msgSvc, IXLogger logger, IBatchMacroRunJobStandAloneFactory execFact,
+            IBatchJobReportExporter[] reportExporters, IBatchJobLogExporter[] logExporters,
             IBatchApplicationProxy batchAppProxy, MainWindow parentWnd, IRibbonButtonCommand[] backstageCmds)
         {
             m_ExecFact = execFact;
-            m_AppProvider = job.FindApplicationProvider(appProviders);
+            m_AppProvider = appProvider;
+
             m_Job = job;
             m_MsgSvc = msgSvc;
             m_Logger = logger;
             m_BatchAppProxy = batchAppProxy;
             m_ParentWnd = parentWnd;
-
-            CommandManager = LoadRibbonCommands(backstageCmds);
 
             InputFilesFilter = GetFileFilters(m_AppProvider.Descriptor);
             MacroFilesFilter = m_AppProvider.Descriptor.MacroFileFilters
@@ -158,10 +152,14 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
             SaveDocumentCommand = new RelayCommand(SaveDocument, () => IsDirty);
             FilterEditEndingCommand = new RelayCommand<DataGridCellEditEndingEventArgs>(FilterEditEnding);
 
+            CancelSelectedJobCommand = new RelayCommand(() => Results.Selected?.CancelJobCommand.Execute(null), () => Results.Selected?.CancelJobCommand.CanExecute(null) == true);
+            ExportSelectedJobLogCommand = new RelayCommand(() => Results.Selected?.ExportLogCommand.Execute(null), () => Results.Selected?.ExportLogCommand.CanExecute(null) == true);
+            ExportSelectedJobReportCommand = new RelayCommand(() => Results.Selected?.ExportReportCommand.Execute(null), () => Results.Selected?.ExportReportCommand.CanExecute(null) == true);
+
             Name = name;
             Settings = new BatchDocumentSettingsVM(m_Job, m_AppProvider, m_Logger);
             Settings.Modified += OnSettingsModified;
-            Results = new JobResultsVM(m_Job, m_ExecFact, m_AppProvider.Descriptor, m_Logger);
+            Results = new JobResultsVM(m_Job, m_ExecFact, m_Logger, m_MsgSvc, reportExporters, logExporters);
 
             Filters = new ObservableCollection<FilterVM>((m_Job.Filters ?? Enumerable.Empty<string>()).Select(f => new FilterVM(f)));
             Filters.CollectionChanged += OnFiltersCollectionChanged;
@@ -177,6 +175,8 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
             {
                 macro.Modified += OnMacroDataModified;
             }
+
+            CommandManager = LoadRibbonCommands(backstageCmds);
         }
 
         protected virtual FileFilter[] GetFileFilters(ICadDescriptor cadEntDesc)
@@ -199,26 +199,23 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
                 new RibbonTab(BatchApplicationCommandManager.InputTab.Name, "Input",
                     new RibbonGroup(BatchApplicationCommandManager.InputTab.FilesGroupName, "Files",
                         new RibbonButtonCommand("Add Files...", Resources.add_file, "Browse files to be added to the current scope",
-                            () => m_ParentWnd.lstInputs.AddFilesCommand.Execute(null),
-                            () => m_ParentWnd.lstInputs.AddFilesCommand.CanExecute(null)),
+                            m_ParentWnd.lstInputs.AddFilesCommand),
                         new RibbonButtonCommand("Add Folders...", Resources.add_folder, "Browse folders to be added to the current scope",
-                            () => m_ParentWnd.lstInputs.AddFoldersCommand.Execute(null),
-                            () => m_ParentWnd.lstInputs.AddFoldersCommand.CanExecute(null)),
+                            m_ParentWnd.lstInputs.AddFoldersCommand),
                         new RibbonButtonCommand("Add From File...", Resources.add_from_file, "Add files and folders from the text file",
-                            AddFromFile, null),
+                            new RelayCommand(AddFromFile)),
                         new RibbonButtonCommand("Remove Files And Folders", Resources.remove_file_folder, "Remove selected files and folders from the scope",
-                            () => m_ParentWnd.lstInputs.DeleteSelectedCommand.Execute(null),
-                            () => m_ParentWnd.lstInputs.DeleteSelectedCommand.CanExecute(null))),
-                new RibbonGroup(BatchApplicationCommandManager.InputTab.FolderFiltersGroupName, "Folder Filters",
+                            m_ParentWnd.lstInputs.DeleteSelectedCommand)),
+                new RibbonGroup("FolderOptions", "Folder Options",
                         new RibbonCustomCommand("Folder Filters", Resources.filter, "List of filters for the files in the folders in the scope",
-                        this, (System.Windows.DataTemplate)m_ParentWnd.FindResource("folderFilterGridTemplate"))),
+                        this, (System.Windows.DataTemplate)m_ParentWnd.FindResource("folderFilterGridTemplate")),
+                        new RibbonToggleCommand("Top Level Only", Resources.top_level_only, "Only process top-level files",
+                        () => Settings.TopLevelFilesOnly, x => Settings.TopLevelFilesOnly = x)),
                 new RibbonGroup(BatchApplicationCommandManager.InputTab.MacrosGroupName, "Macros",
                         new RibbonButtonCommand("Add Macros...", Resources.add_macro, "Browse macros to add to the scope",
-                            () => m_ParentWnd.lstMacros.AddFilesCommand.Execute(null),
-                            () => m_ParentWnd.lstMacros.AddFilesCommand.CanExecute(null)),
+                            m_ParentWnd.lstMacros.AddFilesCommand),
                         new RibbonButtonCommand("Remove Macros", Resources.remove_macro, "Remove selected macros from the scope",
-                            () => m_ParentWnd.lstMacros.DeleteSelectedCommand.Execute(null),
-                            () => m_ParentWnd.lstMacros.DeleteSelectedCommand.CanExecute(null)))),
+                            m_ParentWnd.lstMacros.DeleteSelectedCommand))),
                 new RibbonTab(BatchApplicationCommandManager.SettingsTab.Name, "Settings",
                     new RibbonGroup(BatchApplicationCommandManager.SettingsTab.StartupOptionsGroupName, "Startup Options",
                         new RibbonDropDownButton("Version", m_AppProvider.Descriptor.ApplicationIcon, $"Version of {m_AppProvider.Descriptor.ApplicationName} to use in batch job",
@@ -274,52 +271,23 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
                             t => Settings.BatchSize = Convert.ToInt32(t == 0 ? 1 : t), new RibbonNumericSwitchCommandOptions(0, 1000, true, "0")))),//TODO: some issues when limit is set from 1 (binding does not work) - implemented workaround
                 new RibbonTab(BatchApplicationCommandManager.JobTab.Name, "Job",
                     new RibbonGroup(BatchApplicationCommandManager.JobTab.ExecutionGroupName, "Execution",
-                        new RibbonButtonCommand("Run Job", Resources.run_job, "Start the current job", RunJob, () => CanRunJob),
-                        new RibbonButtonCommand("Cancel Job", Resources.cancel_job, "Cancel currently running job",
-                        () =>
-                        {
-                            if (Results?.Selected != null)
-                            {
-                                Results.Selected.CancelJob();
-                            }
-                        },
-                        () =>
-                        {
-                            if (Results?.Selected != null)
-                            {
-                                return Results.Selected.IsBatchInProgress;
-                            }
-                            else
-                            {
-                                return false;
-                            }
-
-                        })),
+                        new RibbonButtonCommand("Run Job", Resources.run_job, "Start the current job", RunJobCommand),
+                        new RibbonButtonCommand("Cancel Job", Resources.cancel_job, "Cancel currently running job", CancelSelectedJobCommand)),
                     new RibbonGroup(BatchApplicationCommandManager.JobTab.ResultsGroupName, "Results",
                         new RibbonButtonCommand("Export Summary Results", Resources.export_summary, "Export results statuses",
-                        () =>
-                        {
-                            if (Results?.Selected != null)
-                            {
-                                TryExportResults();
-                            }
-                        },
-                        () => Results?.Selected != null),
+                        ExportSelectedJobReportCommand),
                         new RibbonButtonCommand("Export Journal", Resources.export_log, "Export journal to a text file",
-                        () =>
-                        {
-                            if (Results?.Selected != null)
-                            {
-                                TryExportJournal();
-                            }
-                        },
-                        () => Results?.Selected != null))
+                        ExportSelectedJobLogCommand))
                 ));
             
             m_BatchAppProxy.CreateCommandManager(cmdMgr);
 
             return cmdMgr;
         }
+
+        public ICommand CancelSelectedJobCommand { get; }
+        public ICommand ExportSelectedJobReportCommand { get; }
+        public ICommand ExportSelectedJobLogCommand { get; }
 
         public Func<string, object> PathToMacroDataConverter { get; }
             = new Func<string, object>(p => new MacroDataVM(new MacroData() { FilePath = p }));
@@ -348,67 +316,11 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
             IsDirty = true;
         }
 
-        private void TryExportResults()
-        {
-            try
-            {
-                if (FileSystemBrowser.BrowseFileSave(out string filePath,
-                    $"Select file to export journal for job '{Results.Selected.Name}'",
-                    FileSystemBrowser.BuildFilterString(
-                        m_ResultsExporters.Select(e => e.Filter).Concat(new FileFilter[] { FileFilter.AllFiles }).ToArray())))
-                {
-                    var exp = m_ResultsExporters.FirstOrDefault(j => FileSystemUtils.MatchesAnyFilter(filePath, j.Filter.Extensions));
-
-                    if (exp != null)
-                    {
-                        exp.Export(Results.Selected.Name, Results.Selected.Summary, filePath);
-                    }
-                    else
-                    {
-                        throw new UserException("Unrecognized file format");
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                m_Logger.Log(ex);
-                m_MsgSvc.ShowError(ex);
-            }
-        }
-
-        private void TryExportJournal()
-        {
-            try
-            {
-                if (FileSystemBrowser.BrowseFileSave(out string filePath,
-                    $"Select file to export journal for job '{Results.Selected.Name}'",
-                    FileSystemBrowser.BuildFilterString(
-                        m_JournalExporters.Select(e => e.Filter).Concat(new FileFilter[] { FileFilter.AllFiles }).ToArray())))
-                {
-                    var exp = m_JournalExporters.FirstOrDefault(j => FileSystemUtils.MatchesAnyFilter(filePath, j.Filter.Extensions));
-
-                    if (exp != null)
-                    {
-                        exp.Export(Results.Selected.Journal, filePath);
-                    }
-                    else
-                    {
-                        throw new UserException("Unrecognized file format");
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                m_Logger.Log(ex);
-                m_MsgSvc.ShowError(ex);
-            }
-        }
-
         internal void SaveAsDocument()
         {
             if (FileSystemBrowser.BrowseFileSave(out m_FilePath, 
                 "Select file path",
-                FileSystemBrowser.BuildFilterString(FileFilters)))
+                FileFilter.BuildFilterString(FileFilters)))
             {
                 SaveDocument();
                 Name = Path.GetFileNameWithoutExtension(m_FilePath);
@@ -480,14 +392,21 @@ namespace Xarial.CadPlus.Batch.StandAlone.ViewModels
 
             for (int i = 0; i < Filters.Count; i++) 
             {
+                Filters[i].Changed -= OnFilterChanged;
+                Filters[i].Changed += OnFilterChanged;
                 Filters[i].SetBinding(m_Job.Filters, i);
             }
+        }
+
+        private void OnFilterChanged(string filter)
+        {
+            IsDirty = true;
         }
 
         private void AddFromFile()
         {
             if (FileSystemBrowser.BrowseFileOpen(out string path, "Select text file",
-                FileSystemBrowser.BuildFilterString(new FileFilter("Text Files", "*.txt", "*.csv"), FileFilter.AllFiles))) 
+                FileFilter.BuildFilterString(new FileFilter("Text Files", "*.txt", "*.csv"), FileFilter.AllFiles))) 
             {
                 if (File.Exists(path))
                 {

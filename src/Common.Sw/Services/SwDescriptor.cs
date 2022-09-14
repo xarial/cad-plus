@@ -1,10 +1,11 @@
 ﻿//*********************************************************************
 //CAD+ Toolset
-//Copyright(C) 2021 Xarial Pty Limited
+//Copyright(C) 2022 Xarial Pty Limited
 //Product URL: https://cadplus.xarial.com
 //License: https://cadplus.xarial.com/license/
 //*********************************************************************
 
+using SolidWorks.Interop.sldworks;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -14,11 +15,15 @@ using System.Text;
 using System.Threading.Tasks;
 using Xarial.CadPlus.Common.Sw.Properties;
 using Xarial.CadPlus.Plus;
+using Xarial.CadPlus.Plus.Attributes;
 using Xarial.CadPlus.Plus.Data;
 using Xarial.CadPlus.Plus.Services;
+using Xarial.XCad;
+using Xarial.XCad.SolidWorks;
 
 namespace Xarial.CadPlus.Common.Sw.Services
 {
+    [CadSpecificService(CadApplicationIds.SolidWorks)]
     public class SwDescriptor : ICadDescriptor
     {
         public string ApplicationId => CadApplicationIds.SolidWorks;
@@ -28,9 +33,15 @@ namespace Xarial.CadPlus.Common.Sw.Services
         public Image PartIcon => Resources.document_icon;
         public Image AssemblyIcon => Resources.assembly_icon;
         public Image DrawingIcon => Resources.drawing_icon;
+        
         public Image ConfigurationIcon => Resources.config_icon;
         public Image SheetIcon => Resources.sheet_icon;
-        public Image CutListIcon => Resources.cutlist_icon;
+
+        public Image SolidBodyIcon => Resources.solid_body;
+        public Image SheetBodyIcon => Resources.surface_body;
+        public Image CutListSolidBodyIcon => Resources.cut_list_solid_body;
+        public Image CutListSheetMetalIcon => Resources.cut_list_sheet_metal;
+        public Image CutListWeldmentIcon => Resources.cut_list_weldment;
 
         public FileTypeFilter PartFileFilter => new FileTypeFilter("SOLIDWORKS Parts", "*.sldprt", "*.sldlfp", "*.sldblk", "*.prtdot");
         public FileTypeFilter AssemblyFileFilter => new FileTypeFilter("SOLIDWORKS Assemblies", "*.sldasm", "*.asmdot");

@@ -1,4 +1,11 @@
-﻿using System;
+﻿//*********************************************************************
+//CAD+ Toolset
+//Copyright(C) 2022 Xarial Pty Limited
+//Product URL: https://cadplus.xarial.com
+//License: https://cadplus.xarial.com/license/
+//*********************************************************************
+
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -19,7 +26,7 @@ namespace Xarial.CadPlus.Toolbar.Services
         {
             try
             {
-                if (!Path.IsPathRooted(path))
+                if (!string.IsNullOrEmpty(path) && !Path.IsPathRooted(path))
                 {
                     return FileSystemUtils.CombinePaths(workDir, path);
                 }
