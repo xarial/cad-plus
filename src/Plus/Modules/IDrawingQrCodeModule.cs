@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Xarial.XCad.Base.Attributes;
 using Xarial.XCad.Documents;
 using Xarial.XCad.Features;
+using Xarial.XCad.Sketch;
 
 namespace Xarial.CadPlus.Plus.Modules
 {
