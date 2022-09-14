@@ -37,7 +37,8 @@ namespace Xarial.CadPlus.Plus.Modules
         DocumentClose,
         NewSelection,
         ConfigurationChange,
-        Rebuild
+        Rebuild,
+        FirstFeatureAdded
     }
 
     public interface ICommandMacroInfo
