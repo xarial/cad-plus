@@ -41,7 +41,7 @@ namespace Xarial.CadPlus.CustomToolbar.Services
         private readonly IMacroRunner m_MacroRunner;
         private readonly IMessageService m_Msg;
         private readonly IXLogger m_Logger;
-        private readonly IIconsProvider[] m_IconsProviders;
+        private readonly IIconsProviderRegister m_IconsProvidersReg;
 
         private readonly Dictionary<CommandMacroInfo, bool> m_CachedToggleStates;
         private readonly ConcurrentDictionary<CommandMacroInfo, IToggleButtonStateResolver> m_StateResolvers;
@@ -53,14 +53,14 @@ namespace Xarial.CadPlus.CustomToolbar.Services
 
         public CommandsManager(IXExtension addIn, IXApplication app,
             IMacroRunner macroRunner, IMessageService msg,
-            IXLogger logger, IIconsProvider[] iconsProviders, IFilePathResolver pathResolver, IStateResolveCompiler stateResolveCompiler)
+            IXLogger logger, IIconsProviderRegister iconsProvidersReg, IFilePathResolver pathResolver, IStateResolveCompiler stateResolveCompiler)
         {
             m_AddIn = addIn;
             m_App = app;
             m_MacroRunner = macroRunner;
             m_Msg = msg;
             m_Logger = logger;
-            m_IconsProviders = iconsProviders;
+            m_IconsProvidersReg = iconsProvidersReg;
 
             m_StateResolveCompiler = stateResolveCompiler;
 
@@ -84,7 +84,7 @@ namespace Xarial.CadPlus.CustomToolbar.Services
                 foreach (var grp in toolbarInfo.Groups
                     .Where(g => g.Commands?.Any(c => c.Triggers.HasFlag(Triggers_e.Button)) == true))
                 {
-                    var cmdGrp = new CommandGroupInfoSpec(grp, m_IconsProviders, m_PathResolver, m_WorkDir);
+                    var cmdGrp = new CommandGroupInfoSpec(grp, m_IconsProvidersReg.IconsProviders, m_PathResolver, m_WorkDir);
                     
                     ResolveEmptyName(cmdGrp.Info, COMMAND_GROUP_TITLE_TEMPLATE, usedCommandGroupNames, out string grpTitle, out string grpTooltip);
                     cmdGrp.Title = grpTitle;

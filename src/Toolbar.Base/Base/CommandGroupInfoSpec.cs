@@ -6,6 +6,7 @@
 //*********************************************************************
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Xarial.CadPlus.CustomToolbar.Enums;
 using Xarial.CadPlus.CustomToolbar.Structs;
@@ -22,7 +23,7 @@ namespace Xarial.CadPlus.CustomToolbar.Base
 
         private const int GROUP_ID_OFFSET = 500; //this offset is created to avoid conflicts of toolbar commands with the modules command manager
         
-        internal CommandGroupInfoSpec(CommandGroupInfo info, IIconsProvider[] iconsProviders, IFilePathResolver pathResolver, string workDir) : base(info.Id + GROUP_ID_OFFSET)
+        internal CommandGroupInfoSpec(CommandGroupInfo info, IReadOnlyList<IIconsProvider> iconsProviders, IFilePathResolver pathResolver, string workDir) : base(info.Id + GROUP_ID_OFFSET)
         {
             Info = info;
 

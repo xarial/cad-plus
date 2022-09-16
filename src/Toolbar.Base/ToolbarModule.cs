@@ -65,16 +65,16 @@ namespace Xarial.CadPlus.CustomToolbar
         private IMessageService m_Msg;
         private IXLogger m_Logger;
 
-        private List<IIconsProvider> m_IconsProviders;
-
         private static IServiceProvider m_SvcProvider;
         private IToolbarModuleProxy m_ToolbarProxy;
         private IToolbarConfigurationManager m_ToolbarConfMgr;
 
+        private readonly IIconsProviderRegister m_IconsProviderRegister;
+
         public ToolbarModule() 
         {
-            m_IconsProviders = new List<IIconsProvider>();
-            
+            m_IconsProviderRegister = new IconsProviderRegister();
+
             RegisterIconsProvider(new ImageIconsProvider());
         }
 
@@ -156,7 +156,7 @@ namespace Xarial.CadPlus.CustomToolbar
 
             builder.RegisterSelfSingleton<UserSettingsService>();
 
-            builder.RegisterInstance(m_IconsProviders.ToArray());
+            builder.RegisterInstance(m_IconsProviderRegister);
         }
 
         private void LoadCommands(CustomToolbarInfo toolbarInfo, string workDir)
@@ -226,7 +226,7 @@ namespace Xarial.CadPlus.CustomToolbar
             m_ToolbarProxy.RequestMacroRunning -= OnRequestMacroRunning;
         }
 
-        public void RegisterIconsProvider(IIconsProvider provider) => m_IconsProviders.Add(provider);
+        public void RegisterIconsProvider(IIconsProvider provider) => m_IconsProviderRegister.Register(provider);
     }
     
     public interface IToolbarModuleProxy 

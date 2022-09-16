@@ -26,20 +26,20 @@ namespace Xarial.CadPlus.CustomToolbar.UI.ViewModels
 
     public class CommandGroupVMFactory : ICommandGroupVMFactory
     {
-        private readonly IIconsProvider[] m_IconsProviders;
+        private readonly IIconsProviderRegister m_IconsProvidersReg;
         private readonly IFilePathResolver m_FilePathResolver;
 
         private readonly ICommandMacroVMFactory m_MacroVmFactory;
 
-        public CommandGroupVMFactory(IIconsProvider[] iconsProviders, IFilePathResolver filePathResolver, ICommandMacroVMFactory macroVmFactory) 
+        public CommandGroupVMFactory(IIconsProviderRegister iconsProvidersReg, IFilePathResolver filePathResolver, ICommandMacroVMFactory macroVmFactory) 
         {
             m_MacroVmFactory = macroVmFactory;
 
-            m_IconsProviders = iconsProviders;
+            m_IconsProvidersReg = iconsProvidersReg;
             m_FilePathResolver = filePathResolver;
         }
 
-        public CommandGroupVM Create(CommandGroupInfo cmdGrp) => new CommandGroupVM(cmdGrp, m_IconsProviders, m_FilePathResolver, m_MacroVmFactory);
+        public CommandGroupVM Create(CommandGroupInfo cmdGrp) => new CommandGroupVM(cmdGrp, m_IconsProvidersReg.IconsProviders, m_FilePathResolver, m_MacroVmFactory);
     }
 
     public class CommandGroupVM : CommandVM<CommandGroupInfo>
@@ -54,7 +54,7 @@ namespace Xarial.CadPlus.CustomToolbar.UI.ViewModels
 
         private readonly ICommandMacroVMFactory m_MacroVmFactory;
 
-        public CommandGroupVM(CommandGroupInfo cmdGrp, IIconsProvider[] providers, IFilePathResolver filePathResolver, ICommandMacroVMFactory macroVmFactory) 
+        public CommandGroupVM(CommandGroupInfo cmdGrp, IReadOnlyList<IIconsProvider> providers, IFilePathResolver filePathResolver, ICommandMacroVMFactory macroVmFactory) 
             : base(cmdGrp, providers, filePathResolver)
         {
             m_MacroVmFactory = macroVmFactory;

@@ -5,6 +5,7 @@
 //License: https://cadplus.xarial.com/license/
 //*********************************************************************
 
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
@@ -33,18 +34,18 @@ namespace Xarial.CadPlus.CustomToolbar.UI.ViewModels
 
     public class CommandMacroVMFactory : ICommandMacroVMFactory
     {
-        private readonly IIconsProvider[] m_IconsProviders;
+        private readonly IIconsProviderRegister m_IconsProvidersReg;
         private readonly IFilePathResolver m_FilePathResolver;
         private readonly IMacroEntryPointsExtractor m_MacroEntryPointExtractor;
 
-        public CommandMacroVMFactory(IIconsProvider[] iconsProviders, IFilePathResolver filePathResolver, IMacroEntryPointsExtractor macroEntryPointExtractor)
+        public CommandMacroVMFactory(IIconsProviderRegister iconsProvidersReg, IFilePathResolver filePathResolver, IMacroEntryPointsExtractor macroEntryPointExtractor)
         {
-            m_IconsProviders = iconsProviders;
+            m_IconsProvidersReg = iconsProvidersReg;
             m_FilePathResolver = filePathResolver;
             m_MacroEntryPointExtractor = macroEntryPointExtractor;
         }
 
-        public CommandMacroVM Create(CommandMacroInfo macroInfo) => new CommandMacroVM(macroInfo, m_IconsProviders, m_FilePathResolver, m_MacroEntryPointExtractor);
+        public CommandMacroVM Create(CommandMacroInfo macroInfo) => new CommandMacroVM(macroInfo, m_IconsProvidersReg.IconsProviders, m_FilePathResolver, m_MacroEntryPointExtractor);
     }
 
     public class CommandMacroVM : CommandVM<CommandMacroInfo>, INotifyPropertyChanged
@@ -81,7 +82,12 @@ namespace Xarial.CadPlus.CustomToolbar.UI.ViewModels
             private set 
             {
                 m_EntryPoints = value;
-                EntryPoint = EntryPoints?.FirstOrDefault();
+
+                if (EntryPoints?.Contains(EntryPoint) != true)
+                {
+                    EntryPoint = EntryPoints?.FirstOrDefault();
+                }
+
                 this.NotifyChanged();
             }
         }
@@ -216,7 +222,7 @@ namespace Xarial.CadPlus.CustomToolbar.UI.ViewModels
         private readonly FileFilter[] m_MacroFileFilters;
         private readonly IMacroEntryPointsExtractor m_Extractor;
 
-        public CommandMacroVM(CommandMacroInfo cmd, IIconsProvider[] providers, IFilePathResolver filePathResolver, IMacroEntryPointsExtractor extractor)
+        public CommandMacroVM(CommandMacroInfo cmd, IReadOnlyList<IIconsProvider> providers, IFilePathResolver filePathResolver, IMacroEntryPointsExtractor extractor)
             : base(cmd, providers, filePathResolver)
         {
             m_MacroFileFilters = ToolbarModule.Resolve<ICadDescriptor>().MacroFileFilters

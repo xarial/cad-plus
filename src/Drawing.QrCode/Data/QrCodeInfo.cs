@@ -16,6 +16,7 @@ using Xarial.CadPlus.Drawing.QrCode.Services;
 using Xarial.CadPlus.Plus.Modules;
 using Xarial.XCad;
 using Xarial.XCad.Features;
+using Xarial.XCad.Sketch;
 using Xarial.XToolkit.Services.Expressions;
 using Xarial.XToolkit.Services.UserSettings;
 using Xarial.XToolkit.Services.UserSettings.Attributes;

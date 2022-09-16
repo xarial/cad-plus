@@ -21,6 +21,7 @@ using Xarial.XCad.Documents;
 using Xarial.XCad.Documents.Delegates;
 using Xarial.XCad.Documents.Enums;
 using Xarial.XCad.Documents.Structures;
+using Xarial.XCad.Features;
 using Xarial.XToolkit.Reflection;
 
 namespace Xarial.CadPlus.CustomToolbar.Services
@@ -59,7 +60,7 @@ namespace Xarial.CadPlus.CustomToolbar.Services
                 m_App.Documents.DocumentOpened += OnDocumentOpened;
             }
 
-            if (m_Triggers.Keys.Contains(Triggers_e.DocumentNew))
+            if (m_Triggers.Keys.Contains(Triggers_e.DocumentNew) || m_Triggers.Keys.Contains(Triggers_e.ModelingStarted))
             {
                 m_App.Documents.NewDocumentCreated += OnNewDocumentCreated;
             }
@@ -76,7 +77,31 @@ namespace Xarial.CadPlus.CustomToolbar.Services
             => InvokeTrigger(Triggers_e.DocumentOpen, doc);
 
         private void OnNewDocumentCreated(IXDocument doc)
-            => InvokeTrigger(Triggers_e.DocumentNew, doc);
+        {
+            InvokeTrigger(Triggers_e.DocumentNew, doc);
+
+            if (m_Triggers.ContainsKey(Triggers_e.ModelingStarted)) 
+            {
+                switch (doc)
+                {
+                    case IXPart part:
+                        part.Features.FeatureCreated += OnFirstFeatureCreated;
+                        break;
+
+                    case IXAssembly assm:
+                        assm.ComponentInserted += OnFirstComponentInserted;
+                        break;
+
+                    case IXDrawing drw:
+                        drw.Sheets.SheetCreated += OnSheetCreated;
+                        foreach (var sheet in drw.Sheets)
+                        {
+                            sheet.DrawingViews.ViewCreated += OnFirstDrawingViewCreated;
+                        }
+                        break;
+                }
+            }
+        }
 
         private void OnDocumentActivated(IXDocument doc)
             => InvokeTrigger(Triggers_e.DocumentActivated, doc);
@@ -114,22 +139,58 @@ namespace Xarial.CadPlus.CustomToolbar.Services
             doc.Closing += OnDocumentClosing;
         }
 
+        private void OnFirstFeatureCreated(IXDocument doc, IXFeature feature)
+        {
+            doc.Features.FeatureCreated -= OnFirstFeatureCreated;
+
+            InvokeTrigger(Triggers_e.ModelingStarted, doc);
+        }
+
+        private void OnFirstComponentInserted(IXAssembly assembly, IXComponent component)
+        {
+            assembly.ComponentInserted -= OnFirstComponentInserted;
+
+            InvokeTrigger(Triggers_e.ModelingStarted, assembly);
+        }
+
+        private void OnFirstDrawingViewCreated(IXDrawing drawing, IXSheet sheet, IXDrawingView view)
+        {
+            sheet.DrawingViews.ViewCreated -= OnFirstDrawingViewCreated;
+
+            InvokeTrigger(Triggers_e.ModelingStarted, drawing);
+        }
+
+        private void OnSheetCreated(IXDrawing drawing, IXSheet sheet)
+        {
+            sheet.DrawingViews.ViewCreated += OnFirstDrawingViewCreated;
+        }
+
         private void OnDocumentClosing(IXDocument doc, DocumentCloseType_e type)
         {
-            if (doc == m_App.Documents.Active)
-            {
-                InvokeTrigger(Triggers_e.DocumentClose, doc);
-            }
+            InvokeTrigger(Triggers_e.DocumentClose, doc);
 
             if (type == DocumentCloseType_e.Destroy)
             {
                 switch (doc)
                 {
-                    case IXDocument3D doc3D:
-                        doc3D.Configurations.ConfigurationActivated -= OnConfigurationActivated;
+                    case IXPart part:
+                        part.Configurations.ConfigurationActivated -= OnConfigurationActivated;
+                        part.Features.FeatureCreated -= OnFirstFeatureCreated;
+                        break;
+                    case IXAssembly assm:
+                        assm.Configurations.ConfigurationActivated -= OnConfigurationActivated;
+                        assm.ComponentInserted -= OnFirstComponentInserted;
                         break;
                     case IXDrawing draw:
                         draw.Sheets.SheetActivated -= OnSheetActivated;
+                        if (m_Triggers.Keys.Contains(Triggers_e.ModelingStarted))
+                        {
+                            draw.Sheets.SheetCreated -= OnSheetCreated;
+                            foreach (var sheet in draw.Sheets)
+                            {
+                                sheet.DrawingViews.ViewCreated -= OnFirstDrawingViewCreated;
+                            }
+                        }
                         break;
                 }
 
@@ -142,54 +203,24 @@ namespace Xarial.CadPlus.CustomToolbar.Services
         }
 
         private void OnRebuild(IXDocument doc)
-        {
-            if (doc == m_App.Documents.Active)
-            {
-                InvokeTrigger(Triggers_e.Rebuild, doc);
-            }
-        }
+            => InvokeTrigger(Triggers_e.Rebuild, doc);
 
         private void OnSheetActivated(IXDrawing doc, IXSheet newSheet)
-        {
-            if (doc == m_App.Documents.Active)
-            {
-                InvokeTrigger(Triggers_e.ConfigurationSheetChange, doc);
-            }
-        }
+            => InvokeTrigger(Triggers_e.ConfigurationSheetChange, doc);
 
         private void OnConfigurationActivated(IXDocument3D doc, IXConfiguration newConf)
-        {
-            if (doc == m_App.Documents.Active)
-            {
-                InvokeTrigger(Triggers_e.ConfigurationSheetChange, doc);
-            }
-        }
+            => InvokeTrigger(Triggers_e.ConfigurationSheetChange, doc);
 
         private void OnNewSelection(IXDocument doc, IXSelObject selObject)
-        {
-            if (doc == m_App.Documents.Active)
-            {
-                InvokeTrigger(Triggers_e.Selection, doc);
-            }
-        }
+            => InvokeTrigger(Triggers_e.Selection, doc);
 
         private void OnClearSelection(IXDocument doc)
-        {
-            if (doc == m_App.Documents.Active)
-            {
-                InvokeTrigger(Triggers_e.Selection, doc);
-            }
-        }
+            => InvokeTrigger(Triggers_e.Selection, doc);
 
         private void OnSaving(IXDocument doc, DocumentSaveType_e type,
             DocumentSaveArgs args)
-        {
-            if (doc == m_App.Documents.Active)
-            {
-                InvokeTrigger(Triggers_e.DocumentSave, doc);
-            }
-        }
-        
+            => InvokeTrigger(Triggers_e.DocumentSave, doc);
+
         private Dictionary<Triggers_e, CommandMacroInfo[]> LoadTriggers(CustomToolbarInfo toolbarInfo)
         {
             var triggersCmds = new Dictionary<Triggers_e, CommandMacroInfo[]>();
@@ -213,23 +244,30 @@ namespace Xarial.CadPlus.CustomToolbar.Services
 
             return triggersCmds;
         }
-        
+
         private void InvokeTrigger(Triggers_e trigger, IXDocument targetDoc)
         {
             CommandMacroInfo[] cmds;
 
             if (m_Triggers.TryGetValue(trigger, out cmds))
             {
-                cmds = cmds.Where(c => c.Scope.IsInScope(m_App)).ToArray();
-
-                if (cmds.Any())
+                if (targetDoc == null || targetDoc == m_App.Documents.Active)
                 {
-                    m_Logger.Log($"Invoking {cmds.Length} command(s) for the trigger {trigger}", LoggerMessageSeverity_e.Debug);
+                    cmds = cmds.Where(c => c.Scope.IsInScope(m_App)).ToArray();
 
-                    foreach (var cmd in cmds)
+                    if (cmds.Any())
                     {
-                        m_MacroRunner.TryRunMacroCommand(trigger, cmd, targetDoc, m_WorkDir);
+                        m_Logger.Log($"Invoking {cmds.Length} command(s) for the trigger {trigger}", LoggerMessageSeverity_e.Debug);
+
+                        foreach (var cmd in cmds)
+                        {
+                            m_MacroRunner.TryRunMacroCommand(trigger, cmd, targetDoc, m_WorkDir);
+                        }
                     }
+                }
+                else
+                {
+                    m_Logger.Log($"Trigger {trigger} is skipped as the active doc does not match the target doc", LoggerMessageSeverity_e.Debug);
                 }
             }
         }

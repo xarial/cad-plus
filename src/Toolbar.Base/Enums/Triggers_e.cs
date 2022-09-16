@@ -53,6 +53,10 @@ namespace Xarial.CadPlus.CustomToolbar.Enums
         Rebuild = 1 << 9,
 
         [Browsable(false)]
-        Toggle = 1 << 10
+        Toggle = 1 << 10,
+
+        [Title("Modeling Started")]
+        [Summary("Invoked when first feature, component or drawing view is added to the newly created document")]
+        ModelingStarted = 1 << 11
     }
 }

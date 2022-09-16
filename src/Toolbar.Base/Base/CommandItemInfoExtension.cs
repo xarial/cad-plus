@@ -5,6 +5,7 @@
 //License: https://cadplus.xarial.com/license/
 //*********************************************************************
 
+using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -22,7 +23,7 @@ namespace Xarial.CadPlus.CustomToolbar.Base
 {
     internal static class CommandItemInfoExtension
     {
-        internal static IXImage GetCommandIcon(this CommandItemInfo info, IIconsProvider[] iconsProviders, IFilePathResolver pathResolver, string workDir)
+        internal static IXImage GetCommandIcon(this CommandItemInfo info, IReadOnlyList<IIconsProvider> iconsProviders, IFilePathResolver pathResolver, string workDir)
         {
             IXImage icon = null;
 

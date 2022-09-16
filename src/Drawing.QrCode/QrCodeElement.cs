@@ -17,6 +17,7 @@ using Xarial.XCad.Documents;
 using Xarial.XCad.Documents.Structures;
 using Xarial.XCad.Features;
 using Xarial.XCad.Geometry.Structures;
+using Xarial.XCad.Sketch;
 using Xarial.XCad.SolidWorks.Sketch;
 
 namespace Xarial.CadPlus.Drawing.QrCode

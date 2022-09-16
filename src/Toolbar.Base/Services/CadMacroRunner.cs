@@ -137,6 +137,9 @@ namespace Xarial.CadPlus.CustomToolbar.Services
                 case Triggers_e.Rebuild:
                     eventType = EventType_e.Rebuild;
                     break;
+                case Triggers_e.ModelingStarted:
+                    eventType = EventType_e.FirstFeatureAdded;
+                    break;
                 default:
                     throw new NotSupportedException($"{trigger} is not supported");
             }

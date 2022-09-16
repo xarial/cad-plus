@@ -5,6 +5,7 @@
 //License: https://cadplus.xarial.com/license/
 //*********************************************************************
 
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
@@ -135,10 +136,10 @@ namespace Xarial.CadPlus.CustomToolbar.UI.ViewModels
 
         private string m_WorkingDirectory;
         private BitmapSource m_Icon;
-        private readonly IIconsProvider[] m_IconProviders;
+        private readonly IReadOnlyList<IIconsProvider> m_IconProviders;
         private readonly IFilePathResolver m_FilePathResolver;
 
-        protected CommandVM(TCmdInfo cmd, IIconsProvider[] providers, IFilePathResolver filePathResolver)
+        protected CommandVM(TCmdInfo cmd, IReadOnlyList<IIconsProvider> providers, IFilePathResolver filePathResolver)
         {
             Command = cmd;
             m_IconProviders = providers;

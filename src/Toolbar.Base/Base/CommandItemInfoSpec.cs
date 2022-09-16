@@ -6,6 +6,7 @@
 //*********************************************************************
 
 using System;
+using System.Collections.Generic;
 using Xarial.CadPlus.CustomToolbar.Enums;
 using Xarial.CadPlus.CustomToolbar.Structs;
 using Xarial.CadPlus.Plus.Modules;
@@ -19,7 +20,7 @@ namespace Xarial.CadPlus.CustomToolbar.Base
     {
         internal CommandMacroInfo Info { get; }
 
-        internal CommandItemInfoSpec(CommandMacroInfo info, IIconsProvider[] iconsProviders, IFilePathResolver pathResolver, string workDir) : base(info.Id)
+        internal CommandItemInfoSpec(CommandMacroInfo info, IReadOnlyList<IIconsProvider> iconsProviders, IFilePathResolver pathResolver, string workDir) : base(info.Id)
         {
             Info = info;
 

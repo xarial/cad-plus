@@ -21,6 +21,7 @@ using Xarial.XCad.Data.Enums;
 using Xarial.XCad.Documents;
 using Xarial.XCad.Documents.Services;
 using Xarial.XCad.Features;
+using Xarial.XCad.Sketch;
 using Xarial.XCad.SolidWorks;
 using Xarial.XCad.SolidWorks.Documents;
 using Xarial.XToolkit.Services.Expressions;
