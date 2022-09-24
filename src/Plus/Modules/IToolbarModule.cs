@@ -38,7 +38,7 @@ namespace Xarial.CadPlus.Plus.Modules
         NewSelection,
         ConfigurationChange,
         Rebuild,
-        FirstFeatureAdded
+        ModelingStarted
     }
 
     public interface ICommandMacroInfo
