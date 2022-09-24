@@ -35,6 +35,7 @@ namespace Xarial.CadPlus.CustomToolbar.Enums
         DocumentOpen = 1 << 3,
 
         [Title("Activate Document")]
+        [Summary("Invoked when document is opened in its own window")]
         DocumentActivated = 1 << 4,
 
         [Title("Save Document")]
@@ -50,12 +51,13 @@ namespace Xarial.CadPlus.CustomToolbar.Enums
         ConfigurationSheetChange = 1 << 8,
 
         [Title("Rebuild")]
+        [Summary("Invoked when document is regenerated")]
         Rebuild = 1 << 9,
 
         [Browsable(false)]
         Toggle = 1 << 10,
 
-        [Title("Modeling Started")]
+        [Title("New Document Modeling Started")]
         [Summary("Invoked when first feature, component or drawing view is added to the newly created document")]
         ModelingStarted = 1 << 11
     }
