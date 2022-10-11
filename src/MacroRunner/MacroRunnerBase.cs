@@ -11,6 +11,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using Xarial.CadPlus.Plus.Shared.Helpers;
 using Xarial.XCad;
 using Xarial.XCad.Base;
 using Xarial.XCad.Enums;

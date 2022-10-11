@@ -10,8 +10,8 @@
     <PackageReference Include="nunit" Version="3.13.3" />
     <PackageReference Include="NUnit3TestAdapter" Version="4.2.1" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.2.0" />
-    <PackageReference Include="Xarial.CadPlusPlus" Version="0.4.0-dev.4448" />
-    <PackageReference Include="Xarial.CadPlusPlus.Shared" Version="0.4.0-dev.4448" />
+    <PackageReference Include="Xarial.CadPlusPlus" Version="0.4.0-dev.4458" />
+    <PackageReference Include="Xarial.CadPlusPlus.Shared" Version="0.4.0-dev.4458" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\Common\Common.csproj" />
