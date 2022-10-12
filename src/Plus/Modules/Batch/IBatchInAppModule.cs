@@ -13,15 +13,8 @@ using System.Threading.Tasks;
 using Xarial.CadPlus.Plus.Delegates;
 using Xarial.CadPlus.Plus.UI;
 
-namespace Xarial.CadPlus.Plus.Modules
+namespace Xarial.CadPlus.Plus.Modules.Batch
 {
-    public enum BatchModuleGroup_e 
-    {
-        Input,
-        Macros,
-        Options
-    }
-
     public interface IBatchInAppModule : IModule
     {
         event ProcessInAppBatchInputDelegate ProcessInput;
