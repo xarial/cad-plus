@@ -9,7 +9,7 @@
   <Import Project="$(SolutionDir)common\common.module.props" />
   <ItemGroup>
     <PackageReference Include="System.Linq.Dynamic.Core" Version="1.2.19" />
-    <PackageReference Include="Xarial.CadPlusPlus.Shared" Version="0.4.0-dev.4458" />
+    <PackageReference Include="Xarial.CadPlusPlus.Shared" Version="0.4.0-dev.4460" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\configure-icon.png" />
