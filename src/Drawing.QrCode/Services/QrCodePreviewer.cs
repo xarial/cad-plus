@@ -13,6 +13,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Xarial.CadPlus.Drawing.QrCode.Data;
 using Xarial.CadPlus.Plus.Modules;
+using Xarial.CadPlus.Plus.Modules.QrCode;
 using Xarial.XCad.Documents;
 using Xarial.XCad.Geometry.Structures;
 using Xarial.XCad.SolidWorks.Documents;

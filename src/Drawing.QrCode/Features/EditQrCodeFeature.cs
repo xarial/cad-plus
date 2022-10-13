@@ -17,6 +17,7 @@ using Xarial.CadPlus.Drawing.QrCode.Data;
 using Xarial.CadPlus.Drawing.QrCode.Services;
 using Xarial.CadPlus.Plus.Exceptions;
 using Xarial.CadPlus.Plus.Modules;
+using Xarial.CadPlus.Plus.Modules.QrCode;
 using Xarial.CadPlus.Plus.Services;
 using Xarial.XCad;
 using Xarial.XCad.Base;

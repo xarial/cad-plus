@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Xarial.CadPlus.Plus.Modules;
+using Xarial.CadPlus.Plus.Modules.Toolbar;
 
 namespace Xarial.CadPlus.Toolbar.Services
 {

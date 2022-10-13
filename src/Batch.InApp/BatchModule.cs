@@ -43,6 +43,7 @@ using Xarial.CadPlus.Batch.Base.Services;
 using Xarial.CadPlus.Plus.Shared.ViewModels;
 using Xarial.CadPlus.Plus.Shared.Helpers;
 using Xarial.CadPlus.Plus.Exceptions;
+using Xarial.CadPlus.Plus.Modules.Batch;
 
 namespace Xarial.CadPlus.Batch.InApp
 {

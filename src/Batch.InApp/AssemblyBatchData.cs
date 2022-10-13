@@ -32,6 +32,7 @@ using Xarial.CadPlus.Plus.Modules;
 using Xarial.CadPlus.Plus.Data;
 using Xarial.XCad.Documents.Extensions;
 using Xarial.XToolkit.Wpf.Extensions;
+using Xarial.CadPlus.Plus.Modules.Batch;
 
 namespace Xarial.CadPlus.Batch.InApp
 {

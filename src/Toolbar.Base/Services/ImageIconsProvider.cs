@@ -15,6 +15,7 @@ using System.Threading.Tasks;
 using Xarial.CadPlus.CustomToolbar.Base;
 using Xarial.CadPlus.Plus.Data;
 using Xarial.CadPlus.Plus.Modules;
+using Xarial.CadPlus.Plus.Modules.Toolbar;
 using Xarial.CadPlus.Plus.Shared.Data;
 using Xarial.XCad.UI;
 using Xarial.XToolkit;

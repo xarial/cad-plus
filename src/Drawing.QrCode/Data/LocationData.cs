@@ -8,6 +8,7 @@
 using Xarial.CadPlus.Drawing.QrCode.Properties;
 using Xarial.CadPlus.Plus.Attributes;
 using Xarial.CadPlus.Plus.Modules;
+using Xarial.CadPlus.Plus.Modules.QrCode;
 using Xarial.XCad.UI.PropertyPage.Attributes;
 using Xarial.XCad.UI.PropertyPage.Enums;
 

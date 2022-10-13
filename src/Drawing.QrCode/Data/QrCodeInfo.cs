@@ -14,6 +14,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Xarial.CadPlus.Drawing.QrCode.Services;
 using Xarial.CadPlus.Plus.Modules;
+using Xarial.CadPlus.Plus.Modules.QrCode;
 using Xarial.XCad;
 using Xarial.XCad.Features;
 using Xarial.XCad.Sketch;

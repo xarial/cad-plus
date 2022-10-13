@@ -15,6 +15,7 @@ using Xarial.CadPlus.Plus;
 using Xarial.CadPlus.Plus.Data;
 using Xarial.CadPlus.Plus.Extensions;
 using Xarial.CadPlus.Plus.Modules;
+using Xarial.CadPlus.Plus.Modules.Toolbar;
 using Xarial.CadPlus.Toolbar.Properties;
 using Xarial.CadPlus.Toolbar.Services;
 using Xarial.XCad.UI;

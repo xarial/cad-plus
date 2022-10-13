@@ -34,6 +34,7 @@ using System.IO;
 using Xarial.XToolkit.Services;
 using Xarial.CadPlus.Plus.Extensions;
 using Xarial.CadPlus.Plus.DI;
+using Xarial.CadPlus.Plus.Modules.Toolbar;
 
 namespace Xarial.CadPlus.CustomToolbar
 {

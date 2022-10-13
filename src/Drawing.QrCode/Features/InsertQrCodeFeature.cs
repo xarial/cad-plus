@@ -26,6 +26,7 @@ using Xarial.CadPlus.Drawing.QrCode;
 using Xarial.CadPlus.Drawing.QrCode.Services;
 using Xarial.CadPlus.Drawing.QrCode.Data;
 using Xarial.CadPlus.Plus.Modules;
+using Xarial.CadPlus.Plus.Modules.QrCode;
 
 namespace Xarial.CadPlus.Drawing.QrCode.Features
 {

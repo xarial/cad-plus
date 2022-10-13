@@ -43,6 +43,7 @@ using Xarial.XCad.Features;
 using Xarial.XToolkit.Services.Expressions;
 using System.Collections.Generic;
 using Xarial.XCad.Sketch;
+using Xarial.CadPlus.Plus.Modules.QrCode;
 
 namespace Xarial.CadPlus.Drawing.QrCode
 {

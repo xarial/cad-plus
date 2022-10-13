@@ -7,6 +7,7 @@
 
 using System;
 using Xarial.CadPlus.Plus.Modules;
+using Xarial.CadPlus.Plus.Modules.Toolbar;
 
 namespace Xarial.CadPlus.CustomToolbar.Structs
 {

@@ -11,6 +11,7 @@ using System.Linq;
 using Xarial.CadPlus.CustomToolbar.Enums;
 using Xarial.CadPlus.CustomToolbar.Structs;
 using Xarial.CadPlus.Plus.Modules;
+using Xarial.CadPlus.Plus.Modules.Toolbar;
 using Xarial.CadPlus.Toolbar.Services;
 using Xarial.XCad.UI;
 using Xarial.XCad.UI.Commands.Structures;
