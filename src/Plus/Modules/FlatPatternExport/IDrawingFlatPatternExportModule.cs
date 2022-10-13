@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,6 +14,7 @@ namespace Xarial.CadPlus.Plus.Modules.Drawing.FlatPatternExport
         IXSolidBody Body { get; }
         string OutFilePath { get; }
         FlatPatternOptions_e Options { get; }
+        Color? Color { get; }
         double? FontSize { get; }
         FontSizeType_e FontSizeType { get; }
         string NoteText { get; }
@@ -22,6 +24,6 @@ namespace Xarial.CadPlus.Plus.Modules.Drawing.FlatPatternExport
 
     public interface IDrawingFlatPatternExportModule : IModule
     {
-        IReadOnlyList<IBatchJobItem> BatchExportFlatPattern(IXDocument3D doc, IReadOnlyList<FlatPatternExportData> exportData);
+        IReadOnlyList<IBatchJobItem> BatchExportFlatPatterns(IXDocument3D doc, IReadOnlyList<FlatPatternExportData> exportData);
     }
 }
