@@ -2,14 +2,26 @@
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Xarial.CadPlus.Plus.Services;
+using Xarial.XCad.Documents;
 using Xarial.XCad.Geometry;
 
 namespace Xarial.CadPlus.Plus.Modules.Drawing.FlatPatternExport
 {
+    public interface FlatPatternExportData 
+    {
+        IXSolidBody Body { get; }
+        string OutFilePath { get; }
+        FlatPatternOptions_e Options { get; }
+        double? FontSize { get; }
+        FontSizeType_e FontSizeType { get; }
+        string NoteText { get; }
+        NoteDock_e NoteDock { get; }
+        NoteOrientation_e NoteOrientation { get; }
+    }
+
     public interface IDrawingFlatPatternExportModule : IModule
     {
-        FlatPatternBodyType_e GetType(IXSolidBody body);
-        void ExportFlatPattern(IXSolidBody body, string outFilePath, FlatPatternOptions_e options, double? fontSize = null,
-            FontSizeType_e fontSizeType = FontSizeType_e.Points, string noteText = "", NoteDock_e noteDock = NoteDock_e.Center, NoteOrientation_e noteOrientation = NoteOrientation_e.Auto);
+        IReadOnlyList<IBatchJobItem> BatchExportFlatPattern(IXDocument3D doc, IReadOnlyList<FlatPatternExportData> exportData);
     }
 }
