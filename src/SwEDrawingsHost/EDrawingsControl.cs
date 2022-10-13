@@ -16,6 +16,7 @@ namespace Xarial.CadPlus.Xport.SwEDrawingsHost
         v2020,
         v2021,
         v2022,
+        v2023,
         Default
     }
 
@@ -79,6 +80,8 @@ namespace Xarial.CadPlus.Xport.SwEDrawingsHost
                     return "DF78AAAB-45C8-420C-9DB3-CAD13762FE35";
                 case EDrawingsVersion_e.v2022:
                     return "C59EEF21-0223-4C39-A708-A3BE9008C67E";
+                case EDrawingsVersion_e.v2023:
+                    return "476F8C77-404C-4876-BCCA-0215E6B8BB14";
                 default:
                     throw new NotSupportedException("This version of eDrawings is not supported");
             }
@@ -96,6 +99,8 @@ namespace Xarial.CadPlus.Xport.SwEDrawingsHost
                     return new Guid("CEE0D6AD-C251-430C-BA88-FE237B138B91");
                 case EDrawingsVersion_e.v2022:
                     return new Guid("2EA4AE0F-494C-4554-97AE-F02F3076A90D");
+                case EDrawingsVersion_e.v2023:
+                    return new Guid("7C55F0BE-1262-4BCB-8A19-62E729302003");
                 default:
                     throw new NotSupportedException("This version of eDrawings is not supported");
             }
@@ -177,6 +182,8 @@ namespace Xarial.CadPlus.Xport.SwEDrawingsHost
                     return EDrawingsVersion_e.v2021;
                 case 30:
                     return EDrawingsVersion_e.v2022;
+                case 31:
+                    return EDrawingsVersion_e.v2023;
                 default:
                     throw new NotSupportedException($"Version of eDrawings '{buildNumber}' is not supported");
             }

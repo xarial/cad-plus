@@ -100,7 +100,8 @@ namespace Xarial.CadPlus.Batch.StandAlone.Services
         public BatchMacroRunJobStandAlone(BatchJob job, ICadApplicationInstanceProvider appProvider,
             IBatchApplicationProxy batchAppProxy,
             IJobProcessManager jobMgr, IXLogger logger,
-            IResilientWorker<BatchJobContext> worker, IMacroRunnerPopupHandler popupHandler, ITaskRunner taskRunner, IDocumentMetadataAccessLayerProvider docMalProvider)
+            IResilientWorker<BatchJobContext> worker, IMacroRunnerPopupHandler popupHandler, ITaskRunner taskRunner,
+            IDocumentMetadataAccessLayerProvider docMalProvider)
         {
             m_Job = job;
             m_AppProvider = appProvider;
