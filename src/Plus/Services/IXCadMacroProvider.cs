@@ -10,11 +10,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Xarial.XToolkit;
 
 namespace Xarial.CadPlus.Plus.Services
 {
     public interface IXCadMacroProvider
     {
+        FileFilter Filter { get; }
         IXCadMacro GetMacro(string path);
     }
 }
