@@ -1,9 +1,0 @@
-﻿<?xml version='1.0' encoding='utf-8'?>
-<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="Xarial.CadPlus.Toolbar.Properties" GeneratedClassName="Settings">
-  <Profiles />
-  <Settings>
-    <Setting Name="ToolbarsSpecFile" Type="System.String" Scope="User">
-      <Value Profile="(Default)">toolbars.setts</Value>
-    </Setting>
-  </Settings>
-</SettingsFile>

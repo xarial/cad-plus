@@ -1,7 +1,0 @@
-<Project>
-  <PropertyGroup>
-     <OutputPath>..\_build\</OutputPath>
-	 <TargetFramework>net472</TargetFramework>
-	 <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-  </PropertyGroup>
-</Project>
