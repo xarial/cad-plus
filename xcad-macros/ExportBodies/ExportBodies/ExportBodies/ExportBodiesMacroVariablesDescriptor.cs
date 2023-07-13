@@ -12,7 +12,7 @@ namespace Xarial.CadPlus.Examples
         {
             switch (variable.Name) 
             {
-                case ExportBodiesMacroExpressionSolver.VAR_BODY_NAME:
+                case ExportBodiesMacroVariableValueProvider.VAR_BODY_NAME:
                     dynamic = false;
                     return null;
 
@@ -25,7 +25,7 @@ namespace Xarial.CadPlus.Examples
         {
             switch (variable.Name)
             {
-                case ExportBodiesMacroExpressionSolver.VAR_BODY_NAME:
+                case ExportBodiesMacroVariableValueProvider.VAR_BODY_NAME:
                     return System.Windows.Media.Brushes.LightSlateGray;
 
                 default:
@@ -37,7 +37,7 @@ namespace Xarial.CadPlus.Examples
         {
             switch (variable.Name)
             {
-                case ExportBodiesMacroExpressionSolver.VAR_BODY_NAME:
+                case ExportBodiesMacroVariableValueProvider.VAR_BODY_NAME:
                     return "Name of the body";
 
                 default:
@@ -49,7 +49,7 @@ namespace Xarial.CadPlus.Examples
         {
             switch (variable.Name)
             {
-                case ExportBodiesMacroExpressionSolver.VAR_BODY_NAME:
+                case ExportBodiesMacroVariableValueProvider.VAR_BODY_NAME:
                     return Resources.body.ToBitmapImage(true);
 
                 default:
@@ -61,7 +61,7 @@ namespace Xarial.CadPlus.Examples
         {
             switch (variable.Name)
             {
-                case ExportBodiesMacroExpressionSolver.VAR_BODY_NAME:
+                case ExportBodiesMacroVariableValueProvider.VAR_BODY_NAME:
                     return "Body";
 
                 default:

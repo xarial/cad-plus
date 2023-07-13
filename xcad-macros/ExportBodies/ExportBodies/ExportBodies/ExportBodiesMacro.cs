@@ -19,7 +19,10 @@ using Xarial.XToolkit.Services.Expressions;
 namespace Xarial.CadPlus.Examples
 {
     [XCadMacro]
-    [XCadMacroCustomVariable(ExportBodiesMacroExpressionSolver.VAR_BODY_NAME, typeof(ExportBodiesMacroVariablesDescriptor))]
+    [XCadMacroCustomVariables(typeof(ExportBodiesMacroVariablesDescriptor),
+        typeof(ExportBodiesMacroVariableLinks),
+        typeof(ExportBodiesMacroVariableValueProvider),
+        ExportBodiesMacroVariableValueProvider.VAR_BODY_NAME)]
     [Title("Export Bodies")]
     [Description("Export All Bodies to the specified formats")]
     [Icon(typeof(Resources), nameof(Resources.export_bodies))]
@@ -33,18 +36,10 @@ namespace Xarial.CadPlus.Examples
             {
                 var part = (IXPart)doc;
 
-                var exprParser = operation.Services.GetService<IExpressionParser>();
-
-                var solver = new ExportBodiesMacroExpressionSolver();
-
-                var fileNameTemplates = operation.Arguments?.Where(a => !string.IsNullOrEmpty(a))?.ToArray();
-
-                if (fileNameTemplates?.Any() != true)
+                if (operation.Arguments?.Any() != true)
                 {
                     throw new UserException($"File name templates are not specified");
                 }
-
-                var fileNameTokens = fileNameTemplates.Select(t => exprParser.Parse(t)).ToArray();
 
                 var resFiles = new List<ExportedBodyFile>();
 
@@ -52,9 +47,10 @@ namespace Xarial.CadPlus.Examples
                 {
                     if (body.Visible)
                     {
-                        foreach (var fileNameToken in fileNameTokens)
+                        foreach (var fileNameArg in operation.Arguments)
                         {
-                            var outFilePath = solver.Solve(fileNameToken, body);
+                            var outFilePath = fileNameArg.GetValue(body);
+
                             outFilePath = FileSystemUtils.ReplaceIllegalRelativePathCharacters(outFilePath, c => '_');
 
                             if (!Path.IsPathRooted(outFilePath))
@@ -82,6 +78,14 @@ namespace Xarial.CadPlus.Examples
                         {
                             resFile.Body
                         };
+
+                        var dir = Path.GetDirectoryName(resFile.Path);
+                        
+                        if (!Directory.Exists(dir)) 
+                        {
+                            Directory.CreateDirectory(dir);
+                        }
+
                         saveOp.Commit();
 
                         resFile.Status = JobItemOperationResultFileStatus_e.Succeeded;

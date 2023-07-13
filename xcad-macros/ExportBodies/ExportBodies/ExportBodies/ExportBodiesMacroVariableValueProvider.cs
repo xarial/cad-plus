@@ -4,11 +4,11 @@ using Xarial.XToolkit.Services.Expressions;
 
 namespace Xarial.CadPlus.Examples
 {
-    public class ExportBodiesMacroExpressionSolver : ExpressionSolver<IXBody> 
+    public class ExportBodiesMacroVariableValueProvider : VariableValueProvider<IXBody> 
     {
         public const string VAR_BODY_NAME = "bodyName";
 
-        protected override object SolveVariable(string name, object[] args, IXBody context)
+        public override object Provide(string name, object[] args, IXBody context)
         {
             switch (name)
             {
