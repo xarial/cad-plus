@@ -14,7 +14,6 @@ using Xarial.XCad.Base.Attributes;
 using Xarial.XCad.Documents;
 using Xarial.XCad.Geometry;
 using Xarial.XToolkit;
-using Xarial.XToolkit.Services.Expressions;
 
 namespace Xarial.CadPlus.Examples
 {
@@ -73,7 +72,8 @@ namespace Xarial.CadPlus.Examples
                 {
                     try
                     {
-                        var saveOp = (IXDocument3DSaveOperation)part.PreCreateSaveAsOperation(resFile.Path);
+                        var saveOp = part.PreCreateSaveAsOperation(resFile.Path);
+
                         saveOp.Bodies = new IXBody[]
                         {
                             resFile.Body
