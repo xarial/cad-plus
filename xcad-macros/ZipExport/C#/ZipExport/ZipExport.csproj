@@ -4,7 +4,6 @@
     <TargetFramework>net472</TargetFramework>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <RootNamespace>Xarial.CadPlus.Examples</RootNamespace>
-    <UseWPF>true</UseWPF>
   </PropertyGroup>
 
   <ItemGroup>

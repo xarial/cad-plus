@@ -50,11 +50,10 @@ namespace Xarial.CadPlus.Examples
                         {
                             var outFilePath = fileNameArg.GetValue(body);
 
-                            outFilePath = FileSystemUtils.ReplaceIllegalRelativePathCharacters(outFilePath, c => '_');
-
                             if (!Path.IsPathRooted(outFilePath))
                             {
-                                outFilePath = FileSystemUtils.CombinePaths(Path.GetDirectoryName(doc.Path), outFilePath);
+                                outFilePath = FileSystemUtils.CombinePaths(Path.GetDirectoryName(doc.Path),
+                                    FileSystemUtils.ReplaceIllegalRelativePathCharacters(outFilePath, c => '_'));
                             }
 
                             resFiles.Add(new ExportedBodyFile(outFilePath, body));
