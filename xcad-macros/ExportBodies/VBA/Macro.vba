@@ -4,8 +4,6 @@ Dim swApp As SldWorks.SldWorks
 
 Sub main()
 
-    'Debug.Assert False
-    
     Set swApp = Application.SldWorks
     
     Dim macroOper As IMacroOperation
@@ -84,8 +82,16 @@ Sub TryExportBody(model As SldWorks.ModelDoc2, body As SldWorks.Body2, resFile A
 
 try_:
     On Error GoTo catch_
-        
-    If False <> body.Select2(False, Nothing) Then
+    
+    Dim swSelMgr As SldWorks.SelectionMgr
+    Set swSelMgr = model.SelectionManager
+    
+    swSelMgr.SuspendSelectionList
+    
+    Dim swBodies(0) As SldWorks.Body2
+    Set swBodies(0) = body
+    
+    If swSelMgr.AddSelectionListObjects(swBodies, Nothing) = 1 Then
         
         Dim filePath As String
         filePath = resFile.path
@@ -109,10 +115,12 @@ try_:
 
     GoTo finally_
 catch_:
-        macroOper.ReportIssue Err.Description, MacroIssueType_e_Error
-        resFile.Status = MacroOperationResultFileStatus_e_Failed
+    macroOper.ReportIssue Err.Description, MacroIssueType_e_Error
+    resFile.Status = MacroOperationResultFileStatus_e_Failed
 finally_:
 
+    swSelMgr.ResumeSelectionList2 False
+    
 End Sub
 
 Function GetMacroOperation() As IMacroOperation
@@ -126,8 +134,8 @@ Function GetMacroOperation() As IMacroOperation
         Set swCadPlus = swCadPlusFact.Create(swApp, False)
         
         Dim args(1) As String
-        args(0) = "MFGs\\STEP\\{ path [FileNameWithoutExtension] }-{ confOrSheet }-{ bodyName }.step"
-        args(1) = "MFGs\\IGES\\{ path [FileNameWithoutExtension] }-{ confOrSheet }-{ bodyName }.igs"
+        args(0) = "MFGs\STEP\{ path [FileNameWithoutExtension] }-{ bodyName }.step"
+        args(1) = "MFGs\IGES\{ path [FileNameWithoutExtension] }-{ bodyName }.igs"
         Set macroOper = swCadPlus.CreateMacroOperation(swApp.ActiveDoc, "", args)
     #Else
         Dim macroOprMgr As IMacroOperationManager
