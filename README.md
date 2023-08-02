@@ -8,7 +8,7 @@ COM APIs are exposed in the **\[CAD+ Toolset Installation Folder\]\CadPlusSwAddI
 
 CAD++ is available in Standard edition of CAD+ Toolset or higher.
 
-# CAD+ Macro Runner
+# Macro+
 
 CAD+ enhances the macro execution process when used in **Toolbar+**, **Batch+** (Integrated, Stand-Alone and PDM Professional)
 

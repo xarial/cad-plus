@@ -35,7 +35,7 @@ namespace Xarial.CadPlus.Examples
 
             var doc = operation.Document;
 
-            var firstItem = GetFirstItem(operation.Job.JobItems);
+            var firstItem = operation.Job != null ? GetFirstItem(operation.Job.JobItems) : operation.Item;
             var isFirst = firstItem == operation.Item;
 
             ZipFile zipFile;
@@ -45,6 +45,11 @@ namespace Xarial.CadPlus.Examples
                 var zipWriter = operation.Services.GetService<IZipWriter>();
                 
                 var zipFilePath = operation.Arguments[0].GetValue();
+
+                if (!Path.IsPathRooted(zipFilePath)) 
+                {
+                    zipFilePath = Path.Combine(Path.GetDirectoryName(doc.Path), zipFilePath);
+                }
 
                 var zipDir = Path.GetDirectoryName(zipFilePath);
 
@@ -100,7 +105,7 @@ namespace Xarial.CadPlus.Examples
 
             zipFile.Succeeded &= results.All(r => r == true);
 
-            var isLast = GetLastItem(operation.Job.JobItems) == operation.Item;
+            var isLast = (operation.Job != null ? GetLastItem(operation.Job.JobItems) : operation.Item) == operation.Item;
 
             if (isLast) 
             {
