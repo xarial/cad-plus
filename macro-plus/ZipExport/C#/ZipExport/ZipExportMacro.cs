@@ -35,7 +35,7 @@ namespace Xarial.CadPlus.Examples
 
             var doc = operation.Document;
 
-            var firstItem = operation.Job != null ? GetFirstItem(operation.Job.JobItems) : operation.Item;
+            var firstItem = GetFirstItem(operation.Job.JobItems);
             var isFirst = firstItem == operation.Item;
 
             ZipFile zipFile;
@@ -105,7 +105,7 @@ namespace Xarial.CadPlus.Examples
 
             zipFile.Succeeded &= results.All(r => r == true);
 
-            var isLast = (operation.Job != null ? GetLastItem(operation.Job.JobItems) : operation.Item) == operation.Item;
+            var isLast = GetLastItem(operation.Job.JobItems) == operation.Item;
 
             if (isLast) 
             {
