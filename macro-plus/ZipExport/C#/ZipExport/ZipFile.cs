@@ -15,18 +15,20 @@ namespace Xarial.CadPlus.Examples
     {
         public string Path { get; }
         public JobItemOperationResultFileStatus_e Status { get; set; }
-        
-        public IZipStream ZipStream { get; }
+
+        public IZipStream ZipStream => m_ZipStreamLazy.Value;
 
         public bool Succeeded { get; set; }
         public string TempFolder { get; }
 
         private readonly IXLogger m_Logger;
 
-        public ZipFile(string path, IZipStream zipStream, IXLogger logger)
+        private readonly Lazy<IZipStream> m_ZipStreamLazy;
+
+        public ZipFile(string path, Lazy<IZipStream> zipStreamLazy, IXLogger logger)
         {
             Path = path;
-            ZipStream = zipStream;
+            m_ZipStreamLazy = zipStreamLazy;
 
             m_Logger = logger;
 
@@ -38,7 +40,10 @@ namespace Xarial.CadPlus.Examples
 
         public void Dispose()
         {
-            ZipStream.Dispose();
+            if (m_ZipStreamLazy.IsValueCreated)
+            {
+                ZipStream.Dispose();
+            }
             
             try
             {

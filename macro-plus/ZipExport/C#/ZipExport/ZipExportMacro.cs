@@ -58,7 +58,7 @@ namespace Xarial.CadPlus.Examples
                     Directory.CreateDirectory(zipDir);
                 }
 
-                zipFile = new ZipFile(zipFilePath, zipWriter.Write(zipFilePath), operation.Logger);
+                zipFile = new ZipFile(zipFilePath, new Lazy<IZipStream>(() => zipWriter.Write(zipFilePath)), operation.Logger);
 
                 operation.SetResult(zipFile);
             }
