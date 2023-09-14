@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Windows.Controls;
 using Xarial.CadPlus.Examples.Properties;
 using Xarial.CadPlus.Plus;
 using Xarial.CadPlus.Plus.Attributes;
@@ -12,6 +13,7 @@ using Xarial.CadPlus.Plus.Job;
 using Xarial.XCad.Base;
 using Xarial.XCad.Base.Attributes;
 using Xarial.XCad.Documents;
+using Xarial.XCad.Features;
 using Xarial.XCad.Geometry;
 using Xarial.XToolkit;
 
@@ -21,7 +23,7 @@ namespace Xarial.CadPlus.Examples
     [XCadMacroCustomVariables(typeof(ExportBodiesMacroVariablesDescriptor),
         typeof(ExportBodiesMacroVariableLinks),
         typeof(ExportBodiesMacroVariableValueProvider),
-        ExportBodiesMacroVariableValueProvider.VAR_BODY_NAME)]
+        ExportBodiesMacroVariableValueProvider.VAR_BODY_NAME, ExportBodiesMacroVariableValueProvider.VAR_CUT_LIST_PRP, ExportBodiesMacroVariableValueProvider.VAR_QTY)]
     [Title("Export Bodies")]
     [Description("Export All Bodies to the specified formats")]
     [Icon(typeof(Resources), nameof(Resources.export_bodies))]
@@ -42,26 +44,19 @@ namespace Xarial.CadPlus.Examples
 
                 var resFiles = new List<ExportedBodyFile>();
 
-                foreach (var body in part.Bodies) 
+                foreach (var bodyInfo in EnumerateBodies(part)) 
                 {
-                    if (body.Visible)
+                    foreach (var fileNameArg in operation.Arguments)
                     {
-                        foreach (var fileNameArg in operation.Arguments)
+                        var outFilePath = fileNameArg.GetValue(bodyInfo);
+
+                        if (!Path.IsPathRooted(outFilePath))
                         {
-                            var outFilePath = fileNameArg.GetValue(body);
-
-                            if (!Path.IsPathRooted(outFilePath))
-                            {
-                                outFilePath = FileSystemUtils.CombinePaths(Path.GetDirectoryName(doc.Path),
-                                    FileSystemUtils.ReplaceIllegalRelativePathCharacters(outFilePath, c => '_'));
-                            }
-
-                            resFiles.Add(new ExportedBodyFile(outFilePath, body));
+                            outFilePath = FileSystemUtils.CombinePaths(Path.GetDirectoryName(doc.Path),
+                                FileSystemUtils.ReplaceIllegalRelativePathCharacters(outFilePath, c => '_'));
                         }
-                    }
-                    else 
-                    {
-                        operation.Log($"Body '{body.Name}' in '{doc.Path}' is hidden");
+
+                        resFiles.Add(new ExportedBodyFile(outFilePath, bodyInfo.Body));
                     }
                 }
 
@@ -71,6 +66,8 @@ namespace Xarial.CadPlus.Examples
                 {
                     try
                     {
+                        operation.Log($"Exporting '{resFile.Body.Name}' to '{resFile.Path}'");
+
                         var saveOp = part.PreCreateSaveAsOperation(resFile.Path);
 
                         saveOp.Bodies = new IXBody[]
@@ -99,6 +96,26 @@ namespace Xarial.CadPlus.Examples
             else 
             {
                 throw new UserException("Only part files are supported");
+            }
+        }
+
+        private IEnumerable<BodyInfo> EnumerateBodies(IXPart part)
+        {
+            var cutLists = part.Configurations.Active.CutLists.ToArray();
+
+            if (cutLists.Any())
+            {
+                foreach (var cutList in cutLists) 
+                {
+                    yield return new BodyInfo(cutList.Bodies.First(), cutList.Name, cutList.Quantity(), cutList.Properties);
+                }
+            }
+            else
+            {
+                foreach (var body in part.Bodies)
+                {
+                    yield return new BodyInfo(body, body.Name, 1, null);
+                }
             }
         }
     }

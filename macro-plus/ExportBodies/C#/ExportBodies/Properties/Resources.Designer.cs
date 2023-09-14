@@ -73,9 +73,29 @@ namespace Xarial.CadPlus.Examples.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap cut_list_prp {
+            get {
+                object obj = ResourceManager.GetObject("cut_list_prp", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap export_bodies {
             get {
                 object obj = ResourceManager.GetObject("export-bodies", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap qty {
+            get {
+                object obj = ResourceManager.GetObject("qty", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
