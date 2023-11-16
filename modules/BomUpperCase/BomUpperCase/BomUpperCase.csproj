@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<ModuleName>BomUpperCase</ModuleName>
+		<TargetFramework>net472</TargetFramework>
+		<RootNamespace>Xarial.CadPlus.Plus.Samples</RootNamespace>
+		<OutputPath>$(LocalAppData)\Xarial\CADPlusToolset\Plus\$(MSBuildProjectName)</OutputPath>
+		<AssemblyName>$(MSBuildProjectName).Module</AssemblyName>
+		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Xarial.CadPlusPlus" Version="0.4.0-beta.4906" />
+	</ItemGroup>
+
+</Project>
