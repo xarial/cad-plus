@@ -1,27 +1,23 @@
-# CAD+ Toolset API (CAD++)
+<img src="logo.svg" alt="CAD+ Toolset" width="300">
 
-CAD+ Toolset enables extensibility via custom modules, extension of the existing modules and COM API
+CAD+ Toolset is the SOLIDWORKS Solution Partner product which complements functionality of SOLIDWORKS by enabling additional toolsets. Application allows to automate various areas of SOLIDWORKS application
 
-CAD++ SDK is available in the [Xarial.CadPlusPlus](https://www.nuget.org/packages/Xarial.CadPlusPlus) nuget package
+* [eXport+](https://cadplus.xarial.com/export/)
+* [Batch+](https://cadplus.xarial.com/batch/)
+* [Toolbar+](https://cadplus.xarial.com/toolbar)
+* [Drawings+ - Export Flat Patterns](https://cadplus.xarial.com/drawing/export-flat-patterns/)
+* [Drawings+ - QR Code Generator](https://cadplus.xarial.com/drawing/qr-code/)
+* [Properties+](https://cadplus.xarial.com/properties/)
+* [Assembly+ - Components Evaluation Report](https://cadplus.xarial.com/assembly/components-evaluation-report/)
+* [BOM+](https://cadplus.xarial.com/bom/)
+* [SOLIDWORKS PDM Professional Integration](https://cadplus.xarial.com/swpdm/)
+* [Macro+](https://cadplus.xarial.com/macro-plus/)
 
-COM APIs are exposed in the **\[CAD+ Toolset Installation Folder\]\CadPlusSwAddInComAPI.tlb** type library
+CAD+ Toolset can be extended by using CAD+ Toolset API
 
-CAD++ is available in Standard edition of CAD+ Toolset or higher.
+* [.NET modules (CAD++)](https://cadplus.xarial.com/extensibility/cad-plus-plus/)
+* [COM API](https://cadplus.xarial.com/extensibility/com-api/)
+* [VBA Macro++](https://cadplus.xarial.com/macro-plus/vba-macro/)
+* [xCAD .NET Macro](https://cadplus.xarial.com/macro-plus/xcad-macro/)
 
-# Macro+
-
-CAD+ enhances the macro execution process when used in **Toolbar+**, **Batch+** (Integrated, Stand-Alone and PDM Professional)
-
-## VBA Macros
-
-COM APIs for VBA macros are exposed in the **\[CAD+ Toolset Installation Folder\]\Xarial.CadPlus.MacroRunner.tlb** type library
-
-* Macro can accept arguments with expressions
-    * Custom variable can be handled in the expression
-* Macro can return the operation result
-* Macro can output log and trace messages
-* Macro can report custom status messages
-
-## xCAD.NET Macros
-
-* Macros can be created in C# or VB.NET via CAD++ SDK which is available in the [Xarial.CadPlusPlus](https://www.nuget.org/packages/Xarial.CadPlusPlus) nuget package
+This repository contains examples of the CAD+ extensibility
