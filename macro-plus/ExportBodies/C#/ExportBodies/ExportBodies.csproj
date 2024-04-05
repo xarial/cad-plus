@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Xarial.CadPlusPlus" Version="0.4.0-beta.4906" />
+    <PackageReference Include="Xarial.CadPlusPlus" Version="0.4.1" />
   </ItemGroup>
 
   <ItemGroup>
