@@ -4,13 +4,29 @@
 		<ModuleName>BomUpperCase</ModuleName>
 		<TargetFramework>net472</TargetFramework>
 		<RootNamespace>Xarial.CadPlus.Plus.Samples</RootNamespace>
-		<OutputPath>$(LocalAppData)\Xarial\CADPlusToolset\Plus\$(MSBuildProjectName)</OutputPath>
 		<AssemblyName>$(MSBuildProjectName).Module</AssemblyName>
 		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Xarial.CadPlusPlus" Version="0.4.0-beta.4906" />
+		<PackageReference Include="Xarial.CadPlusPlus" Version="0.4.1" />
 	</ItemGroup>
+
+  <PropertyGroup>
+    <ModuleDirectory>$(LocalAppData)\Xarial\CADPlusToolset\Plus\$(MSBuildProjectName)</ModuleDirectory>
+  </PropertyGroup>
+
+  <Target Name="RegisterModule" AfterTargets="Build">
+    <Message Importance="High" Text="Registering CAD+ module '$(ModuleDirectory)'" />
+    <ItemGroup>
+      <ModuleFiles Include="$(TargetDir)\**\*.*"/>
+    </ItemGroup>
+    <Copy SourceFiles="@(ModuleFiles)" DestinationFolder="$(ModuleDirectory)" />
+  </Target>
+
+  <Target Name="UnregisterModule" BeforeTargets="Clean">
+    <Message Importance="High" Text="Unregistering CAD+ module '$(ModuleDirectory)'" />
+    <RemoveDir Directories="$(ModuleDirectory)" />
+  </Target>
 
 </Project>
