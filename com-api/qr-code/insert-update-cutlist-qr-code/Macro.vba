@@ -92,17 +92,17 @@ Function TryGetSingleCutListName(sheet As SldWorks.sheet, ByRef cutListName As S
     Set swView = sheet.GetViews()(0)
     
     If swView.GetBodiesCount() = 1 Then
-    
+               
         Dim swRefDoc As SldWorks.ModelDoc2
         
         Set swRefDoc = swView.ReferencedDocument
         
         Dim swBody As SldWorks.Body2
         Set swBody = swView.Bodies(0)
-        
+               
         Dim swCutList As SldWorks.Feature
         
-        Set swCutList = GetCutListFromBody(swRefDoc, swBody)
+        Set swCutList = GetCutListFromBody(swRefDoc, swView.ReferencedConfiguration, swBody)
         
         If Not swCutList Is Nothing Then
             TryGetSingleCutListName = True
@@ -119,7 +119,19 @@ Function TryGetSingleCutListName(sheet As SldWorks.sheet, ByRef cutListName As S
     
 End Function
 
-Function GetCutListFromBody(model As SldWorks.ModelDoc2, body As SldWorks.Body2) As SldWorks.Feature
+Function GetCutListFromBody(model As SldWorks.ModelDoc2, confName As String, body As SldWorks.Body2) As SldWorks.Feature
+    
+    Dim activeConf As String
+    activeConf = model.ConfigurationManager.ActiveConfiguration.Name
+    
+    If LCase(activeConf) <> LCase(confName) Then
+        model.ShowConfiguration2 confName
+    End If
+    
+    Dim hasError As Boolean
+    
+try_:
+    On Error GoTo catch_
     
     Dim swFeat As SldWorks.Feature
     Dim swBodyFolder As SldWorks.BodyFolder
@@ -146,7 +158,7 @@ Function GetCutListFromBody(model As SldWorks.ModelDoc2, body As SldWorks.Body2)
                     
                     If LCase(swCutListBody.Name) = LCase(body.Name) Then
                         Set GetCutListFromBody = swFeat
-                        Exit Function
+                        GoTo finally_
                     End If
                     
                 Next
@@ -157,6 +169,21 @@ Function GetCutListFromBody(model As SldWorks.ModelDoc2, body As SldWorks.Body2)
         Set swFeat = swFeat.GetNextFeature
         
     Loop
+    
+    hasError = False
+    GoTo finally_
+    
+catch_:
+    hasError = True
+finally_:
+
+    If LCase(activeConf) <> LCase(confName) Then
+        model.ShowConfiguration2 activeConf
+    End If
+    
+    If hasError Then
+        Err.Raise Err.Number, Err.Source, Err.Description, Err.HelpFile, Err.HelpContext
+    End If
 
 End Function
 
